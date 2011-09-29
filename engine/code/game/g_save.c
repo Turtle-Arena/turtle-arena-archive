@@ -151,7 +151,7 @@ void G_LoadGame(fileHandle_t f)
 
 	// The server should check but just in case...
 	if (loadData.version != SAVE_VERSION) {
-	    G_Printf( "Error: Unsupported savegame version, %i\n", loadData.version);
+	    G_Error( "Unsupported savegame version, %i\n", loadData.version);
         return;
 	}
 
@@ -163,10 +163,6 @@ void G_LoadGameClientEx(int gameClient, int saveClient)
 	int j;
 	gclient_t *client;
 	save_client_t *saved;
-
-	if (loadData.version != SAVE_VERSION) {
-        return;
-	}
 
 	if (clientLoad[saveClient]) {
 		return;
@@ -188,6 +184,7 @@ void G_LoadGameClientEx(int gameClient, int saveClient)
 	}
 
 	trap_SendServerCommand( gameClient, va("spPlayer %s %s", saved->model, saved->headModel) );
+	// ZTM: FIXME: Change model now! (Otherwise can see model change!)
 
 	for (j = 0; j < MAX_HOLDABLE; j++)
 	{
@@ -214,6 +211,11 @@ void G_LoadGameClient(int gameClient)
 	int saveClient;
 	int i;
 
+	// Check if save game was loaded.
+	if (loadData.version != SAVE_VERSION) {
+        return;
+	}
+
 	// Bots don't save data in save files.
 	if (g_entities[gameClient].r.svFlags & SVF_BOT) {
 		return;
@@ -231,6 +233,11 @@ void G_LoadGameClient(int gameClient)
 	}
 
 	saveClient = gameClient - firstHumanGameClient;
+
+	if (saveClient < 0) {
+		G_Error("Invalid saved client, %d\n", saveClient);
+		return;
+	}
 
 	//G_Printf("DEBUG: Human client (%d) in saveData slot (%d)?...\n", gameClient, saveClient);
 
