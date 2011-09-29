@@ -120,7 +120,8 @@ static void LoadGame_MenuEvent( void *ptr, int event ) {
 	switch( ((menucommon_s*)ptr)->id ) {
 	case ID_GO:
 		UI_ForceMenuOff ();
-		trap_Cmd_ExecuteText( EXEC_APPEND, va( "loadgame %s\n", // TA_SP
+		trap_Cvar_Set("g_saveFileName", s_savegames.list.itemnames[s_savegames.list.curvalue]);
+		trap_Cmd_ExecuteText( EXEC_APPEND, va( "loadgame %s\n",
 								s_savegames.list.itemnames[s_savegames.list.curvalue]) );
 		break;
 
@@ -366,8 +367,25 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 	{
 		default:
 		case ID_SP_NEWGAME:
+		{
+			qtime_t	now;
+			char		*nowString;
+
+			// Automaticly set filename based on current time.
+			trap_RealTime( &now );
+			nowString = va( "%04d%02d%02d%02d%02d%02d",
+					1900 + now.tm_year,
+					1 + now.tm_mon,
+					now.tm_mday,
+					now.tm_hour,
+					now.tm_min,
+					now.tm_sec );
+
+			trap_Cvar_Set("g_saveFileName", nowString);
+
 			UI_SPPlayerMenu(UI_GetArenaInfoByNumber(0));
 			break;
+		}
 
 		case ID_SP_LOADGAME:
 			UI_LoadGameMenu();
