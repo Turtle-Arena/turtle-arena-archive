@@ -71,7 +71,7 @@ ifndef BUILD_GAME_QVM
   BUILD_GAME_QVM   =
 endif
 ifndef BUILD_FINAL
-  BUILD_FINAL=0
+  BUILD_FINAL      =0
 endif
 
 ifndef USE_FREETYPE

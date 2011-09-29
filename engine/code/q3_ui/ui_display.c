@@ -151,15 +151,6 @@ DisplayOptions_UpdateMenuItems
 */
 static void DisplayOptions_UpdateMenuItems( void )
 {
-	/*if ( displayOptionsInfo.openal.curvalue == 1 )
-	{
-		displayOptionsInfo.quality.generic.flags |= QMF_GRAYED;
-	}
-	else
-	{
-		displayOptionsInfo.quality.generic.flags &= ~QMF_GRAYED;
-	}*/
-
 	displayOptionsInfo.apply.generic.flags |= QMF_HIDDEN|QMF_INACTIVE;
 
 	if ( displayOptionsInfo.greyscale_default != displayOptionsInfo.greyscale.curvalue )

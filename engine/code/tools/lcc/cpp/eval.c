@@ -107,13 +107,7 @@ eval(Tokenrow *trp, int kw)
 
 	trp->tp++;
 	if (kw==KIFDEF || kw==KIFNDEF) {
-		if (
-#if 1 // ZTM: FIXME: Only happens on 64 bit Turtle Arena
-		(trp->lp - trp->bp != 4 && trp->lp - trp->bp != 5) ||
-#else
-		trp->lp - trp->bp != 4 ||
-#endif
-		trp->tp->type!=NAME) {
+		if (trp->lp - trp->bp != 4 || trp->tp->type!=NAME) {
 			error(ERROR, "Syntax error in #ifdef/#ifndef");
 			return 0;
 		}
