@@ -1227,7 +1227,7 @@ void G_InitBots( qboolean restart ) {
 
 		if ( !fragLimit && !timeLimit ) {
 #ifdef NOTRATEDM // frag to score
-			trap_Cvar_Set( "scorelimit", "500" );
+			trap_Cvar_Set( "scorelimit", "1000" );
 #else
 			trap_Cvar_Set( "fraglimit", "10" );
 #endif
