@@ -3443,18 +3443,6 @@ static void FS_Startup( const char *gameName )
 	fs_gamedirvar = Cvar_Get ("fs_game", "", CVAR_INIT|CVAR_SYSTEMINFO );
 
 	// add search path elements in reverse priority order
-#if !defined WIN32 && !defined MACOS_X
-	if (fs_basepath->string[0] == '.' && !FS_BaseFileExists("default.cfg")
-		&& !FS_BaseFileExists("pak0.pk3") && !FS_BaseFileExists("assets0.pk3"))
-	{
-		// Required files are missing, use location of the Deb package data
-#ifdef TA_MAIN
-		Cvar_Set("fs_basepath", "/usr/share/games/turtlearena" );
-#else
-		Cvar_Set("fs_basepath", "/usr/share/games/quake3" );
-#endif
-	}
-#endif
 	if (fs_basepath->string[0]) {
 		FS_AddGameDirectory( fs_basepath->string, gameName );
 	}
