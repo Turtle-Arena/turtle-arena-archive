@@ -105,13 +105,14 @@ send "\b \b"
 static void CON_Back( void )
 {
 	char key;
+	size_t UNUSED_VAR size;
 
 	key = '\b';
-	write(STDOUT_FILENO, &key, 1);
+	size = write(STDOUT_FILENO, &key, 1);
 	key = ' ';
-	write(STDOUT_FILENO, &key, 1);
+	size = write(STDOUT_FILENO, &key, 1);
 	key = '\b';
-	write(STDOUT_FILENO, &key, 1);
+	size = write(STDOUT_FILENO, &key, 1);
 }
 
 /*
@@ -162,12 +163,13 @@ static void CON_Show( void )
 		ttycon_hide--;
 		if (ttycon_hide == 0)
 		{
-			write(STDOUT_FILENO, "]", 1);
+			size_t UNUSED_VAR size;
+			size = write(STDOUT_FILENO, "]", 1);
 			if (TTY_con.cursor)
 			{
 				for (i=0; i<TTY_con.cursor; i++)
 				{
-					write(STDOUT_FILENO, TTY_con.buffer+i, 1);
+					size = write(STDOUT_FILENO, TTY_con.buffer+i, 1);
 				}
 			}
 		}
@@ -380,6 +382,7 @@ char *CON_Input( void )
 #else
 	field_t *history;
 #endif
+	size_t UNUSED_VAR size;
 
 	if(ttycon_on)
 	{
@@ -420,8 +423,8 @@ char *CON_Input( void )
 					Q_strncpyz(text, TTY_con.buffer, sizeof(text));
 					Field_Clear(&TTY_con);
 					key = '\n';
-					write(STDOUT_FILENO, &key, 1);
-					write(STDOUT_FILENO, "]", 1);
+					size = write(STDOUT_FILENO, &key, 1);
+					size = write(STDOUT_FILENO, "]", 1);
 					return text;
 				}
 				if (key == '\t')
@@ -490,7 +493,7 @@ char *CON_Input( void )
 			TTY_con.cursor++;
 #ifndef __wii__
 			// print the current line (this is differential)
-			write(STDOUT_FILENO, &key, 1);
+			size = write(STDOUT_FILENO, &key, 1);
 #endif
 		}
 

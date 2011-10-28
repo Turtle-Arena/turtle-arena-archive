@@ -1127,7 +1127,7 @@ Returns filesize and an open FILE pointer.
 */
 extern qboolean		com_fullyInitialized;
 
-long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_t *file, qboolean uniqueFILE)
+long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_t *file, qboolean uniqueFILE, qboolean unpure)
 {
 	long			hash;
 	pack_t		*pak;
@@ -1236,7 +1236,7 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 		if(search->pack->hashTable[hash])
 		{
 			// disregard if it doesn't match one of the allowed pure pak files
-			if(!FS_PakIsPure(search->pack))
+			if(!unpure && !FS_PakIsPure(search->pack))
 			{
 				*file = 0;
 				return -1;
@@ -1340,7 +1340,7 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 		//   this test can make the search fail although the file is in the directory
 		// I had the problem on https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=8
 		// turned out I used FS_FileExists instead
-		if(fs_numServerPaks)
+		if(!unpure && fs_numServerPaks)
 		{
 			if(!FS_IsExt(filename, ".cfg", len) &&		// for config files
 			   !FS_IsExt(filename, ".menu", len) &&		// menu files
@@ -1404,7 +1404,7 @@ long FS_FOpenFileRead(const char *filename, fileHandle_t *file, qboolean uniqueF
 
 	for(search = fs_searchpaths; search; search = search->next)
 	{
-	        len = FS_FOpenFileReadDir(filename, search, file, uniqueFILE);
+	        len = FS_FOpenFileReadDir(filename, search, file, uniqueFILE, qfalse);
 	        
 	        if(file == NULL)
 	        {
@@ -1488,7 +1488,7 @@ vmInterpret_t FS_FindVM(void **startSearch, char *found, int foundlen, const cha
 				}
 			}
 
-			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse) > 0)
+			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse, qfalse) > 0)
 			{
 				*startSearch = search;
 				return VMI_COMPILED;
@@ -1510,7 +1510,7 @@ vmInterpret_t FS_FindVM(void **startSearch, char *found, int foundlen, const cha
                                 }
 		        }
 
-			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse) > 0)
+			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse, qfalse) > 0)
 			{
 				*startSearch = search;
 
@@ -1815,7 +1815,7 @@ a null buffer will just return the file length without loading
 If searchPath is non-NULL search only in that specific search path
 ============
 */
-long FS_ReadFileDir(const char *qpath, void *searchPath, void **buffer)
+long FS_ReadFileDir(const char *qpath, void *searchPath, qboolean unpure, void **buffer)
 {
 	fileHandle_t	h;
 	searchpath_t	*search;
@@ -1888,7 +1888,7 @@ long FS_ReadFileDir(const char *qpath, void *searchPath, void **buffer)
 	else
 	{
 		// look for it in a specific search path only
-		len = FS_FOpenFileReadDir(qpath, search, &h, qfalse);
+		len = FS_FOpenFileReadDir(qpath, search, &h, qfalse, unpure);
 	}
 
 	if ( h == 0 ) {
@@ -1947,7 +1947,7 @@ a null buffer will just return the file length without loading
 */
 long FS_ReadFile(const char *qpath, void **buffer)
 {
-	return FS_ReadFileDir(qpath, NULL, buffer);
+	return FS_ReadFileDir(qpath, NULL, qfalse, buffer);
 }
 
 /*
@@ -2957,7 +2957,7 @@ qboolean FS_Which(const char *filename, void *searchPath)
 {
 	searchpath_t *search = searchPath;
 
-	if(FS_FOpenFileReadDir(filename, search, NULL, qfalse) > 0)
+	if(FS_FOpenFileReadDir(filename, search, NULL, qfalse, qfalse) > 0)
 	{
 		if(search->pack)
 		{

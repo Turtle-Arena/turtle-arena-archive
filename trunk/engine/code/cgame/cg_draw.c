@@ -2756,7 +2756,12 @@ static void CG_DrawCrosshair(void)
 		trap_R_SetColor( NULL );
 	}
 
-	w = h = cg_crosshairSize.value;
+	if (cg.numViewports > 1) {
+		// In splitscreen make crosshair normal [non-splitscreen] size, so it is easier to see.
+		w = h = cg_crosshairSize.value * 2.0f;
+	} else {
+		w = h = cg_crosshairSize.value;
+	}
 
 	// pulse the size of the crosshair when picking up items
 	f = cg.time - cg.cur_lc->itemPickupBlendTime;
@@ -2768,9 +2773,6 @@ static void CG_DrawCrosshair(void)
 
 	x = cg_crosshairX.integer;
 	y = cg_crosshairY.integer;
-#ifndef IOQ3ZTM // HUD_ASPECT_CORRECT
-	CG_AdjustFrom640( &x, &y, &w, &h );
-#endif
 
 	ca = cg_drawCrosshair.integer;
 	if (ca < 0) {
@@ -2778,13 +2780,7 @@ static void CG_DrawCrosshair(void)
 	}
 	hShader = cgs.media.crosshairShader[ ca % NUM_CROSSHAIRS ];
 
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
 	CG_DrawPic( ((SCREEN_WIDTH-w)*0.5f)+x, ((SCREEN_HEIGHT-h)*0.5f)+y, w, h, hShader );
-#else
-	trap_R_DrawStretchPic( x + cg.refdef.x + 0.5 * (cg.refdef.width - w), 
-		y + cg.refdef.y + 0.5 * (cg.refdef.height - h), 
-		w, h, 0, 0, 1, 1, hShader );
-#endif
 }
 
 /*
