@@ -5,7 +5,7 @@
 #
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 56
+IOQ3ZTM_REVISION = 57
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
