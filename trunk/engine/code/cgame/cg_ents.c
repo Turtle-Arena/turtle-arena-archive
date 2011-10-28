@@ -1666,14 +1666,13 @@ static void CG_TeamBase( centity_t *cent ) {
 #ifdef IOQ3ZTM
 			if (c < 0.6f && (t & 100)) {
 				// ZTM: Smoke particles
-				localEntity_t	*smoke;
 				vec3_t			up = {0, 0, 1};
 				vec3_t			origin;
 
 				VectorCopy(cent->lerpOrigin, origin);
 				origin[2] += 56;
 
-				smoke = CG_SmokePuff( origin, up,
+				CG_SmokePuff( origin, up,
 						  32,
 						  1, 1, 1, 0.33f,
 						  100,

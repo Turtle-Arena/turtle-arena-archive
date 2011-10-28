@@ -975,8 +975,7 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 	int		step;
 	vec3_t	origin, lastPos;
 	int		t;
-	int		startTime, contents;
-	int		lastContents;
+	int		startTime;
 	entityState_t	*es;
 	vec3_t	up;
 	localEntity_t	*smoke;
@@ -996,7 +995,6 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 	t = step * ( (startTime + step) / step );
 
 	BG_EvaluateTrajectory( &es->pos, cg.time, origin );
-	contents = CG_PointContents( origin, -1 );
 
 	// if object (e.g. grenade) is stationary, don't toss up smoke
 	if ( es->pos.trType == TR_STATIONARY ) {
@@ -1005,16 +1003,8 @@ static void CG_SparkTrail( centity_t *ent, const projectileInfo_t *wi )
 	}
 
 	BG_EvaluateTrajectory( &es->pos, ent->trailTime, lastPos );
-	lastContents = CG_PointContents( lastPos, -1 );
 
 	ent->trailTime = cg.time;
-
-	/*if ( contents & ( CONTENTS_WATER | CONTENTS_SLIME | CONTENTS_LAVA ) ) {
-		if ( contents & lastContents & CONTENTS_WATER ) {
-			CG_BubbleTrail( lastPos, origin, 8 );
-		}
-		return;
-	}*/
 
 	for ( ; t <= ent->trailTime ; t += step ) {
 		BG_EvaluateTrajectory( &es->pos, t, lastPos );
@@ -2352,7 +2342,6 @@ Allow the shader to be per-weapon
 */
 void CG_AddWeaponTrailOld(centity_t *cent, refEntity_t *gun, int weaponHand)
 {
-	weapon_t weaponNum;
 	refEntity_t trail;
 	vec3_t		angles, dir;
 	float		angle, d;
@@ -2387,8 +2376,6 @@ void CG_AddWeaponTrailOld(centity_t *cent, refEntity_t *gun, int weaponHand)
 
 	yawAngle = &cent->pe.weaponTrails[weaponHand].yawAngle;
 	yawing = &cent->pe.weaponTrails[weaponHand].yawing;
-
-	weaponNum = cent->currentState.weapon;
 
 	clientNum = cent->currentState.clientNum;
 	if ( clientNum >= 0 && clientNum < MAX_CLIENTS ) {
@@ -3818,7 +3805,6 @@ void CG_FireWeapon( centity_t *cent ) {
 	entityState_t *ent;
 	int				c;
 #ifdef TA_WEAPSYS
-	weaponGroupInfo_t	*weap;
 	int				hand;
 #ifndef TURTLEARENA // POWERS
 	qboolean		firstValid = qtrue;
@@ -3844,9 +3830,7 @@ void CG_FireWeapon( centity_t *cent ) {
 #endif
 		return;
 	}
-#ifdef TA_WEAPSYS
-	weap = &cg_weapongroups[ ent->weapon ];
-#else
+#ifndef TA_WEAPSYS
 	weap = &cg_weapons[ ent->weapon ];
 #endif
 
@@ -4081,7 +4065,6 @@ Cool wall hit effects, note that the "particles" are models not sprites.
 #define	EXP_JUMP		150
 void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFlags, int skipNum )
 {
-	localEntity_t	*le;
 	int i, j;
 	//int k;
 	int numParticles;
@@ -4180,7 +4163,7 @@ void CG_ImpactParticles( vec3_t origin, vec3_t dir, float radius, int surfaceFla
 				//}
 
 				model = cgs.media.matModels[i][rand()%cgs.media.matNumModels[i]];
-				le = CG_LaunchModel(newOrigin, velocity, model, radius/4);
+				CG_LaunchModel(newOrigin, velocity, model, radius/4);
 			}
 		}
 	}
@@ -4732,6 +4715,10 @@ void CG_MissileImpact( int projnum, int clientNum, vec3_t origin, vec3_t dir, im
 				sfx = cg_projectiles[projnum].impactSound[2];
 			}
 		}
+	}
+
+	if ( sfx ) {
+		trap_S_StartSound( origin, ENTITYNUM_WORLD, CHAN_AUTO, sfx );
 	}
 
 	mark = cg_projectiles[projnum].impactMarkShader;

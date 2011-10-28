@@ -2631,7 +2631,9 @@ CG_PlayerPowerups
 */
 static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 	int		powerups;
+#ifndef IOQ3ZTM // FLAG
 	clientInfo_t	*ci;
+#endif
 
 	powerups = cent->currentState.powerups;
 	if ( !powerups ) {
@@ -2650,7 +2652,9 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 		trap_S_AddLoopingSound( cent->currentState.number, cent->lerpOrigin, vec3_origin, cgs.media.flightSound );
 	}
 
+#ifndef IOQ3ZTM // FLAG
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
+#endif
 	// redflag
 	if ( powerups & ( 1 << PW_REDFLAG ) ) {
 #ifdef IOQ3ZTM // FLAG
