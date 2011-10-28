@@ -1470,9 +1470,7 @@ void UI_Cache_f( void ) {
 	PlayerModel_Cache();
 	PlayerSettings_Cache();
 	Controls_Cache();
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
 	UI_Joystick_Cache();
-#endif
 	Demos_Cache();
 	UI_CinematicsMenu_Cache();
 	Preferences_Cache();

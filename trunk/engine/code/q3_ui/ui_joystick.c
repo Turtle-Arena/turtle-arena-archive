@@ -31,8 +31,6 @@ JOYSTICK SELECT MENU
 
 #include "ui_local.h"
 
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-
 #define MAX_JOYSTICKS 16
 
 #define JOY_MENU_VERTICAL_SPACING		16
@@ -329,4 +327,3 @@ void UI_JoystickMenu( int localClient ) {
 	UI_PushMenu( &joystickMenu.menu );
 }
 
-#endif // IOQ3ZTM
