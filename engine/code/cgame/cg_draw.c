@@ -3191,16 +3191,11 @@ CG_DrawFollow
 =================
 */
 static qboolean CG_DrawFollow( void ) {
-	vec4_t		color;
 	const char	*name;
 
 	if ( !(cg.cur_ps->pm_flags & PMF_FOLLOW) ) {
 		return qfalse;
 	}
-	color[0] = 1;
-	color[1] = 1;
-	color[2] = 1;
-	color[3] = 1;
 
 	CG_HudPlacement(HUD_CENTER);
 

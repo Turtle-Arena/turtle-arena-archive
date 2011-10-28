@@ -5403,7 +5403,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 #define MAX_DEFAULT_ANIMATIONS 4
 	int anim[MAX_DEFAULT_ANIMATIONS]; // Animations to use, best to default.
 	qboolean reversed;
-	qboolean flipflop;
+	//qboolean flipflop;
 	int i;
 
 	if (loadedAnim == NULL)
@@ -5414,7 +5414,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 
 	memset(anim, -1, MAX_DEFAULT_ANIMATIONS * sizeof (int));
 	reversed = qfalse;
-	flipflop = qfalse;
+	//flipflop = qfalse;
 
 	// Set defaults for quake3 and missionpack animations
 	switch (index)
@@ -5533,7 +5533,7 @@ qboolean BG_SetDefaultAnimation(qboolean loadedAnim[], int index, animation_t *a
 			anim[0] = TORSO_GESTURE;
 			anim[1] = TORSO_STAND2;
 			anim[2] = TORSO_STAND;
-			flipflop = qtrue;
+			//flipflop = qtrue;
 			break;
 
 #ifdef TURTLEARENA // PLAYERS
@@ -6881,7 +6881,7 @@ BG_ParseObjectCFGFile
 */
 bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 {
-	char		*text_p, *prev;
+	char		*text_p;
 	int			len;
 	int			i;
 	char		*token;
@@ -6931,7 +6931,6 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 
 	// read optional parameters
 	while ( 1 ) {
-		prev = text_p;	// so we can unget
 		token = COM_Parse( &text_p );
 		if ( !*token ) {
 			break;

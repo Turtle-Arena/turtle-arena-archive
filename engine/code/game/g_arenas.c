@@ -45,10 +45,10 @@ void UpdateTournamentInfo( void ) {
 	int			n, msglen;
 #else
 	int			n, accuracy, perfect,	msglen;
-#endif
 #ifdef MISSIONPACK
   int score1, score2;
 	qboolean won;
+#endif
 #endif
 	char		buf[32];
 	char		msg[MAX_STRING_CHARS];
@@ -92,7 +92,11 @@ void UpdateTournamentInfo( void ) {
 			accuracy = 0;
 		}
 #endif
-#ifdef MISSIONPACK
+#ifdef TA_SP
+		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %s %i %i", level.time, level.teamScores[TEAM_RED], level.teamScores[TEAM_BLUE],
+					player->client->pers.playercfg.model, player->client->ps.persistant[PERS_SCORE],
+					player->client->ps.persistant[PERS_CAPTURES]);
+#elif defined MISSIONPACK
 		won = qfalse;
 		if (g_gametype.integer >= GT_CTF) {
 			score1 = level.teamScores[TEAM_RED];
@@ -112,11 +116,6 @@ void UpdateTournamentInfo( void ) {
 				score1 = level.clients[ level.sortedClients[1] ].ps.persistant[PERS_SCORE];
 			}
 		}
-#ifdef TA_SP
-		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %s %i %i", level.time, score1, score2,
-					player->client->pers.playercfg.model, player->client->ps.persistant[PERS_SCORE],
-					player->client->ps.persistant[PERS_CAPTURES]);
-#else
 		if (won && player->client->ps.persistant[PERS_KILLED] == 0) {
 			perfect = 1;
 		} else {
@@ -126,7 +125,6 @@ void UpdateTournamentInfo( void ) {
 			player->client->ps.persistant[PERS_IMPRESSIVE_COUNT], player->client->ps.persistant[PERS_EXCELLENT_COUNT],player->client->ps.persistant[PERS_DEFEND_COUNT],
 			player->client->ps.persistant[PERS_ASSIST_COUNT], player->client->ps.persistant[PERS_GAUNTLET_FRAG_COUNT], player->client->ps.persistant[PERS_SCORE],
 			perfect, score1, score2, level.time, player->client->ps.persistant[PERS_CAPTURES] );
-#endif
 #else
 		perfect = ( level.clients[playerClientNum].ps.persistant[PERS_RANK] == 0 && player->client->ps.persistant[PERS_KILLED] == 0 ) ? 1 : 0;
 		Com_sprintf( msg, sizeof(msg), "postgame %i %i %i %i %i %i %i %i", level.numNonSpectatorClients, playerClientNum, accuracy,

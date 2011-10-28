@@ -2401,11 +2401,9 @@ static void PM_TorsoAnimation( void ) {
 #ifdef TA_HOLDSYS
 static void PM_NextHoldable(void)
 {
-	int i, original;
+	int i;
 
 	// Change to the next valid holdable item.
-	original = pm->ps->holdableIndex;
-
 	for ( i = 1 ; i < BG_NumHoldableItems() ; i++ ) {
 		pm->ps->holdableIndex++;
 		if ( pm->ps->holdableIndex == BG_NumHoldableItems() ) {
@@ -2431,7 +2429,6 @@ static void PM_NextHoldable(void)
 		}
 	}
 	if ( i == BG_NumHoldableItems() ) {
-		//pm->ps->holdableIndex = original;
 		// None are valid so use none.
 		pm->ps->holdableIndex = HI_NONE;
 	}
