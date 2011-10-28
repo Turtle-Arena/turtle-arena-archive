@@ -121,13 +121,10 @@ static void UI_JoystickMenu_Event( void *ptr, int event ) {
 
 /*
 ============
-UI_TokenizeString
-
-Clone of Cmd_TokenizeString that doesn't use global variables.
+UI_TokenizeDelimitedString
 ============
 */
-static void UI_TokenizeString( const char *text_in, char *cmd_tokenized,
-					int *cmd_argc, char **cmd_argv, qboolean ignoreQuotes )
+static void UI_TokenizeDelimitedString( const char *text_in, char *cmd_tokenized, int *cmd_argc, char **cmd_argv, char delimiter)
 {
 	const char	*text;
 	char	*textOut;
@@ -147,78 +144,24 @@ static void UI_TokenizeString( const char *text_in, char *cmd_tokenized,
 			return;			// this is usually something malicious
 		}
 
-		while ( 1 ) {
-			// skip whitespace
-			while ( *text && *text <= ' ' ) {
-				text++;
-			}
-			if ( !*text ) {
-				return;			// all tokens parsed
-			}
-
-			// skip // comments
-			if ( text[0] == '/' && text[1] == '/' ) {
-				return;			// all tokens parsed
-			}
-
-			// skip /* */ comments
-			if ( text[0] == '/' && text[1] =='*' ) {
-				while ( *text && ( text[0] != '*' || text[1] != '/' ) ) {
-					text++;
-				}
-				if ( !*text ) {
-					return;		// all tokens parsed
-				}
-				text += 2;
-			} else {
-				break;			// we are ready to parse a token
-			}
+		// skip whitespace
+		while ( *text && *text <= ' ' ) {
+			text++;
 		}
-
-		// handle quoted strings
-		// NOTE TTimo this doesn't handle \" escaping
-		if ( !ignoreQuotes && *text == '"' ) {
-			cmd_argv[*cmd_argc] = textOut;
-			(*cmd_argc)++;
-			text++;
-			while ( *text && *text != '"' ) {
-				*textOut++ = *text++;
-			}
-			*textOut++ = 0;
-			if ( !*text ) {
-				return;		// all tokens parsed
-			}
-			text++;
-			continue;
+		if ( !*text ) {
+			return;			// all tokens parsed
 		}
 
 		// regular token
 		cmd_argv[*cmd_argc] = textOut;
 		(*cmd_argc)++;
 
-		// skip until whitespace, quote, or command
-		while ( *text > ' ' ) {
-			if ( !ignoreQuotes && text[0] == '"' ) {
-				break;
-			}
-
-			if ( text[0] == '/' && text[1] == '/' ) {
-				break;
-			}
-
-			// skip /* */ comments
-			if ( text[0] == '/' && text[1] =='*' ) {
-				break;
-			}
-
+		// skip until newline or null.
+		while ( *text && *text != delimiter) {
 			*textOut++ = *text++;
 		}
 
 		*textOut++ = 0;
-
-		if ( !*text ) {
-			return;		// all tokens parsed
-		}
 	}
 }
 
@@ -233,7 +176,7 @@ static void UI_Joystick_GetNames( void ) {
 	char	*cmd_argv[MAX_STRING_TOKENS];		// points into cmd_tokenized
 	char	cmd_tokenized[BIG_INFO_STRING+MAX_STRING_TOKENS];	// will have 0 bytes inserted
 
-	// Get quoted string of joystick names.
+	// Get newline delimited string of joystick names.
 	Q_strncpyz(joybuf, UI_Cvar_VariableString("in_availableJoysticks"), sizeof(joybuf));
 
 	// Option to disable joystick
@@ -241,7 +184,7 @@ static void UI_Joystick_GetNames( void ) {
 
 	if (*joybuf) {
 		// Seperate joystick names
-		UI_TokenizeString( joybuf, cmd_tokenized, &joystickMenu.numJoysticks, cmd_argv, qfalse );
+		UI_TokenizeDelimitedString( joybuf, cmd_tokenized, &joystickMenu.numJoysticks, cmd_argv, '\n' );
 
 		// Joysticks plus disable option
 		joystickMenu.numJoysticks += 1;

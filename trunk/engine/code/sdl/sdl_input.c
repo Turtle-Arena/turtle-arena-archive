@@ -681,20 +681,9 @@ static void IN_InitJoystick( void )
 	// Print list and build cvar to allow ui to select joystick.
 	for (i = 0; i < total; i++)
 	{
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-		Q_strcat( buf, sizeof( buf ), va( "\"%.61s\" ", SDL_JoystickName(i) ) );
-#else
 		Q_strcat(buf, sizeof(buf), SDL_JoystickName(i));
 		Q_strcat(buf, sizeof(buf), "\n");
-#endif
 	}
-
-#ifdef IOQ3ZTM // SELECT_JOYSTICK
-	if (*buf) {
-		// Remove space at the end of the string
-		buf[ strlen( buf ) - 1 ] = 0;
-	}
-#endif
 
 	Cvar_Get( "in_availableJoysticks", buf, CVAR_ROM );
 
