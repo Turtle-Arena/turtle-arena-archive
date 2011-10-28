@@ -4,34 +4,8 @@
 # GNU Make required
 #
 
-VERSION=0.5.2
-CLIENTBIN=turtlearena
-SERVERBIN=turtlearena-server
-
-BASEGAME=base
-BASEGAME_FLAGS= -DMISSIONPACK
-
-MISSIONPACK=missionpack
-MISSIONPACK_FLAGS= -DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
-
-# Add "-DEXAMPLE" to define EXAMPLE in engine and game/cgame/ui.
-BUILD_DEFINES =
-
-# You can disable building basegame or missionpack by setting the following to 0
-ifndef BUILD_BASEGAME
-  BUILD_BASEGAME =
-endif
-ifndef BUILD_MISSIONPACK
-  BUILD_MISSIONPACK = 0
-endif
-
-ifndef COPYDIR
-COPYDIR="/usr/local/games/turtlearena"
-endif
-
-
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 46
+IOQ3ZTM_REVISION = 54
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
@@ -69,6 +43,12 @@ ifndef BUILD_GAME_SO
 endif
 ifndef BUILD_GAME_QVM
   BUILD_GAME_QVM   =
+endif
+ifndef BUILD_BASEGAME
+  BUILD_BASEGAME =
+endif
+ifndef BUILD_MISSIONPACK
+  BUILD_MISSIONPACK=0
 endif
 ifndef BUILD_FINAL
   BUILD_FINAL      =0
@@ -306,6 +286,43 @@ else
 endif
 export CROSS_COMPILING
 
+ifndef VERSION
+VERSION=0.5.2
+endif
+
+ifndef CLIENTBIN
+CLIENTBIN=turtlearena
+endif
+
+ifndef SERVERBIN
+SERVERBIN=turtlearena-server
+endif
+
+ifndef BASEGAME
+BASEGAME=base
+endif
+
+ifndef BASEGAME_CFLAGS
+BASEGAME_CFLAGS=-DMISSIONPACK
+endif
+
+ifndef MISSIONPACK
+MISSIONPACK=missionpack
+endif
+
+ifndef MISSIONPACK_CFLAGS
+MISSIONPACK_CFLAGS=-DMISSIONPACK -DMISSIONPACK_HUD # -DMISSIONPACK_HARVESTER
+endif
+
+# Add "-DEXAMPLE" to define EXAMPLE in engine and game/cgame/ui.
+ifndef BUILD_DEFINES
+BUILD_DEFINES =
+endif
+
+ifndef COPYDIR
+COPYDIR="/usr/local/games/turtlearena"
+endif
+
 ifndef COPYBINDIR
 COPYBINDIR=$(COPYDIR)
 endif
@@ -469,6 +486,7 @@ ifneq ($(BUILD_FINAL),1)
 	endif
 endif
 
+
 #############################################################################
 # SETUP AND BUILD -- LINUX
 #############################################################################
@@ -609,20 +627,20 @@ ifeq ($(PLATFORM),darwin)
   BASE_CFLAGS = -Wall -Wimplicit -Wstrict-prototypes
 
   ifeq ($(ARCH),ppc)
-    BASE_CFLAGS += -faltivec
+    BASE_CFLAGS += -arch ppc -faltivec -mmacosx-version-min=10.2
     OPTIMIZEVM += -O3
   endif
   ifeq ($(ARCH),ppc64)
-    BASE_CFLAGS += -faltivec
+    BASE_CFLAGS += -arch ppc64 -faltivec -mmacosx-version-min=10.2
   endif
   ifeq ($(ARCH),i386)
     OPTIMIZEVM += -march=prescott -mfpmath=sse
     # x86 vm will crash without -mstackrealign since MMX instructions will be
     # used no matter what and they corrupt the frame pointer in VM calls
-    BASE_CFLAGS += -m32 -mstackrealign
+    BASE_CFLAGS += -arch i386 -m32 -mstackrealign
   endif
   ifeq ($(ARCH),x86_64)
-    OPTIMIZEVM += -mfpmath=sse
+    OPTIMIZEVM += -arch x86_64 -mfpmath=sse
   endif
 
   BASE_CFLAGS += -fno-strict-aliasing -DMACOS_X -fno-common -pipe
@@ -673,7 +691,7 @@ ifeq ($(PLATFORM),darwin)
 
   SHLIBEXT=dylib
   SHLIBCFLAGS=-fPIC -fno-common
-  SHLIBLDFLAGS=-dynamiclib $(LDFLAGS)
+  SHLIBLDFLAGS=-dynamiclib $(LDFLAGS) -Wl,-U,_com_altivec
 
   NOTSHLIBCFLAGS=-mdynamic-no-pic
 
@@ -1271,6 +1289,10 @@ else
   RENDERER_LIBS += -ljpeg
 endif
 
+ifeq ("$(CC)", $(findstring "$(CC)", "clang" "clang++"))
+  BASE_CFLAGS += -Qunused-arguments
+endif
+
 ifdef DEFAULT_BASEDIR
   BASE_CFLAGS += -DDEFAULT_BASEDIR=\\\"$(DEFAULT_BASEDIR)\\\"
 endif
@@ -1333,49 +1355,49 @@ endif
 
 define DO_SHLIB_CC
 $(echo_cmd) "SHLIB_CC $<"
-$(Q)$(CC) $(BASEGAME_FLAGS) $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_CFLAGS) $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_GAME_CC
 $(echo_cmd) "GAME_CC $<"
-$(Q)$(CC) $(BASEGAME_FLAGS) -DQAGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_CFLAGS) -DQAGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_CGAME_CC
 $(echo_cmd) "CGAME_CC $<"
-$(Q)$(CC) $(BASEGAME_FLAGS) -DCGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_CFLAGS) -DCGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_UI_CC
 $(echo_cmd) "UI_CC $<"
-$(Q)$(CC) $(BASEGAME_FLAGS) -DUI $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(BASEGAME_CFLAGS) -DUI $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_SHLIB_CC_MISSIONPACK
 $(echo_cmd) "SHLIB_CC_MISSIONPACK $<"
-$(Q)$(CC) $(MISSIONPACK_FLAGS) $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_CFLAGS) $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_GAME_CC_MISSIONPACK
 $(echo_cmd) "GAME_CC_MISSIONPACK $<"
-$(Q)$(CC) $(MISSIONPACK_FLAGS) -DQAGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_CFLAGS) -DQAGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_CGAME_CC_MISSIONPACK
 $(echo_cmd) "CGAME_CC_MISSIONPACK $<"
-$(Q)$(CC) $(MISSIONPACK_FLAGS) -DCGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_CFLAGS) -DCGAME $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
 define DO_UI_CC_MISSIONPACK
 $(echo_cmd) "UI_CC_MISSIONPACK $<"
-$(Q)$(CC) $(MISSIONPACK_FLAGS) -DUI $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
+$(Q)$(CC) $(MISSIONPACK_CFLAGS) -DUI $(SHLIBCFLAGS) $(CFLAGS) $(OPTIMIZEVM) -o $@ -c $<
 $(Q)$(DO_QVM_DEP)
 endef
 
@@ -1416,7 +1438,7 @@ release:
 # an informational message, then start building
 targets: makedirs
 	@echo ""
-	@echo "Building Turtle Arena in $(B):"
+	@echo "Building $(CLIENTBIN) in $(B):"
 	@echo "  IOQ3ZTM_REVISION: $(IOQ3ZTM_REVISION)"
 	@echo "  PLATFORM: $(PLATFORM)"
 	@echo "  ARCH: $(ARCH)"
@@ -1482,26 +1504,18 @@ makedirs:
 	@if [ ! -d $(B)/renderer ];then $(MKDIR) $(B)/renderer;fi
 	@if [ ! -d $(B)/renderersmp ];then $(MKDIR) $(B)/renderersmp;fi
 	@if [ ! -d $(B)/ded ];then $(MKDIR) $(B)/ded;fi
-ifneq ($(BUILD_BASEGAME),0)
 	@if [ ! -d $(B)/$(BASEGAME) ];then $(MKDIR) $(B)/$(BASEGAME);fi
 	@if [ ! -d $(B)/$(BASEGAME)/cgame ];then $(MKDIR) $(B)/$(BASEGAME)/cgame;fi
 	@if [ ! -d $(B)/$(BASEGAME)/game ];then $(MKDIR) $(B)/$(BASEGAME)/game;fi
 	@if [ ! -d $(B)/$(BASEGAME)/ui ];then $(MKDIR) $(B)/$(BASEGAME)/ui;fi
 	@if [ ! -d $(B)/$(BASEGAME)/qcommon ];then $(MKDIR) $(B)/$(BASEGAME)/qcommon;fi
 	@if [ ! -d $(B)/$(BASEGAME)/vm ];then $(MKDIR) $(B)/$(BASEGAME)/vm;fi
-endif
-
 	@if [ ! -d $(B)/$(MISSIONPACK) ];then $(MKDIR) $(B)/$(MISSIONPACK);fi
-ifneq ($(BUILD_MISSIONPACK),0)
 	@if [ ! -d $(B)/$(MISSIONPACK)/cgame ];then $(MKDIR) $(B)/$(MISSIONPACK)/cgame;fi
 	@if [ ! -d $(B)/$(MISSIONPACK)/game ];then $(MKDIR) $(B)/$(MISSIONPACK)/game;fi
 	@if [ ! -d $(B)/$(MISSIONPACK)/ui ];then $(MKDIR) $(B)/$(MISSIONPACK)/ui;fi
 	@if [ ! -d $(B)/$(MISSIONPACK)/qcommon ];then $(MKDIR) $(B)/$(MISSIONPACK)/qcommon;fi
 	@if [ ! -d $(B)/$(MISSIONPACK)/vm ];then $(MKDIR) $(B)/$(MISSIONPACK)/vm;fi
-else
-# Need dir for ui_syscalls.o
-	@if [ ! -d $(B)/$(MISSIONPACK)/ui ];then $(MKDIR) $(B)/$(MISSIONPACK)/ui;fi
-endif
 	@if [ ! -d $(B)/tools ];then $(MKDIR) $(B)/tools;fi
 	@if [ ! -d $(B)/tools/asm ];then $(MKDIR) $(B)/tools/asm;fi
 	@if [ ! -d $(B)/tools/etc ];then $(MKDIR) $(B)/tools/etc;fi
@@ -1630,42 +1644,42 @@ $(Q3LCC): $(Q3LCCOBJ) $(Q3RCC) $(Q3CPP)
 
 define DO_Q3LCC
 $(echo_cmd) "Q3LCC $<"
-$(Q)$(Q3LCC) $(BASEGAME_FLAGS) $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_CFLAGS) $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC
 $(echo_cmd) "CGAME_Q3LCC $<"
-$(Q)$(Q3LCC) $(BASEGAME_FLAGS) -DCGAME $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_CFLAGS) -DCGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_GAME_Q3LCC
 $(echo_cmd) "GAME_Q3LCC $<"
-$(Q)$(Q3LCC) $(BASEGAME_FLAGS) -DQAGAME $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_CFLAGS) -DQAGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_UI_Q3LCC
 $(echo_cmd) "UI_Q3LCC $<"
-$(Q)$(Q3LCC) $(BASEGAME_FLAGS) -DUI $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(BASEGAME_CFLAGS) -DUI $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_Q3LCC_MISSIONPACK
 $(echo_cmd) "Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_CFLAGS) $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_CGAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "CGAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) -DCGAME $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_CFLAGS) -DCGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_GAME_Q3LCC_MISSIONPACK
 $(echo_cmd) "GAME_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) -DQAGAME $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_CFLAGS) -DQAGAME $(BUILD_DEFINES) -o $@ $<
 endef
 
 define DO_UI_Q3LCC_MISSIONPACK
 $(echo_cmd) "UI_Q3LCC_MISSIONPACK $<"
-$(Q)$(Q3LCC) $(MISSIONPACK_FLAGS) -DUI $(BUILD_DEFINES) -o $@ $<
+$(Q)$(Q3LCC) $(MISSIONPACK_CFLAGS) -DUI $(BUILD_DEFINES) -o $@ $<
 endef
 
 

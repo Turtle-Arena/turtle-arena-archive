@@ -886,28 +886,32 @@ Clear around a sized down screen
 */
 void CG_TileClear( void ) {
 	int		top, bottom, left, right;
-	int		w, h;
+	float		x, y, w, h;
 
-	w = cgs.glconfig.vidWidth;
-	h = cgs.glconfig.vidHeight;
-
-	if (cg.cur_ps->pm_type == PM_INTERMISSION || cg_viewsize.integer >= 100 || cg.viewport != 0) {
+	if (cg.cur_ps->pm_type == PM_INTERMISSION || cg_viewsize.integer >= 100) {
 		return;		// full screen rendering
 	}
 
+	// viewport coords
+	x = y = 0;
+	w = SCREEN_WIDTH;
+	h = SCREEN_HEIGHT;
+	CG_AdjustFrom640(&x, &y, &w, &h);
+
+	// view screen coords
 	top = cg.refdef.y;
 	bottom = top + cg.refdef.height-1;
 	left = cg.refdef.x;
 	right = left + cg.refdef.width-1;
 
 	// clear above view screen
-	CG_TileClearBox( 0, 0, w, top, cgs.media.backTileShader );
+	CG_TileClearBox( x, y, w, top, cgs.media.backTileShader );
 
 	// clear below view screen
-	CG_TileClearBox( 0, bottom, w, h - bottom, cgs.media.backTileShader );
+	CG_TileClearBox( x, bottom, w, h - bottom, cgs.media.backTileShader );
 
 	// clear left of view screen
-	CG_TileClearBox( 0, top, left, bottom - top + 1, cgs.media.backTileShader );
+	CG_TileClearBox( x, top, left, bottom - top + 1, cgs.media.backTileShader );
 
 	// clear right of view screen
 	CG_TileClearBox( right, top, w - right, bottom - top + 1, cgs.media.backTileShader );
