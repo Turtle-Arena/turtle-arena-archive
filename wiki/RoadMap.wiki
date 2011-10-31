@@ -83,29 +83,89 @@ Optional goals;
   * Switch to missionpack ui?
   * Remake some of the sound effects / add some of the missing sounds effects?
 
-== 0.8 ==
-Focus on map themes and multiplayer maps. Goal is the develop assets/skills for single player. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game, comparable to commercial games.
+== Complete Multiplayer Game (EBX 0.8) ==
+Focus on map themes and multiplayer maps. The goal is the develop assets/skills for single player. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game, comparable to commercial games.
 
   * Create scenery objects and brushes
   * Map Themes (Sets of textures, sky, models, misc_objects, and music)
   * New multiplayer maps using the new map themes
 
-  * Finish '2D mode'
-    * Finish Path system for players
-    * Single camera mode for '2D maps' (set "2dmode" "1" in worldspawn to focus on local players), like the camera in Super Smash Bros. and TMNT Smash-up
-      * Draw HUDs for all local players.
-      * Focus on all local players (or all players in level depending on map settings).
+  * Create new editor config that is CC-BY-SA-3.0, cannot reuse text from current config (that I didn't write).
+  * Create HTML editing and entities documents (included in radiant config) (CC-BY-SA-3.0).
+  * Create HTML BSPC document (CC-BY-SA-3.0)
 
-== 1.0 ==
-Complete the majority of the Single Player / Co-op code and have it playable.
+  * Create all new textures for each map theme (5?).
+  * Create a sky shader for each map theme (5?).
+  * Create 6 music tracks, menu + one for each map theme (5?).
+  * Add missing sound effects.
 
-  * Enemies for Single Player
-  * Single Player Maps (at least one stage would be good)
-  * Per-stage gimmicks
-  * Save game system
-  * Player Abilities
-  * Remake UI with missionpack ui scripting?
+  * Create map objects.
+  * Finish interactive map object code.
 
-== 1.2 ==
-  * Expand Single Player / Co-op
-  * Multiplayer improvements
+  * Try to improve the gameplay experience.
+
+  * Create 10 new maps, one map for FFA/Duel/TDM and one for CTF/1Flag/Overload using each of the 5 map themes.
+
+== Main Game Focus (EBX 1.0) ==
+Complete the majority of the Main Game (Single Player) / Co-op code and have it playable.
+
+  * Add proper co-op end of level screen.
+
+  * Add main game end of game stuff.
+
+
+
+  * Create NPC system.
+
+  * Create NPCs (models, sounds, and scripts that tell game info about NPCs).
+
+  * Update radiant config and HTML docs.
+
+
+
+  * Remove current co-op maps.
+
+  * Remove code for enemy co-op bots?
+
+
+
+  * Create 3 new co-op maps (a single stage) using map theme from 0.8 with NPCs.
+
+  * Create a second stage?
+
+
+
+  * Add co-op bot AI.
+
+
+
+  * Finish splitscreen sound support.
+
+== Complete Main Game (EBX 1.2) ==
+  * Create remaining main game maps (3 or 4 stages, each with 3 maps)
+  * Add main game ending.
+
+  * Add hidden items (one for each of the main characters in each main gmae map).
+
+== Multiplayer Expanded (EBX 1.4) ==
+
+  * Add more non-co-op maps (10 more maps?)
+
+  * Improve existing non-co-op maps.
+
+
+
+  * Add more non-main-game characters.
+
+
+
+  * Expand map themes by adding more map objects, skies, etc?
+
+== Completed (EBX 2.0) ==
+  * Translation support.
+
+
+  * Polish overall game.
+
+
+  * Create complete editing documentation for the game.
