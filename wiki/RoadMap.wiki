@@ -20,48 +20,55 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * Fixed various usability issues.
 
 === 0.5.3 ===
-  * Add head model animation support.
+  * Add "Arcade Mode".
+  * DONE: Create new icon and loading screen.
+  * ...
+
+=== 0.5.4 ===
   * Make changes to player model system for future models.
+  * Add head model animation support.
   * Make sure IQM support is fully working.
   * Create test single model IQM player that uses skeleton blending (for testing and demonstration new player model animation system).
   * Start making new player models.
 
-=== 0.5.4 ===
+=== 0.5.5 ===
   * Remove the TMNT player models.
   * Add a new player model designed for the game.
   * Add weapon for new player if needed.
 
-=== 0.5.5 ===
+  * Rename the game to Extraordinary Beat X (EBX).
+  * Replace logo.
+  * Create new menu background.
+  * Replace teams (names and icons), currently Katanas and Sais.
+  * Create new CTF flag skins (using new default team icons).
+
+=== 0.5.6 ===
   * Add new player model(s).
   * Add weapon(s) for new player(s) if needed.
   * Finish breakable/pushable objects and brushes code.
 
-=== 0.5.6 ===
-  * (Finish four main player models)
-  * Rename the game (to hopefully its final name)
-  * Create new logo
-  * Create new icon, menu background, and loading screen?
-  * Replace teams (names and icons), currently Katanas and Sais.
-
 === 0.5.7 ===
 0.5.7 may be kind of a Release Candidate for 0.6.
 
+  * (Finish four main player models)
   * Improve current maps (but only a little if at all)
   * Fix any issues that are found.
 
 == 0.6 ==
 Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
 
-  * Rename the game (to hopefully its final name)
-  * Create new logo
-  * Create new icon, menu background, and loading screen?
+  * Rename the game to Extraordinary Beat X (EBX).
+  * Replace logo.
+  * DONE: Replace icon and loading screen.
+  * Create new menu background.
   * Replace teams (names and icons), currently Katanas and Sais.
+  * Create new CTF flag skins (using new default team icons).
 
   * Make changes to player model system for future models.
   * Make sure IQM support is fully working.
 
   * Remove the current player models, replace with new player models designed for the game.
-  * Add weapons for new players if needed.
+  * Add weapons for new players.
 
   * DONE: Remove remaining OpenArena images and sounds.
   * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
