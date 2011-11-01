@@ -1641,6 +1641,7 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 			}
 
 			iqmData = model->modelData;
+			str = iqmData->names;
 
 			refSkel->type = ST_RELATIVE;
 			refSkel->numJoints = iqmData->num_joints;
