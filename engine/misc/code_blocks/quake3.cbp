@@ -465,6 +465,7 @@
 		<Unit filename="../../code/client/snd_codec.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/client/snd_codec.h" />
 		<Unit filename="../../code/client/snd_codec_ogg.c">
 			<Option compilerVar="CC" />
 		</Unit>
