@@ -72,10 +72,6 @@ functions imported from the main executable
 ==================================================================
 */
 
-#define	CGAME_IMPORT_API_VERSION	4
-
-// ZTM: Note to self: The order is important and if any
-//             more are added update cg_syscalls.ASM
 typedef enum {
 	CG_PRINT,
 	CG_ERROR,
