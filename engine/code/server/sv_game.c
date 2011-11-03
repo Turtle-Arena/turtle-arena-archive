@@ -919,6 +919,17 @@ Called for both a full init and a restart
 */
 static void SV_InitGameVM( qboolean restart ) {
 	int		i;
+	int		v;
+
+	// sanity check
+	v = VM_SafeCall( gvm, GAME_GETAPIVERSION );
+	if (v != GAME_API_VERSION) {
+		// Free gvm now, so GAME_SHUTDOWN doesn't get called later.
+		VM_Free( gvm );
+		gvm = NULL;
+
+		Com_Error(ERR_DROP, "Game is version %d, expected %d", v, GAME_API_VERSION );
+	}
 
 	// start the entity parsing at the beginning
 	sv.entityParsePoint = CM_EntityString();

@@ -774,6 +774,7 @@ void CL_InitCGame( void ) {
 	const char			*mapname;
 	int					t1, t2;
 	vmInterpret_t		interpret;
+	int					v;
 
 	t1 = Sys_Milliseconds();
 
@@ -798,6 +799,17 @@ void CL_InitCGame( void ) {
 	if ( !cgvm ) {
 		Com_Error( ERR_DROP, "VM_Create on cgame failed" );
 	}
+
+	// sanity check
+	v = VM_SafeCall( cgvm, CG_GETAPIVERSION );
+	if (v != CG_API_VERSION) {
+		// Free cgvm now, so CG_SHUTDOWN doesn't get called later.
+		VM_Free( cgvm );
+		cgvm = NULL;
+
+		Com_Error(ERR_DROP, "CGame is version %d, expected %d", v, CG_API_VERSION );
+	}
+
 	clc.state = CA_LOADING;
 
 #ifdef IOQ3ZTM

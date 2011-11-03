@@ -910,6 +910,38 @@ intptr_t QDECL VM_Call( vm_t *vm, int callnum, ... )
 
 //=================================================================
 
+vm_t *safeVM = NULL;
+
+intptr_t VM_APISafeSystemCalls( intptr_t *args ) {
+	Com_Error(ERR_FATAL, "%s vm tried to make an unsafe syscall, it may be an incompatible quake3 vm", safeVM ? safeVM->name : "unknown");
+	return 0;
+}
+
+// Makes a VM_Call where the vm cannot make any system calls.
+// If vm tries to make a system call, it errors.
+// Probably only useful for getting api version.
+int QDECL VM_SafeCall( vm_t *vm, int callnum )
+{
+	intptr_t	(*savedSystemCall)( intptr_t *parms );
+	int			value;
+
+	safeVM = vm;
+	savedSystemCall = vm->systemCall;
+
+	// Use API safe system call function.
+	vm->systemCall = VM_APISafeSystemCalls;
+
+	// Make the call.
+	value = (int)VM_Call(vm, callnum);
+
+	// Restore systemCall pointer
+	vm->systemCall = savedSystemCall;
+
+	return value;
+}
+
+//=================================================================
+
 static int QDECL VM_ProfileSort( const void *a, const void *b ) {
 	vmSymbol_t	*sa, *sb;
 

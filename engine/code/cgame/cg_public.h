@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 //
 
+#define CG_API_VERSION	1
 
 #define	CMD_BACKUP			64	
 #define	CMD_MASK			(CMD_BACKUP - 1)
@@ -198,6 +199,8 @@ functions exported to the main executable
 */
 
 typedef enum {
+	CG_GETAPIVERSION,	// system reserved
+
 	CG_INIT,
 //	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum )
 	// called when the level loads or when the renderer is restarted

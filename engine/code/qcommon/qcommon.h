@@ -370,6 +370,7 @@ void	VM_Forced_Unload_Done(void);
 vm_t	*VM_Restart(vm_t *vm, qboolean unpure);
 
 intptr_t		QDECL VM_Call( vm_t *vm, int callNum, ... );
+int				VM_SafeCall( vm_t *vm, int callnum );
 
 void	VM_Debug( int level );
 

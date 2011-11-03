@@ -419,6 +419,8 @@ typedef enum {
 // functions exported by the game subsystem
 //
 typedef enum {
+	GAME_GETAPIVERSION = 0,	// system reserved
+
 	GAME_INIT,	// ( int levelTime, int randomSeed, int restart );
 	// init and shutdown will be called every single level
 	// The game should call G_GET_ENTITY_TOKEN to parse through all the
