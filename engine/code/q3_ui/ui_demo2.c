@@ -239,12 +239,12 @@ static void Demos_MenuInit( void ) {
 		for(; i < s_demos.numDemos; i++)
 		{
 			s_demos.list.itemnames[i] = demoname;
- 		
+		
 			len = strlen(demoname);
- 
+
 			demoname += len + 1;
 		}
- 
+
 		if(!j)
 		{
 			if(protocolLegacy > 0 && s_demos.numDemos < MAX_DEMOS)
