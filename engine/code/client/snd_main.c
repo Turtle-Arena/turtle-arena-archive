@@ -36,6 +36,136 @@ cvar_t *s_muteWhenUnfocused;
 
 static soundInterface_t si;
 
+listener_t listeners[MAX_LISTENERS];
+
+/*
+=================
+S_ListenersInit
+=================
+*/
+void S_ListenersInit(void) {
+	int i;
+
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		listeners[i].updated = qfalse;
+
+		listeners[i].number = -1;
+		VectorClear(listeners[i].origin);
+		AxisClear(listeners[i].axis);
+		listeners[i].inwater = 0;
+		listeners[i].firstPerson = qfalse;
+	}
+}
+
+/*
+=================
+S_ListenersEndFrame
+=================
+*/
+void S_ListenersEndFrame(void) {
+	int i;
+
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		// Didn't receive update for this listener this frame, so disable it.
+		if (!listeners[i].updated)
+			listeners[i].number = -1;
+
+		listeners[i].updated = qfalse;
+	}
+}
+
+/*
+=================
+S_HearingThroughEntity
+=================
+*/
+qboolean S_HearingThroughEntity( int entityNum )
+{
+	int i;
+
+	// Note: Listeners may be one frame out of date.
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		if (listeners[i].number == entityNum)
+		{
+			return listeners[i].firstPerson;
+		}
+	}
+
+	return qfalse;
+}
+
+/*
+====================
+S_EntityIsListener
+====================
+*/
+qboolean S_EntityIsListener(int entityNum)
+{
+	int i;
+
+	// NOTE: Listeners may be one frame out of date.
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		if (entityNum == listeners[i].number)
+		{
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+/*
+====================
+S_ListenerNumForEntity
+====================
+*/
+int S_ListenerNumForEntity(int entityNum, qboolean create)
+{
+	int i;
+	int freeListener = -1;
+
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		if (listeners[i].number == entityNum)
+			return entityNum;
+		else if (create && freeListener == -1 && listeners[i].number == -1)
+			freeListener = i;
+	}
+
+	return freeListener;
+}
+
+/*
+=================
+S_UpdateListener
+=================
+*/
+void S_UpdateListener(int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson)
+{
+	int listener;
+
+	// Get listener for entityNum.
+	listener = S_ListenerNumForEntity(entityNum, qtrue);
+
+	if (listener < 0 || listener >= MAX_LISTENERS)
+		return;
+
+	listeners[listener].updated = qtrue;
+
+	// Update listener info.
+	listeners[listener].number = entityNum;
+	VectorCopy(origin, listeners[listener].origin);
+	VectorCopy(axis[0], listeners[listener].axis[0]);
+	VectorCopy(axis[1], listeners[listener].axis[1]);
+	VectorCopy(axis[2], listeners[listener].axis[2]);
+	listeners[listener].inwater = inwater;
+	listeners[listener].firstPerson = firstPerson;
+}
+
 /*
 =================
 S_ValidateInterface
@@ -202,11 +332,10 @@ void S_StopLoopingSound( int entityNum )
 S_Respatialize
 =================
 */
-void S_Respatialize( int entityNum, const vec3_t origin,
-		vec3_t axis[3], int inwater, int listener )
+void S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson )
 {
 	if( si.Respatialize ) {
-		si.Respatialize( entityNum, origin, axis, inwater, listener );
+		si.Respatialize( entityNum, origin, axis, inwater, firstPerson );
 	}
 }
 

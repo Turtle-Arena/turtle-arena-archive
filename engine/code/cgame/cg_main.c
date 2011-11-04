@@ -35,9 +35,6 @@ int forceModelModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-int CG_ViewType( int entityNum );
-#endif
 
 
 /*
@@ -77,10 +74,6 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-	case CG_VIEW_TYPE:
-		return CG_ViewType(arg0);
-#endif
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
 		break;
@@ -2586,44 +2579,6 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		trap_Cvar_Set("cg_thirdPerson", "1");
 #endif
 }
-
-#ifdef IOQ3ZTM_NO_COMPAT // EAR_IN_ENTITY
-/*
-=================
-CG_ViewType
-
-Called by CG_VIEW_TYPE.
-
-Return -1 if not our client.
-Return 0 if in first person.
-Return 1 if in third person.
-=================
-*/
-int CG_ViewType( int entityNum ) {
-#ifdef TA_SPLITVIEW
-	int i;
-
-	if (!cg.snap) {
-		return -1;
-	}
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == entityNum) {
-			// ZTM: FIXME: Check if spectator, and return 0
-			return cg_thirdPerson[cg.snap->lcIndex[i]].integer;
-		}
-	}
-
-	return -1;
-#else
-	if (cg.snap && cg.snap->ps.clientNum != entityNum) {
-		return -1;
-	}
-
-	return cg.renderingThirdPerson;
-#endif
-}
-#endif
 
 /*
 =================
