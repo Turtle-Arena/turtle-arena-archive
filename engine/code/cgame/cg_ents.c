@@ -33,29 +33,15 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
-#ifdef IOQ3ZTM
 qboolean CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName )
-#else
-void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							qhandle_t parentModel, char *tagName )
-#endif
-{
+							qhandle_t parentModel, char *tagName ) {
 	int				i;
 	orientation_t	lerped;
+	qboolean		returnValue;
 	
 	// lerp the tag
-#ifdef IOQ3ZTM
-	qboolean rtn = qtrue;
-	if (!trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0 - parent->backlerp, tagName ))
-	{
-		rtn = qfalse;
-	}
-#else
-	trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	returnValue = trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
-#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -66,9 +52,8 @@ void CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( lerped.axis, ((refEntity_t *)parent)->axis, entity->axis );
 	entity->backlerp = parent->backlerp;
-#ifdef IOQ3ZTM
-	return rtn;
-#endif
+
+	return returnValue;
 }
 
 
@@ -80,31 +65,17 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
-#ifdef IOQ3ZTM
 qboolean CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName )
-#else
-void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							qhandle_t parentModel, char *tagName )
-#endif
-{
+							qhandle_t parentModel, char *tagName ) {
 	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
+	qboolean		returnValue;
 
 //AxisClear( entity->axis );
 	// lerp the tag
-#ifdef IOQ3ZTM
-	qboolean rtn = qtrue;
-	if (!trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0 - parent->backlerp, tagName ))
-	{
-		rtn = qfalse;
-	}
-#else
-	trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	returnValue = trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
-#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -115,9 +86,8 @@ void CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 	// had to cast away the const to avoid compiler problems...
 	MatrixMultiply( entity->axis, lerped.axis, tempAxis );
 	MatrixMultiply( tempAxis, ((refEntity_t *)parent)->axis, entity->axis );
-#ifdef IOQ3ZTM
-	return rtn;
-#endif
+
+	return returnValue;
 }
 
 
