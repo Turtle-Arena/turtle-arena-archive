@@ -960,7 +960,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 				s->curvalue++;
 				if (s->curvalue >= s->numitems)
 					s->curvalue = 0;
-				if (strlen(s->itemnames[s->curvalue]) > 0) {
+				if (!s->itemnames || strlen(s->itemnames[s->curvalue]) > 0) {
 					break;
 				}
 			}
@@ -988,7 +988,7 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 				s->curvalue--;
 				if (s->curvalue < 0)
 					s->curvalue = s->numitems-1;
-				if (strlen(s->itemnames[s->curvalue]) > 0) {
+				if (!s->itemnames || strlen(s->itemnames[s->curvalue]) > 0) {
 					break;
 				}
 			}
