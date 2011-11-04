@@ -131,12 +131,12 @@ static char quake3worldMessage[] = "Visit www.quake3world.com - News, Community,
 #endif
 #endif
 
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
-static int gamecodetoui[] = {8,4,6,0,10,2,12,1,3,5,7,9,11};
-static int uitogamecode[] = {4,8,6,9,2,10,3,11,1,12,5,13,7};
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
+static int gamecodetoui[NUM_COLOR_EFFECTS] = {8,4,6,0,10,2,12,1,3,5,7,9,11};
+static int uitogamecode[NUM_COLOR_EFFECTS] = {4,8,6,9,2,10,3,11,1,12,5,13,7};
 #else
-static int gamecodetoui[] = {4,2,3,0,5,1,6};
-static int uitogamecode[] = {4,6,2,3,1,5,7};
+static int gamecodetoui[NUM_COLOR_EFFECTS] = {4,2,3,0,5,1,6};
+static int uitogamecode[NUM_COLOR_EFFECTS] = {4,6,2,3,1,5,7};
 #endif
 
 
@@ -230,7 +230,7 @@ void AssetCache( void ) {
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	uiInfo.uiDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	uiInfo.uiDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
 	uiInfo.uiDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	uiInfo.uiDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_ORANGE );
 	uiInfo.uiDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );
@@ -1251,12 +1251,10 @@ static void UI_DrawTeamMember(rectDef_t *rect, float scale, vec4_t color, qboole
 }
 
 static void UI_DrawEffects(rectDef_t *rect, float scale, vec4_t color) {
+	float xOffset = 128.0f / (NUM_COLOR_EFFECTS + 1);
+
 	UI_DrawHandlePic( rect->x, rect->y - 14, 128, 8, uiInfo.uiDC.Assets.fxBasePic );
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
-	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 9 + 4, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
-#else
-	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * 16 + 8, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
-#endif
+	UI_DrawHandlePic( rect->x + uiInfo.effectsColor * xOffset + xOffset * 0.5f, rect->y - 16, 16, 12, uiInfo.uiDC.Assets.fxPic[uiInfo.effectsColor] );
 }
 
 static void UI_DrawMapPreview(rectDef_t *rect, float scale, vec4_t color, qboolean net) {

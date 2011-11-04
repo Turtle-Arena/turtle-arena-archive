@@ -2344,7 +2344,7 @@ void CG_AssetCache( void ) {
 	//Com_Printf("Menu Size: %i bytes\n", sizeof(Menus));
 	cgDC.Assets.gradientBar = trap_R_RegisterShaderNoMip( ASSET_GRADIENTBAR );
 	cgDC.Assets.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
 	cgDC.Assets.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	cgDC.Assets.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_ORANGE );
 	cgDC.Assets.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );

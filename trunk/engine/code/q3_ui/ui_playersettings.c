@@ -44,13 +44,17 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 #define ART_FX_WHITE		"menu/art/fx_white"
 #define ART_FX_YELLOW		"menu/art/fx_yel"
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
 #define ART_FX_ORANGE		"menu/art/fx_orange"
 #define ART_FX_LIME			"menu/art/fx_lime"
 #define ART_FX_VIVIDGREEN	"menu/art/fx_vividgreen"
 #define ART_FX_LIGHTBLUE	"menu/art/fx_lightblue"
 #define ART_FX_PURPLE		"menu/art/fx_purple"
 #define ART_FX_PINK			"menu/art/fx_pink"
+
+#define NUM_COLOR_EFFECTS 13
+#else
+#define NUM_COLOR_EFFECTS 7
 #endif
 
 #define ID_NAME			10
@@ -63,12 +67,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #endif
 
 #define MAX_NAMELENGTH	20
-
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
-#define NUM_COLOR_EFFECTS 13
-#else
-#define NUM_COLOR_EFFECTS 7
-#endif
 
 
 typedef struct {
@@ -101,12 +99,12 @@ typedef struct {
 
 static playersettings_t	s_playersettings;
 
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
-static int gamecodetoui[] = {8,4,6,0,10,2,12,1,3,5,7,9,11};
-static int uitogamecode[] = {4,8,6,9,2,10,3,11,1,12,5,13,7};
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
+static int gamecodetoui[NUM_COLOR_EFFECTS] = {8,4,6,0,10,2,12,1,3,5,7,9,11};
+static int uitogamecode[NUM_COLOR_EFFECTS] = {4,8,6,9,2,10,3,11,1,12,5,13,7};
 #else
-static int gamecodetoui[] = {4,2,3,0,5,1,6};
-static int uitogamecode[] = {4,6,2,3,1,5,7};
+static int gamecodetoui[NUM_COLOR_EFFECTS] = {4,2,3,0,5,1,6};
+static int uitogamecode[NUM_COLOR_EFFECTS] = {4,6,2,3,1,5,7};
 #endif
 
 static const char *handicap_items[] = {
@@ -263,6 +261,7 @@ static void PlayerSettings_DrawEffects( void *self ) {
 	qboolean		focus;
 	int				style;
 	float			*color;
+	float			xOffset;
 
 	item = (menulist_s *)self;
 	focus = (item->generic.parent->cursor == item->generic.menuPosition);
@@ -288,12 +287,11 @@ static void PlayerSettings_DrawEffects( void *self ) {
 #endif
 	UI_DrawProportionalString( item->generic.x, item->generic.y, "Effects", style, color );
 
+	xOffset = 128.0f / (NUM_COLOR_EFFECTS + 1);
+
 	UI_DrawHandlePic( item->generic.x + 64, item->generic.y + PROP_HEIGHT + 8, 128, 8, s_playersettings.fxBasePic );
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
-	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
-#else
-	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * 16 + 8, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
-#endif
+	UI_DrawHandlePic( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6, 16, 12, s_playersettings.fxPic[item->curvalue] );
+
 #ifdef IOQ3ZTM // UI_COLOR2
 	if (focus) {
 		float color[4];
@@ -307,16 +305,15 @@ static void PlayerSettings_DrawEffects( void *self ) {
 
 		color[3] = 0.5 + 0.5 * sin( uis.realtime / PULSE_DIVISOR );
 
-		// MORE_COLOR_EFFECTS
 		// UI_DrawRect, but width and height are 2.
 		// top
-		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6, 16, 2, color );
+		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6, 16, 2, color );
 		// bottom
-		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6 + 10, 16, 2, color );
+		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6 + 10, 16, 2, color );
 		// left
-		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
+		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
 		// right
-		UI_FillRect( item->generic.x + 64 + item->curvalue * 9 + 4 + 14, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
+		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f + 14, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
 	}
 #endif
 }
@@ -646,7 +643,7 @@ void PlayerSettings_Cache( void ) {
 	trap_R_RegisterShaderNoMip( ART_BACK1 );
 
 	s_playersettings.fxBasePic = trap_R_RegisterShaderNoMip( ART_FX_BASE );
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
 	s_playersettings.fxPic[0] = trap_R_RegisterShaderNoMip( ART_FX_RED );
 	s_playersettings.fxPic[1] = trap_R_RegisterShaderNoMip( ART_FX_ORANGE );
 	s_playersettings.fxPic[2] = trap_R_RegisterShaderNoMip( ART_FX_YELLOW );

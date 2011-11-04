@@ -871,7 +871,7 @@ static void CG_ColorFromString( const char *v, vec3_t color ) {
 
 	val = atoi( v );
 
-#ifdef IOQ3ZTM // MORE_COLOR_EFFECTS
+#ifdef TA_DATA // MORE_COLOR_EFFECTS
 	switch (val)
 	{
 		case 1: // blue
