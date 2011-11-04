@@ -218,8 +218,8 @@ void	trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
 	syscall( CG_S_UPDATEENTITYPOSITION, entityNum, origin );
 }
 
-void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener ) {
-	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater, listener );
+void	trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson ) {
+	syscall( CG_S_RESPATIALIZE, entityNum, origin, axis, inwater, firstPerson );
 }
 
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {

@@ -132,7 +132,7 @@ typedef struct
 	void (*AddLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*AddRealLoopingSound)( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx );
 	void (*StopLoopingSound)(int entityNum );
-	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, int listener );
+	void (*Respatialize)( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson );
 	void (*UpdateEntityPosition)( int entityNum, const vec3_t origin );
 	void (*Update)( void );
 	void (*DisableSounds)( void );
@@ -150,6 +150,29 @@ typedef struct
 #endif
 } soundInterface_t;
 
+// Listener data
+typedef struct
+{
+	qboolean	updated;	// qtrue if updated this frame.
+
+	int			number; // entity number
+	vec3_t		origin;
+	vec3_t		axis[3];
+	int			inwater;
+	qboolean	firstPerson;
+} listener_t;
+
+// Currently the only listeners are local clients, but add a few extra if someone wants to add listening through portals.
+#define MAX_LISTENERS		(MAX_SPLITVIEW+4)
+
+extern listener_t listeners[MAX_LISTENERS];
+
+void S_ListenersInit(void);
+void S_ListenersEndFrame(void);
+qboolean S_HearingThroughEntity( int entityNum );
+qboolean S_EntityIsListener(int entityNum);
+int S_ListenerNumForEntity(int entityNum, qboolean create);
+void S_UpdateListener(int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson);
 
 /*
 ====================================================================
