@@ -2989,7 +2989,7 @@ static void UI_LoadDemos( void ) {
 
 	protocolLegacy = trap_Cvar_VariableValue("com_legacyprotocol");
 	protocol = trap_Cvar_VariableValue("com_protocol");
- 
+
 	if(!protocol)
 		protocol = trap_Cvar_VariableValue("protocol");
 	if(protocolLegacy == protocol)
@@ -5150,13 +5150,13 @@ static void UI_BuildQ3Model_List( void )
 				}
 				if (!dirty) {
 					Com_sprintf( uiInfo.q3HeadNames[uiInfo.q3HeadCount], sizeof(uiInfo.q3HeadNames[uiInfo.q3HeadCount]), "%s", scratch);
-					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] =
-							trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
+					uiInfo.q3HeadIcons[uiInfo.q3HeadCount++] = trap_R_RegisterShaderNoMip(va("models/players/%s/%s",dirptr,skinname));
 				}
 			}
 
 		}
 	}	
+
 }
 
 
