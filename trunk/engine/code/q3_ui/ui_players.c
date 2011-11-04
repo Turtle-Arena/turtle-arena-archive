@@ -385,29 +385,15 @@ static void UI_LegsSequencing( playerInfo_t *pi ) {
 UI_PositionEntityOnTag
 ======================
 */
-#ifdef IOQ3ZTM
 static qboolean UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							clipHandle_t parentModel, char *tagName )
-#else
-static void UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							clipHandle_t parentModel, char *tagName )
-#endif
-{
+							clipHandle_t parentModel, char *tagName ) {
 	int				i;
 	orientation_t	lerped;
+	qboolean		returnValue;
 	
 	// lerp the tag
-#ifdef IOQ3ZTM
-	qboolean rtn = qtrue;
-	if (!trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0 - parent->backlerp, tagName ))
-	{
-		rtn = qfalse;
-	}
-#else
-	trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	returnValue = trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
-#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -418,9 +404,8 @@ static void UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 	// cast away const because of compiler problems
 	MatrixMultiply( lerped.axis, ((refEntity_t*)parent)->axis, entity->axis );
 	entity->backlerp = parent->backlerp;
-#ifdef IOQ3ZTM
-	return rtn;
-#endif
+
+	return returnValue;
 }
 
 
@@ -429,30 +414,16 @@ static void UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *pare
 UI_PositionRotatedEntityOnTag
 ======================
 */
-#ifdef IOQ3ZTM
 static qboolean UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							clipHandle_t parentModel, char *tagName )
-#else
-static void UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent, 
-							clipHandle_t parentModel, char *tagName )
-#endif
-{
+							clipHandle_t parentModel, char *tagName ) {
 	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
+	qboolean		returnValue;
 
 	// lerp the tag
-#ifdef IOQ3ZTM
-	qboolean rtn = qtrue;
-	if (!trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
-		1.0 - parent->backlerp, tagName ))
-	{
-		rtn = qfalse;
-	}
-#else
-	trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	returnValue = trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
-#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -463,9 +434,8 @@ static void UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_
 	// cast away const because of compiler problems
 	MatrixMultiply( entity->axis, ((refEntity_t *)parent)->axis, tempAxis );
 	MatrixMultiply( lerped.axis, tempAxis, entity->axis );
-#ifdef IOQ3ZTM
-	return rtn;
-#endif
+
+	return returnValue;
 }
 
 

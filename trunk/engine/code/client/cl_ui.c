@@ -851,12 +851,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 
 	case UI_CM_LERPTAG:
-#ifdef IOQ3ZTM
 		return re.LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
-#else
-		re.LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
-		return 0;
-#endif
 
 	case UI_S_REGISTERSOUND:
 		return S_RegisterSound( VMA(1), args[2] );

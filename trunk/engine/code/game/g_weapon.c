@@ -186,19 +186,16 @@ Modifies the child's position and axis by the given
 tag location
 ======================
 */
-qboolean G_PositionEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
+static qboolean G_PositionEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
 	orientation_t parent, qhandle_t parentTags, char *tagName )
 {
 	int				i;
 	orientation_t	lerped;
-	qboolean rtn = qtrue;
+	qboolean		returnValue;
 
 	// lerp the tag
-	if (!trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
-		1.0 - parentLF->backlerp, tagName ))
-	{
-		rtn = qfalse;
-	}
+	returnValue = trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
+		1.0 - parentLF->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent.origin, child->origin );
@@ -208,7 +205,7 @@ qboolean G_PositionEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
 
 	MatrixMultiply( lerped.axis, parent.axis, child->axis );
 
-	return rtn;
+	return returnValue;
 }
 
 
@@ -220,21 +217,18 @@ Modifies the child's position and axis by the given
 tag location
 ======================
 */
-qboolean G_PositionRotatedEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
+static qboolean G_PositionRotatedEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
 	orientation_t parent, qhandle_t parentTags, char *tagName )
 {
 	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
-	qboolean rtn = qtrue;
+	qboolean		returnValue;
 
 //AxisClear( entity->axis );
 	// lerp the tag
-	if (!trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
-		1.0 - parentLF->backlerp, tagName ))
-	{
-		rtn = qfalse;
-	}
+	returnValue = trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
+		1.0 - parentLF->backlerp, tagName );
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent.origin, child->origin );
@@ -246,7 +240,7 @@ qboolean G_PositionRotatedEntityOnTag( orientation_t *child, lerpFrame_t *parent
 	MatrixMultiply( child->axis, lerped.axis, tempAxis );
 	MatrixMultiply( tempAxis, parent.axis, child->axis );
 
-	return rtn;
+	return returnValue;
 }
 
 /*
