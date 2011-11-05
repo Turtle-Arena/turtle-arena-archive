@@ -857,9 +857,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 	shader_t *shader;
 	int		fogNum;
 	int dlighted;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 	int sortOrder;
-#endif
 	vec4_t clip, eye;
 	int i;
 	unsigned int pointOr = 0;
@@ -871,11 +869,7 @@ static qboolean SurfIsOffscreen( const drawSurf_t *drawSurf, vec4_t clipDest[128
 
 	R_RotateForViewer();
 
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	R_DecomposeSort( drawSurf, &entityNum, &shader, &fogNum, &dlighted, &sortOrder );
-#else
-	R_DecomposeSort( drawSurf->sort, &entityNum, &shader, &fogNum, &dlighted );
-#endif
+	R_DecomposeSort( drawSurf, &shader, &sortOrder, &entityNum, &fogNum, &dlighted );
 	RB_BeginSurface( shader, fogNum );
 	rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 
@@ -1120,39 +1114,39 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 {
 	int			index;
 
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
+	if (sortOrder == SS_BAD && shader) {
+		sortOrder = shader->sort;
+	}
+#endif
+
 	// instead of checking for overflow, we just mask the index
 	// so it wraps around
 	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
 	// the sort data is packed into a single 32 bit value so it can be
 	// compared quickly during the qsorting process
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	if (sortOrder == SS_BAD && shader) {
-		sortOrder = shader->sort;
-	}
-
-	R_ComposeSort(&tr.refdef.drawSurfs[index], tr.shiftedEntityNum, shader, 
-					fogIndex, dlightMap, sortOrder);
+	R_ComposeSort(&tr.refdef.drawSurfs[index], shader, sortOrder,
+					tr.shiftedEntityNum, fogIndex, dlightMap);
 #else
-	tr.refdef.drawSurfs[index].sort = (shader->sortedIndex << QSORT_SHADERNUM_SHIFT) 
-		| tr.shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
+	R_ComposeSort(&tr.refdef.drawSurfs[index], shader, shader->sort,
+					tr.shiftedEntityNum, fogIndex, dlightMap);
 #endif
 	tr.refdef.drawSurfs[index].surface = surface;
 	tr.refdef.numDrawSurfs++;
 }
 
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 /*
 =================
 R_ComposeSort
 =================
 */
-void R_ComposeSort( drawSurf_t *drawSurf, int shiftedEntityNum, shader_t *shader, 
-					 int fogIndex, int dlightMap, int sortOrder)
-{
+void R_ComposeSort( drawSurf_t *drawSurf, shader_t *shader, int sortOrder,
+					 int shiftedEntityNum, int fogIndex, int dlightMap ) {
+	drawSurf->shaderIndex = shader->index;
+
 	drawSurf->sort = (sortOrder << QSORT_ORDER_SHIFT) 
 		| shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
-
-	drawSurf->shaderIndex = shader->index;
 }
 
 /*
@@ -1160,16 +1154,17 @@ void R_ComposeSort( drawSurf_t *drawSurf, int shiftedEntityNum, shader_t *shader
 R_DecomposeSort
 =================
 */
-void R_DecomposeSort( const drawSurf_t *drawSurf, int *entityNum, shader_t **shader, 
-					 int *fogNum, int *dlightMap, int *sortOrder) {
-	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;
-	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT ) & 31;
-	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
-	*dlightMap = drawSurf->sort & 3;
-
+void R_DecomposeSort( const drawSurf_t *drawSurf, shader_t **shader, int *sortOrder,
+					 int *entityNum, int *fogNum, int *dlightMap ) {
 	*shader = tr.shaders[ drawSurf->shaderIndex ];
+
+	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT ) & 31;
+	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & MAX_ENTITIES;
+	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;
+	*dlightMap = drawSurf->sort & 3;
 }
 
+#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 /*
 =================
 R_SortOrder
@@ -1177,22 +1172,8 @@ R_SortOrder
 Returns entity defined sort order, returns SS_BAD if no sort order is defined
 =================
 */
-int R_SortOrder(trRefEntity_t *ent)
-{
+int R_SortOrder(trRefEntity_t *ent) {
 	return ((ent && (ent->e.renderfx & RF_FORCE_ENT_ALPHA) && ent->e.shaderRGBA[3] < 0xFF) ? SS_BLEND0 : SS_BAD);
-}
-#else
-/*
-=================
-R_DecomposeSort
-=================
-*/
-void R_DecomposeSort( unsigned sort, int *entityNum, shader_t **shader, 
-					 int *fogNum, int *dlightMap ) {
-	*fogNum = ( sort >> QSORT_FOGNUM_SHIFT ) & 31;
-	*shader = tr.sortedShaders[ ( sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
-	*entityNum = ( sort >> QSORT_ENTITYNUM_SHIFT ) & (MAX_GENTITIES-1);
-	*dlightMap = sort & 3;
 }
 #endif
 
@@ -1206,9 +1187,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	int				fogNum;
 	int				entityNum;
 	int				dlighted;
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 	int				sortOrder;
-#endif
 	int				i;
 
 	// it is possible for some views to not have any surfaces
@@ -1231,8 +1210,7 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	// check for any pass through drawing, which
 	// may cause another view to be rendered first
 	for ( i = 0 ; i < numDrawSurfs ; i++ ) {
-#ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-		R_DecomposeSort( (drawSurfs+i), &entityNum, &shader, &fogNum, &dlighted, &sortOrder );
+		R_DecomposeSort( (drawSurfs+i), &shader, &sortOrder, &entityNum, &fogNum, &dlighted );
 
 		if ( sortOrder > SS_PORTAL ) {
 			break;
@@ -1246,18 +1224,6 @@ void R_SortDrawSurfs( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 				ri.Error (ERR_DROP, "Surface with shader '%s' has sort == SS_BAD", shader->name );
 			}
 		}
-#else
-		R_DecomposeSort( (drawSurfs+i)->sort, &entityNum, &shader, &fogNum, &dlighted );
-
-		if ( shader->sort > SS_PORTAL ) {
-			break;
-		}
-
-		// no shader should ever have this sort type
-		if ( shader->sort == SS_BAD ) {
-			ri.Error (ERR_DROP, "Shader '%s'with sort == SS_BAD", shader->name );
-		}
-#endif
 
 		// if the mirror was completely clipped away, we may need to check another surface
 		if ( R_MirrorViewBySurface( (drawSurfs+i), entityNum) ) {
