@@ -48,6 +48,7 @@ void S_ListenersInit(void) {
 
 	for (i = 0; i < MAX_LISTENERS; ++i)
 	{
+		listeners[i].valid = qfalse;
 		listeners[i].updated = qfalse;
 
 		listeners[i].number = -1;
@@ -68,9 +69,9 @@ void S_ListenersEndFrame(void) {
 
 	for (i = 0; i < MAX_LISTENERS; ++i)
 	{
-		// Didn't receive update for this listener this frame, so disable it.
+		// Didn't receive update for this listener this frame, so free it.
 		if (!listeners[i].updated)
-			listeners[i].number = -1;
+			listeners[i].valid = qfalse;
 
 		listeners[i].updated = qfalse;
 	}
@@ -88,7 +89,7 @@ qboolean S_HearingThroughEntity( int entityNum )
 	// Note: Listeners may be one frame out of date.
 	for (i = 0; i < MAX_LISTENERS; ++i)
 	{
-		if (listeners[i].number == entityNum)
+		if (listeners[i].valid && listeners[i].number == entityNum)
 		{
 			return listeners[i].firstPerson;
 		}
@@ -109,7 +110,7 @@ qboolean S_EntityIsListener(int entityNum)
 	// NOTE: Listeners may be one frame out of date.
 	for (i = 0; i < MAX_LISTENERS; ++i)
 	{
-		if (entityNum == listeners[i].number)
+		if (listeners[i].valid && listeners[i].number == entityNum)
 		{
 			return qtrue;
 		}
@@ -130,9 +131,12 @@ int S_ListenerNumForEntity(int entityNum, qboolean create)
 
 	for (i = 0; i < MAX_LISTENERS; ++i)
 	{
-		if (listeners[i].number == entityNum)
-			return entityNum;
-		else if (create && freeListener == -1 && listeners[i].number == -1)
+		if (listeners[i].valid)
+		{
+			if (listeners[i].number == entityNum)
+				return entityNum;
+		}
+		else if (create && freeListener == -1)
 			freeListener = i;
 	}
 
@@ -154,6 +158,7 @@ void S_UpdateListener(int entityNum, const vec3_t origin, vec3_t axis[3], int in
 	if (listener < 0 || listener >= MAX_LISTENERS)
 		return;
 
+	listeners[listener].valid = qtrue;
 	listeners[listener].updated = qtrue;
 
 	// Update listener info.

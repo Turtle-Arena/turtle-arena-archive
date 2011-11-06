@@ -153,6 +153,7 @@ typedef struct
 // Listener data
 typedef struct
 {
+	qboolean	valid;		// qtrue if setup.
 	qboolean	updated;	// qtrue if updated this frame.
 
 	int			number; // entity number
