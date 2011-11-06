@@ -446,7 +446,7 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 	*left_vol = 0;
 
 	for (i = 0; i < MAX_LISTENERS; i++) {
-		if (!listeners[i].updated)
+		if (!listeners[i].valid || !listeners[i].updated)
 			continue;
 
 		// calculate stereo seperation and distance attenuation
@@ -540,19 +540,24 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 //	Com_Printf("playing %s\n", sfx->soundName);
 	// pick a channel to play on
 
-	if (entityNum == MAX_GENTITIES) {
-		// Special case for sounds started using StartLocalSound
-		allowed = 4 * MAX_SPLITVIEW;
-		fullVolume = qtrue;
-	} else if (S_HearingThroughEntity(entityNum)) {
-		allowed = 8;
-		fullVolume = qtrue;
-	} else if (S_EntityIsListener(entityNum)) {
-		allowed = 8;
-		fullVolume = qfalse;
-	} else {
+	if (origin) {
 		allowed = 4;
 		fullVolume = qfalse;
+	} else {
+		if (entityNum == MAX_GENTITIES) {
+			// Special case for sounds started using StartLocalSound
+			allowed = 4 * MAX_SPLITVIEW;
+			fullVolume = qtrue;
+		} else if (S_HearingThroughEntity(entityNum)) {
+			allowed = 8;
+			fullVolume = qtrue;
+		} else if (S_EntityIsListener(entityNum)) {
+			allowed = 8;
+			fullVolume = qfalse;
+		} else {
+			allowed = 4;
+			fullVolume = qfalse;
+		}
 	}
 
 	ch = s_channels;
