@@ -1999,18 +1999,18 @@ Menu_Cache
 void Menu_Cache( void )
 {
 #ifdef IOQ3ZTM // FONT_REWRITE
-	UI_LoadFont(&uis.fontSmall, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 8, 0);
-	UI_LoadFont(&uis.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
-	UI_LoadFont(&uis.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+	UI_LoadFont(&uis.fontSmall, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 16, 8, 0);
+	UI_LoadFont(&uis.fontBig, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 16, 16, 0);
+	UI_LoadFont(&uis.fontGiant, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 48, 32, 0);
 
-	UI_LoadFont(&uis.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, PROP_GAP_WIDTH);
-	UI_LoadFont(&uis.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, PROP_GAP_WIDTH);
+	UI_LoadFont(&uis.fontPropSmall, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, PROP_GAP_WIDTH);
+	UI_LoadFont(&uis.fontPropBig, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, PROP_GAP_WIDTH);
 #ifndef TA_DATA
-	UI_LoadFont(&uis.fontPropGlowSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	UI_LoadFont(&uis.fontPropGlowBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
+	UI_LoadFont(&uis.fontPropGlowSmall, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	UI_LoadFont(&uis.fontPropGlowBig, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
 #endif
 
-	UI_LoadFont(&uis.fontBanner, "fonts/FreeSerif.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
+	UI_LoadFont(&uis.fontBanner, "fonts/mplus-2p-black.ttf", "menu/art/font2_prop.tga", 48, 32, 0);
 #else
 	uis.charset			= trap_R_RegisterShaderNoMip( "gfx/2d/bigchars" );
 	uis.charsetProp		= trap_R_RegisterShaderNoMip( "menu/art/font1_prop.tga" );
