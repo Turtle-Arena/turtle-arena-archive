@@ -256,7 +256,7 @@ void SP_target_push( gentity_t *self ) {
 	G_SetMovedir (self->s.angles, self->s.origin2);
 	VectorScale (self->s.origin2, self->speed, self->s.origin2);
 
-#ifdef IOQ3ZTM // Allow each trigger_hunt to have its own noise_index
+#ifdef IOQ3ZTM // Allow each target_push to have its own noise_index
 	if ( G_SpawnString( "noise", "NOSOUND", &s ) ) {
 		if (!strstr( s, ".wav" )) {
 			Com_sprintf (buffer, sizeof(buffer), "%s.wav", s );
