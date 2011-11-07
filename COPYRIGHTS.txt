@@ -110,66 +110,43 @@ base/botfiles/rnd.c
 base/botfiles/syn.c
 base/botfiles/teamplay.h
 
-== GNU FreeFont ==
-The following files were created from GNU Freefont fonts, and are licensed under
-	the GNU General Public License; either version 2 of the License, or
-	(at your option) any later version. They also include the
-	special exception for fonts (see lisence at bottom of this file).
+== M+ Outline Fonts ==
+The following files are Copyright (C) 2002-2011 M+ FONTS PROJECT and licensed as follows:
+	"These fonts are free softwares. Unlimited permission is granted to use, copy, and distribute it, with or without modification, either commercially and noncommercially. THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY."
 
-The dat and tga files listed below were created by Turtle Arena, using freetype2
+TrueType Fonts from M+ Outline Fonts (v044)
+base/fonts/mplus-1c-regular.ttf
+base/fonts/mplus-1c-bold.ttf
+base/fonts/mplus-1mn-regular.ttf
+base/fonts/mplus-2p-black.ttf
 
-Files that created from base/fonts/FreeSans.ttf:
-base/fonts/FreeSans_0_12.tga
-base/fonts/FreeSans_0_16.tga
-base/fonts/FreeSans_0_20.tga
-base/fonts/FreeSans_1_20.tga
-base/fonts/FreeSans_12.dat
-base/fonts/FreeSans_16.dat
-base/fonts/FreeSans_20.dat
+The dat and tga files listed below were created by the engine, using freetype2.
 
-Copies of FreeSans_*.dat for compatability with Quake III: Team Arena
-base/fonts/fontImage_12.dat
-base/fonts/fontImage_16.dat
-base/fonts/fontImage_20.dat
+Files that created from base/fonts/mplus-1c-regular.ttf:
+base/fonts/mplus-1c-regular_0_8.tga
+base/fonts/mplus-1c-regular_0_12.tga
+base/fonts/mplus-1c-regular_0_16.tga
+base/fonts/mplus-1c-regular_0_20.tga
+base/fonts/mplus-1c-regular_0_48.tga
+base/fonts/mplus-1c-regular_1_48.tga
+base/fonts/mplus-1c-regular_8.dat
+base/fonts/mplus-1c-regular_12.dat
+base/fonts/mplus-1c-regular_16.dat
+base/fonts/mplus-1c-regular_20.dat
+base/fonts/mplus-1c-regular_48.dat
 
-Files that created from base/fonts/FreeSansBold.ttf:
-base/fonts/FreeSansBold_0_16.tga
-base/fonts/FreeSansBold_16.dat
+Files that created from base/fonts/mplus-1c-bold.ttf:
+base/fonts/mplus-1c-bold_0_20.tga
+base/fonts/mplus-1c-bold_0_27.tga
+base/fonts/mplus-1c-bold_1_27.tga
+base/fonts/mplus-1c-bold_20.dat
+base/fonts/mplus-1c-bold_27.dat
 
-Files that created from base/fonts/FreeSerif.ttf:
-base/fonts/FreeSerif_0_48.tga
-base/fonts/FreeSerif_48.dat
+Files that created from base/fonts/mplus-1mn-regular.ttf:
+base/fonts/mplus-1mn-regular_0_16.tga
+base/fonts/mplus-1mn-regular_16.dat
 
-TrueType Fonts from GNU FreeFont
-base/fonts/FreeSans.ttf
-base/fonts/FreeSansBold.ttf
-base/fonts/FreeSerif.ttf
-
-These versions are from the 2008-09-12 GPL version 2 (or later) release.
-
-License
----------
-
-Free UCS scalable fonts is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License as published
-by the Free Software Foundation; either version 2 of the License, or
-(at your option) any later version.
-
-The fonts are distributed in the hope that they will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
-
-You should have received a copy of the GNU General Public License along
-with this program; if not, write to the Free Software Foundation, Inc.,
-51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
-As a special exception, if you create a document which uses this font, and
-embed this font or unaltered portions of this font into the document, this
-font does not by itself cause the resulting document to be covered by the
-GNU General Public License. This exception does not however invalidate any
-other reasons why the document might be covered by the GNU General Public
-License. If you modify this font, you may extend this exception to your
-version of the font, but you are not obligated to do so.  If you do not
-wish to do so, delete this exception statement from your version.
+Files that created from base/fonts/mplus-1mn-regular.ttf:
+base/fonts/mplus-1mn-regular_0_16.tga
+base/fonts/mplus-1mn-regular_16.dat
 

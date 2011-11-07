@@ -3232,11 +3232,11 @@ void CL_InitRenderer( void ) {
 
 	// load character sets
 #ifdef IOQ3ZTM // FONT_REWRITE
-	SCR_LoadFont(&cls.fontTiny, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 8, 8, 0);
+	SCR_LoadFont(&cls.fontTiny, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 8, 8, 0);
 	SCR_LoadFont(&cls.fontSmall, cl_consoleFont->string, "gfx/2d/bigchars", cl_consoleFontSize->integer,
 			cl_consoleFontSize->integer*0.66f, cl_consoleFontKerning->value);
-	SCR_LoadFont(&cls.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
-	//SCR_LoadFont(&cls.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+	SCR_LoadFont(&cls.fontBig, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 16, 16, 0);
+	//SCR_LoadFont(&cls.fontGiant, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 48, 32, 0);
 #else
 	cls.charSetShader = re.RegisterShader( "gfx/2d/bigchars" );
 #endif
@@ -3721,9 +3721,9 @@ void CL_Init( void ) {
 	// ~ and `, as keys and characters
 	cl_consoleKeys = Cvar_Get( "cl_consoleKeys", "~ ` 0x7e 0x60", CVAR_ARCHIVE);
 #ifdef IOQ3ZTM // USE_FREETYPE
-	cl_consoleFont = Cvar_Get ("cl_consoleFont", "fonts/FreeSansBold.ttf", CVAR_ARCHIVE | CVAR_LATCH);
-	cl_consoleFontSize = Cvar_Get ("cl_consoleFontSize", "16", CVAR_ARCHIVE | CVAR_LATCH);
-	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE | CVAR_LATCH);
+	cl_consoleFont = Cvar_Get ("cl_consoleFont", "fonts/mplus-1mn-regular.ttf", CVAR_ARCHIVE);
+	cl_consoleFontSize = Cvar_Get ("cl_consoleFontSize", "16", CVAR_ARCHIVE);
+	cl_consoleFontKerning = Cvar_Get ("cl_consoleFontKerning", "0", CVAR_ARCHIVE);
 #endif
 
 #ifdef IOQ3ZTM // ANALOG
