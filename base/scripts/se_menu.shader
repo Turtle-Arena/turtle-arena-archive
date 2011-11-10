@@ -69,3 +69,49 @@ levelShotDetail
 	}
 }
 
+// cgame bot skill shaders...
+menu/art/skill1
+{
+	nomipmaps
+	{
+		map menu/art/skill1.png
+		blendfunc blend
+	}
+}
+
+menu/art/skill2
+{
+	nomipmaps
+	{
+		map menu/art/skill2.png
+		blendfunc blend
+	}
+}
+
+menu/art/skill3
+{
+	nomipmaps
+	{
+		map menu/art/skill3.png
+		blendfunc blend
+	}
+}
+
+menu/art/skill4
+{
+	nomipmaps
+	{
+		map menu/art/skill4.png
+		blendfunc blend
+	}
+}
+
+menu/art/skill5
+{
+	nomipmaps
+	{
+		map menu/art/skill5.png
+		blendfunc blend
+	}
+}
+
