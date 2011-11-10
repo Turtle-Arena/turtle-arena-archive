@@ -263,7 +263,11 @@ Build a client snapshot structure
 =============================================================================
 */
 
+#ifdef IOQ3ZTM_NO_COMPAT // MORE_ENTITIES
+#define	MAX_SNAPSHOT_ENTITIES	MAX_GENTITIES
+#else
 #define	MAX_SNAPSHOT_ENTITIES	1024
+#endif
 typedef struct {
 	int		numSnapshotEntities;
 	int		snapshotEntities[MAX_SNAPSHOT_ENTITIES];	
