@@ -431,9 +431,9 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 #endif
 	float		dpiScale = 72.0f / dpi; // change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 	float		glyphScale = 1.0f;
-#endif
 	void		*faceData;
 	int			i, len;
+#endif
 	char		fontName[MAX_QPATH];
 	char		strippedName[MAX_QPATH];
 	char		name[MAX_QPATH];
