@@ -2416,16 +2416,16 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// load a few needed things before we do any screen updates
 #ifdef IOQ3ZTM // FONT_REWRITE
-	CG_LoadFont(&cgs.media.fontTiny, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 8, 8, 0);
-	CG_LoadFont(&cgs.media.fontSmall, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 8, 0);
-	CG_LoadFont(&cgs.media.fontBig, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 16, 16, 0);
-	CG_LoadFont(&cgs.media.fontGiant, "fonts/FreeSans.ttf", "gfx/2d/bigchars", 48, 32, 0);
+	CG_LoadFont(&cgs.media.fontTiny, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 8, 8, 0);
+	CG_LoadFont(&cgs.media.fontSmall, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 16, 8, 0);
+	CG_LoadFont(&cgs.media.fontBig, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 16, 16, 0);
+	CG_LoadFont(&cgs.media.fontGiant, "fonts/mplus-1c-regular.ttf", "gfx/2d/bigchars", 48, 32, 0);
 
-	CG_LoadFont(&cgs.media.fontPropSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	CG_LoadFont(&cgs.media.fontPropBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
+	CG_LoadFont(&cgs.media.fontPropSmall, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	CG_LoadFont(&cgs.media.fontPropBig, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop.tga", PROP_HEIGHT, 22*0.66f, 0);
 #ifndef TA_DATA
-	CG_LoadFont(&cgs.media.fontPropGlowSmall, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
-	CG_LoadFont(&cgs.media.fontPropGlowBig, "fonts/FreeSansBold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
+	CG_LoadFont(&cgs.media.fontPropGlowSmall, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT*PROP_SMALL_SIZE_SCALE, PROP_HEIGHT*PROP_SMALL_SIZE_SCALE*0.66f, 0);
+	CG_LoadFont(&cgs.media.fontPropGlowBig, "fonts/mplus-1c-bold.ttf", "menu/art/font1_prop_glo.tga", PROP_HEIGHT, 22*0.66f, 0);
 #endif
 
 	cgs.media.whiteShader		= trap_R_RegisterShader( "white" );
