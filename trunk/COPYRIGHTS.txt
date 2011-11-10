@@ -36,6 +36,10 @@ base/menu/art/skill2.png
 base/menu/art/skill3.png
 base/menu/art/skill4.png
 base/menu/art/skill5.png
+base/icons/ammo_regen.png
+base/icons/doubler.png
+base/icons/guard.png
+base/icons/scout.png
 base/textures/common/alpha000.png
 base/textures/common/alpha025.png
 base/textures/common/alpha050.png
@@ -75,10 +79,6 @@ base/menu/art/save_0.png
 base/menu/art/save_1.png
 base/menu/art/specify_0.png
 base/menu/art/specify_1.png
-base/icons/ammo_regen.png
-base/icons/doubler.png
-base/icons/guard.png
-base/icons/scout.png
 
 == zero-project.gr ==
 The following is copyright (c) 2010 zero-project and is licensed under the
