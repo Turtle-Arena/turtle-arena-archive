@@ -647,7 +647,7 @@ void Con_DrawNotify (void)
 		{
 			SCR_DrawBigString (8, v, "say_team:", 1.0f, qfalse );
 #ifdef IOQ3ZTM // FONT_REWRITE
-			skip = Com_FontStringWidth(&cls.fontBig, "say_team: ", 0);
+			skip = 8+Com_FontStringWidth(&cls.fontBig, "say_team: ", 0);
 #else
 			skip = 10;
 #endif
@@ -656,7 +656,7 @@ void Con_DrawNotify (void)
 		{
 			SCR_DrawBigString (8, v, "say:", 1.0f, qfalse );
 #ifdef IOQ3ZTM // FONT_REWRITE
-			skip = Com_FontStringWidth(&cls.fontBig, "say: ", 0);
+			skip = 8+Com_FontStringWidth(&cls.fontBig, "say: ", 0);
 #else
 			skip = 5;
 #endif
