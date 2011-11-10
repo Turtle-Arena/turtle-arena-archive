@@ -27,7 +27,6 @@ endif
 
 console
 {
-	nopicmip
 	nomipmaps
 	{
 		map gfx/misc/console01.png

@@ -4,114 +4,114 @@
 // HOLDABLE ICONS
 icons/medkit
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/medkit.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/portal
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/portal.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 // Shurikens
 icons/shuriken
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/shuriken.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/shurikenelectric
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/shurikenelectric.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/shurikenfire
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/shurikenfire.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/shurikenlaser
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/shurikenlaser.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 // POWERUP ICONS
 icons/defense
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/defense.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 icons/strength
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/strength.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 icons/speed
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/speed.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 icons/invis
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/invis.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 icons/flight
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/flight.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/invul
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/invul.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 // MEDAL ICONS -- ZTM: Move to se_sprites.shader ?
 medal_assist
 {
-	nopicmip
+	nomipmaps
 	{
 		clampmap menu/medals/medal_assist.png
 		blendFunc blend
@@ -120,7 +120,7 @@ medal_assist
 
 medal_defend
 {
-	nopicmip
+	nomipmaps
 	{
 		clampmap menu/medals/medal_defend.png
 		blendFunc blend
@@ -129,7 +129,7 @@ medal_defend
 
 medal_capture
 {
-	nopicmip
+	nomipmaps
 	{
 		clampmap menu/medals/medal_capture.png
 		blendFunc blend
@@ -139,191 +139,191 @@ medal_capture
 // WEAPON ICONS
 icons/iconw_default
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_default.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_katanas
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_katanas.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_daisho
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_daisho.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_sais
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_sais.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_nunchucks
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_nunchucks.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_hammer
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_hammer.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_axe
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_axe.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_longsword
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_longsword.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_bat
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_bat.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_bo
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_bo.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_bamboo
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_bamboo.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_triblaster
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_triblaster.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_electric
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_electric.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_homing
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_homing.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_rocket
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_rocket.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_grapple
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_grapple.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconw_railgun
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconw_railgun.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 // HEALTH ICONS
 icons/iconh_small
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconh_small.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconh_medium
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconh_medium.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconh_large
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconh_large.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconh_mega
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconh_mega.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
@@ -331,7 +331,7 @@ icons/iconh_mega
 // Images have no alpha
 icons/iconf_red1
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_red1.png
 	}
@@ -339,7 +339,7 @@ icons/iconf_red1
 
 icons/iconf_red2
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_red2.png
 	}
@@ -347,7 +347,7 @@ icons/iconf_red2
 
 icons/iconf_red3
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_red3.png
 	}
@@ -355,7 +355,7 @@ icons/iconf_red3
 
 icons/iconf_blu1
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_blu1.png
 	}
@@ -363,7 +363,7 @@ icons/iconf_blu1
 
 icons/iconf_blu2
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_blu2.png
 	}
@@ -371,7 +371,7 @@ icons/iconf_blu2
 
 icons/iconf_blu3
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_blu3.png
 	}
@@ -379,7 +379,7 @@ icons/iconf_blu3
 
 icons/iconf_neutral1
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_neutral1.png
 	}
@@ -387,7 +387,7 @@ icons/iconf_neutral1
 
 icons/iconf_neutral3
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconf_neutral3.png
 	}
@@ -396,19 +396,19 @@ icons/iconf_neutral3
 // SCORE ICONS
 icons/iconi_star
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconi_star.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/iconi_sphere
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/iconi_sphere.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
@@ -454,36 +454,36 @@ scoreboardPing
 
 icons/guard
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/guard.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/doubler
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/doubler.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/ammo_regen
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/ammo_regen.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
 
 icons/scout
 {
-	nopicmip
+	nomipmaps
 	{
 		map icons/scout.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+		blendFunc blend
 	}
 }
