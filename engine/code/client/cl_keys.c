@@ -458,7 +458,7 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 	float	color[4];
 
 	color[0] = color[1] = color[2] = color[3] = 1.0;
-	SCR_DrawFontStringExt(font, x, y, str, color, qfalse, noColorEscape, (size == BIGCHAR_WIDTH), (size == BIGCHAR_WIDTH), 0);
+	SCR_DrawFontStringExt(font, x, y, str, color, qfalse, noColorEscape, (size == BIGCHAR_WIDTH), qfalse, 0);
 #else
 	if ( size == SMALLCHAR_WIDTH ) {
 		float	color[4];
@@ -500,7 +500,7 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		for (id = 0; id < (edit->cursor - prestep - i); i++) {
 			strWidth += Com_FontCharWidth( font, str[i] );
 		}
-		SCR_DrawFontChar(font, x + strWidth, y, cursorChar, (size == BIGCHAR_WIDTH));
+		SCR_DrawFontChar(font, x + strWidth, y, cursorChar, qfalse);
 #else
 		if ( size == SMALLCHAR_WIDTH ) {
 			SCR_DrawSmallChar( x + ( edit->cursor - prestep - i ) * size, y, cursorChar );
