@@ -353,11 +353,11 @@ void SCR_DrawBigString( int x, int y, const char *s, float alpha, qboolean noCol
 
 	color[0] = color[1] = color[2] = 1.0;
 	color[3] = alpha;
-	SCR_DrawFontStringExt( &cls.fontBig, x, y, s, color, qfalse, noColorEscape, qtrue, qtrue, 0 );
+	SCR_DrawFontStringExt( &cls.fontBig, x, y, s, color, qfalse, noColorEscape, qtrue, qfalse, 0 );
 }
 
 void SCR_DrawBigStringColor( int x, int y, const char *s, vec4_t color, qboolean noColorEscape ) {
-	SCR_DrawFontStringExt( &cls.fontBig, x, y, s, color, qtrue, noColorEscape, qtrue, qtrue, 0 );
+	SCR_DrawFontStringExt( &cls.fontBig, x, y, s, color, qtrue, noColorEscape, qtrue, qfalse, 0 );
 }
 #else
 /*

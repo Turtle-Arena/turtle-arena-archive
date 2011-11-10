@@ -582,10 +582,54 @@ void Con_DrawNotify (void)
 	int		skip;
 	int		currentColor;
 
+	v = 0;
+
+#ifdef TA_MISC // Place the chat input above notify lines.
+	if (!(Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) )) {
+		// draw the chat line
+		if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE )
+		{
+			x = cl_conXOffset->integer;
+
+			if (chat_team)
+			{
+				SCR_DrawBigString (x, v, "say_team:", 1.0f, qfalse );
+#ifdef IOQ3ZTM // FONT_REWRITE
+				skip = x+Com_FontStringWidth(&cls.fontBig, "say_team: ", 0);
+#else
+				skip = 10;
+#endif
+			}
+			else
+			{
+				SCR_DrawBigString (x, v, "say:", 1.0f, qfalse );
+#ifdef IOQ3ZTM // FONT_REWRITE
+				skip = x+Com_FontStringWidth(&cls.fontBig, "say: ", 0);
+#else
+				skip = 5;
+#endif
+			}
+
+#ifdef IOQ3ZTM // FONT_REWRITE
+			Field_BigDraw( &chatField, skip, v,
+				SCREEN_WIDTH - skip, qtrue, qtrue );
+#else
+			Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
+				SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
+#endif
+
+#ifdef IOQ3ZTM // FONT_REWRITE
+			v += Com_FontCharHeight(&cls.fontBig);
+#else
+			v += BIGCHAR_HEIGHT;
+#endif
+		}
+	}
+#endif
+
 	currentColor = 7;
 	re.SetColor( g_color_table[currentColor] );
 
-	v = 0;
 	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
 	{
 		if (i < 0)
@@ -636,6 +680,7 @@ void Con_DrawNotify (void)
 
 	re.SetColor( NULL );
 
+#ifndef TA_MISC
 	if (Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
 		return;
 	}
@@ -670,8 +715,13 @@ void Con_DrawNotify (void)
 			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
 #endif
 
+#ifdef IOQ3ZTM // FONT_REWRITE
+		v += Com_FontCharHeight(&cls.fontBig);
+#else
 		v += BIGCHAR_HEIGHT;
+#endif
 	}
+#endif
 
 }
 
