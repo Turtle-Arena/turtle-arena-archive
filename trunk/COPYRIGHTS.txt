@@ -31,6 +31,11 @@ base/gfx/2d/numbers/six_32b.png
 base/gfx/2d/numbers/seven_32b.png
 base/gfx/2d/numbers/eight_32b.png
 base/gfx/2d/numbers/nine_32b.png
+base/menu/art/skill1.png
+base/menu/art/skill2.png
+base/menu/art/skill3.png
+base/menu/art/skill4.png
+base/menu/art/skill5.png
 base/textures/common/alpha000.png
 base/textures/common/alpha025.png
 base/textures/common/alpha050.png
@@ -40,13 +45,6 @@ base/textures/common/alpha100.png
 
 The following use GNU FreeFont, for font license see
 	http://www.gnu.org/software/freefont/license.html
-
-Images that use GNU FreeFont FreeMono:
-base/menu/art/skill1.png
-base/menu/art/skill2.png
-base/menu/art/skill3.png
-base/menu/art/skill4.png
-base/menu/art/skill5.png
 
 Images that use GNU FreeFont FreeSansBold:
 base/menu/art/accept_0.png
