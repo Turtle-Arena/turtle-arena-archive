@@ -26,7 +26,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #define	MAX_DLIGHTS		32		// can't be increased, because bit flags are used on surfaces
 
+#ifdef IOQ3ZTM_NO_COMPAT // MORE_ENTITIES
+#define	ENTITYNUM_BITS		14		// can't be increased without changing drawsurf bit packing
+#else
 #define	ENTITYNUM_BITS		12		// can't be increased without changing drawsurf bit packing
+#endif
 #define	MAX_ENTITIES		((1<<ENTITYNUM_BITS) - 1)
 
 // renderfx flags
