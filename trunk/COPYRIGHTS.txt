@@ -13,7 +13,7 @@ All data in the base and base-src directories, unless otherwise noted, are
 	Attribution-ShareAlike 3.0 Unported.
 	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
 
-The data files in the base directory that have other source files are included
+The data files in the base directory that have source files are included
 	in the base-src directory.
 
 The following use M+ Outline Fonts, for font license see the last section of
@@ -47,10 +47,33 @@ base/textures/common/alpha075.png
 base/textures/common/alpha085.png
 base/textures/common/alpha100.png
 
+Images that use M+ 1mn Regular:
+base/gfx/clientLoading.png
+base/gfx/clientLoading_low.png
+
 The following use GNU FreeFont, for font license see
 	http://www.gnu.org/software/freefont/license.html
 
+Images that use GNU FreeFont FreeMono:
+base/textures/tech/terminal.png
+base/textures/tech/terminal_editor.png
+
+Images that use GNU FreeFont FreeMono Bold:
+base/menu/tab/name.png
+base/menu/tab/ping.png
+base/menu/tab/score.png
+base/menu/tab/time.png
+
+Images that use GNU FreeFont FreeSans:
+base/models/powerups/ammo2.png
+base/models/powerups/doubler2.png
+base/models/powerups/guard2.png
+base/models/powerups/scout2.png
+base/textures/fog/fogblack.png
+base/textures/fog/fogwhite.png
+
 Images that use GNU FreeFont FreeSansBold:
+base/textures/city/manhole_top.png
 base/menu/art/accept_0.png
 base/menu/art/accept_1.png
 base/menu/art/back_0.png
