@@ -20,58 +20,54 @@ The following use M+ Outline Fonts, for font license see the last section of
 	this file.
 
 Images that use M+ 1c Bold:
-base/gfx/2d/numbers/minus_32b.png
-base/gfx/2d/numbers/zero_32b.png
-base/gfx/2d/numbers/one_32b.png
-base/gfx/2d/numbers/two_32b.png
-base/gfx/2d/numbers/three_32b.png
-base/gfx/2d/numbers/four_32b.png
-base/gfx/2d/numbers/five_32b.png
-base/gfx/2d/numbers/six_32b.png
-base/gfx/2d/numbers/seven_32b.png
 base/gfx/2d/numbers/eight_32b.png
+base/gfx/2d/numbers/five_32b.png
+base/gfx/2d/numbers/four_32b.png
+base/gfx/2d/numbers/minus_32b.png
 base/gfx/2d/numbers/nine_32b.png
-base/menu/tab/name.png
-base/menu/tab/ping.png
-base/menu/tab/score.png
-base/menu/tab/time.png
+base/gfx/2d/numbers/one_32b.png
+base/gfx/2d/numbers/seven_32b.png
+base/gfx/2d/numbers/six_32b.png
+base/gfx/2d/numbers/three_32b.png
+base/gfx/2d/numbers/two_32b.png
+base/gfx/2d/numbers/zero_32b.png
+base/icons/ammo_regen.png
+base/icons/doubler.png
+base/icons/guard.png
+base/icons/scout.png
 base/menu/art/skill1.png
 base/menu/art/skill2.png
 base/menu/art/skill3.png
 base/menu/art/skill4.png
 base/menu/art/skill5.png
-base/icons/ammo_regen.png
-base/icons/doubler.png
-base/icons/guard.png
-base/icons/scout.png
+base/menu/tab/name.png
+base/menu/tab/ping.png
+base/menu/tab/score.png
+base/menu/tab/time.png
+base/models/powerups/ammo2.png
+base/models/powerups/doubler2.png
+base/models/powerups/guard2.png
+base/models/powerups/scout2.png
+base/textures/city/manhole_top.png
 base/textures/common/alpha000.png
 base/textures/common/alpha025.png
 base/textures/common/alpha050.png
 base/textures/common/alpha075.png
 base/textures/common/alpha085.png
 base/textures/common/alpha100.png
+base/textures/fog/fogblack.png
+base/textures/fog/fogwhite.png
 
 Images that use M+ 1mn Regular:
 base/gfx/clientLoading.png
 base/gfx/clientLoading_low.png
+base/textures/tech/terminal.png
+base/textures/tech/terminal_editor.png
 
 The following use GNU FreeFont, for font license see
 	http://www.gnu.org/software/freefont/license.html
 
-Images that use GNU FreeFont FreeMono:
-base/textures/tech/terminal.png
-base/textures/tech/terminal_editor.png
-
-Images that use GNU FreeFont FreeSans:
-base/models/powerups/ammo2.png
-base/models/powerups/doubler2.png
-base/models/powerups/guard2.png
-base/models/powerups/scout2.png
-base/textures/fog/fogblack.png
-base/textures/fog/fogwhite.png
-
 Images that use GNU FreeFont FreeSansBold:
-base/textures/city/manhole_top.png
 base/menu/art/accept_0.png
 base/menu/art/accept_1.png
 base/menu/art/back_0.png
