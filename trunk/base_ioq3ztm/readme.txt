@@ -11,32 +11,27 @@ All data in the this directory (base_ioq3ztm), unless otherwise noted, are
 	option) any later version and licensed under the Creative Commons ShareAlike
 	3.0. You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
 
-There are some source files are mixed in with the data. Some of the files were
-	created from source files in the ../base-src directory.
+There are some source files are mixed in with the data. Some of the files may
+	have been created from source files in the ../base-src directory.
 
 The following use M+ Outline Fonts, for font license see the last section of
 	this file.
 
 Images that use M+ 1c Bold:
+menu/art/create_0.png
+menu/art/create_1.png
+menu/art/fight_0.png
+menu/art/fight_1.png
 menu/art/level_complete1.png
 menu/art/level_complete2.png
 menu/art/level_complete3.png
 menu/art/level_complete4.png
 menu/art/level_complete5.png
+menu/art/skirmish_0.png
+menu/art/skirmish_1.png
 
 Images that use M+ 2p Black:
 menu/art/font2_prop.png
-
-The following use GNU FreeFont, for font license see
-	http://www.gnu.org/software/freefont/license.html
-
-Images that use GNU FreeFont FreeSansBold:
-menu/art/create_0.png
-menu/art/create_1.png
-menu/art/fight_0.png
-menu/art/fight_1.png
-menu/art/skirmish_0.png
-menu/art/skirmish_1.png
 
 == OpenArena ==
 The following are from OpenArena,

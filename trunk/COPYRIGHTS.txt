@@ -35,11 +35,43 @@ base/icons/ammo_regen.png
 base/icons/doubler.png
 base/icons/guard.png
 base/icons/scout.png
+base/menu/art/accept_0.png
+base/menu/art/accept_1.png
+base/menu/art/back_0.png
+base/menu/art/back_1.png
+base/menu/art/cancel_0.png
+base/menu/art/cancel_1.png
+base/menu/art/delete_0.png
+base/menu/art/delete_1.png
+base/menu/art/join_0.png
+base/menu/art/join_1.png
+base/menu/art/load_0.png
+base/menu/art/load_1.png
+base/menu/art/menu_0.png
+base/menu/art/menu_1.png
+base/menu/art/model_0.png
+base/menu/art/model_1.png
+base/menu/art/new_0.png
+base/menu/art/new_1.png
+base/menu/art/next_0.png
+base/menu/art/next_1.png
+base/menu/art/play_0.png
+base/menu/art/play_1.png
+base/menu/art/refresh_0.png
+base/menu/art/refresh_1.png
+base/menu/art/replay_0.png
+base/menu/art/replay_1.png
+base/menu/art/reset_0.png
+base/menu/art/reset_1.png
+base/menu/art/save_0.png
+base/menu/art/save_1.png
 base/menu/art/skill1.png
 base/menu/art/skill2.png
 base/menu/art/skill3.png
 base/menu/art/skill4.png
 base/menu/art/skill5.png
+base/menu/art/specify_0.png
+base/menu/art/specify_1.png
 base/menu/tab/name.png
 base/menu/tab/ping.png
 base/menu/tab/score.png
@@ -63,39 +95,6 @@ base/gfx/clientLoading.png
 base/gfx/clientLoading_low.png
 base/textures/tech/terminal.png
 base/textures/tech/terminal_editor.png
-
-The following use GNU FreeFont, for font license see
-	http://www.gnu.org/software/freefont/license.html
-
-Images that use GNU FreeFont FreeSansBold:
-base/menu/art/accept_0.png
-base/menu/art/accept_1.png
-base/menu/art/back_0.png
-base/menu/art/back_1.png
-base/menu/art/delete_0.png
-base/menu/art/delete_1.png
-base/menu/art/join_0.png
-base/menu/art/join_1.png
-base/menu/art/load_0.png
-base/menu/art/load_1.png
-base/menu/art/menu_0.png
-base/menu/art/menu_1.png
-base/menu/art/model_0.png
-base/menu/art/model_1.png
-base/menu/art/next_0.png
-base/menu/art/next_1.png
-base/menu/art/play_0.png
-base/menu/art/play_1.png
-base/menu/art/refresh_0.png
-base/menu/art/refresh_1.png
-base/menu/art/replay_0.png
-base/menu/art/replay_1.png
-base/menu/art/reset_0.png
-base/menu/art/reset_1.png
-base/menu/art/save_0.png
-base/menu/art/save_1.png
-base/menu/art/specify_0.png
-base/menu/art/specify_1.png
 
 == zero-project.gr ==
 The following is copyright (c) 2010 zero-project and is licensed under the
