@@ -1,5 +1,4 @@
-// Taken from Open Arena
-// (changed filenames "sound\voices\rott\" to "sound/voices/male1/")
+// Based on file from Open Arena
 male
 
 getflag
@@ -36,14 +35,12 @@ followme
 yes
 {
 	sound/voices/male1/yes.ogg	"Yes."
-	sound/voices/male1/affirmative.ogg	"Affirmative."
-	sound/voices/male1/okay.ogg	"Okay"
+	sound/voices/male1/okay.ogg	"Okay."
 }
 
 no
 {
 	sound/voices/male1/no.ogg	"No."
-	sound/voices/male1/negative.ogg	"Negative."
 }
 
 ihaveflag
@@ -178,14 +175,3 @@ onreturnflag
 	sound/voices/male1/gettingourflag.ogg	"Getting our flag!"
 }
 
-// Turtle Arena has no harvester gametype...
-harvest
-{
-//	sound/voices/male1/getsomeskulls.ogg	"Get some skulls"
-}
-
-// Turtle Arena has no gaunlet
-kill_gauntlet
-{
-
-}
