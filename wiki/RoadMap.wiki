@@ -2,7 +2,7 @@
 #labels Phase-Design
 
 = Roadmap =
-Work-in-progress plans for future Turtle Arena releases.
+Work-in-progress plans for future releases.
 
 == 0.5 series ==
 The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with more often releases.
@@ -22,6 +22,7 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
 === 0.5.3 ===
   * Add "Arcade Mode".
   * DONE: Create new icon and loading screen.
+  * DONE: Replace usage of GNU Freefont fonts with M+ Outline Fonts.
   * ...
 
 === 0.5.4 ===
