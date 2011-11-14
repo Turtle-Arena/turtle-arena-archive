@@ -1391,6 +1391,7 @@ int RE_JointIndexForName(qhandle_t handle, const char *jointName)
 	int			i;
 
 	model = R_GetModelByHandle( handle );
+	jointIndex = -1;
 
 	switch (model->type)
 	{
@@ -1414,10 +1415,6 @@ int RE_JointIndexForName(qhandle_t handle, const char *jointName)
 					// Look at next joint name
 					str += strlen( str ) + 1;
 				}
-
-				// Bone not found
-				if (i == iqmData->num_joints)
-					jointIndex = -1;
 				break;
 			}
 
@@ -1440,16 +1437,11 @@ int RE_JointIndexForName(qhandle_t handle, const char *jointName)
 						break;
 					}
 				}
-
-				// Bone not found
-				if (i == mod->numTags)
-					jointIndex = -1;
 				break;
 			}
 #endif
 
 		default:
-			jointIndex = -1;
 			break;
 	}
 
@@ -1707,7 +1699,9 @@ void R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
 			numJoints = MAX_SKELETON_JOINTS;
 		}
 
-		for (i = 0; i < numJoints; ++i, parent = in->jointParents[i]) {
+		for (i = 0; i < numJoints; ++i) {
+			parent = in->jointParents[i];
+
 			if( parent >= 0 ) {
 				OrientationMultiply(in->joints[parent], in->joints[i], &out->joints[i]);
 			} else {
