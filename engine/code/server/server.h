@@ -200,9 +200,9 @@ typedef struct client_s {
 	qboolean		compat;
 #endif
 
-	int	owner; // If not -1 this client is splitscreen with owner
-	int local_clients[MAX_SPLITVIEW-1]; // If any are not -1 this client is splitscreen main client,
-										// local_clients are there splitscreen players.
+	struct client_s *mainClient;
+	struct client_s *localClients[MAX_SPLITVIEW-1]; // If any are not NULL this client is splitscreen main client,
+										// localClients are their splitscreen players.
 } client_t;
 
 //=============================================================================

@@ -144,18 +144,16 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	int		index, i;
 	int 	lc = 0;
 
-	// Send command to owner, but prepend it with "lc# "
-	if (client->owner != -1) {
-		int clientNum = client - svs.clients;
-
-		client = svs.clients + client->owner;
-
+	// Send command to main client, but prepend it with "lc# "
+	if (client->mainClient) {
 		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-			if (client->local_clients[i] == clientNum) {
+			if (client->mainClient->localClients[i] == client) {
 				lc = i+1;
 				break;
 			}
 		}
+
+		client = client->mainClient;
 	}
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
@@ -238,7 +236,7 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
 		// Don't sent print for extra local clients
-		if (client->owner != -1 && !strncmp( (char *)message, "print", 5)) {
+		if (client->mainClient && !strncmp( (char *)message, "print", 5)) {
 			continue;
 		}
 
@@ -1102,8 +1100,8 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 				cl->lastPacketTime = svs.time;	// don't timeout
 
 				for (j = 0; j < MAX_SPLITVIEW-1; j++) {
-					if (cl->local_clients[j] != -1) {
-						svs.clients[cl->local_clients[j]].lastPacketTime = svs.time;	// don't timeout
+					if (cl->localClients[j]) {
+						cl->localClients[j]->lastPacketTime = svs.time;	// don't timeout
 					}
 				}
 
@@ -1133,7 +1131,7 @@ static void SV_CalcPings( void ) {
 		cl = &svs.clients[i];
 
 		// Splitscreen client's ping is set by main client.
-		if (cl->owner != -1) {
+		if (cl->mainClient) {
 			continue;
 		}
 		if ( cl->state != CS_ACTIVE ) {
@@ -1174,11 +1172,11 @@ static void SV_CalcPings( void ) {
 
 		// Splitscreen clients' ping is set by main client.
 		for ( j = 0 ; j < MAX_SPLITVIEW-1 ; j++ ) {
-			if ( cl->local_clients[j] == -1 ) {
+			if (!cl->localClients[j]) {
 				continue;
 			}
 
-			ps = SV_GameClientNum( cl->local_clients[j] );
+			ps = SV_GameClientNum( cl->localClients[j] - svs.clients );
 			ps->ping = cl->ping;
 		}
 	}
@@ -1250,7 +1248,7 @@ static qboolean SV_CheckPaused( void ) {
 	// only pause if there is just a single client connected
 	count = 0;
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if ( cl->owner != -1) {
+		if (cl->mainClient) {
 			// Don't count extra local clients (allows pausing in splitscreen).
 			continue;
 		}

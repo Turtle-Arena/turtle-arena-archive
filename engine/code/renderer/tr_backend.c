@@ -525,7 +525,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	qboolean		depthRange, oldDepthRange, isCrosshair, wasCrosshair;
 	int				i;
 	drawSurf_t		*drawSurf;
-	int				oldSort;
+	uint64_t		oldSort;
 	float			originalTime;
 
 	// save original time for entity shader offsets
@@ -549,7 +549,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	backEnd.pc.c_surfaces += numDrawSurfs;
 
 	for (i = 0, drawSurf = drawSurfs ; i < numDrawSurfs ; i++, drawSurf++) {
-		if ( drawSurf->sort == oldSort && (shader_t*)tr.shaders[ drawSurf->shaderIndex ] == oldShader) {
+		if ( drawSurf->sort == oldSort ) {
 			// fast path, same as previous sort
 			rb_surfaceTable[ *drawSurf->surface ]( drawSurf->surface );
 			continue;
