@@ -2210,6 +2210,83 @@ static qboolean CollapseMultitexture( void ) {
 }
 
 /*
+=============
+
+FixRenderCommandList
+https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=493
+Arnout: this is a nasty issue. Shaders can be registered after drawsurfaces are generated
+but before the frame is rendered. This will, for the duration of one frame, cause drawsurfaces
+to be rendered with bad shaders. To fix this, need to go through all render commands and fix
+sortedIndex.
+==============
+*/
+static void FixRenderCommandList( int newShader ) {
+	renderCommandList_t	*cmdList = &backEndData[tr.smpFrame]->commands;
+
+	if( cmdList ) {
+		const void *curCmd = cmdList->cmds;
+
+		while ( 1 ) {
+			curCmd = PADP(curCmd, sizeof(void *));
+
+			switch ( *(const int *)curCmd ) {
+			case RC_SET_COLOR:
+				{
+				const setColorCommand_t *sc_cmd = (const setColorCommand_t *)curCmd;
+				curCmd = (const void *)(sc_cmd + 1);
+				break;
+				}
+			case RC_STRETCH_PIC:
+				{
+				const stretchPicCommand_t *sp_cmd = (const stretchPicCommand_t *)curCmd;
+				curCmd = (const void *)(sp_cmd + 1);
+				break;
+				}
+			case RC_DRAW_SURFS:
+				{
+				int i;
+				drawSurf_t	*drawSurf;
+				shader_t	*shader;
+				int			sortOrder;
+				int			fogNum;
+				int			entityNum;
+				int			dlightMap;
+				int			sortedIndex;
+				const drawSurfsCommand_t *ds_cmd =  (const drawSurfsCommand_t *)curCmd;
+
+				for( i = 0, drawSurf = ds_cmd->drawSurfs; i < ds_cmd->numDrawSurfs; i++, drawSurf++ ) {
+					R_DecomposeSort(drawSurf, &shader, &sortOrder, &entityNum, &fogNum, &dlightMap);
+					sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
+					if( sortedIndex >= newShader ) {
+						sortedIndex++;
+						R_ComposeSort(drawSurf, sortedIndex, sortOrder, (entityNum << QSORT_ENTITYNUM_SHIFT),
+										fogNum, dlightMap);
+					}
+				}
+				curCmd = (const void *)(ds_cmd + 1);
+				break;
+				}
+			case RC_DRAW_BUFFER:
+				{
+				const drawBufferCommand_t *db_cmd = (const drawBufferCommand_t *)curCmd;
+				curCmd = (const void *)(db_cmd + 1);
+				break;
+				}
+			case RC_SWAP_BUFFERS:
+				{
+				const swapBuffersCommand_t *sb_cmd = (const swapBuffersCommand_t *)curCmd;
+				curCmd = (const void *)(sb_cmd + 1);
+				break;
+				}
+			case RC_END_OF_LIST:
+			default:
+				return;
+			}
+		}
+	}
+}
+
+/*
 ==============
 SortNewShader
 
@@ -2235,6 +2312,10 @@ static void SortNewShader( void ) {
 		tr.sortedShaders[i+1] = tr.sortedShaders[i];
 		tr.sortedShaders[i+1]->sortedIndex++;
 	}
+
+	// Arnout: fix rendercommandlist
+	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=493
+	FixRenderCommandList( i+1 );
 
 	newShader->sortedIndex = i+1;
 	tr.sortedShaders[i+1] = newShader;

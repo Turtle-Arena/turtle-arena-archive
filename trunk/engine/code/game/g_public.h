@@ -85,8 +85,9 @@ typedef struct {
 	// entity[ent->r.ownerNum].r.ownerNum == passEntityNum	(don't interact with other missiles from owner)
 	int			ownerNum;
 
-	int			owner; // If not -1 this client is splitscreen with owner
-	int			local_clients[MAX_SPLITVIEW-1]; // Extra local clients for splitscreen, allows game to access local_clients.
+	// Variables for game read access.
+	int			mainClientNum; // If not -1 this client is splitscreen with mainClientNum
+	int			localClientNums[MAX_SPLITVIEW-1]; // Extra local clients for splitscreen.
 } entityShared_t;
 
 

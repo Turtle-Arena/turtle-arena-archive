@@ -1089,7 +1089,15 @@ static void R_RadixSort( drawSurf_t *source, int size )
   R_Radix( 1, size, scratch, source );
   R_Radix( 2, size, source, scratch );
   R_Radix( 3, size, scratch, source );
+  R_Radix( 4, size, source, scratch );
+  R_Radix( 5, size, scratch, source );
+  R_Radix( 6, size, source, scratch );
+  R_Radix( 7, size, scratch, source );
 #else
+  R_Radix( 7, size, source, scratch );
+  R_Radix( 6, size, scratch, source );
+  R_Radix( 5, size, source, scratch );
+  R_Radix( 4, size, scratch, source );
   R_Radix( 3, size, source, scratch );
   R_Radix( 2, size, scratch, source );
   R_Radix( 1, size, source, scratch );
@@ -1123,13 +1131,13 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 	// instead of checking for overflow, we just mask the index
 	// so it wraps around
 	index = tr.refdef.numDrawSurfs & DRAWSURF_MASK;
-	// the sort data is packed into a single 32 bit value so it can be
+	// the sort data is packed into a single 64 bit value so it can be
 	// compared quickly during the qsorting process
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	R_ComposeSort(&tr.refdef.drawSurfs[index], shader, sortOrder,
+	R_ComposeSort(&tr.refdef.drawSurfs[index], shader->sortedIndex, sortOrder,
 					tr.shiftedEntityNum, fogIndex, dlightMap);
 #else
-	R_ComposeSort(&tr.refdef.drawSurfs[index], shader, shader->sort,
+	R_ComposeSort(&tr.refdef.drawSurfs[index], shader->sortedIndex, shader->sort,
 					tr.shiftedEntityNum, fogIndex, dlightMap);
 #endif
 	tr.refdef.drawSurfs[index].surface = surface;
@@ -1141,12 +1149,10 @@ void R_AddDrawSurf( surfaceType_t *surface, shader_t *shader,
 R_ComposeSort
 =================
 */
-void R_ComposeSort( drawSurf_t *drawSurf, shader_t *shader, int sortOrder,
+void R_ComposeSort( drawSurf_t *drawSurf, int sortedShaderIndex, int sortOrder,
 					 int shiftedEntityNum, int fogIndex, int dlightMap ) {
-	drawSurf->shaderIndex = shader->index;
-
-	drawSurf->sort = (sortOrder << QSORT_ORDER_SHIFT) 
-		| shiftedEntityNum | ( fogIndex << QSORT_FOGNUM_SHIFT ) | (int)dlightMap;
+	drawSurf->sort = ((uint64_t)sortedShaderIndex << QSORT_SHADERNUM_SHIFT) | ((uint64_t)sortOrder << QSORT_ORDER_SHIFT) 
+		| (uint64_t)shiftedEntityNum | ( (uint64_t)fogIndex << QSORT_FOGNUM_SHIFT ) | (uint64_t)dlightMap;
 }
 
 /*
@@ -1156,8 +1162,7 @@ R_DecomposeSort
 */
 void R_DecomposeSort( const drawSurf_t *drawSurf, shader_t **shader, int *sortOrder,
 					 int *entityNum, int *fogNum, int *dlightMap ) {
-	*shader = tr.shaders[ drawSurf->shaderIndex ];
-
+	*shader = tr.sortedShaders[ ( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1) ];
 	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT ) & 31;
 	*entityNum = ( drawSurf->sort >> QSORT_ENTITYNUM_SHIFT ) & MAX_ENTITIES;
 	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;

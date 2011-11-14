@@ -1078,7 +1078,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		other = &g_entities[j];
 
 		// Don't send to extra local clients, would be printed multiple times.
-		if (other->r.owner != -1) {
+		if (other->r.mainClientNum != -1) {
 			continue;
 		}
 
@@ -1892,12 +1892,12 @@ void ClientCommand( int clientNum ) {
 
 		cmd++;
 
-		if (ent->r.local_clients[lc] == -1) {
+		if (ent->r.localClientNums[lc] == -1) {
 			//G_Printf("Local client %d not connected.\n", lc+1);
 			return;
 		}
 
-		ent = g_entities + ent->r.local_clients[lc];
+		ent = g_entities + ent->r.localClientNums[lc];
 		if ( !ent->client ) {
 			return;		// not fully in game yet
 		}
