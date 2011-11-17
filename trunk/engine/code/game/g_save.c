@@ -28,12 +28,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // NOTE: Make sure BG_SAVE_VERSIONS stays up to date
 //         with current save code.
 
-#define	SAVE_VERSION 5 // current version of save/load routines
-
-#define MAX_SAVE_CLIENTS 1 // ZTM: NOTE: If splitscreen is added, support more players in single player.
+#define	SAVE_VERSION 6 // current version of save/load routines
 
 typedef struct
 {
+	byte localClientNum;
 	char model[MAX_QPATH];
 	char headModel[MAX_QPATH];
 	byte holdable[MAX_HOLDABLE];
@@ -51,15 +50,44 @@ typedef struct
     char mapname[MAX_QPATH];
     byte skill;
     byte maxclients;
+    byte localClients;
 
 	// game only, server doesn't read these.
 	//
-    save_client_t clients[MAX_SAVE_CLIENTS];
+    save_client_t clients[MAX_SPLITVIEW];
 
 } save_t;
 
 save_t loadData;
 qboolean savegameLoaded = qfalse;
+
+/*
+============
+G_LocalClientNumForGentitiyNum
+============
+*/
+int G_LocalClientNumForGentitiyNum(int gentityNum) {
+	int i;
+	int mainClient;
+	
+	mainClient = g_entities[gentityNum].r.mainClientNum;
+
+	// Check if main client.
+	if (mainClient < 0 || mainClient >= level.maxclients)
+		return 0;
+	else
+	{
+		// Find the extra local client number.
+		for (i = 1; i < MAX_SPLITVIEW; i++) {
+			if (g_entities[mainClient].r.localClientNums[i-1] == gentityNum) {
+				return i;
+			}
+		}
+	}
+
+	return -1;
+}
+
 
 /*
 ============
@@ -98,30 +126,36 @@ qboolean G_SaveGame(fileHandle_t f)
 
 	saveData.skill = trap_Cvar_VariableIntegerValue("g_spSkill");
 	saveData.maxclients = level.maxclients;
-	if (saveData.maxclients > MAX_SAVE_CLIENTS)
-		saveData.maxclients = MAX_SAVE_CLIENTS;
+	if (saveData.maxclients > MAX_SPLITVIEW)
+		saveData.maxclients = MAX_SPLITVIEW;
+
+	// Bits get added are each local client in savegame.
+	saveData.localClients = 0;
 
 	client = 0;
 	for (i = 0; i < level.maxclients; i++)
 	{
-		if (g_entities[i].r.svFlags & SVF_BOT) {
-			// Don't save bots
+		if (g_entities[i].r.svFlags & SVF_BOT)
 			continue;
-		}
-		if (level.clients[i].pers.connected != CON_CONNECTED)  {
-			continue;
-		}
 
-		saveData.clients[client].connected = level.clients[i].pers.connected;
+		if (level.clients[i].pers.connected != CON_CONNECTED)
+			continue;
+
+		// Don't save dead (Game Over) clients.
+		if (level.clients[i].ps.persistant[PERS_LIVES] < 1 && level.clients[i].ps.persistant[PERS_CONTINUES] < 1)
+			continue;
+
+		saveData.clients[client].localClientNum = G_LocalClientNumForGentitiyNum(i);
+		saveData.localClients |= (1<<saveData.clients[client].localClientNum);
 
 		// model/skin
 		Q_strncpyz(saveData.clients[client].model, level.clients[i].pers.playercfg.model, MAX_QPATH);
+
 		// headmodel/skin
 		Q_strncpyz(saveData.clients[client].headModel, level.clients[i].pers.playercfg.headModel, MAX_QPATH);
 
 		// holdable items
-		for (j = 0; j < MAX_HOLDABLE; j++)
-		{
+		for (j = 0; j < MAX_HOLDABLE; j++) {
 			saveData.clients[client].holdable[j] = level.clients[i].ps.holdable[j];
 		}
 		saveData.clients[client].holdableSelected = level.clients[i].ps.holdableIndex;
@@ -132,6 +166,11 @@ qboolean G_SaveGame(fileHandle_t f)
 		if (client >= saveData.maxclients) {
 			break;
 		}
+	}
+
+	for ( ; client < MAX_SPLITVIEW; client++) {
+		// Unused slots
+		saveData.clients[client].localClientNum = 0xff;
 	}
 
 	// Write saveData
@@ -158,33 +197,6 @@ void G_LoadGame(fileHandle_t f)
     savegameLoaded = qtrue;
 }
 
-void G_LoadGameClientEx(int gameClient, int saveClient)
-{
-	int j;
-	gclient_t *client;
-	save_client_t *saved;
-
-	if (saveClient >= loadData.maxclients) {
-		return;
-	}
-
-	saved = &loadData.clients[saveClient];
-	client = &level.clients[gameClient];
-
-	// Set model/headmodel.
-	trap_Cvar_Set(Com_LocalClientCvarName(saveClient, "spmodel"), saved->model);
-	trap_Cvar_Set(Com_LocalClientCvarName(saveClient, "spheadmodel"), saved->headModel);
-
-	for (j = 0; j < MAX_HOLDABLE; j++)
-	{
-		client->ps.holdable[j] = saved->holdable[j];
-	}
-	client->ps.holdableIndex = saved->holdableSelected;
-	client->ps.persistant[PERS_SCORE] = saved->score;
-	client->ps.persistant[PERS_LIVES] = saved->lives;
-	client->ps.persistant[PERS_CONTINUES] = saved->continues;
-}
-
 /*
 ==========
 G_LoadGameClient
@@ -196,9 +208,10 @@ There can be a different number of bots on different maps, the order of the clie
 */
 void G_LoadGameClient(int gameClient)
 {
-	int firstHumanGameClient;
-	int saveClient;
-	int i;
+	int localClientNum;
+	int i, j;
+	gclient_t *client;
+	save_client_t *saved;
 
 	// Check if save game is loaded.
 	if (!savegameLoaded) {
@@ -210,26 +223,39 @@ void G_LoadGameClient(int gameClient)
 		return;
 	}
 
-	firstHumanGameClient = 0;
+	localClientNum = G_LocalClientNumForGentitiyNum(gameClient);
 
-	for (i = 0; i < level.maxclients; i++)
-	{
-		if (g_entities[i].r.svFlags & SVF_BOT)
-			continue;
-
-		firstHumanGameClient = i;
-		break;
-	}
-
-	saveClient = gameClient - firstHumanGameClient;
-
-	if (saveClient < 0) {
-		G_Error("Invalid saved client, %d\n", saveClient);
+	// Not a valid local client.
+	if (localClientNum < 0) {
 		return;
 	}
 
-	//G_Printf("DEBUG: Human client (%d) in saveData slot (%d)?...\n", gameClient, saveClient);
+	// Find save slot.
+	saved = NULL;
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (loadData.clients[i].localClientNum == localClientNum) {
+			saved = &loadData.clients[i];
+			break;
+		}
+	}
 
-	G_LoadGameClientEx(gameClient, saveClient);
+	if (!saved) {
+		// Client not in savefile.
+		return;
+	}
+
+	client = &level.clients[gameClient];
+
+	// Set model/headmodel.
+	trap_Cvar_Set(Com_LocalClientCvarName(localClientNum, "spmodel"), saved->model);
+	trap_Cvar_Set(Com_LocalClientCvarName(localClientNum, "spheadmodel"), saved->headModel);
+
+	for (j = 0; j < MAX_HOLDABLE; j++) {
+		client->ps.holdable[j] = saved->holdable[j];
+	}
+	client->ps.holdableIndex = saved->holdableSelected;
+	client->ps.persistant[PERS_SCORE] = saved->score;
+	client->ps.persistant[PERS_LIVES] = saved->lives;
+	client->ps.persistant[PERS_CONTINUES] = saved->continues;
 }
 #endif // TA_SP
