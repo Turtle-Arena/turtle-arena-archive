@@ -1,7 +1,6 @@
-#summary todo and bugs
+#summary todo list
 #labels Phase-Design
-
-*Turtle Arena TODO and BUGS*, also see the issue tracker for more, [http://code.google.com/p/turtlearena/issues http://code.google.com/p/turtlearena/issues].
+*Turtle Arena "to do"s.* This is a list of ideas (which should be moved to the issue tracker). For more "to do"s see the [http://code.google.com/p/turtlearena/wiki/RoadMap road map] and [http://code.google.com/p/turtlearena/issues issue tracker].
 
 = engine =
 == Weapons (and attacking) ==
@@ -12,15 +11,11 @@
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
     * Logic-wise `tag_hand_*` make more sense, but I still support tag_weapon/flag (My players use tag_weapon/flag ...)
 
-  * TODO: Add Bow and Arrow? (Like LoZ:TP)
-    * ("Charge up" weapon (and animate player), when fully charged fire projectile (or fire on release weaponFlag?) )
-  * TODO: Aiming mode for third-person, camera looks over player's shoulder (Like LoZ:TP)
-
   * TODO: Add PD_CUSTOM projectile death type
     * pdModel (string), pdShader (string), pdSprite (bool), pdDuration (int), pdLight (int) (vec3), pdExpBase (int), pdExpAdd (int), pdExpOnPlayer (bool)
     * pdExpOnPlayer would set whether or not to explode on players in CG_MissileHitPlayer
 
-  * TODO: Add PT_CUSTOM projectile trail type
+  * TODO: Add PT_CUSTOM projectile trail type.
 
   * TODO: Per-weapon run animations (Support `LEGS_*`, `BOTH_*`, and `TORSO_*`)
     * Idea for supporting `TORSO_*`
@@ -28,24 +23,10 @@
       * If (!(animations[run].prefixType & AP_LEGS)) PM_ContinueAnim(LEGS_RUN);
 
 == Single Player ==
-  * TODO: Added enemy NPCs
+  * STARTED: Savegames for single player.
 
-  * TODO: Finish savegames for single player
-    * When starting single player have user pick save slot and/or enter name to set g_saveFilename. (Like SRB2 2.0)
-      * (No save option would use "" which defaults to "autosave")
-
-  * TODO: Rewrite single player post-game data saving.
-    * Have it be more like in Team Arena then Q3, using ".game" files instead of cvars in config.
-    * Or one single data file with all of the sp data (Or SP data files -like SRB2 2.0)
-
-  * TODO (STARTED): Have a completed game menu/screen
+  * STARTED: Have a completed game menu/screen.
     * sp_complete and sp_gameover
-
-== Render ==
-  * BUG: When there are multiple ghost models they may not be sorted into correct order
-    * Requires depth sorting to fix
-
-  * BUG: At the beginning of q3dm0 the portal can be seen though the mirror
 
 == UI ==
   * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
@@ -53,8 +34,6 @@
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
 == Teamplay ==
-  * TODO: Data: Create team skins for players?
-
   * TODO: Data: Update flag skins for new default teams
 
   * TODO: Per-team flag skins? (Team icon is on flag skin)
@@ -99,8 +78,6 @@
   * TODO: Support models/players/NAME/animsounds.cfg used in STV:Elite Force (SP) (Also used in Jedi Knight 2) ?
     * Started see bg_sound_t and Sounds_Parse; it is similar to animsounds, but different.
     * It currently doesn't load sounds and is for NPC and misc objects only.
-
-  * TODO: New gametypes; Last Man Standing, King of the Hill, and Keepaway? -- Based of there forms in TMNT: Mutant Melee.
 
   * TODO: Support focusing on 4 players with one camera, for a local 4 player game (splitscreen would be optional).
 
