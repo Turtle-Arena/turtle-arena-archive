@@ -1487,9 +1487,7 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
 float Com_FontStringHeight( font_t *font, const char *s, int limit );
 #endif
 
-#ifndef QAGAME
 char *Com_LocalClientCvarName(int localClient, char *in_cvarName);
-#endif
 
 #define Square(x) ((x)*(x))
 

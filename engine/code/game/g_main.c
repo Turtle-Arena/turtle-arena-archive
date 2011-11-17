@@ -711,6 +711,12 @@ void G_ShutdownGame( int restart ) {
 		level.logFile = 0;
 	}
 
+#ifdef TA_SP
+	if (restart && g_gametype.integer == GT_SINGLE_PLAYER) {
+		G_WriteCoopSessionData(qtrue);
+	}
+#endif
+
 	// write all the client session data so we can get it back
 	G_WriteSessionData();
 
@@ -1286,6 +1292,12 @@ void ExitLevel (void) {
 
 	level.changemap = NULL;
 	level.intermissiontime = 0;
+
+#ifdef TA_SP
+	if (g_gametype.integer == GT_SINGLE_PLAYER) {
+		G_WriteCoopSessionData(qfalse);
+	}
+#endif
 
 	// reset all the scores so we don't enter the intermission again
 	level.teamScores[TEAM_RED] = 0;

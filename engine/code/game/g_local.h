@@ -435,9 +435,6 @@ struct gclient_s {
 	int lockonTime;
 	qboolean hadLockon;
 #endif
-#ifdef TA_SP // Save/Load
-	qboolean dontClearDataNextSpawn;
-#endif
 
 	char		*areabits;
 };
@@ -786,7 +783,7 @@ void BeginIntermission (void);
 void InitClientPersistant (gclient_t *client);
 void InitClientResp (gclient_t *client);
 void InitBodyQue (void);
-void ClientSpawn( gentity_t *ent );
+void ClientSpawn( gentity_t *ent, qboolean firstTime );
 void player_die (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
 #ifdef TURTLEARENA // NIGHTS_ITEMS
 void AddScoreEx( gentity_t *ent, vec3_t origin, int score, int chain);
@@ -912,6 +909,13 @@ void G_InitSessionData( gclient_t *client, char *userinfo );
 void G_InitWorldSession( void );
 void G_WriteSessionData( void );
 
+#ifdef TA_SP
+void G_ReadCoopSessionData( gclient_t *client );
+void G_InitCoopSessionData( gclient_t *client );
+
+void G_WriteCoopSessionData( qboolean restart );
+#endif
+
 //
 // g_arenas.c
 //
@@ -1001,11 +1005,6 @@ extern	level_locals_t	level;
 extern	gentity_t		g_entities[MAX_GENTITIES];
 
 #define	FOFS(x) ((size_t)&(((gentity_t *)0)->x))
-
-#ifdef TA_SP // save/load
-void G_SavePersistant(char *nextmap);
-void G_LoadPersistant(int clientnum);
-#endif
 
 extern	vmCvar_t	g_gametype;
 extern	vmCvar_t	g_dedicated;
