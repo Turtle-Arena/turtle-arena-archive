@@ -34,7 +34,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 typedef struct
 {
-	byte connected;
 	char model[MAX_QPATH];
 	char headModel[MAX_QPATH];
 	byte holdable[MAX_HOLDABLE];
@@ -60,7 +59,7 @@ typedef struct
 } save_t;
 
 save_t loadData;
-qboolean clientLoad[MAX_CLIENTS];
+qboolean savegameLoaded = qfalse;
 
 /*
 ============
@@ -144,18 +143,19 @@ qboolean G_SaveGame(fileHandle_t f)
 // Called after level is loaded.
 void G_LoadGame(fileHandle_t f)
 {
-	// Read saveData
+	// Read data
 	trap_FS_Read(&loadData, sizeof (save_t), f);
-
-	memset(clientLoad, qfalse, MAX_CLIENTS * sizeof (qboolean));
 
 	// The server should check but just in case...
 	if (loadData.version != SAVE_VERSION) {
-	    G_Error( "Unsupported savegame version, %i\n", loadData.version);
+		savegameLoaded = qfalse;
+		G_Error( "Unsupported savegame version, %i\n", loadData.version);
         return;
 	}
 
     // Server sets skill and maxclients before loading the level.
+
+    savegameLoaded = qtrue;
 }
 
 void G_LoadGameClientEx(int gameClient, int saveClient)
@@ -164,27 +164,16 @@ void G_LoadGameClientEx(int gameClient, int saveClient)
 	gclient_t *client;
 	save_client_t *saved;
 
-	if (clientLoad[saveClient]) {
-		return;
-	}
-	clientLoad[saveClient] = qtrue;
-
 	if (saveClient >= loadData.maxclients) {
 		return;
 	}
 
 	saved = &loadData.clients[saveClient];
-	if (saved->connected != CON_CONNECTED) {
-		return;
-	}
-
 	client = &level.clients[gameClient];
-	if (client->pers.connected != CON_CONNECTED) {
-		return;
-	}
 
-	trap_SendServerCommand( gameClient, va("spPlayer %s %s", saved->model, saved->headModel) );
-	// ZTM: FIXME: Change model now! (Otherwise can see model change!)
+	// Set model/headmodel.
+	trap_Cvar_Set(Com_LocalClientCvarName(saveClient, "spmodel"), saved->model);
+	trap_Cvar_Set(Com_LocalClientCvarName(saveClient, "spheadmodel"), saved->headModel);
 
 	for (j = 0; j < MAX_HOLDABLE; j++)
 	{
@@ -211,8 +200,8 @@ void G_LoadGameClient(int gameClient)
 	int saveClient;
 	int i;
 
-	// Check if save game was loaded.
-	if (loadData.version != SAVE_VERSION) {
+	// Check if save game is loaded.
+	if (!savegameLoaded) {
         return;
 	}
 

@@ -2795,15 +2795,7 @@ static void CG_PlayerSprites( centity_t *cent
 		return;
 	}
 
-#ifdef TA_SP // ZTM: NOTE: Must disable talk balloon in sp intermission (not co-op), because there is a menu open.
-				// ZTM: FIXME: Check if this is still needed.
-	if ( (cent->currentState.eFlags & EF_TALK)
-			&& !(cg.intermissionStarted && cg_singlePlayerActive.integer
-			&& cg.cur_ps->pm_type == PM_SPINTERMISSION) )
-#else
-	if ( cent->currentState.eFlags & EF_TALK )
-#endif
-	{
+	if ( cent->currentState.eFlags & EF_TALK ) {
 #ifdef IOQ3ZTM
 		CG_PlayerFloatSprite( origin, 0, cgs.media.balloonShader );
 #else

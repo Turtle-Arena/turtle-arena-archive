@@ -724,7 +724,7 @@ ClientRespawn
 */
 void ClientRespawn( gentity_t *ent ) {
 	CopyToBodyQue (ent);
-	ClientSpawn(ent);
+	ClientSpawn(ent, qfalse);
 }
 
 /*
@@ -1329,15 +1329,15 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 //	areabits = client->areabits;
 
 	memset( client, 0, sizeof(*client) );
-#ifdef TA_SP // Save/Load
-	client->dontClearDataNextSpawn = qtrue; // Don't clean client again on first spawn
-#endif
 
 	client->pers.connected = CON_CONNECTING;
 
 	// read or initialize the session data
 	if ( firstTime || level.newSession ) {
 		G_InitSessionData( client, userinfo );
+#ifdef TA_SP
+		G_InitCoopSessionData( client );
+#endif
 	}
 	G_ReadSessionData( client );
 
@@ -1353,22 +1353,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	G_LogPrintf( "ClientConnect: %i\n", clientNum );
 	ClientUserinfoChanged( clientNum );
 
-#ifdef TA_SP // Save/Load
-	//
-	// Load persistant data
-	//
-	G_LoadPersistant(clientNum);
-	G_LoadGameClient(clientNum);
-#endif
-
 	// don't do the "xxx connected" messages if they were caried over from previous level
+	if ( firstTime ) {
 #ifdef TA_SP
-    // If its single player don't add message.
-	if ( firstTime && !g_singlePlayer.integer)
-#else
-	if ( firstTime )
+    	// If it's single player don't add message.
+		if (!g_singlePlayer.integer)
 #endif
-	{
 		// ZTM: TODO: Have a different message for when splitscreen player joins?
 		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 
@@ -1415,6 +1405,13 @@ void ClientBegin( int clientNum ) {
 
 	client = level.clients + clientNum;
 
+#ifdef IOQ3ZTM
+	// Check if first connect
+	firstTime = (ent->flags & FL_FIRST_TIME);
+
+	ent->flags &= FL_FIRST_TIME;
+#endif
+
 	if ( ent->r.linked ) {
 		trap_UnlinkEntity( ent );
 	}
@@ -1435,47 +1432,33 @@ void ClientBegin( int clientNum ) {
 	flags = client->ps.eFlags;
 	memset( &client->ps, 0, sizeof( client->ps ) );
 	client->ps.eFlags = flags;
-#ifdef TA_SP
-	if (g_gametype.integer == GT_SINGLE_PLAYER)
-	{
-		if (client->sess.sessionTeam != TEAM_FREE)
-		{
-			// Enemies only have 1 life
-			client->ps.persistant[PERS_LIVES] = 1;
-		}
-		else
-		{
-			// Start with 3 lives and if not multiplayer 1 continue
-			client->ps.persistant[PERS_LIVES] = 3;
-
-			if (g_singlePlayer.integer) {
-				client->ps.persistant[PERS_CONTINUES] = 1;
-			}
-		}
-	}
-#endif
 
 #ifdef TA_PLAYERSYS
 	G_LoadPlayer(clientNum, client->pers.playercfg.model, client->pers.playercfg.headModel);
 #endif
 
-#ifdef IOQ3ZTM
-	firstTime = (ent->flags & FL_FIRST_TIME);
-#endif
-
 	// locate ent at a spawn point
-	ClientSpawn( ent );
+	ClientSpawn( ent, firstTime );
+
+#ifdef TA_SP
+	G_ReadCoopSessionData( client );
+
+	// In multiplayer make sure players have at least 3 lives.
+	if (!g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER
+		&& client->ps.persistant[PERS_LIVES] < 3)
+	{
+		client->ps.persistant[PERS_LIVES] = 3;
+	}
+#endif
 
 #ifdef IOQ3ZTM
 	// show entered the game message
-	if (firstTime)
+	if (firstTime && !g_singlePlayer.integer)
 #else
 	if ( client->sess.sessionTeam != TEAM_SPECTATOR )
 #endif
 	{
-#ifdef IOQ3ZTM
-		ent->flags &= FL_FIRST_TIME;
-#else
+#ifndef IOQ3ZTM
 		if ( g_gametype.integer != GT_TOURNAMENT  )
 #endif
 		{
@@ -1497,7 +1480,7 @@ after the first ClientBegin, and after each respawn
 Initializes all non-persistant parts of playerState
 ============
 */
-void ClientSpawn(gentity_t *ent) {
+void ClientSpawn(gentity_t *ent, qboolean firstTime) {
 	int		index;
 	vec3_t	spawn_origin, spawn_angles;
 	gclient_t	*client;
@@ -1588,12 +1571,6 @@ void ClientSpawn(gentity_t *ent) {
 
 	// clear everything but the persistant data
 
-#ifdef TA_SP // Save/Load
-	if (client->dontClearDataNextSpawn) {
-		client->dontClearDataNextSpawn = qfalse;
-		client->lastkilled_client = -1;
-	} else {
-#endif
 	saved = client->pers;
 	savedSess = client->sess;
 	savedPing = client->ps.ping;
@@ -1619,9 +1596,6 @@ void ClientSpawn(gentity_t *ent) {
 		client->ps.persistant[i] = persistant[i];
 	}
 	client->ps.eventSequence = eventSequence;
-#ifdef TA_SP // Save/Load
-	}
-#endif
 
 	// increment the spawncount so the client will detect the respawn
 	client->ps.persistant[PERS_SPAWN_COUNT]++;
@@ -1678,23 +1652,32 @@ void ClientSpawn(gentity_t *ent) {
 
 	client->ps.clientNum = index;
 
+#ifdef TA_SP
+	if (g_gametype.integer == GT_SINGLE_PLAYER) {
+		client->ps.holdableIndex = HI_NONE;
+	}
+	else
+#endif
+	{
 #ifdef TA_HOLDSYS
 #ifdef TURTLEARENA // HOLDABLE
-	// Start with 10 shurikens!
+		// Start with 10 shurikens!
 #ifdef IOQ3ZTM // LASERTAG
-	if (g_laserTag.integer) {
-		client->ps.holdableIndex = HI_NONE;
-	} else {
+		if (g_laserTag.integer) {
+			client->ps.holdableIndex = HI_NONE;
+		} else {
 #endif
-	client->ps.holdable[HI_SHURIKEN] = 10;
-	client->ps.holdableIndex = HI_SHURIKEN;
+		client->ps.holdable[HI_SHURIKEN] = 10;
+		client->ps.holdableIndex = HI_SHURIKEN;
 #ifdef IOQ3ZTM // LASERTAG
-	}
+		}
 #endif
 #else
-	client->ps.holdableIndex = HI_NONE;
+		client->ps.holdableIndex = HI_NONE;
 #endif
 #endif
+	}
+
 #ifdef TA_WEAPSYS // ZTM: Respawn code. Start with default weapon. Set ammo values.
 	// Set default weapon
 #if defined TA_PLAYERSYS
@@ -1993,229 +1976,12 @@ void ClientDisconnect( int clientNum ) {
 	}
 }
 
-#ifdef TA_SP // save/load
-// ZTM: TODO: Merge with g_session.c ? ( G_WriteClientSessionData )
+#ifdef TA_SP
 /*
 ===========
-G_SavePersistant
-
-Saves the data in a cvar so we don't have to write a file
-after each level in SinglePlayer.
-
-Should allow 64 client single player games...
-
-Save the lives, continues, score, and holdable stuff.
+G_ClientCompletedLevel
 ============
 */
-void G_SavePersistant(char *nextmap)
-{
-	char savedata[MAX_CVAR_VALUE_STRING*2];
-	char *s;
-	int i;
-	gclient_t *client;
-#ifdef TA_HOLDSYS
-	int j;
-	char holdableData[(MAX_HOLDABLE*2)+1];
-	int save_array;
-#endif
-	int skill;
-
-	// If real single player, auto-save at level end, but not end of the game.
-	if (g_singlePlayer.integer && Q_stricmp(nextmap, "sp_end") != 0) {
-		char filename[MAX_STRING_CHARS];
-
-		trap_Cvar_VariableStringBuffer("g_saveFilename", filename, sizeof(filename) );
-
-		trap_Cvar_Set("g_saveMapname", nextmap);
-		trap_SendConsoleCommand( EXEC_APPEND, va("savegame %s", filename) );
-	}
-	skill = trap_Cvar_VariableValue( "g_spSkill" );
-
-	memset(savedata, 0, sizeof(savedata));
-	// Save game settings.
-	Com_sprintf(savedata, sizeof(savedata), "map\\%s\\sk\\%i\\", nextmap, skill);
-	//G_Printf("DEBUG: Savedata=%s\n", savedata);
-	// Hack for CVAR_SEVERINFO
-	for (i = 0; i < strlen(savedata); i++)
-	{
-		if (savedata[i] == '\\')
-			savedata[i] = '/';
-	}
-	trap_Cvar_Set("g_spSaveData", savedata);
-	savedata[0] = '\0';
-
-	for (i = 0; i < level.maxclients; i++)
-	{
-		client = &level.clients[i];
-
-#ifdef TA_HOLDSYS
-		s = va("livs\\%d\\ctns\\%d\\scr\\%i\\hi\\%i",
-				client->ps.persistant[PERS_LIVES],
-				client->ps.persistant[PERS_CONTINUES],
-				client->ps.persistant[PERS_SCORE], client->ps.holdableIndex);
-#else
-		s = va("n\\%s\\livs\\%d\\ctns\\%d\\scr\\%i",
-				client->ps.persistant[PERS_LIVES],
-				client->ps.persistant[PERS_CONTINUES],
-				client->ps.persistant[PERS_SCORE]);
-#endif
-		Q_strncpyz(savedata, s, sizeof(savedata));
-
-#ifdef TA_HOLDSYS
-		// Save arrays.
-		holdableData[0] = '\0';
-		save_array = 0;
-		for (j = 1; j < MAX_HOLDABLE; j++)
-		{
-			if (client->ps.holdable[j] > 0) {
-				// Only need to save holdables up to save_array.
-				save_array = j;
-			}
-			s = va("%s%i", client->ps.holdable[j] < 10 ? "0" : "", client->ps.holdable[j]);
-			strcat(holdableData, s);
-		}
-		if (save_array)
-		{
-			strcat(savedata, "\\hd\\"); // holdable data
-			holdableData[save_array*2 - 1] = 0;
-			strcat(savedata, holdableData);
-		}
-#endif
-
-		// Check var bounds
-		if (strlen(savedata) > MAX_CVAR_VALUE_STRING)
-		{
-			// ZTM: This shouldn't happen.
-			trap_Cvar_Set("g_spSaveData", "");
-
-			if (g_singlePlayer.value)
-				G_Error("Saving SP client data failed\ntoo much data! (%i/%i)\n%s\n", (int)strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
-			else // Don't error to network
-				G_Printf("Saving co-op client data failed\ntoo much data! (%i/%i)\n%s\n", (int)strlen(savedata), MAX_CVAR_VALUE_STRING, savedata);
-
-			return;
-		}
-
-		// Hack for CVAR_SEVERINFO
-		for (i = 0; i < strlen(savedata); i++)
-		{
-			if (savedata[i] == '\\')
-				savedata[i] = '/';
-		}
-
-		//G_Printf("DEBUG: Savedata=%s\n", savedata);
-		trap_Cvar_Set(va("g_spSaveData%i", i), savedata);
-		savedata[0] = '\0';
-	}
-}
-
-void G_LoadPersistant(int clientnum)
-{
-	char savedata[MAX_CVAR_VALUE_STRING+1];
-	gclient_t *client;
-	int i;
-	char *config;
-	char *s;
-#ifdef TA_HOLDSYS
-	int j;
-	int array_len;
-	char array_data[3];
-#endif
-	char currentMap[MAX_QPATH];
-	int skill;
-
-	// Single Player and Co-op only
-	if (g_gametype.integer != GT_SINGLE_PLAYER)
-	{
-		return;
-	}
-
-	//trap_SendConsoleCommand( EXEC_APPEND, "loadgame autosave" );
-
-	memset(savedata, 0, sizeof(savedata));
-	trap_Cvar_VariableStringBuffer("g_spSaveData", savedata, sizeof(savedata));
-	config = savedata;
-
-	if (!strlen(savedata)) {
-		return; // nothing to load.
-	}
-
-	// Hack for CVAR_SEVERINFO
-	for (i = 0; i < strlen(savedata); i++)
-	{
-		if (savedata[i] == '/')
-			savedata[i] = '\\';
-	}
-	//G_Printf("DEBUG: Savedata=%s\n", savedata);
-
-	s = Info_ValueForKey(config, "map");
-	trap_Cvar_VariableStringBuffer( "mapname", currentMap, sizeof(currentMap) );
-	if (strcmp(currentMap, s) != 0)
-	{
-		trap_Cvar_Set("g_spSaveData", "");
-		return;
-	}
-
-	// Read skill
-	s = Info_ValueForKey(config, "sk");
-	skill = atoi(s);
-	if (skill < 1) {
-		skill = 1;
-	}
-	if (skill > 5) {
-		skill = 5;
-	}
-	if (skill != trap_Cvar_VariableValue( "g_spSkill" ))
-	{
-		trap_Cvar_Set("g_spSkill", va("%i", skill));
-		// Map needs to be reloaded!
-		G_Printf(S_COLOR_YELLOW "Warning: SP skill mismatch, is %i should be %i.\n", trap_Cvar_VariableIntegerValue( "g_spSkill" ), skill);
-	}
-
-	memset(savedata, 0, sizeof(savedata));
-	trap_Cvar_VariableStringBuffer(va("g_spSaveData%i", clientnum), savedata, sizeof(savedata));
-	config = savedata;
-
-	if (strlen(savedata) < 1) {
-		return; // nothing to load.
-	}
-
-	client = &level.clients[clientnum];
-
-	//G_Printf("DEBUG: Loading SP data for %s\n", client->pers.netname);
-
-	// Found client.
-	client->ps.persistant[PERS_LIVES] = atoi(Info_ValueForKey(config, "livs"));
-	if (!g_singlePlayer.integer && !client->ps.persistant[PERS_LIVES]) {
-		client->ps.persistant[PERS_LIVES] = 3;
-	}
-	client->ps.persistant[PERS_CONTINUES] = atoi(Info_ValueForKey(config, "ctns"));
-	client->ps.persistant[PERS_SCORE] = atoi(Info_ValueForKey(config, "scr"));
-#ifdef TA_HOLDSYS
-	client->ps.holdableIndex = atoi(Info_ValueForKey(config, "hi"));
-
-	// Read array
-	array_data[2] = 0;
-	s = Info_ValueForKey(config, "hd");
-	array_len = strlen(s) / 2;
-	for (j = 0; j < array_len && j < MAX_HOLDABLE; j++)
-	{
-		array_data[0] = s[j*2];
-		array_data[1] = s[(j*2)+1];
-		client->ps.holdable[j+1] = atoi(array_data);
-	}
-#endif
-
-	// Don't ever load this data again.
-	trap_Cvar_Set(va("g_spSaveData%i", clientnum),"");
-
-#if 0 // CLIENTNUM // Need it so can load all clients.
-	trap_Cvar_Set("g_spSaveData", "");
-#endif
-}
-#endif
-
-#ifdef TA_SP
 qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 {
 	char buf[MAX_QPATH];
@@ -2248,12 +2014,16 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 
 	if (nextMap == NULL || *nextMap == '\0')
 	{
+		char	mapname[MAX_STRING_CHARS];
+
+		trap_Cvar_VariableStringBuffer( "mapname", mapname, sizeof(mapname) );
+
+		// Save mapname
+		trap_Cvar_Set("g_saveMapname", mapname);
+
 		trap_Cvar_Set("nextmap", "map_restart");
 		return qtrue;
 	}
-
-	// Save client data for next level.
-	G_SavePersistant(nextMap);
 
 	// Reached the end of the single player levels
 	if (Q_stricmp(nextMap, "sp_end") == 0)
@@ -2284,6 +2054,9 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 			}
 		}
 	}
+
+	// Save name of next map, for coop session data and save games.
+	trap_Cvar_Set("g_saveMapname", nextMap);
 
 	// Set cvar for level change.
 	Com_sprintf(buf, MAX_QPATH, "spmap %s", nextMap);

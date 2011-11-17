@@ -1324,35 +1324,6 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-#ifdef TA_SP
-	if ( !strcmp( cmd, "spPlayer" ) ) {
-		int cmdArgc = trap_Argc();
-
-		if (cmdArgc > start+1)
-		{
-			if (cg_singlePlayerActive.integer)
-			{
-				trap_Cvar_Set("spmodel", CG_Argv(start+1));
-				if (cmdArgc > start+2) {
-					trap_Cvar_Set("spheadmodel", CG_Argv(start+2));
-				} else {
-					trap_Cvar_Set("spheadmodel", "");
-				}
-			}
-			else if (cgs.gametype == GT_SINGLE_PLAYER)
-			{
-				trap_Cvar_Set("model", CG_Argv(start+1));
-				if (cmdArgc > start+2) {
-					trap_Cvar_Set("headmodel", CG_Argv(start+2));
-				} else {
-					trap_Cvar_Set("headmodel", "");
-				}
-			}
-		}
-		return;
-	}
-#endif
-
 	CG_Printf( "Unknown client game command: %s\n", cmd );
 }
 
