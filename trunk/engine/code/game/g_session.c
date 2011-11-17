@@ -127,6 +127,10 @@ void G_InitSessionData( gclient_t *client, char *userinfo ) {
 				if ( g_maxGameClients.integer > 0 && 
 					level.numNonSpectatorClients >= g_maxGameClients.integer ) {
 					sess->sessionTeam = TEAM_SPECTATOR;
+#ifdef TA_SP // SP_BOSS
+				} else if (g_gametype.integer == GT_SINGLE_PLAYER && value[0] == 'r') {
+					sess->sessionTeam = TEAM_RED;
+#endif
 				} else {
 					sess->sessionTeam = TEAM_FREE;
 				}
