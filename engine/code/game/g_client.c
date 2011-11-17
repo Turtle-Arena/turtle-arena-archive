@@ -1437,6 +1437,21 @@ void ClientBegin( int clientNum ) {
 	G_LoadPlayer(clientNum, client->pers.playercfg.model, client->pers.playercfg.headModel);
 #endif
 
+#ifdef TA_SP
+	// Drop dead clients on level load in main game.
+	if (g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER)
+	{
+		// Get number of lives/continues.
+		G_ReadCoopSessionData( client );
+
+		// Check if client is dead.
+		if (client->ps.persistant[PERS_LIVES] < 1 && client->ps.persistant[PERS_CONTINUES] < 1) {
+			trap_DropClient(clientNum, "was dropped, game over.");
+			return;
+		}
+	}
+#endif
+
 	// locate ent at a spawn point
 	ClientSpawn( ent, firstTime );
 

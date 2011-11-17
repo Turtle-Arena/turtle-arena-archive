@@ -1190,13 +1190,14 @@ Return value
 2 - no map loaded or wrong map loaded.
 ==================
 */
-int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill, byte *pMaxclients)
+int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill, byte *pMaxclients, byte *pLocalClients)
 {
 	char buffer[MAX_QPATH];
 	char s[MAX_QPATH];
 	byte version;
 	byte skill;
 	byte maxclients;
+	byte localClients;
 
 	FS_Read2 (&version, 1, f); // version
 	Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
@@ -1210,12 +1211,16 @@ int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill,
 	FS_Read2 (loadmap, MAX_QPATH, f); // map name
 	FS_Read2 (&skill, 1, f); // skill
 	FS_Read2 (&maxclients, 1, f); // maxclients
+	FS_Read2 (&localClients, 1, f); // localClients
 
 	if (pSkill) {
 		*pSkill = skill;
 	}
 	if (pMaxclients) {
 		*pMaxclients = maxclients;
+	}
+	if (pLocalClients) {
+		*pLocalClients = localClients;
 	}
 
 	Cvar_VariableStringBuffer( "mapname", buffer, sizeof(buffer) );
@@ -1234,7 +1239,7 @@ int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill,
 
 static void SV_LoadGame_f(void) {
 	char loadmap[MAX_QPATH];
-	byte skill, maxclients;
+	byte skill, maxclients, localClients;
 	char savegame[MAX_TOKEN_CHARS];
 	char filename[MAX_QPATH];
 	fileHandle_t f;
@@ -1274,7 +1279,7 @@ static void SV_LoadGame_f(void) {
 
 	if (load_atemp == 0)
 	{
-		int load = SP_LoadGame(f, filename, loadmap, &skill, &maxclients);
+		int load = SP_LoadGame(f, filename, loadmap, &skill, &maxclients, &localClients);
 
 		if (load == -1)
 		{
@@ -1287,6 +1292,7 @@ static void SV_LoadGame_f(void) {
 		Cvar_SetValue("ui_singlePlayerActive", 1);
 		Cvar_SetValue("g_spSkill", skill);
 		Cvar_SetValue("sv_maxclients", maxclients);
+		Cvar_SetValue("cl_localClients", localClients);
 
 		FS_FCloseFile( f );
 		// "loadgame" is called in SV_SpawnServer
@@ -1296,7 +1302,7 @@ static void SV_LoadGame_f(void) {
 	}
 	else
 	{
-		if (SP_LoadGame(f, filename, loadmap, NULL, NULL) == 1 || !gvm)
+		if (SP_LoadGame(f, filename, loadmap, NULL, NULL, NULL) == 1 || !gvm)
 		{
 			FS_FCloseFile( f );
 			// We still need to load the map, so quit.
