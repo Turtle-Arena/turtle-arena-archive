@@ -1359,8 +1359,10 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
     	// If it's single player don't add message.
 		if (!g_singlePlayer.integer)
 #endif
-		// ZTM: TODO: Have a different message for when splitscreen player joins?
-		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
+		// Only show for main client.
+		if (ent->r.mainClientNum == -1) {
+			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
+		}
 
 #ifdef IOQ3ZTM
 		// show entered the game message
@@ -1477,7 +1479,12 @@ void ClientBegin( int clientNum ) {
 		if ( g_gametype.integer != GT_TOURNAMENT  )
 #endif
 		{
-			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
+			if (ent->r.mainClientNum != -1) {
+				// Extra local clients show a different message.
+				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " dropped in\n\"", client->pers.netname) );
+			} else {
+				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
+			}
 		}
 	}
 	G_LogPrintf( "ClientBegin: %i\n", clientNum );

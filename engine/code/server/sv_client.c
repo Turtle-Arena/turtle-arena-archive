@@ -868,7 +868,8 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	ent->s.number = clientNum;
 	client->gentity = ent;
 
-	// Set local client indexes (must be done after game resets ent->r).
+	// Set client indexes (must be done after game resets ent->r).
+	client->gentity->r.mainClientNum = client->mainClient ? client->mainClient - svs.clients : -1;
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		client->gentity->r.localClientNums[i] = client->localClients[i] ? client->localClients[i] - svs.clients : -1;
 	}
