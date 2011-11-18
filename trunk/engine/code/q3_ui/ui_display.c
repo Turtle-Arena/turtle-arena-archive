@@ -188,9 +188,11 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 		"red-cyan",
 		"red-blue",
 		"red-green",
+		"green-magenta",
 		"cyan-red",
 		"blue-red",
 		"green-red",
+		"magenta-green",
 		NULL
 	};
 
