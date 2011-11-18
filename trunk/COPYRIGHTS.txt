@@ -1,23 +1,12 @@
-Turtle Arena data copyrights for base and base-src directories.
-
-All of the data is licensed under "the GNU General Public License;
-	either version 2 of the License, or (at your option) any later version"
-	or "Creative Commons Attribution-ShareAlike 3.0 Unported" see list below
-	for details.
+Turtle Arena data copyrights for base and base-src directories ("the data files"), excludes any files compiled from the engine source code (including but not limited to QVM, DLL, SO, and DYLIB files).
 
 == ZTM ==
-All data in the base and base-src directories, unless otherwise noted, are
-	copyright (c) 2009-2011 Zack "ZTurtleMan" Middleton and are licensed under
-	the GNU General Public License; either version 2 of the License, or (at your
-	option) any later version and licensed under the Creative Commons
-	Attribution-ShareAlike 3.0 Unported.
+All of the data files, unless otherwise noted, are copyright (c) 2009-2011 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version and licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported.
 	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
 
-The data files in the base directory that have source files are included
-	in the base-src directory.
+The data files in the base directory that have source files are included in the base-src directory.
 
-The following use M+ Outline Fonts, for font license see the last section of
-	this file.
+The following use M+ Outline Fonts, for font license see the last section of this file.
 
 Images that use M+ 1c Bold:
 base/gfx/2d/numbers/eight_32b.png
@@ -108,10 +97,7 @@ music/zero-project_-_Whispering_Wind.ogg
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.
 base/scripts/male1.voice is based on file from OpenArena.
 
-The following are based on files from OpenArena and are
-	copyright (c) 2006 Dmn_clown and 2009-2011 Zack "ZTurtleMan" Middleton
-	and are licensed under the GNU General Public License; either version 2 of
-	the License, or (at your option) any later version.
+The following are based on files from OpenArena and are copyright (c) 2006 Dmn_clown and 2009-2011 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
 base/botfiles/bots/default_c.c
 base/botfiles/bots/default_i.c
@@ -137,33 +123,33 @@ base/fonts/mplus-1c-bold.ttf
 base/fonts/mplus-1mn-regular.ttf
 base/fonts/mplus-2p-black.ttf
 
-The dat and tga files listed below were created by the engine, using freetype2.
+The dat and png files listed below were created by the engine, using freetype2.
 
-Files that created from base/fonts/mplus-1c-regular.ttf:
-base/fonts/mplus-1c-regular_0_8.tga
-base/fonts/mplus-1c-regular_0_12.tga
-base/fonts/mplus-1c-regular_0_16.tga
-base/fonts/mplus-1c-regular_0_20.tga
-base/fonts/mplus-1c-regular_0_48.tga
-base/fonts/mplus-1c-regular_1_48.tga
+Files created from base/fonts/mplus-1c-regular.ttf:
+base/fonts/mplus-1c-regular_0_8.png
+base/fonts/mplus-1c-regular_0_12.png
+base/fonts/mplus-1c-regular_0_16.png
+base/fonts/mplus-1c-regular_0_20.png
+base/fonts/mplus-1c-regular_0_48.png
+base/fonts/mplus-1c-regular_1_48.png
 base/fonts/mplus-1c-regular_8.dat
 base/fonts/mplus-1c-regular_12.dat
 base/fonts/mplus-1c-regular_16.dat
 base/fonts/mplus-1c-regular_20.dat
 base/fonts/mplus-1c-regular_48.dat
 
-Files that created from base/fonts/mplus-1c-bold.ttf:
-base/fonts/mplus-1c-bold_0_20.tga
-base/fonts/mplus-1c-bold_0_27.tga
-base/fonts/mplus-1c-bold_1_27.tga
+Files created from base/fonts/mplus-1c-bold.ttf:
+base/fonts/mplus-1c-bold_0_20.png
+base/fonts/mplus-1c-bold_0_27.png
+base/fonts/mplus-1c-bold_1_27.png
 base/fonts/mplus-1c-bold_20.dat
 base/fonts/mplus-1c-bold_27.dat
 
-Files that created from base/fonts/mplus-1mn-regular.ttf:
-base/fonts/mplus-1mn-regular_0_16.tga
+Files created from base/fonts/mplus-1mn-regular.ttf:
+base/fonts/mplus-1mn-regular_0_16.png
 base/fonts/mplus-1mn-regular_16.dat
 
-Files that created from base/fonts/mplus-1mn-regular.ttf:
-base/fonts/mplus-1mn-regular_0_16.tga
+Files created from base/fonts/mplus-1mn-regular.ttf:
+base/fonts/mplus-1mn-regular_0_16.png
 base/fonts/mplus-1mn-regular_16.dat
 

@@ -9,7 +9,7 @@ Turtle Arena credits.
 * Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
 * Mercenaries Guild Client for Tremulous (Fixed up freetype code and use TTF in console)
 * ZEQ2-lite				(For cel shading tcGen code)
-* GNU FreeFonts			(For FreeSans, FreeSansBold, and FreeMono fonts)
+* M+ Outline Fonts		(For M+ 1c, M+ 1mn, and M+ 2p fonts)
 * zero-project			(For music)
 * Zack "ZTurtleMan" Middleton
 
@@ -42,13 +42,11 @@ ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
 ** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
 
 * OpenArena (OPENARENA): http://openarena.ws
-** Changed default sound filename. Load Ogg Vorbis sounds (when no wav is found).
 ** (OA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
 
 * Xreal (XREAL): http://www.xreal-project.net/
 ** Homing rockets (Xreal svn r2785)
 ** Fired rockets and homing-rockets can be destroyed (Xreal svn r > 2785)
-** Used Xreal to find what to change to add per-player bounding boxes (Xreal svn r3050)
 ** Jeff "Jeffro11" Attwood (EXTERNAL_LIGHTMAPS): http://ioquake.org/forums/viewtopic.php?f=2&t=100
 
 * Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
