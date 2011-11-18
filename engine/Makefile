@@ -173,10 +173,8 @@ else # END QUAKE3
 	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to ioquake3 (might be q3 mod compatible)
 	# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
 	#
-	#   EAR_IN_ENTITY; It fixes checking if we are in first person in sound code.
-	#       Q3 mods will CG_Error("vmMain: unknown command 9") however...
-    #   DAMAGE_SKINS; Allows player skins to have shaders to use when damaged.
-    #       Adds a new var "skinFraction" to entityState_t and refEntity_t
+	#   DAMAGE_SKINS; Allows player skins to have shaders to use when damaged.
+	#       Adds a new var "skinFraction" to entityState_t and refEntity_t
 	#
 	# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
 	#####
@@ -1016,7 +1014,7 @@ ifeq ($(PLATFORM),sunos)
   CC=gcc
   INSTALL=ginstall
   MKDIR=gmkdir
-  COPYDIR="/usr/local/share/games/quake3"
+  COPYDIR="/usr/local/share/games/turtlearena"
 
   ifneq (,$(findstring i86pc,$(shell uname -m)))
     ARCH=i386
