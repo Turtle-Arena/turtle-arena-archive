@@ -701,9 +701,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 		killer, self->s.number, meansOfDeath, killerName, 
 		self->client->pers.netname, obit );
 
-#ifdef IOQ3ZTM_NO_COMPAT
-	// Don't send death obituary when swiching to spactator mode.
-	if (meansOfDeath != MOD_SPECTATE) {
+#ifdef IOQ3ZTM // SWITCH_TEAM
+	// Don't send death obituary when swiching teams.
+	if (meansOfDeath != MOD_SUICIDE_TEAM_CHANGE) {
 #endif
 	// broadcast the death event to everyone
 	ent = G_TempEntity( self->r.currentOrigin, EV_OBITUARY );
@@ -742,7 +742,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	}
 #endif
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
-#ifdef IOQ3ZTM_NO_COMPAT
+#ifdef IOQ3ZTM // SWITCH_TEAM
 	}
 #endif
 
@@ -833,8 +833,8 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 #ifndef TA_MISC // DROP_FLAG
 	// if I committed suicide, the flag does not fall, it returns.
 	if (meansOfDeath == MOD_SUICIDE
-#ifdef IOQ3ZTM_NO_COMPAT
-		|| meansOfDeath == MOD_SPECTATE
+#ifdef IOQ3ZTM // SWITCH_TEAM
+		|| meansOfDeath == MOD_SUICIDE_TEAM_CHANGE
 #endif
 		)
 	{

@@ -692,8 +692,8 @@ void SetTeam( gentity_t *ent, char *s ) {
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
-#ifdef IOQ3ZTM_NO_COMPAT
-		player_die (ent, ent, ent, 100000, MOD_SPECTATE);
+#ifdef IOQ3ZTM // SWITCH_TEAM
+		player_die (ent, ent, ent, 100000, MOD_SUICIDE_TEAM_CHANGE);
 #else
 		player_die (ent, ent, ent, 100000, MOD_SUICIDE);
 #endif

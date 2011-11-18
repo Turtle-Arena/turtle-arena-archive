@@ -1332,8 +1332,8 @@ char	*modNames[MOD_MAX] = {
 	"MOD_TELEFRAG",
 	"MOD_FALLING",
 	"MOD_SUICIDE",
-#ifdef IOQ3ZTM_NO_COMPAT
-	"MOD_SPECTATE",
+#ifdef IOQ3ZTM // SWITCH_TEAM
+	"MOD_SUICIDE_TEAM_CHANGE",
 #endif
 	"MOD_TARGET_LASER",
 	"MOD_TRIGGER_HURT",
@@ -4838,7 +4838,7 @@ char *eventnames[] = {
 	"EV_POWERUP_QUAD",
 	"EV_POWERUP_BATTLESUIT",
 	"EV_POWERUP_REGEN",
-#if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
+#ifndef TURTLEARENA // POWERS
 	"EV_POWERUP_INVUL",
 #endif
 
@@ -4846,7 +4846,7 @@ char *eventnames[] = {
 	"EV_GIB_PLAYER",			// gib a previously living player
 #endif
 	"EV_SCOREPLUM",			// score plum
-#if defined TURTLEARENA || defined NET_COMPAT// NIGHTS_ITEMS
+#ifdef TURTLEARENA // NIGHTS_ITEMS
 	"EV_CHAINPLUM",
 #endif
 #ifdef TA_ENTSYS // BREAKABLE MISC_OBJECT
@@ -4859,12 +4859,12 @@ char *eventnames[] = {
 	"EV_PROXIMITY_MINE_STICK",
 	"EV_PROXIMITY_MINE_TRIGGER",
 #endif
-#if !defined TURTLEARENA || defined NET_COMPAT // NO_KAMIKAZE_ITEM
+#ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	"EV_KAMIKAZE",			// kamikaze explodes
 #endif
 	"EV_OBELISKEXPLODE",		// obelisk explodes
 	"EV_OBELISKPAIN",		// obelisk pain
-#if !defined TURTLEARENA || defined NET_COMPAT  // POWERS
+#ifndef TURTLEARENA // POWERS
 	"EV_INVUL_IMPACT",		// invulnerability sphere impact
 	"EV_JUICED",				// invulnerability juiced effect
 	"EV_LIGHTNINGBOLT",		// lightning bolt bounced of invulnerability sphere
