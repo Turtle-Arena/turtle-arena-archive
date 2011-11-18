@@ -805,13 +805,14 @@ Generated a bunch of gibs launching out from the bodies location
 void CG_GibPlayer( vec3_t playerOrigin ) {
 	vec3_t	origin, velocity;
 
-	if ( !cg_blood.integer ) {
-		return;
-	}
-
 #ifdef IOQ3ZTM // ZTM: Have cg_gibs disable ALL gibs.
 	// allow gibs to be turned off
-	if ( !cg_gibs.integer ) {
+	if ( !cg_blood.integer || !cg_gibs.integer ) {
+		// ZTM: TODO: Have a smoke explosion (so body isn't just gone)?
+		return;
+	}
+#else
+	if ( !cg_blood.integer ) {
 		return;
 	}
 #endif
