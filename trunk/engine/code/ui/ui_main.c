@@ -4559,7 +4559,11 @@ static void UI_FeederSelection(float feederID, int index) {
   } else if (feederID == FEEDER_Q3HEADS) {
     if (index >= 0 && index < uiInfo.q3HeadCount) {
       trap_Cvar_Set( "model", uiInfo.q3HeadNames[index]);
+#ifdef IOQ3ZTM // BLANK_HEADMODEL
+      trap_Cvar_Set( "headmodel", "");
+#else
       trap_Cvar_Set( "headmodel", uiInfo.q3HeadNames[index]);
+#endif
 			updateModel = qtrue;
 		}
   } else if (feederID == FEEDER_MAPS || feederID == FEEDER_ALLMAPS) {
