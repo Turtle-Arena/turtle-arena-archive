@@ -92,7 +92,7 @@ typedef enum {
 	RT_MAX_REF_ENTITY_TYPE
 } refEntityType_t;
 
-#ifdef IOQ3ZTM_NO_COMPAT // BONES
+#ifdef IOQ3ZTM // BONES
 #define MAX_SKELETON_JOINTS 128 // see IQM_MAX_JOINTS
 // ZTM: TODO: Replace IQM_MAX_JOINTS with MAX_SKELETON_JOINTS?
 
