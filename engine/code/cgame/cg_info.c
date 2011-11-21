@@ -24,6 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 #include "cg_local.h"
 
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 #define MAX_LOADING_PLAYER_ICONS	16
 #define MAX_LOADING_ITEM_ICONS		26
 
@@ -57,6 +58,7 @@ static void CG_DrawLoadingIcons( void ) {
 		CG_DrawPic( x, y, 32, 32, loadingItemIcons[n] );
 	}
 }
+#endif
 
 
 /*
@@ -71,6 +73,7 @@ void CG_LoadingString( const char *s ) {
 	trap_UpdateScreen();
 }
 
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 /*
 ===================
 CG_LoadingItem
@@ -78,13 +81,6 @@ CG_LoadingItem
 */
 void CG_LoadingItem( int itemNum ) {
 	gitem_t		*item;
-
-#ifdef TA_SP
-	if (cgs.gametype == GT_SINGLE_PLAYER)
-	{
-		return;
-	}
-#endif
 
 #ifdef TA_ITEMSYS
 	item = BG_ItemForItemNum(itemNum);
@@ -112,13 +108,6 @@ void CG_LoadingClient( int clientNum ) {
 	char			iconName[MAX_QPATH];
 #ifdef IOQ3ZTM // PLAYER_DIR
 	int				i;
-#endif
-
-#ifdef TA_SP
-	if (cgs.gametype == GT_SINGLE_PLAYER)
-	{
-		return;
-	}
 #endif
 
 	info = CG_ConfigString( CS_PLAYERS + clientNum );
@@ -193,14 +182,13 @@ void CG_LoadingClient( int clientNum ) {
 	Q_strncpyz( personality, Info_ValueForKey( info, "n" ), sizeof(personality) );
 	Q_CleanStr( personality );
 
-#ifndef TA_SP
 	if( cgs.gametype == GT_SINGLE_PLAYER ) {
 		trap_S_RegisterSound( va( "sound/player/announce/%s.wav", personality ), qtrue );
 	}
-#endif
 
 	CG_LoadingString( personality );
 }
+#endif
 
 
 /*
@@ -239,8 +227,10 @@ void CG_DrawInformation( void ) {
 	detail = trap_R_RegisterShader( "levelShotDetail" );
 	trap_R_DrawStretchPic( 0, 0, cgs.glconfig.vidWidth, cgs.glconfig.vidHeight, 0, 0, 2.5, 2, detail );
 
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 	// draw the icons of things as they are loaded
 	CG_DrawLoadingIcons();
+#endif
 
 	// the first 150 rows are reserved for the client connection
 	// screen to write into

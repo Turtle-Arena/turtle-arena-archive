@@ -1470,7 +1470,9 @@ static void CG_RegisterGraphics( void ) {
 #endif
 	{
 		if ( items[ i ] == '1' || cg_buildScript.integer ) {
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 			CG_LoadingItem( i );
+#endif
 			CG_RegisterItemVisuals( i );
 		}
 	}
@@ -1482,7 +1484,6 @@ static void CG_RegisterGraphics( void ) {
 	for ( i = 1 ; i < BG_NumNPCs() ; i++ )
 	{
 		if ( npcs[ i ] == '1' || cg_buildScript.integer ) {
-			//CG_LoadingItem( i );
 			CG_RegisterNPCVisuals( i );
 		}
 	}
@@ -1628,6 +1629,7 @@ CG_RegisterClients
 */
 static void CG_RegisterClients( void ) {
 	int		i;
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 	int		j;
 	int		numLocalClients = 1; // cg.snap->numPSs; ZTM: FIXME?: cg.snap is NULL here, how can we get number?
 
@@ -1635,10 +1637,12 @@ static void CG_RegisterClients( void ) {
 		CG_LoadingClient(cg.localClients[i].clientNum);
 		CG_NewClientInfo(cg.localClients[i].clientNum);
 	}
+#endif
 
 	for (i=0 ; i<MAX_CLIENTS ; i++) {
 		const char		*clientInfo;
 
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 		for (j = 0; j < numLocalClients; j++) {
 			if (cg.localClients[j].clientNum == i) {
 				break;
@@ -1647,12 +1651,15 @@ static void CG_RegisterClients( void ) {
 		if (j != numLocalClients) {
 			continue;
 		}
+#endif
 
 		clientInfo = CG_ConfigString( CS_PLAYERS+i );
 		if ( !clientInfo[0]) {
 			continue;
 		}
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 		CG_LoadingClient( i );
+#endif
 		CG_NewClientInfo( i );
 	}
 	CG_BuildSpectatorString();
