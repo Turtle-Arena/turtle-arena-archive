@@ -262,6 +262,7 @@ static void CG_TransitionSnapshot( void ) {
 
 			cg.cur_localClientNum = i;
 			cg.cur_lc = &cg.localClients[i];
+			cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 
 			ops = &oldFrame->pss[oldFrame->lcIndex[i]];
 			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
