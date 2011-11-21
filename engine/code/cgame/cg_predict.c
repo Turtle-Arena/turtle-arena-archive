@@ -620,6 +620,10 @@ void CG_PredictPlayerState( void ) {
 
 		Pmove (&cg_pmove);
 
+#ifdef TURTLEARENA
+		cg.cur_lc->waterlevel = cg_pmove.waterlevel;
+#endif
+
 		moved = qtrue;
 
 		// add push trigger movement effects

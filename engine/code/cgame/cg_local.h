@@ -873,6 +873,12 @@ typedef struct {
 
 	char		killerName[MAX_NAME_LENGTH];
 
+#ifdef TURTLEARENA
+	int			waterlevel;
+	int			airBarFadeTime; // Air bar start fade time
+	qboolean	airBarDrawn; // Drew air bar last frame
+#endif
+
 } cglc_t;
  
 typedef struct {
