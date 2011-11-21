@@ -644,6 +644,7 @@ gentity_t *Team_ResetFlag( int team ) {
 	return rent;
 }
 
+#ifndef TURTLEARENA
 void Team_ResetFlags( void ) {
 	if( g_gametype.integer == GT_CTF ) {
 		Team_ResetFlag( TEAM_RED );
@@ -655,6 +656,7 @@ void Team_ResetFlags( void ) {
 	}
 #endif
 }
+#endif
 
 void Team_ReturnFlagSound( gentity_t *ent, int team ) {
 	gentity_t	*te;
@@ -943,7 +945,20 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 			}
 		}
 	}
+
+#ifdef TURTLEARENA
+	// Respawn the carried flag.
+	if( g_gametype.integer == GT_CTF ) {
+		Team_ResetFlag( OtherTeam(team) );
+	}
+#ifdef MISSIONPACK
+	else if( g_gametype.integer == GT_1FCTF ) {
+		Team_ResetFlag( TEAM_FREE );
+	}
+#endif
+#else
 	Team_ResetFlags();
+#endif
 
 	CalculateRanks();
 
