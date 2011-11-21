@@ -906,13 +906,39 @@ void CG_DrawAirBar( int x, int y, int w, int h )
 {
 	vec4_t		color_air = { 0.42f, 0.64f, 0.76f, 1.0f };
 	vec4_t		color_empty = { 0.2f, 0.2f, 0.9f, 1.0f };
-	vec4_t		color_hud;
+	vec4_t		color_hud = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const int	borderSize = 2;
+	const int	fadeOutDelay = 1000;
+	const int	fadeOutTime = 500;
 	int value;
 	float frac;
+	float alpha;
 
 	// Air time left
 	value = cg.cur_ps->powerups[PW_AIR] - cg.time;
+
+	// Disable airbar when not in deep water and it is full.
+	if (cg.cur_lc->waterlevel <= 1 && value >= 30000) {
+		if (!cg.cur_lc->airBarDrawn) {
+			// First spawn in game, don't fade out because it hasn't been drawn yet!
+			return;
+		}
+
+		if (!cg.cur_lc->airBarFadeTime) {
+			cg.cur_lc->airBarFadeTime = cg.time;
+		} else if (cg.cur_lc->airBarFadeTime && cg.cur_lc->airBarFadeTime + fadeOutDelay + fadeOutTime < cg.time) {
+			cg.cur_lc->airBarDrawn = qfalse;
+			return;
+		}
+	} else {
+		cg.cur_lc->airBarDrawn = qtrue;
+		cg.cur_lc->airBarFadeTime = 0;
+	}
+
+	if (cg.cur_lc->airBarFadeTime && cg.time > cg.cur_lc->airBarFadeTime + fadeOutDelay)
+		alpha = 1.0f - ((cg.time - cg.cur_lc->airBarFadeTime - fadeOutDelay) / (float)fadeOutTime);
+	else
+		alpha = 1.0f;
 
 	// Don't have less than zero air left
 	if (value < 0) {
@@ -926,9 +952,12 @@ void CG_DrawAirBar( int x, int y, int w, int h )
 	}
 
 	// Colorize hud background
-	if (CG_GetHudColor(color_hud)) {
-		trap_R_SetColor(color_hud);
-	}
+	CG_GetHudColor(color_hud);
+
+	// Fade air bar
+	color_air[3] = color_empty[3] = color_hud[3] = alpha;
+
+	trap_R_SetColor(color_hud);
 
 	// Draw healthbar background
 	CG_DrawPic( x, y, w, h, cgs.media.hudBarBackgroundShader );
