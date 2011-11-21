@@ -2175,8 +2175,10 @@ int CG_LocalClient( int clientNum );
 // cg_info.c
 //
 void CG_LoadingString( const char *s );
+#ifndef TURTLEARENA // NO_LOADING_ICONS
 void CG_LoadingItem( int itemNum );
 void CG_LoadingClient( int clientNum );
+#endif
 void CG_DrawInformation( void );
 
 //
