@@ -52,7 +52,7 @@ typedef unsigned int glIndex_t;
 // can't be increased without changing bit packing for drawsurfs
 // see QSORT_SHADERNUM_SHIFT
 #define SHADERNUM_BITS	14
-#define	MAX_SHADERS				(1<<SHADERNUM_BITS)
+#define MAX_SHADERS		(1<<SHADERNUM_BITS)
 
 //#define MAX_SHADER_STATES 2048
 #define MAX_STATES_PER_SHADER 32

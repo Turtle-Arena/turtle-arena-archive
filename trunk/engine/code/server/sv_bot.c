@@ -45,7 +45,7 @@ SV_BotAllocateClient
 ==================
 */
 int SV_BotAllocateClient(void) {
-	int			i;
+	int			i, j;
 	client_t	*cl;
 
 	// find a client slot
@@ -65,6 +65,16 @@ int SV_BotAllocateClient(void) {
 	cl->lastPacketTime = svs.time;
 	cl->netchan.remoteAddress.type = NA_BOT;
 	cl->rate = 16384;
+
+	// Not an extra splitscreen client.
+	cl->mainClient = NULL;
+	cl->gentity->r.mainClientNum = -1;
+
+	// No extra splitscreen clients.
+	for (j = 0; j < MAX_SPLITVIEW-1; j++) {
+		cl->localClients[j] = NULL;
+		cl->gentity->r.localClientNums[j] = -1;
+	}
 
 	return i;
 }
