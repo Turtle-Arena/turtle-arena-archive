@@ -355,48 +355,46 @@ gfx/damage/hammer_mrk
 //
 // Player damage hit effects
 //
-// Based on bloodExplosion
-//
 
 meleeHit1
 {
 	cull disable
+	nomipmaps
 	{
-		animmap 5 models/weaphits/meleehit1_1.png models/weaphits/meleehit1_2.png models/weaphits/meleehit1_3.png models/weaphits/meleehit1_4.png models/weaphits/meleehit1_5.png
+		map models/weaphits/meleehit1.png
 		blendfunc blend
 	}
 }
 
-//meleeHit2
-//{
-//	cull disable
-//	{
-//		animmap 5 models/weaphits/meleehit2_1.png models/weaphits/meleehit2_2.png models/weaphits/meleehit2_3.png models/weaphits/meleehit2_4.png models/weaphits/meleehit2_5.png
-//		blendfunc blend
-//	}
-//}
+meleeHit2
+{
+	cull disable
+	nomipmaps
+	{
+		map models/weaphits/meleehit2.png
+		blendfunc blend
+	}
+}
 
 missileHit1
 {
 	cull disable
+	nomipmaps
 	{
-		// ZTM: TODO: Create images for missileHit1
-//		animmap 5 models/weaphits/missilehit1_1.png models/weaphits/missilehit1_2.png models/weaphits/missilehit1_3.png models/weaphits/missilehit1_4.png models/weaphits/missilehit1_5.png
-
-		// Temporarily use secondary melee hit images
-		animmap 5 models/weaphits/meleehit2_1.png models/weaphits/meleehit2_2.png models/weaphits/meleehit2_3.png models/weaphits/meleehit2_4.png models/weaphits/meleehit2_5.png
+		map models/weaphits/missilehit1.png
 		blendfunc blend
 	}
 }
 
-//missileHit2
-//{
-//	cull disable
-//	{
-//		animmap 5 models/weaphits/missilehit2_1.png models/weaphits/missilehit2_2.png models/weaphits/missilehit2_3.png models/weaphits/missilehit2_4.png models/weaphits/missilehit2_5.png
-//		blendfunc blend
-//	}
-//}
+missileHit2
+{
+	cull disable
+	nomipmaps
+	{
+		map models/weaphits/missilehit2.png
+		blendfunc blend
+	}
+}
 
 
 //
