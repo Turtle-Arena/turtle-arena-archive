@@ -3979,7 +3979,8 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	VectorCopy ( origin, ex->refEntity.origin);
 	ex->refEntity.reType = RT_SPRITE;
 	ex->refEntity.rotation = rand() % 360;
-	ex->refEntity.radius = 24;
+	ex->radius = 18 + (rand() & 6);
+	ex->refEntity.radius = -(ex->radius - 6); // scale down explosion over time. size = ex->radius + frac * ex->refEntity.radius
 
 	ex->refEntity.customShader = hShader;
 
