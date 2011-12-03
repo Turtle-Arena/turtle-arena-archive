@@ -1631,8 +1631,6 @@ void ClientSpawn(gentity_t *ent, qboolean firstTime) {
 		)
 	{
 		client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
-		// Become non-solid
-		ent->s.contents &= ~CONTENTS_BODY;
 	}
 #endif
 

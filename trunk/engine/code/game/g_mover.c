@@ -71,7 +71,7 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 		mask = ent->clipmask;
 	} else {
 #ifdef IOQ3ZTM // Don't push brushes inside of players!
-		mask = MASK_PLAYERSOLID;
+		mask = MASK_SOLID | CONTENTS_BODY;
 #else
 		mask = MASK_SOLID;
 #endif

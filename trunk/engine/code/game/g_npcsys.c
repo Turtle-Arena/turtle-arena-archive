@@ -176,7 +176,7 @@ static void G_NPC_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 
 	//if (self->activator->spawnflags & MOBJF_UNSOLIDDEATH)
 	{
-		self->s.contents = 0;
+		self->bgNPC.npc_ps.contents = 0;
 		trap_LinkEntity( self );
 		//G_Printf("    unsolid misc_object\n");
 	}
@@ -258,14 +258,14 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	trace_t		tr;
 	vec3_t		dest;
 
-	VectorCopy(ent->bgNPC.info->mins, ent->s.mins);
-	VectorCopy(ent->bgNPC.info->maxs, ent->s.maxs);
+	VectorCopy(ent->bgNPC.info->mins, ent->bgNPC.npc_ps.mins);
+	VectorCopy(ent->bgNPC.info->maxs, ent->bgNPC.npc_ps.maxs);
 
 	ent->s.eType = ET_NPC;
 	ent->s.modelindex = ent->bgNPC.info - bg_npcinfo;		// store item number in modelindex
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
-	ent->s.contents = CONTENTS_BODY;
+	ent->bgNPC.npc_ps.contents = CONTENTS_BODY;
 	ent->clipmask = MASK_PLAYERSOLID;
 	//ent->touch = Touch_Item;
 
@@ -319,6 +319,8 @@ void FinishSpawningNPC( gentity_t *ent ) {
 		}
 #endif
 	}
+
+	NPC_PlayerStateToEntityState( &ent->bgNPC.npc_ps, &ent->s, qtrue );
 
 	trap_LinkEntity (ent);
 }
@@ -429,6 +431,13 @@ void G_RunNPC( gentity_t *ent )
 	pm.ps = &ent->bgNPC.npc_ps;
 	pm.cmd = ucmd;
 
+#ifdef TURTLEARENA // NO_BODY_TRACE
+	if ( pm.ps->pm_type == PM_DEAD ) {
+		pm.ps->powerups[PW_FLIGHT] = 0;
+	}
+
+	pm.tracemask = MASK_PLAYERSOLID;
+#else
 	if ( pm.ps->pm_type == PM_DEAD ) {
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;
 		pm.ps->powerups[PW_FLIGHT] = 0;
@@ -436,6 +445,7 @@ void G_RunNPC( gentity_t *ent )
 	else {
 		pm.tracemask = MASK_PLAYERSOLID;
 	}
+#endif
 	pm.trace = trap_Trace;
 	pm.pointcontents = trap_PointContents;
 	pm.debugLevel = g_debugMove.integer;
