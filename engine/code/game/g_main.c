@@ -1143,12 +1143,13 @@ void MoveClientToIntermission( gentity_t *ent ) {
 	memset( ent->client->ps.powerups, 0, sizeof(ent->client->ps.powerups) );
 
 	ent->client->ps.eFlags = 0;
+	ent->client->ps.contents = 0;
 	ent->s.eFlags = 0;
+	ent->s.contents = 0;
 	ent->s.eType = ET_GENERAL;
 	ent->s.modelindex = 0;
 	ent->s.loopSound = 0;
 	ent->s.event = 0;
-	ent->r.contents = 0;
 }
 
 /*

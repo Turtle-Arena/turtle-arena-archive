@@ -107,9 +107,9 @@ void G_AutoAim(gentity_t *ent, int projnum, vec3_t start, vec3_t forward, vec3_t
 	VectorCopy(target->r.currentOrigin, targetOrigin);
 	for (i = 0; i < 3; i++)
 	{
-		targetOrigin[i] += (target->r.mins[i] + target->r.maxs[i]) * 0.5;
+		targetOrigin[i] += (target->s.mins[i] + target->s.maxs[i]) * 0.5;
 		// Move around a bit so that shurikens don't all stick in the same spot.
-		maxRand = target->r.maxs[i] * 0.5;
+		maxRand = target->s.maxs[i] * 0.5;
 		targetOrigin[i] += maxRand - (random() * (maxRand * 2));
 	}
 
@@ -1395,9 +1395,9 @@ void Weapon_HookThink (gentity_t *ent)
 		vec3_t v, oldorigin;
 
 		VectorCopy(ent->r.currentOrigin, oldorigin);
-		v[0] = ent->enemy->r.currentOrigin[0] + (ent->enemy->r.mins[0] + ent->enemy->r.maxs[0]) * 0.5;
-		v[1] = ent->enemy->r.currentOrigin[1] + (ent->enemy->r.mins[1] + ent->enemy->r.maxs[1]) * 0.5;
-		v[2] = ent->enemy->r.currentOrigin[2] + (ent->enemy->r.mins[2] + ent->enemy->r.maxs[2]) * 0.5;
+		v[0] = ent->enemy->r.currentOrigin[0] + (ent->enemy->s.mins[0] + ent->enemy->s.maxs[0]) * 0.5;
+		v[1] = ent->enemy->r.currentOrigin[1] + (ent->enemy->s.mins[1] + ent->enemy->s.maxs[1]) * 0.5;
+		v[2] = ent->enemy->r.currentOrigin[2] + (ent->enemy->s.mins[2] + ent->enemy->s.maxs[2]) * 0.5;
 		SnapVectorTowards( v, oldorigin );	// save net bandwidth
 
 		G_SetOrigin( ent, v );

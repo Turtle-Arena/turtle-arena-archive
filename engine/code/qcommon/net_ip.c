@@ -1869,6 +1869,7 @@ void NET_Sleep(int msec)
 NET_Restart_f
 ====================
 */
-void NET_Restart_f( void ) {
-	NET_Config( networkingEnabled );
+void NET_Restart_f(void)
+{
+	NET_Config(qtrue);
 }

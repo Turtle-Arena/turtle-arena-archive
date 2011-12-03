@@ -108,7 +108,7 @@ Also called by event processing code
 ======================
 */
 void CG_SetEntitySoundPosition( centity_t *cent ) {
-	if ( cent->currentState.solid == SOLID_BMODEL ) {
+	if ( cent->currentState.bmodel ) {
 		vec3_t	origin;
 		float	*v;
 
@@ -1313,7 +1313,7 @@ static void CG_Mover( centity_t *cent ) {
 	ent.skinNum = ( cg.time >> 6 ) & 1;
 
 	// get the model, either as a bmodel or a modelindex
-	if ( s1->solid == SOLID_BMODEL ) {
+	if ( s1->bmodel ) {
 		ent.hModel = cgs.inlineDrawModel[s1->modelindex];
 	} else {
 		ent.hModel = cgs.gameModels[s1->modelindex];
@@ -1508,7 +1508,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 		}
 	}
 
-	if ( i != MAX_SPLITVIEW ) {
+	if ( i == MAX_SPLITVIEW ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}

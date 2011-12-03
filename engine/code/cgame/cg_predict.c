@@ -48,6 +48,7 @@ void CG_BuildSolidList( void ) {
 	centity_t	*cent;
 	snapshot_t	*snap;
 	entityState_t	*ent;
+	playerState_t	*ps;
 
 	cg_numSolidEntities = 0;
 	cg_numTriggerEntities = 0;
@@ -59,8 +60,8 @@ void CG_BuildSolidList( void ) {
 	}
 
 	for ( i = 0 ; i < snap->numEntities ; i++ ) {
-		cent = &cg_entities[ snap->entities[ i ].number ];
-		ent = &cent->currentState;
+		ent = &snap->entities[i];
+		cent = &cg_entities[ent->number];
 
 		if ( ent->eType == ET_ITEM || ent->eType == ET_PUSH_TRIGGER || ent->eType == ET_TELEPORT_TRIGGER ) {
 			cg_triggerEntities[cg_numTriggerEntities] = cent;
@@ -68,12 +69,7 @@ void CG_BuildSolidList( void ) {
 			continue;
 		}
 
-#ifdef IOQ3ZTM
-		if ( ent->solid )
-#else
-		if ( cent->nextState.solid )
-#endif
-		{
+		if ( ent->bmodel || ent->contents ) {
 			cg_solidEntities[cg_numSolidEntities] = cent;
 			cg_numSolidEntities++;
 			continue;
@@ -82,9 +78,9 @@ void CG_BuildSolidList( void ) {
 
 	// Add local clients to solid entity list
 	for ( i = 0 ; i < snap->numPSs ; i++ ) {
-		cent = &cg_entities[ snap->pss[i].clientNum ];
-		ent = &cent->currentState;
-		if ( ent->solid ) {
+		ps = &snap->pss[i];
+		cent = &cg_entities[ps->clientNum];
+		if ( ps->contents ) {
 			cg_solidEntities[cg_numSolidEntities] = cent;
 			cg_numSolidEntities++;
 		}
@@ -99,11 +95,10 @@ CG_ClipMoveToEntities
 */
 static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
 							int skipNumber, int mask, trace_t *tr ) {
-	int			i, x, zd, zu;
+	int			i;
 	trace_t		trace;
 	entityState_t	*ent;
 	clipHandle_t 	cmodel;
-	vec3_t		bmins, bmaxs;
 	vec3_t		origin, angles;
 	centity_t	*cent;
 
@@ -115,23 +110,18 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 			continue;
 		}
 
-		if ( ent->solid == SOLID_BMODEL ) {
-			// special value for bmodel
+		// if it doesn't have any brushes of a type we
+		// are looking for, ignore it
+		if ( !(mask & ent->contents) ) {
+			continue;
+		}
+
+		if ( ent->bmodel ) {
 			cmodel = trap_CM_InlineModel( ent->modelindex );
 			VectorCopy( cent->lerpAngles, angles );
 			BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
 		} else {
-			// encoded bbox
-			x = (ent->solid & 255);
-			zd = ((ent->solid>>8) & 255);
-			zu = ((ent->solid>>16) & 255) - 32;
-
-			bmins[0] = bmins[1] = -x;
-			bmaxs[0] = bmaxs[1] = x;
-			bmins[2] = -zd;
-			bmaxs[2] = zu;
-
-			cmodel = trap_CM_TempBoxModel( bmins, bmaxs );
+			cmodel = trap_CM_TempBoxModel( ent->mins, ent->maxs, ent->contents );
 			VectorCopy( vec3_origin, angles );
 			VectorCopy( cent->lerpOrigin, origin );
 		}
@@ -192,7 +182,7 @@ int		CG_PointContents( const vec3_t point, int passEntityNum ) {
 			continue;
 		}
 
-		if (ent->solid != SOLID_BMODEL) { // special value for bmodel
+		if ( !ent->bmodel ) {
 			continue;
 		}
 
@@ -386,7 +376,7 @@ static void CG_TouchTriggerPrediction( void ) {
 			continue;
 		}
 
-		if ( ent->solid != SOLID_BMODEL ) {
+		if ( !ent->bmodel ) {
 			continue;
 		}
 
@@ -396,7 +386,7 @@ static void CG_TouchTriggerPrediction( void ) {
 		}
 
 		trap_CM_BoxTrace( &trace, cg.cur_lc->predictedPlayerState.origin, cg.cur_lc->predictedPlayerState.origin, 
-			cg_pmove.mins, cg_pmove.maxs, cmodel, -1 );
+			cg.cur_lc->predictedPlayerState.mins, cg.cur_lc->predictedPlayerState.maxs, cmodel, -1 );
 
 		if ( !trace.startsolid ) {
 			continue;

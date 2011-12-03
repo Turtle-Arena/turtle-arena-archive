@@ -114,7 +114,7 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	{
 		player->client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
 		// Become non-solid
-		player->r.contents &= ~CONTENTS_BODY;
+		player->s.contents &= ~CONTENTS_BODY;
 	}
 #endif
 
@@ -156,8 +156,8 @@ void SP_misc_model( gentity_t *ent ) {
 
 #if 0
 	ent->s.modelindex = G_ModelIndex( ent->model );
-	VectorSet (ent->r.mins, -16, -16, -16);
-	VectorSet (ent->r.maxs, 16, 16, 16);
+	VectorSet (ent->s.mins, -16, -16, -16);
+	VectorSet (ent->s.maxs, 16, 16, 16);
 	trap_LinkEntity (ent);
 
 	G_SetOrigin( ent, ent->s.origin );
@@ -220,8 +220,8 @@ The portal surface nearest this entity will show a view from the targeted misc_p
 This must be within 64 world units of the surface!
 */
 void SP_misc_portal_surface(gentity_t *ent) {
-	VectorClear( ent->r.mins );
-	VectorClear( ent->r.maxs );
+	VectorClear( ent->s.mins );
+	VectorClear( ent->s.maxs );
 	trap_LinkEntity (ent);
 
 	ent->r.svFlags = SVF_PORTAL;
@@ -242,8 +242,8 @@ The target for a misc_portal_director.  You can set either angles or target anot
 void SP_misc_portal_camera(gentity_t *ent) {
 	float	roll;
 
-	VectorClear( ent->r.mins );
-	VectorClear( ent->r.maxs );
+	VectorClear( ent->s.mins );
+	VectorClear( ent->s.maxs );
 	trap_LinkEntity (ent);
 
 	G_SpawnFloat( "roll", "0", &roll );
@@ -442,13 +442,13 @@ void DropPortalDestination( gentity_t *player ) {
 	VectorCopy( player->s.pos.trBase, snapped );
 	SnapVector( snapped );
 	G_SetOrigin( ent, snapped );
-	VectorCopy( player->r.mins, ent->r.mins );
-	VectorCopy( player->r.maxs, ent->r.maxs );
+	VectorCopy( player->s.mins, ent->s.mins );
+	VectorCopy( player->s.maxs, ent->s.maxs );
 
 	ent->classname = "hi_portal destination";
 	ent->s.pos.trType = TR_STATIONARY;
 
-	ent->r.contents = CONTENTS_CORPSE;
+	ent->s.contents = CONTENTS_CORPSE;
 	ent->takedamage = qtrue;
 	ent->health = 200;
 	ent->die = PortalDie;
@@ -552,13 +552,13 @@ void DropPortalSource( gentity_t *player ) {
 	VectorCopy( player->s.pos.trBase, snapped );
 	SnapVector( snapped );
 	G_SetOrigin( ent, snapped );
-	VectorCopy( player->r.mins, ent->r.mins );
-	VectorCopy( player->r.maxs, ent->r.maxs );
+	VectorCopy( player->s.mins, ent->s.mins );
+	VectorCopy( player->s.maxs, ent->s.maxs );
 
 	ent->classname = "hi_portal source";
 	ent->s.pos.trType = TR_STATIONARY;
 
-	ent->r.contents = CONTENTS_CORPSE | CONTENTS_TRIGGER;
+	ent->s.contents = CONTENTS_CORPSE | CONTENTS_TRIGGER;
 	ent->takedamage = qtrue;
 	ent->health = 200;
 	ent->die = PortalDie;
@@ -704,7 +704,7 @@ void ObjectDeath(gentity_t *self)
 		self->think = ObjectRespawn;
 		if (self->objectcfg->invisibleUnsolidDeath) {
 			// Invisible non-solid
-			self->r.contents = 0;
+			self->s.contents = 0;
 			trap_UnlinkEntity(self);
 		}
 	} else if (self->wait < 0) {
@@ -734,7 +734,7 @@ void ObjectDie(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int d
 #endif
 
 	if (self->objectcfg->unsolidOnDeath && !self->objectcfg->invisibleUnsolidDeath) {
-		self->r.contents = 0;
+		self->s.contents = 0;
 		trap_LinkEntity( self );
 	}
 
@@ -820,7 +820,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 
 	if (health > 0) {
 		//G_Printf("ObjectSpawn: animated damagable\n");
-		ent->r.contents = CONTENTS_BODY;
+		ent->s.contents = CONTENTS_BODY;
 		ent->health = health;
 		ent->takedamage = qtrue;
 		ent->die = ObjectDie;
@@ -828,7 +828,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 		ent->use = ObjectUse;
 	} else if ( ent->target ) {
 		//G_Printf("ObjectSpawn: animated touchable\n");
-		ent->r.contents = CONTENTS_TRIGGER;
+		ent->s.contents = CONTENTS_TRIGGER;
 		ent->touch = ObjectTouchTrigger;
 	} else {
 		//G_Printf("ObjectSpawn: animated scenery\n");
@@ -846,7 +846,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 
 		// drop to floor
 		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
-		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
+		trap_Trace( &tr, ent->s.origin, ent->s.mins, ent->s.maxs, dest, ent->s.number, MASK_SOLID );
 		if ( tr.startsolid ) {
 			ent->s.origin[2] -= 1;
 			G_Printf( "ObjectSpawn: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );
@@ -858,9 +858,9 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 			ent->s.groundEntityNum = tr.entityNum;
 			if (ent->spawnflags & MOBJF_NO_BBOX) {
 				// no bbox, so assume mins is ground
-				ent->r.mins[2] = ent->s.origin[2] - tr.endpos[2];
-				ent->r.mins[0] = ent->r.mins[1] = -1;
-				ent->r.maxs[0] = ent->r.maxs[1] = 1;
+				ent->s.mins[2] = ent->s.origin[2] - tr.endpos[2];
+				ent->s.mins[0] = ent->s.mins[1] = -1;
+				ent->s.maxs[0] = ent->s.maxs[1] = 1;
 				G_SetOrigin( ent, ent->s.origin );
 			} else {
 				G_SetOrigin( ent, tr.endpos );
@@ -889,8 +889,8 @@ gentity_t *misc_object_clone(gentity_t *owner, int health, vec3_t origin, vec3_t
 	ent = G_Spaw();
 
 	ent->activator = owner;
-	VectorCopy(owner->r.mins, ent->r.mins);
-	VectorCopy(owner->r.maxs, ent->r.maxs);
+	VectorCopy(owner->s.mins, ent->s.mins);
+	VectorCopy(owner->s.maxs, ent->s.maxs);
 	ent->target = owner->target;
 	ent->wait = owner->wait;
 	ent->message = owner->message;
@@ -965,8 +965,8 @@ void SP_misc_object( gentity_t *ent ) {
 			ent->objectcfg = BG_DefaultObjectCFG();
 		}
 
-		VectorCopy(ent->objectcfg->bbmins, ent->r.mins);
-		VectorCopy(ent->objectcfg->bbmaxs, ent->r.maxs);
+		VectorCopy(ent->objectcfg->bbmins, ent->s.mins);
+		VectorCopy(ent->objectcfg->bbmaxs, ent->s.maxs);
 
 		// The data in this entity over-rides the cfg file.
 		if (!entHealth) {
@@ -1000,8 +1000,8 @@ void SP_misc_object( gentity_t *ent ) {
 	}
 
 	if (ent->spawnflags & MOBJF_NO_BBOX) {
-		VectorCopy(vec3_origin, ent->r.mins);
-		VectorCopy(vec3_origin, ent->r.maxs);
+		VectorCopy(vec3_origin, ent->s.mins);
+		VectorCopy(vec3_origin, ent->s.maxs);
 	}
 
 	ent->flags = 0;

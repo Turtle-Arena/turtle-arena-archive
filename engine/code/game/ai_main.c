@@ -1651,7 +1651,7 @@ int BotAIStartFrame(int time) {
 			}
 #ifdef MISSIONPACK
 			// never link prox mine triggers
-			if (ent->r.contents == CONTENTS_TRIGGER) {
+			if (ent->s.contents == CONTENTS_TRIGGER) {
 				if (ent->touch == ProximityMine_Trigger) {
 					trap_BotLibUpdateEntity(i, NULL);
 					continue;
@@ -1668,11 +1668,11 @@ int BotAIStartFrame(int time) {
 				VectorCopy(ent->r.currentAngles, state.angles);
 			}
 			VectorCopy(ent->s.origin2, state.old_origin);
-			VectorCopy(ent->r.mins, state.mins);
-			VectorCopy(ent->r.maxs, state.maxs);
+			VectorCopy(ent->s.mins, state.mins);
+			VectorCopy(ent->s.maxs, state.maxs);
 			state.type = ent->s.eType;
 			state.flags = ent->s.eFlags;
-			if (ent->r.bmodel) state.solid = SOLID_BSP;
+			if (ent->s.bmodel) state.solid = SOLID_BSP;
 			else state.solid = SOLID_BBOX;
 			state.groundent = ent->s.groundEntityNum;
 			state.modelindex = ent->s.modelindex;

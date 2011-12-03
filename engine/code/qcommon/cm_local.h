@@ -145,6 +145,8 @@ extern	cvar_t		*cm_noAreas;
 extern	cvar_t		*cm_noCurves;
 extern	cvar_t		*cm_playerCurveClip;
 
+extern 	int			capsule_contents;
+
 // cm_test.c
 
 // Used for oriented capsule collision detection

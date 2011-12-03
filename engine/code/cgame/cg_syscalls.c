@@ -141,12 +141,12 @@ clipHandle_t trap_CM_InlineModel( int index ) {
 	return syscall( CG_CM_INLINEMODEL, index );
 }
 
-clipHandle_t trap_CM_TempBoxModel( const vec3_t mins, const vec3_t maxs ) {
-	return syscall( CG_CM_TEMPBOXMODEL, mins, maxs );
+clipHandle_t trap_CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int contents ) {
+	return syscall( CG_CM_TEMPBOXMODEL, mins, maxs, contents );
 }
 
-clipHandle_t trap_CM_TempCapsuleModel( const vec3_t mins, const vec3_t maxs ) {
-	return syscall( CG_CM_TEMPCAPSULEMODEL, mins, maxs );
+clipHandle_t trap_CM_TempCapsuleModel( const vec3_t mins, const vec3_t maxs, int contents ) {
+	return syscall( CG_CM_TEMPCAPSULEMODEL, mins, maxs, contents );
 }
 
 int		trap_CM_PointContents( const vec3_t p, clipHandle_t model ) {

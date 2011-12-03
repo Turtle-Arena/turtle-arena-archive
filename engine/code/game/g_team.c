@@ -1543,14 +1543,14 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 	VectorCopy( origin, ent->s.pos.trBase );
 	VectorCopy( origin, ent->r.currentOrigin );
 
-	VectorSet( ent->r.mins, -15, -15, 0 );
-	VectorSet( ent->r.maxs, 15, 15, 87 );
+	VectorSet( ent->s.mins, -15, -15, 0 );
+	VectorSet( ent->s.maxs, 15, 15, 87 );
 
 	ent->s.eType = ET_GENERAL;
 	ent->flags = FL_NO_KNOCKBACK;
 
 	if( g_gametype.integer == GT_OBELISK ) {
-		ent->r.contents = CONTENTS_SOLID;
+		ent->s.contents = CONTENTS_SOLID;
 		ent->takedamage = qtrue;
 		ent->health = g_obeliskHealth.integer;
 		ent->die = ObeliskDie;
@@ -1560,7 +1560,7 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 	}
 #ifdef MISSIONPACK_HARVESTER
 	if( g_gametype.integer == GT_HARVESTER ) {
-		ent->r.contents = CONTENTS_TRIGGER;
+		ent->s.contents = CONTENTS_TRIGGER;
 		ent->touch = ObeliskTouch;
 	}
 #endif
@@ -1575,7 +1575,7 @@ gentity_t *SpawnObelisk( vec3_t origin, int team, int spawnflags) {
 
 		// drop to floor
 		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
-		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
+		trap_Trace( &tr, ent->s.origin, ent->s.mins, ent->s.maxs, dest, ent->s.number, MASK_SOLID );
 		if ( tr.startsolid ) {
 			ent->s.origin[2] -= 1;
 			G_Printf( "SpawnObelisk: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin) );

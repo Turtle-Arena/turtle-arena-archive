@@ -5030,8 +5030,19 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 		}
 	}
 
+	s->contents = ps->contents;
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
+
+	s->bmodel = qfalse;
+
+	VectorCopy( ps->mins, s->mins );
+	VectorCopy( ps->maxs, s->maxs );
+	if ( snap ) {
+		SnapVector( s->mins );
+		SnapVector( s->maxs );
+	}
+
 #ifdef TA_WEAPSYS
 	// cgame needs the weaponHands for all clients.
 	s->weaponHands = ps->weaponHands;
@@ -5128,8 +5139,19 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 		}
 	}
 
+	s->contents = ps->contents;
 	s->loopSound = ps->loopSound;
 	s->generic1 = ps->generic1;
+
+	s->bmodel = qfalse;
+
+	VectorCopy( ps->mins, s->mins );
+	VectorCopy( ps->maxs, s->maxs );
+	if ( snap ) {
+		SnapVector( s->mins );
+		SnapVector( s->maxs );
+	}
+
 #ifdef TA_WEAPSYS
 	// cgame needs the weaponHands for all clients.
 	s->weaponHands = ps->weaponHands;

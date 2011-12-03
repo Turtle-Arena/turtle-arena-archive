@@ -885,7 +885,14 @@ netField_t	entityStateFields[] =
 { NETF(origin[0]), 0 },
 { NETF(origin[1]), 0 },
 { NETF(origin[2]), 0 },
-{ NETF(solid), 24 },
+{ NETF(contents), 32 },
+{ NETF(bmodel), 1 },
+{ NETF(mins[0]), 0 },
+{ NETF(mins[1]), 0 },
+{ NETF(mins[2]), 0 },
+{ NETF(maxs[0]), 0 },
+{ NETF(maxs[1]), 0 },
+{ NETF(maxs[2]), 0 },
 { NETF(powerups), MAX_POWERUPS },
 { NETF(modelindex), 8 },
 { NETF(otherEntityNum2), GENTITYNUM_BITS },
@@ -1204,6 +1211,7 @@ netField_t	playerStateFields[] =
 { PSF(groundEntityNum), GENTITYNUM_BITS },
 { PSF(weaponstate), 4 },
 { PSF(eFlags), 32 },
+{ PSF(contents), 32 },
 { PSF(externalEvent), 10 },
 { PSF(gravity), 16 },
 { PSF(speed), 16 },
@@ -1237,7 +1245,13 @@ netField_t	playerStateFields[] =
 { PSF(nextPoint[2]), 0 },
 #endif
 { PSF(jumppad_ent), GENTITYNUM_BITS },
-{ PSF(loopSound), 16 }
+{ PSF(loopSound), 16 },
+{ PSF(mins[0]), 0 },
+{ PSF(mins[1]), 0 },
+{ PSF(mins[2]), 0 },
+{ PSF(maxs[0]), 0 },
+{ PSF(maxs[1]), 0 },
+{ PSF(maxs[2]), 0 }
 #ifdef TA_HOLDSYS
 ,{ PSF(holdableIndex), 5 }
 #endif

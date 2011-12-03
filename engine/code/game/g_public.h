@@ -63,12 +63,6 @@ typedef struct {
 	// if SVF_CLIENTMASK is set, use bitmask for clients to send to (maxclients must be <= 32, up to the mod to enforce this)
 	int			singleClient;		
 
-	qboolean	bmodel;				// if false, assume an explicit mins / maxs bounding box
-									// only set by trap_SetBrushModel
-	vec3_t		mins, maxs;
-	int			contents;			// CONTENTS_TRIGGER, CONTENTS_SOLID, CONTENTS_BODY, etc
-									// a non-solid entity should set to 0
-
 	vec3_t		absmin, absmax;		// derived from mins/maxs and origin + rotation
 
 	// currentOrigin will be used for all collision detection and world linking.

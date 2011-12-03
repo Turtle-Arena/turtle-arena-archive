@@ -336,8 +336,8 @@ void	G_TouchTriggers( gentity_t *ent ) {
 	num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 	// can't use ent->absmin, because that has a one unit pad
-	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
-	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+	VectorAdd( ent->client->ps.origin, ent->s.mins, mins );
+	VectorAdd( ent->client->ps.origin, ent->s.maxs, maxs );
 
 	for ( i=0 ; i<num ; i++ ) {
 		hit = &g_entities[touch[i]];
@@ -345,7 +345,7 @@ void	G_TouchTriggers( gentity_t *ent ) {
 		if ( !hit->touch && !ent->touch ) {
 			continue;
 		}
-		if ( !( hit->r.contents & CONTENTS_TRIGGER ) ) {
+		if ( !( hit->s.contents & CONTENTS_TRIGGER ) ) {
 			continue;
 		}
 
@@ -1085,7 +1085,7 @@ static int StuckInOtherClient(gentity_t *ent)
 			continue;
 		}
 #ifdef TURTLEARENA // POWERS
-		if ( !(ent2->r.contents & CONTENTS_BODY) ) {
+		if ( !(ent2->s.contents & CONTENTS_BODY) ) {
 			continue;
 		}
 #endif
@@ -1145,6 +1145,7 @@ void SendPendingPredictableEvents( playerState_t *ps ) {
 		t->s.eType = ET_EVENTS + event;
 		t->s.eFlags |= EF_PLAYER_EVENT;
 		t->s.otherEntityNum = ps->clientNum;
+		t->s.contents = 0;
 		// send to everyone except the client who generated the event
 		t->r.svFlags |= SVF_NOTSINGLECLIENT;
 		t->r.singleClient = ps->clientNum;
@@ -1464,7 +1465,7 @@ void ClientThink_real( gentity_t *ent ) {
 			client->ps.enemyOrigin[2] += ent->enemy->client->ps.viewheight;
 		} else {
 			VectorCopy(ent->enemy->r.currentOrigin, client->ps.enemyOrigin);
-			client->ps.enemyOrigin[2] += ent->enemy->r.maxs[2] * 0.8f;
+			client->ps.enemyOrigin[2] += ent->enemy->s.maxs[2] * 0.8f;
 		}
 		client->ps.enemyEnt = ent->enemy-g_entities;
 	}
@@ -1653,11 +1654,11 @@ void ClientThink_real( gentity_t *ent ) {
 			vec3_t maxs = { 42, 42, 42 };
 			vec3_t oldmins, oldmaxs;
 
-			VectorCopy (ent->r.mins, oldmins);
-			VectorCopy (ent->r.maxs, oldmaxs);
+			VectorCopy (ent->s.mins, oldmins);
+			VectorCopy (ent->s.maxs, oldmaxs);
 			// expand
-			VectorCopy (mins, ent->r.mins);
-			VectorCopy (maxs, ent->r.maxs);
+			VectorCopy (mins, ent->s.mins);
+			VectorCopy (maxs, ent->s.maxs);
 			trap_LinkEntity(ent);
 			// check if this would get anyone stuck in this player
 			if ( !StuckInOtherClient(ent) ) {
@@ -1665,8 +1666,8 @@ void ClientThink_real( gentity_t *ent ) {
 				client->ps.pm_flags |= PMF_INVULEXPAND;
 			}
 			// set back
-			VectorCopy (oldmins, ent->r.mins);
-			VectorCopy (oldmaxs, ent->r.maxs);
+			VectorCopy (oldmins, ent->s.mins);
+			VectorCopy (oldmaxs, ent->s.maxs);
 			trap_LinkEntity(ent);
 		}
 	}
@@ -1769,9 +1770,6 @@ void ClientThink_real( gentity_t *ent ) {
 
 	// use the snapped origin for linking so it matches client predicted versions
 	VectorCopy( ent->s.pos.trBase, ent->r.currentOrigin );
-
-	VectorCopy (pm.mins, ent->r.mins);
-	VectorCopy (pm.maxs, ent->r.maxs);
 
 	ent->waterlevel = pm.waterlevel;
 	ent->watertype = pm.watertype;
@@ -2185,7 +2183,7 @@ void ClientEndFrame( gentity_t *ent ) {
 				ent->client->ps.powerups[ i ] = 0;
 
 				// Become solid again after trap_LinkEntity
-				ent->r.contents |= CONTENTS_BODY;
+				ent->s.contents |= CONTENTS_BODY;
 
 				// Must unlink so we don't kill our self.
 				trap_UnlinkEntity (ent);
@@ -2205,15 +2203,15 @@ void ClientEndFrame( gentity_t *ent ) {
 					gentity_t	*hit;
 					vec3_t		mins, maxs;
 
-					VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
-					VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+					VectorAdd( ent->client->ps.origin, ent->s.mins, mins );
+					VectorAdd( ent->client->ps.origin, ent->s.maxs, maxs );
 					num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
 
 					for (i=0 ; i<num ; i++) {
 						hit = &g_entities[touch[i]];
 
 						// Skip non-solid misc_objects
-						if ( !hit->client && (!hit->s.solid || hit->s.solid == SOLID_BMODEL) )
+						if ( !(hit->s.contents & MASK_PLAYERSOLID) )
 							continue;
 
 						// nail it
