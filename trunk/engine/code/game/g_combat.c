@@ -427,7 +427,7 @@ void TossClientPersistantPowerups( gentity_t *ent ) {
 
 	powerup->r.svFlags &= ~SVF_NOCLIENT;
 	powerup->s.eFlags &= ~EF_NODRAW;
-	powerup->r.contents = CONTENTS_TRIGGER;
+	powerup->s.contents = CONTENTS_TRIGGER;
 	trap_LinkEntity( powerup );
 
 	ent->client->ps.stats[STAT_PERSISTANT_POWERUP] = 0;
@@ -486,7 +486,8 @@ void GibEntity( gentity_t *self, int killer ) {
 	G_AddEvent( self, EV_GIB_PLAYER, killer );
 	self->takedamage = qfalse;
 	self->s.eType = ET_INVISIBLE;
-	self->r.contents = 0;
+	self->client->ps.contents = 0;
+	self->s.contents = 0;
 }
 #endif
 
@@ -892,7 +893,7 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->s.weapon = WP_NONE;
 #endif
 	self->s.powerups = 0;
-	self->r.contents = CONTENTS_CORPSE;
+	self->client->ps.contents = self->s.contents = CONTENTS_CORPSE;
 
 	self->s.angles[0] = 0;
 	self->s.angles[2] = 0;
@@ -903,9 +904,9 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	self->s.loopSound = 0;
 
 #ifdef TA_PLAYERSYS // Use per-player bounding box
-	self->r.maxs[2] = self->client->pers.playercfg.deadmax;
+	self->client->ps.maxs[2] = self->s.maxs[2] = self->client->pers.playercfg.deadmax;
 #else
-	self->r.maxs[2] = -8;
+	self->client->ps.maxs[2] = self->s.maxs[2] = -8;
 #endif
 
 	// don't allow respawn until the death anim is done
@@ -1108,7 +1109,7 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 	gentity_t   *tent;
 	vec3_t      size;
  
- 	VectorSubtract(targ->r.maxs, targ->r.mins, size);
+ 	VectorSubtract(targ->s.maxs, targ->s.mins, size);
  	VectorScale(size, 0.5, size);
  
 	// point doesn't work with splash damage weapons?
@@ -1126,7 +1127,7 @@ void G_BreakableDebris( gentity_t *targ, gentity_t *inflictor, gentity_t *attack
 #endif
 
 		// Find the center of the brush
-		VectorAdd(targ->r.mins, size, center);
+		VectorAdd(targ->s.mins, size, center);
 
 		tent = G_TempEntity( center, EV_SPAWN_DEBRIS );
 		tent->s.eventParm = 255;

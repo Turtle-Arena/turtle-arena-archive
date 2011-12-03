@@ -1358,7 +1358,7 @@ PM_CheckStuck
 void PM_CheckStuck(void) {
 	trace_t trace;
 
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask);
+	pm->trace (&trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask);
 	if (trace.allsolid) {
 		//int shit = qtrue;
 	}
@@ -1386,13 +1386,13 @@ static int PM_CorrectAllSolid( trace_t *trace ) {
 				point[0] += (float) i;
 				point[1] += (float) j;
 				point[2] += (float) k;
-				pm->trace (trace, point, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
+				pm->trace (trace, point, pm->ps->mins, pm->ps->maxs, point, pm->ps->clientNum, pm->tracemask);
 				if ( !trace->allsolid ) {
 					point[0] = pm->ps->origin[0];
 					point[1] = pm->ps->origin[1];
 					point[2] = pm->ps->origin[2] - 0.25;
 
-					pm->trace (trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
+					pm->trace (trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, point, pm->ps->clientNum, pm->tracemask);
 					pml.groundTrace = *trace;
 					return qtrue;
 				}
@@ -1430,7 +1430,7 @@ static void PM_GroundTraceMissed( void ) {
 		VectorCopy( pm->ps->origin, point );
 		point[2] -= 64;
 
-		pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
+		pm->trace (&trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, point, pm->ps->clientNum, pm->tracemask);
 		if ( trace.fraction == 1.0 ) {
 			if ( pm->cmd.forwardmove >= 0 
 #ifdef TA_PATHSYS // 2DMODE
@@ -1480,7 +1480,7 @@ static void PM_GroundTrace( void ) {
 	point[1] = pm->ps->origin[1];
 	point[2] = pm->ps->origin[2] - 0.25;
 
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, point, pm->ps->clientNum, pm->tracemask);
+	pm->trace (&trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, point, pm->ps->clientNum, pm->tracemask);
 	pml.groundTrace = trace;
 
 	// do something corrective if the trace starts in a solid...
@@ -1691,22 +1691,22 @@ static void PM_CheckDuck (void)
 	if ( pm->ps->powerups[PW_INVULNERABILITY] ) {
 		if ( pm->ps->pm_flags & PMF_INVULEXPAND ) {
 			// invulnerability sphere has a 42 units radius
-			VectorSet( pm->mins, -42, -42, -42 );
-			VectorSet( pm->maxs, 42, 42, 42 );
+			VectorSet( pm->ps->mins, -42, -42, -42 );
+			VectorSet( pm->ps->maxs, 42, 42, 42 );
 		}
 		else {
 #ifdef TA_NPCSYS
 			if (pm->npc) {
-					VectorCopy( pm->npc->info->mins, pm->mins );
-					VectorCopy( pm->npc->info->maxs, pm->maxs );
+					VectorCopy( pm->npc->info->mins, pm->ps->mins );
+					VectorCopy( pm->npc->info->maxs, pm->ps->maxs );
 			} else {
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-				VectorCopy( pm->playercfg->bbmins, pm->mins );
-				VectorCopy( pm->playercfg->bbmaxs, pm->maxs );
+				VectorCopy( pm->playercfg->bbmins, pm->ps->mins );
+				VectorCopy( pm->playercfg->bbmaxs, pm->ps->maxs );
 #else
-			VectorSet( pm->mins, -15, -15, MINS_Z );
-			VectorSet( pm->maxs, 15, 15, 16 );
+			VectorSet( pm->ps->mins, -15, -15, MINS_Z );
+			VectorSet( pm->ps->maxs, 15, 15, 16 );
 #endif
 #ifdef TA_NPCSYS
 			}
@@ -1721,24 +1721,24 @@ static void PM_CheckDuck (void)
 
 #ifdef TA_NPCSYS
 	if (pm->npc) {
-		VectorCopy( pm->npc->info->mins, pm->mins );
-		pm->maxs[0] = pm->npc->info->maxs[0];
-		pm->maxs[1] = pm->npc->info->maxs[1];
+		VectorCopy( pm->npc->info->mins, pm->ps->mins );
+		pm->ps->maxs[0] = pm->npc->info->maxs[0];
+		pm->ps->maxs[1] = pm->npc->info->maxs[1];
 	} else {
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-		VectorCopy( pm->playercfg->bbmins, pm->mins );
+		VectorCopy( pm->playercfg->bbmins, pm->ps->mins );
 
-		pm->maxs[0] = pm->playercfg->bbmaxs[0];
-		pm->maxs[1] = pm->playercfg->bbmaxs[1];
+		pm->ps->maxs[0] = pm->playercfg->bbmaxs[0];
+		pm->ps->maxs[1] = pm->playercfg->bbmaxs[1];
 #else
-	pm->mins[0] = -15;
-	pm->mins[1] = -15;
+	pm->ps->mins[0] = -15;
+	pm->ps->mins[1] = -15;
 
-	pm->maxs[0] = 15;
-	pm->maxs[1] = 15;
+	pm->ps->maxs[0] = 15;
+	pm->ps->maxs[1] = 15;
 
-	pm->mins[2] = MINS_Z;
+	pm->ps->mins[2] = MINS_Z;
 #endif
 #ifdef TA_NPCSYS
 	}
@@ -1748,13 +1748,13 @@ static void PM_CheckDuck (void)
 	{
 #ifdef TA_NPCSYS
 		if (pm->npc) {
-			pm->maxs[2] = pm->npc->info->deadmax;
+			pm->ps->maxs[2] = pm->npc->info->deadmax;
 		} else
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-		pm->maxs[2] = pm->playercfg->deadmax;
+		pm->ps->maxs[2] = pm->playercfg->deadmax;
 #else
-		pm->maxs[2] = -8;
+		pm->ps->maxs[2] = -8;
 #endif
 		pm->ps->viewheight = DEAD_VIEWHEIGHT;
 		return;
@@ -1774,15 +1774,15 @@ static void PM_CheckDuck (void)
 			// try to stand up
 #ifdef TA_NPCSYS
 			if (pm->npc) {
-				pm->maxs[2] = pm->npc->info->maxs[2];
+				pm->ps->maxs[2] = pm->npc->info->maxs[2];
 			} else
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-				pm->maxs[2] = pm->playercfg->bbmaxs[2];
+				pm->ps->maxs[2] = pm->playercfg->bbmaxs[2];
 #else
-			pm->maxs[2] = 32;
+			pm->ps->maxs[2] = 32;
 #endif
-			pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask );
+			pm->trace (&trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, pm->ps->origin, pm->ps->clientNum, pm->tracemask );
 			if (!trace.allsolid)
 				pm->ps->pm_flags &= ~PMF_DUCKED;
 		}
@@ -1792,13 +1792,13 @@ static void PM_CheckDuck (void)
 	{
 #ifdef TA_NPCSYS
 		if (pm->npc) {
-			pm->maxs[2] = pm->npc->info->maxs[2] / 2;
+			pm->ps->maxs[2] = pm->npc->info->maxs[2] / 2;
 		} else
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-			pm->maxs[2] = pm->playercfg->bbmaxs[2] / 2;
+			pm->ps->maxs[2] = pm->playercfg->bbmaxs[2] / 2;
 #else
-		pm->maxs[2] = 16;
+		pm->ps->maxs[2] = 16;
 #endif
 		pm->ps->viewheight = CROUCH_VIEWHEIGHT;
 	}
@@ -1806,13 +1806,13 @@ static void PM_CheckDuck (void)
 	{
 #ifdef TA_NPCSYS
 		if (pm->npc) {
-			pm->maxs[2] = pm->npc->info->maxs[2];
+			pm->ps->maxs[2] = pm->npc->info->maxs[2];
 		} else
 #endif
 #ifdef TA_PLAYERSYS // BOUNDINGBOX
-			pm->maxs[2] = pm->playercfg->bbmaxs[2];
+			pm->ps->maxs[2] = pm->playercfg->bbmaxs[2];
 #else
-		pm->maxs[2] = 32;
+		pm->ps->maxs[2] = 32;
 #endif
 		pm->ps->viewheight = DEFAULT_VIEWHEIGHT;
 	}
@@ -3054,7 +3054,7 @@ static void PM_LadderMove( void ) {
 	VectorCopy(pm->ps->origin, origin);
 	origin[2] -= 20;
 
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
+	pm->trace (&trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, origin,
 		pm->ps->clientNum, pm->tracemask);
 
 	if(trace.fraction < 1)
@@ -3075,7 +3075,7 @@ static void PM_LadderMove( void ) {
 		//  (But only if not moving and if on a vertical ladder)
 		if (!VectorLength(pm->ps->velocity) && pm->ps->origin2[2] == 0)
 		{
-			float baseZ = (pm->ps->origin[2] + pm->mins[2]);
+			float baseZ = (pm->ps->origin[2] + pm->ps->mins[2]);
 			int baseZint = (int)baseZ;
 			int offset = baseZint % 8;
 
@@ -3087,8 +3087,8 @@ static void PM_LadderMove( void ) {
 					offset = 8 - abs(offset);
 				}
 
-				//Com_Printf("DEBUG: Snap ladder origin %f (%d) %s to %d (ofs=%d)\n", baseZ, baseZint, (pm->ps->pm_flags & PMF_BACKWARDS_RUN) ? "down" : "up", baseZint + offset - (int)pm->mins[2], offset);
-				pm->ps->origin[2] = baseZint + offset - (int)pm->mins[2];
+				//Com_Printf("DEBUG: Snap ladder origin %f (%d) %s to %d (ofs=%d)\n", baseZ, baseZint, (pm->ps->pm_flags & PMF_BACKWARDS_RUN) ? "down" : "up", baseZint + offset - (int)pm->ps->mins[2], offset);
+				pm->ps->origin[2] = baseZint + offset - (int)pm->ps->mins[2];
 			}
 		}
 	} else {   // if they're trying to move... lets calculate it
@@ -3240,7 +3240,7 @@ void CheckLadder( void )
 	VectorCopy(pm->ps->origin, origin);
 	origin[2] -= 30;
 
-	pm->trace (&trace, pm->ps->origin, pm->mins, pm->maxs, origin,
+	pm->trace (&trace, pm->ps->origin, pm->ps->mins, pm->ps->maxs, origin,
 		pm->ps->clientNum, pm->tracemask);
 
 	if(trace.fraction == 1)
@@ -3259,7 +3259,7 @@ void CheckLadder( void )
 	VectorNormalize (flatforward);
 	VectorMA (origin, 2, flatforward, spot);
 
-	pm->trace (&trace, origin, pm->mins, pm->maxs, spot,
+	pm->trace (&trace, origin, pm->ps->mins, pm->ps->maxs, spot,
 		pm->ps->clientNum, pm->tracemask);
 
 	if ((trace.fraction < 1) && (trace.surfaceFlags & SURF_LADDER)) {

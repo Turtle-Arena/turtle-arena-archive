@@ -131,11 +131,11 @@ void SV_SetBrushModel( sharedEntity_t *ent, const char *name ) {
 
 	h = CM_InlineModel( ent->s.modelindex );
 	CM_ModelBounds( h, mins, maxs );
-	VectorCopy (mins, ent->r.mins);
-	VectorCopy (maxs, ent->r.maxs);
-	ent->r.bmodel = qtrue;
+	VectorCopy (mins, ent->s.mins);
+	VectorCopy (maxs, ent->s.maxs);
+	ent->s.bmodel = qtrue;
 
-	ent->r.contents = -1;		// we don't know exactly what is in the brushes
+	ent->s.contents = -1;		// we don't know exactly what is in the brushes
 
 	SV_LinkEntity( ent );		// FIXME: remove
 }

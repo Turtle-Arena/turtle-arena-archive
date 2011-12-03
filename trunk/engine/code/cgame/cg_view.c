@@ -1207,6 +1207,10 @@ static void CG_DamageBlendBlob( void ) {
 	}
 #endif
 
+	if (!cg_blood.integer) {
+		return;
+	}
+
 	if ( !cg.cur_lc->damageValue ) {
 		return;
 	}

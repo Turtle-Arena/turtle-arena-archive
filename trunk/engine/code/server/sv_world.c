@@ -33,17 +33,17 @@ be returned, otherwise a custom box tree will be constructed.
 ================
 */
 clipHandle_t SV_ClipHandleForEntity( const sharedEntity_t *ent ) {
-	if ( ent->r.bmodel ) {
+	if ( ent->s.bmodel ) {
 		// explicit hulls in the BSP model
 		return CM_InlineModel( ent->s.modelindex );
 	}
 	if ( ent->r.svFlags & SVF_CAPSULE ) {
 		// create a temp capsule from bounding box sizes
-		return CM_TempBoxModel( ent->r.mins, ent->r.maxs, qtrue );
+		return CM_TempBoxModel( ent->s.mins, ent->s.maxs, qtrue, ent->s.contents );
 	}
 
 	// create a temp tree from bounding box sizes
-	return CM_TempBoxModel( ent->r.mins, ent->r.maxs, qfalse );
+	return CM_TempBoxModel( ent->s.mins, ent->s.maxs, qfalse, ent->s.contents );
 }
 
 
@@ -207,7 +207,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 	int			leafs[MAX_TOTAL_ENT_LEAFS];
 	int			cluster;
 	int			num_leafs;
-	int			i, j, k;
+	int			i;
 	int			area;
 	int			lastLeaf;
 	float		*origin, *angles;
@@ -219,55 +219,25 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 		SV_UnlinkEntity( gEnt );	// unlink from old position
 	}
 
-	// encode the size into the entityState_t for client prediction
-	if ( gEnt->r.bmodel ) {
-		gEnt->s.solid = SOLID_BMODEL;		// a solid_box will never create this value
-	} else if ( gEnt->r.contents & ( CONTENTS_SOLID | CONTENTS_BODY ) ) {
-		// assume that x/y are equal and symetric
-		i = gEnt->r.maxs[0];
-		if (i<1)
-			i = 1;
-		if (i>255)
-			i = 255;
-
-		// z is not symetric
-		j = (-gEnt->r.mins[2]);
-		if (j<1)
-			j = 1;
-		if (j>255)
-			j = 255;
-
-		// and z maxs can be negative...
-		k = (gEnt->r.maxs[2]+32);
-		if (k<1)
-			k = 1;
-		if (k>255)
-			k = 255;
-
-		gEnt->s.solid = (k<<16) | (j<<8) | i;
-	} else {
-		gEnt->s.solid = 0;
-	}
-
 	// get the position
 	origin = gEnt->r.currentOrigin;
 	angles = gEnt->r.currentAngles;
 
 	// set the abs box
-	if ( gEnt->r.bmodel && (angles[0] || angles[1] || angles[2]) ) {
+	if ( gEnt->s.bmodel && (angles[0] || angles[1] || angles[2]) ) {
 		// expand for rotation
 		float		max;
 		int			i;
 
-		max = RadiusFromBounds( gEnt->r.mins, gEnt->r.maxs );
+		max = RadiusFromBounds( gEnt->s.mins, gEnt->s.maxs );
 		for (i=0 ; i<3 ; i++) {
 			gEnt->r.absmin[i] = origin[i] - max;
 			gEnt->r.absmax[i] = origin[i] + max;
 		}
 	} else {
 		// normal
-		VectorAdd (origin, gEnt->r.mins, gEnt->r.absmin);	
-		VectorAdd (origin, gEnt->r.maxs, gEnt->r.absmax);
+		VectorAdd (origin, gEnt->s.mins, gEnt->r.absmin);
+		VectorAdd (origin, gEnt->s.maxs, gEnt->r.absmax);
 	}
 
 	// because movement is clipped an epsilon away from an actual edge,
@@ -473,7 +443,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 
 	// if it doesn't have any brushes of a type we
 	// are looking for, ignore it
-	if ( ! ( contentmask & touch->r.contents ) ) {
+	if ( ! ( contentmask & touch->s.contents ) ) {
 		trace->fraction = 1.0;
 		return;
 	}
@@ -484,7 +454,7 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 	origin = touch->r.currentOrigin;
 	angles = touch->r.currentAngles;
 
-	if ( !touch->r.bmodel ) {
+	if ( !touch->s.bmodel ) {
 		angles = vec3_origin;	// boxes don't rotate
 	}
 
@@ -545,7 +515,7 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 
 		// if it doesn't have any brushes of a type we
 		// are looking for, ignore it
-		if ( ! ( clip->contentmask & touch->r.contents ) ) {
+		if ( ! ( clip->contentmask & touch->s.contents ) ) {
 			continue;
 		}
 
@@ -556,7 +526,7 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		angles = touch->r.currentAngles;
 
 
-		if ( !touch->r.bmodel ) {
+		if ( !touch->s.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate
 		}
 
@@ -673,7 +643,7 @@ int SV_PointContents( const vec3_t p, int passEntityNum ) {
 		// might intersect, so do an exact clip
 		clipHandle = SV_ClipHandleForEntity( hit );
 		angles = hit->r.currentAngles;
-		if ( !hit->r.bmodel ) {
+		if ( !hit->s.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate
 		}
 

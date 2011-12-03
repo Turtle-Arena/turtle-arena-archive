@@ -782,9 +782,9 @@ qboolean fire_projectile(gentity_t *self, vec3_t start, vec3_t forward,
 		if (bg_projectileinfo[projnum].shootable)
 		{
 			// Make the projectile shootable
-			bolt->r.contents = CONTENTS_SHOOTABLE;
-			VectorCopy(mins, bolt->r.mins);
-			VectorCopy(maxs, bolt->r.maxs);
+			bolt->s.contents = CONTENTS_SHOOTABLE;
+			VectorCopy(mins, bolt->s.mins);
+			VectorCopy(maxs, bolt->s.maxs);
 			bolt->takedamage = qtrue;
 			bolt->health = bg_projectileinfo[projnum].damage;
 
@@ -974,13 +974,13 @@ static void ProximityMine_Activate( gentity_t *ent ) {
 	trigger->classname = "proxmine_trigger";
 
 	r = ent->splashRadius;
-	VectorSet( trigger->r.mins, -r, -r, -r );
-	VectorSet( trigger->r.maxs, r, r, r );
+	VectorSet( trigger->s.mins, -r, -r, -r );
+	VectorSet( trigger->s.maxs, r, r, r );
 
 	G_SetOrigin( trigger, ent->s.pos.trBase );
 
 	trigger->parent = ent;
-	trigger->r.contents = CONTENTS_TRIGGER;
+	trigger->s.contents = CONTENTS_TRIGGER;
 	trigger->touch = ProximityMine_Trigger;
 
 	trap_LinkEntity (trigger);
@@ -1288,8 +1288,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		// link the prox mine to the other entity
 		ent->enemy = other;
 		VectorCopy(dir, ent->movedir);
-		VectorSet(ent->r.mins, -4, -4, -4);
-		VectorSet(ent->r.maxs, 4, 4, 4);
+		VectorSet(ent->s.mins, -4, -4, -4);
+		VectorSet(ent->s.maxs, 4, 4, 4);
 		trap_LinkEntity(ent);
 
 		return;
@@ -1323,8 +1323,8 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 		ent->enemy = other;
 		ent->die = ProximityMine_Die;
 		VectorCopy(trace->plane.normal, ent->movedir);
-		VectorSet(ent->r.mins, -4, -4, -4);
-		VectorSet(ent->r.maxs, 4, 4, 4);
+		VectorSet(ent->s.mins, -4, -4, -4);
+		VectorSet(ent->s.maxs, 4, 4, 4);
 		trap_LinkEntity(ent);
 
 		return;
@@ -1348,9 +1348,9 @@ void G_MissileImpact( gentity_t *ent, trace_t *trace ) {
 
 			ent->enemy = other;
 
-			v[0] = other->r.currentOrigin[0] + (other->r.mins[0] + other->r.maxs[0]) * 0.5;
-			v[1] = other->r.currentOrigin[1] + (other->r.mins[1] + other->r.maxs[1]) * 0.5;
-			v[2] = other->r.currentOrigin[2] + (other->r.mins[2] + other->r.maxs[2]) * 0.5;
+			v[0] = other->r.currentOrigin[0] + (other->s.mins[0] + other->s.maxs[0]) * 0.5;
+			v[1] = other->r.currentOrigin[1] + (other->s.mins[1] + other->s.maxs[1]) * 0.5;
+			v[2] = other->r.currentOrigin[2] + (other->s.mins[2] + other->s.maxs[2]) * 0.5;
 
 			SnapVectorTowards( v, ent->s.pos.trBase );	// save net bandwidth
 		} else {
@@ -1492,11 +1492,11 @@ void G_RunMissile( gentity_t *ent ) {
 		passent = ent->r.ownerNum;
 	}
 	// trace a line from the previous position to the current position
-	trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, origin, passent, ent->clipmask );
+	trap_Trace( &tr, ent->r.currentOrigin, ent->s.mins, ent->s.maxs, origin, passent, ent->clipmask );
 
 	if ( tr.startsolid || tr.allsolid ) {
 		// make sure the tr.entityNum is set to the entity we're stuck in
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, passent, ent->clipmask );
+		trap_Trace( &tr, ent->r.currentOrigin, ent->s.mins, ent->s.maxs, ent->r.currentOrigin, passent, ent->clipmask );
 		tr.fraction = 0;
 	}
 	else {
@@ -1534,7 +1534,7 @@ void G_RunMissile( gentity_t *ent ) {
 #endif
 	{
 		// check if the prox mine is outside the owner bbox
-		trap_Trace( &tr, ent->r.currentOrigin, ent->r.mins, ent->r.maxs, ent->r.currentOrigin, ENTITYNUM_NONE, ent->clipmask );
+		trap_Trace( &tr, ent->r.currentOrigin, ent->s.mins, ent->s.maxs, ent->r.currentOrigin, ENTITYNUM_NONE, ent->clipmask );
 		if (!tr.startsolid || tr.entityNum != ent->r.ownerNum) {
 #ifdef TA_WEAPSYS
 			ent->count |= 1;

@@ -660,13 +660,13 @@ void CopyToBodyQue( gentity_t *ent ) {
 	}
 
 	body->r.svFlags = ent->r.svFlags;
-	VectorCopy (ent->r.mins, body->r.mins);
-	VectorCopy (ent->r.maxs, body->r.maxs);
+	VectorCopy (ent->s.mins, body->s.mins);
+	VectorCopy (ent->s.maxs, body->s.maxs);
 	VectorCopy (ent->r.absmin, body->r.absmin);
 	VectorCopy (ent->r.absmax, body->r.absmax);
 
 	body->clipmask = CONTENTS_SOLID | CONTENTS_PLAYERCLIP;
-	body->r.contents = CONTENTS_CORPSE;
+	body->s.contents = CONTENTS_CORPSE;
 	body->r.ownerNum = ent->s.number;
 
 #ifdef TURTLEARENA // POWERS
@@ -997,8 +997,8 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	Q_strncpyz(playercfg->model, inModelName, MAX_QPATH);
 	Q_strncpyz(playercfg->headModel, inHeadModel, MAX_QPATH);
 
-	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
-	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
+	VectorCopy (client->pers.playercfg.bbmins, client->ps.mins);
+	VectorCopy (client->pers.playercfg.bbmaxs, client->ps.maxs);
 
 #ifdef TA_WEAPSYS
 	// DEFAULT_DEFAULT_WEAPON
@@ -1632,7 +1632,7 @@ void ClientSpawn(gentity_t *ent, qboolean firstTime) {
 	{
 		client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
 		// Become non-solid
-		ent->r.contents &= ~CONTENTS_BODY;
+		ent->s.contents &= ~CONTENTS_BODY;
 	}
 #endif
 
@@ -1651,13 +1651,13 @@ void ClientSpawn(gentity_t *ent, qboolean firstTime) {
 	// clear entity values
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 	client->ps.eFlags = flags;
+	client->ps.contents = CONTENTS_BODY;
 
 	ent->s.groundEntityNum = ENTITYNUM_NONE;
 	ent->client = &level.clients[index];
 	ent->takedamage = qtrue;
 	ent->inuse = qtrue;
 	ent->classname = "player";
-	ent->r.contents = CONTENTS_BODY;
 	ent->clipmask = MASK_PLAYERSOLID;
 	ent->die = player_die;
 	ent->waterlevel = 0;
@@ -1665,11 +1665,11 @@ void ClientSpawn(gentity_t *ent, qboolean firstTime) {
 	ent->flags = 0;
 	
 #ifdef TA_PLAYERSYS
-	VectorCopy (client->pers.playercfg.bbmins, ent->r.mins);
-	VectorCopy (client->pers.playercfg.bbmaxs, ent->r.maxs);
+	VectorCopy (client->pers.playercfg.bbmins, client->ps.mins);
+	VectorCopy (client->pers.playercfg.bbmaxs, client->ps.maxs);
 #else
-	VectorCopy (playerMins, ent->r.mins);
-	VectorCopy (playerMaxs, ent->r.maxs);
+	VectorCopy (playerMins, client->ps.mins);
+	VectorCopy (playerMaxs, client->ps.maxs);
 #endif
 
 	client->ps.clientNum = index;
@@ -2214,12 +2214,12 @@ void SP_nights_start( gentity_t *ent )
 	// Touch this to go into NiGHTS mode
 	//    and go to current mare.
 
-	VectorSet( ent->r.mins, -15, -15, -15 );
-	VectorSet( ent->r.maxs, 15, 15, 15 );
+	VectorSet( ent->s.mins, -15, -15, -15 );
+	VectorSet( ent->s.maxs, 15, 15, 15 );
 
 	ent->s.eType = ET_GENERAL;
 	ent->flags = FL_NO_KNOCKBACK;
-	ent->r.contents = CONTENTS_TRIGGER;
+	ent->s.contents = CONTENTS_TRIGGER;
 	ent->touch = Drone_Touch;
 
 	// Check for invalid map name on spawn, easier to find bugs in maps.
@@ -2275,12 +2275,12 @@ void SP_nights_target( gentity_t *ent )
 {
 	gitem_t *item;
 
-	VectorSet( ent->r.mins, -15, -15, -15 );
-	VectorSet( ent->r.maxs, 15, 15, 15 );
+	VectorSet( ent->s.mins, -15, -15, -15 );
+	VectorSet( ent->s.maxs, 15, 15, 15 );
 
 	ent->s.eType = ET_GENERAL;
 	ent->flags = FL_NO_KNOCKBACK;
-	ent->r.contents = CONTENTS_TRIGGER;
+	ent->s.contents = CONTENTS_TRIGGER;
 	ent->touch = Capture_Touch;
 
 	if (!ent->health) {

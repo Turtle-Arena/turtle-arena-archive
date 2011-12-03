@@ -594,14 +594,14 @@ void G_KillBox (gentity_t *ent) {
 #ifdef TA_ENTSYS // BREAKABLE
 	if (!ent->client)
 	{
-		VectorAdd( ent->r.currentOrigin, ent->r.mins, mins );
-		VectorAdd( ent->r.currentOrigin, ent->r.maxs, maxs );
+		VectorAdd( ent->r.currentOrigin, ent->s.mins, mins );
+		VectorAdd( ent->r.currentOrigin, ent->s.maxs, maxs );
 	}
 	else
 	{
 #endif
-	VectorAdd( ent->client->ps.origin, ent->r.mins, mins );
-	VectorAdd( ent->client->ps.origin, ent->r.maxs, maxs );
+	VectorAdd( ent->client->ps.origin, ent->s.mins, mins );
+	VectorAdd( ent->client->ps.origin, ent->s.maxs, maxs );
 #ifdef TA_ENTSYS // BREAKABLE
 	}
 #endif
@@ -739,7 +739,7 @@ gentity_t *G_FindRadius(gentity_t *from, const vec3_t org, float rad)
 		}
 
 		for(j = 0; j < 3; j++)
-			eorg[j] = org[j] - (targetOrg[j] + (from->r.mins[j] + from->r.maxs[j]) * 0.5);
+			eorg[j] = org[j] - (targetOrg[j] + (from->s.mins[j] + from->s.maxs[j]) * 0.5);
 
 		if (VectorLength(eorg) > rad)
 			continue;
@@ -813,7 +813,7 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 		targetOrg[2] += target->client->ps.viewheight;
 	} else {
 		VectorCopy(target->r.currentOrigin, targetOrg);
-		targetOrg[2] += (target->r.mins[2] + target->r.maxs[2])/2;
+		targetOrg[2] += (target->s.mins[2] + target->s.maxs[2])/2;
 	}
 
 	// Unneeded for target trace test, the trace found it so it is visable
@@ -826,7 +826,7 @@ qboolean G_ValidTarget(gentity_t *source, gentity_t *target,
 	if (tests >= 2)
 	{
 		for(j = 0; j < 3; j++) {
-			eorg[j] = start[j] - (targetOrg[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+			eorg[j] = start[j] - (targetOrg[j] + (target->s.mins[j] + target->s.maxs[j]) * 0.5);
 		}
 
 		dist = VectorLength(eorg);
@@ -902,11 +902,11 @@ gentity_t *G_FindTarget(gentity_t *source, const vec3_t start, const vec3_t dir,
 			targetOrg[2] += target->client->ps.viewheight;
 		} else {
 			VectorCopy(target->r.currentOrigin, targetOrg);
-			targetOrg[2] += (target->r.mins[2] + target->r.maxs[2])/2;
+			targetOrg[2] += (target->s.mins[2] + target->s.maxs[2])/2;
 		}
 
 		for(j = 0; j < 3; j++) {
-			eorg[j] = start[j] - (targetOrg[j] + (target->r.mins[j] + target->r.maxs[j]) * 0.5);
+			eorg[j] = start[j] - (targetOrg[j] + (target->s.mins[j] + target->s.maxs[j]) * 0.5);
 		}
 
 		dist = VectorLength(eorg);

@@ -176,7 +176,7 @@ static void G_NPC_Die( gentity_t *self, gentity_t *inflictor, gentity_t *attacke
 
 	//if (self->activator->spawnflags & MOBJF_UNSOLIDDEATH)
 	{
-		self->r.contents = 0;
+		self->s.contents = 0;
 		trap_LinkEntity( self );
 		//G_Printf("    unsolid misc_object\n");
 	}
@@ -258,14 +258,14 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	trace_t		tr;
 	vec3_t		dest;
 
-	VectorCopy(ent->bgNPC.info->mins, ent->r.mins);
-	VectorCopy(ent->bgNPC.info->maxs, ent->r.maxs);
+	VectorCopy(ent->bgNPC.info->mins, ent->s.mins);
+	VectorCopy(ent->bgNPC.info->maxs, ent->s.maxs);
 
 	ent->s.eType = ET_NPC;
 	ent->s.modelindex = ent->bgNPC.info - bg_npcinfo;		// store item number in modelindex
 	ent->s.modelindex2 = 0; // zero indicates this isn't a dropped item
 
-	ent->r.contents = CONTENTS_BODY;
+	ent->s.contents = CONTENTS_BODY;
 	ent->clipmask = MASK_PLAYERSOLID;
 	//ent->touch = Touch_Item;
 
@@ -275,7 +275,7 @@ void FinishSpawningNPC( gentity_t *ent ) {
 	} else {
 		// drop to floor
 		VectorSet( dest, ent->s.origin[0], ent->s.origin[1], ent->s.origin[2] - 4096 );
-		trap_Trace( &tr, ent->s.origin, ent->r.mins, ent->r.maxs, dest, ent->s.number, MASK_SOLID );
+		trap_Trace( &tr, ent->s.origin, ent->s.mins, ent->s.maxs, dest, ent->s.number, MASK_SOLID );
 		if ( tr.startsolid ) {
 			G_Printf ("FinishSpawningNPC: %s startsolid at %s\n", ent->classname, vtos(ent->s.origin));
 			G_FreeEntity( ent );
@@ -444,9 +444,6 @@ void G_RunNPC( gentity_t *ent )
 	pm.pmove_fixed = pmove_fixed.integer;
 	pm.pmove_msec = pmove_msec.integer;
 	pm.npc = &ent->bgNPC;
-
-	VectorCopy (ent->r.mins, pm.mins);
-	VectorCopy (ent->r.maxs, pm.maxs);
 
 	Pmove (&pm);
 

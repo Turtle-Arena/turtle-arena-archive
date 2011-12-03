@@ -68,6 +68,7 @@ cmodel_t	box_model;
 cplane_t	*box_planes;
 cbrush_t	*box_brush;
 
+int			capsule_contents;
 
 
 void	CM_InitBoxHull (void);
@@ -756,7 +757,7 @@ void CM_InitBoxHull (void)
 	box_brush = &cm.brushes[cm.numBrushes];
 	box_brush->numsides = 6;
 	box_brush->sides = cm.brushsides + cm.numBrushSides;
-	box_brush->contents = CONTENTS_BODY;
+	box_brush->contents = 0; // Will be set to CONTENTS_SOLID, CONTENTS_BODY, etc
 
 	box_model.leaf.numLeafBrushes = 1;
 //	box_model.leaf.firstLeafBrush = cm.numBrushes;
@@ -798,12 +799,13 @@ BSP trees instead of being compared directly.
 Capsules are handled differently though.
 ===================
 */
-clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule ) {
+clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule, int contents ) {
 
 	VectorCopy( mins, box_model.mins );
 	VectorCopy( maxs, box_model.maxs );
 
 	if ( capsule ) {
+		capsule_contents = contents;
 		return CAPSULE_MODEL_HANDLE;
 	}
 
@@ -822,6 +824,8 @@ clipHandle_t CM_TempBoxModel( const vec3_t mins, const vec3_t maxs, int capsule 
 
 	VectorCopy( mins, box_brush->bounds[0] );
 	VectorCopy( maxs, box_brush->bounds[1] );
+
+	box_brush->contents = contents;
 
 	return BOX_MODEL_HANDLE;
 }
