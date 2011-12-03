@@ -411,7 +411,11 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 		pm.playercfg = &client->pers.playercfg;
 #endif
 		pm.cmd = *ucmd;
+#ifdef TURTLEARENA // NO_BODY_TRACE
+		pm.tracemask = MASK_PLAYERSOLID;
+#else
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
+#endif
 		pm.trace = trap_Trace;
 		pm.pointcontents = trap_PointContents;
 
@@ -1055,18 +1059,13 @@ void ClientEvents( gentity_t *ent, int oldEventSequence ) {
 
 }
 
-#if defined MISSIONPACK || defined TURTLEARENA // POWERS
+#if defined MISSIONPACK && !defined TURTLEARENA // POWERS
 /*
 ==============
 StuckInOtherClient
 ==============
 */
-#ifdef TURTLEARENA // POWERS
-static gentity_t *StuckInOtherClient(gentity_t *ent)
-#else
-static int StuckInOtherClient(gentity_t *ent)
-#endif
-{
+static int StuckInOtherClient(gentity_t *ent) {
 	int i;
 	gentity_t	*ent2;
 
@@ -1084,11 +1083,6 @@ static int StuckInOtherClient(gentity_t *ent)
 		if ( ent2->health <= 0 ) {
 			continue;
 		}
-#ifdef TURTLEARENA // POWERS
-		if ( !(ent2->s.contents & CONTENTS_BODY) ) {
-			continue;
-		}
-#endif
 		//
 		if (ent2->r.absmin[0] > ent->r.absmax[0])
 			continue;
@@ -1102,17 +1096,9 @@ static int StuckInOtherClient(gentity_t *ent)
 			continue;
 		if (ent2->r.absmax[2] < ent->r.absmin[2])
 			continue;
-#ifdef TURTLEARENA // POWERS
-		return ent2;
-#else
 		return qtrue;
-#endif
 	}
-#ifdef TURTLEARENA // POWERS
-	return NULL;
-#else
 	return qfalse;
-#endif
 }
 #endif
 
@@ -1679,10 +1665,13 @@ void ClientThink_real( gentity_t *ent ) {
 	pm.playercfg = &client->pers.playercfg;
 #endif
 	pm.cmd = *ucmd;
+#ifndef TURTLEARENA // NO_BODY_TRACE
 	if ( pm.ps->pm_type == PM_DEAD ) {
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;
 	}
-	else if ( ent->r.svFlags & SVF_BOT ) {
+	else
+#endif
+	if ( ent->r.svFlags & SVF_BOT ) {
 		pm.tracemask = MASK_PLAYERSOLID | CONTENTS_BOTCLIP;
 	}
 	else {
@@ -2171,59 +2160,6 @@ void ClientEndFrame( gentity_t *ent ) {
 				&& i == PW_FLIGHT)
 			{
 				G_DeNiGHTSizePlayer(ent);
-			}
-			else
-#endif
-#ifdef TURTLEARENA // POWERS
-			if (ent->client->ps.powerups[ i ] > 0
-				&& i == PW_FLASHING)
-			{
-				gentity_t *stuck;
-
-				ent->client->ps.powerups[ i ] = 0;
-
-				// Become solid again after trap_LinkEntity
-				ent->s.contents |= CONTENTS_BODY;
-
-				// Must unlink so we don't kill our self.
-				trap_UnlinkEntity (ent);
-
-#if 1 // Instead of telefragging, be killed
-				// if you would be solid in another player die.
-				stuck = StuckInOtherClient(ent);
-				if (stuck)
-				{
-					G_Damage ( ent, stuck, stuck, NULL, NULL,
-						100000, DAMAGE_NO_PROTECTION, MOD_TRIGGER_HURT);
-				}
-				else
-				{
-					int			i, num;
-					int			touch[MAX_GENTITIES];
-					gentity_t	*hit;
-					vec3_t		mins, maxs;
-
-					VectorAdd( ent->client->ps.origin, ent->s.mins, mins );
-					VectorAdd( ent->client->ps.origin, ent->s.maxs, maxs );
-					num = trap_EntitiesInBox( mins, maxs, touch, MAX_GENTITIES );
-
-					for (i=0 ; i<num ; i++) {
-						hit = &g_entities[touch[i]];
-
-						// Skip non-solid misc_objects
-						if ( !(hit->s.contents & MASK_PLAYERSOLID) )
-							continue;
-
-						// nail it
-						G_Damage ( ent, hit, hit, NULL, NULL,
-							100000, DAMAGE_NO_PROTECTION, MOD_TRIGGER_HURT);
-						break;
-					}
-				}
-#else // Telefrag
-				G_KillBox( ent );
-#endif
-				trap_LinkEntity(ent);
 			}
 			else
 #endif

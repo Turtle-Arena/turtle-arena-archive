@@ -110,11 +110,8 @@ void TeleportPlayer( gentity_t *player, vec3_t origin, vec3_t angles ) {
 	// toggle the teleport bit so the client knows to not lerp
 	player->client->ps.eFlags ^= EF_TELEPORT_BIT;
 #ifdef TURTLEARENA // POWERS
-	if (g_teleportFluxTime.integer)
-	{
+	if (g_teleportFluxTime.integer) {
 		player->client->ps.powerups[PW_FLASHING] = level.time + g_teleportFluxTime.integer * 1000;
-		// Become non-solid
-		player->s.contents &= ~CONTENTS_BODY;
 	}
 #endif
 
@@ -820,7 +817,7 @@ gentity_t *ObjectSpawn(gentity_t *ent, int health, vec3_t origin, vec3_t angles,
 
 	if (health > 0) {
 		//G_Printf("ObjectSpawn: animated damagable\n");
-		ent->s.contents = CONTENTS_BODY;
+		ent->s.contents = CONTENTS_SOLID;
 		ent->health = health;
 		ent->takedamage = qtrue;
 		ent->die = ObjectDie;
