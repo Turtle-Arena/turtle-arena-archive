@@ -669,6 +669,19 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	CG_Printf ("%s", text);
 }
 
+#ifdef IOQ3ZTM
+void QDECL Com_DPrintf( const char *msg, ... ) {
+	va_list		argptr;
+	char		text[1024];
+
+	va_start (argptr, msg);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);
+	va_end (argptr);
+
+	CG_DPrintf ("%s", text);
+}
+#endif
+
 /*
 ================
 CG_Argv
