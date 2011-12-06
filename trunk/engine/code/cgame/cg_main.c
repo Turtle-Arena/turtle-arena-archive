@@ -2024,7 +2024,11 @@ void CG_LoadMenus(const char *menuFile) {
 		}
 	}
 
+#ifdef IOQ3ZTM // LESS_VERBOSE
+	Com_DPrintf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
+#else
 	Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
+#endif
 
 }
 
