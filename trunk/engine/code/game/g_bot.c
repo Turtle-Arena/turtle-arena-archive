@@ -284,6 +284,7 @@ void G_AdvanceMap( void ) {
 #endif
 
 
+#ifndef TA_SP
 /*
 =================
 PlayerIntroSound
@@ -308,6 +309,7 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 
 	trap_SendConsoleCommand( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
 }
+#endif
 
 
 #ifdef IOQ3ZTM // RANDOMBOT
@@ -613,7 +615,9 @@ G_CheckBotSpawn
 */
 void G_CheckBotSpawn( void ) {
 	int		n;
+#ifndef TA_SP
 	char	userinfo[MAX_INFO_VALUE];
+#endif
 
 	G_CheckMinimumPlayers();
 
@@ -627,10 +631,12 @@ void G_CheckBotSpawn( void ) {
 		ClientBegin( botSpawnQueue[n].clientNum );
 		botSpawnQueue[n].spawnTime = 0;
 
+#ifndef TA_SP
 		if( g_gametype.integer == GT_SINGLE_PLAYER ) {
 			trap_GetUserinfo( botSpawnQueue[n].clientNum, userinfo, sizeof(userinfo) );
 			PlayerIntroSound( Info_ValueForKey (userinfo, "model") );
 		}
+#endif
 	}
 }
 
