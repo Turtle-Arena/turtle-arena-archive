@@ -3435,11 +3435,7 @@ R_InitShaders
 ==================
 */
 void R_InitShaders( void ) {
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "Initializing Shaders\n" );
-#else
-	ri.Printf( PRINT_ALL, "Initializing Shaders\n" );
-#endif
+	ri.Printf(PRINT_DEVELOPER, "Initializing Shaders\n");
 
 	Com_Memset(hashTable, 0, sizeof(hashTable));
 

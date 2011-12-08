@@ -606,7 +606,6 @@ int CG_LastAttacker( int localClientNum ) {
 	return cg.snap->pss[cg.snap->lcIndex[localClientNum]].persistant[PERS_ATTACKER];
 }
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 void QDECL CG_DPrintf( const char *msg, ... ) {
 	va_list		argptr;
 	char		text[1024];
@@ -623,7 +622,6 @@ void QDECL CG_DPrintf( const char *msg, ... ) {
 
 	trap_Print( text );
 }
-#endif
 
 void QDECL CG_Printf( const char *msg, ... ) {
 	va_list		argptr;
@@ -669,7 +667,6 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	CG_Printf ("%s", text);
 }
 
-#ifdef IOQ3ZTM
 void QDECL Com_DPrintf( const char *msg, ... ) {
 	va_list		argptr;
 	char		text[1024];
@@ -680,7 +677,6 @@ void QDECL Com_DPrintf( const char *msg, ... ) {
 
 	CG_DPrintf ("%s", text);
 }
-#endif
 
 /*
 ================
@@ -2037,12 +2033,7 @@ void CG_LoadMenus(const char *menuFile) {
 		}
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
-#else
-	Com_Printf("UI menu load time = %d milli seconds\n", trap_Milliseconds() - start);
-#endif
-
 }
 
 

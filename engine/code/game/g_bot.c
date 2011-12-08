@@ -182,11 +182,7 @@ void G_LoadArenas( void ) {
 		strcat(filename, dirptr);
 		G_LoadArenasFromFile(filename);
 	}
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	G_DPrintf( "%i arenas parsed\n", g_numArenas );
-#else
-	trap_Printf( va( "%i arenas parsed\n", g_numArenas ) );
-#endif
+	G_DPrintf("%i arenas parsed\n", g_numArenas);
 
 	for( n = 0; n < g_numArenas; n++ ) {
 		Info_SetValueForKey( g_arenaInfos[n], "num", va( "%i", n ) );
@@ -1125,11 +1121,7 @@ static void G_LoadBots( void ) {
 		strcat(filename, dirptr);
 		G_LoadBotsFromFile(filename);
 	}
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	G_DPrintf( "%i bots parsed\n", g_numBots );
-#else
-	trap_Printf( va( "%i bots parsed\n", g_numBots ) );
-#endif
+	G_DPrintf("%i bots parsed\n", g_numBots);
 }
 
 

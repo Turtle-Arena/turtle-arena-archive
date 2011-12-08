@@ -442,11 +442,7 @@ void SV_MasterHeartbeat(const char *message)
 #endif
 
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-		Com_DPrintf ("Sending heartbeat to %s\n", sv_master[i]->string );
-#else
-		Com_Printf ("Sending heartbeat to %s\n", sv_master[i]->string );
-#endif
+		Com_DPrintf("Sending heartbeat to %s\n", sv_master[i]->string);
 
 		// this command should be changed if the server info / status format
 		// ever incompatably changes

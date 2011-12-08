@@ -1414,11 +1414,7 @@ void Com_TouchMemory( void ) {
 
 	end = Sys_Milliseconds();
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf( "Com_TouchMemory: %i msec\n", end - start );
-#else
-	Com_Printf( "Com_TouchMemory: %i msec\n", end - start );
-#endif
 }
 
 
@@ -1683,11 +1679,7 @@ void Hunk_Clear( void ) {
 	hunk_permanent = &hunk_low;
 	hunk_temp = &hunk_high;
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf( "Hunk_Clear: reset the hunk ok\n" );
-#else
-	Com_Printf( "Hunk_Clear: reset the hunk ok\n" );
-#endif
 	VM_Clear();
 #ifdef HUNK_DEBUG
 	hunkblocks = NULL;

@@ -324,7 +324,6 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 }
 
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 void QDECL G_DPrintf( const char *fmt, ... ) {
 	va_list		argptr;
 	char		text[1024];
@@ -339,7 +338,6 @@ void QDECL G_DPrintf( const char *fmt, ... ) {
 
 	trap_Printf( text );
 }
-#endif
 
 void QDECL G_Printf( const char *fmt, ... ) {
 	va_list		argptr;
@@ -416,11 +414,7 @@ void G_FindTeams( void ) {
 		}
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	G_DPrintf ("%i teams with %i entities\n", c, c2);
-#else
-	G_Printf ("%i teams with %i entities\n", c, c2);
-#endif
 }
 
 void G_RemapTeamShaders( void ) {
@@ -554,15 +548,9 @@ G_InitGame
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	int					i;
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	G_DPrintf ("------- Game Initialization -------\n");
 	G_DPrintf ("gamename: %s\n", GAMEVERSION);
 	G_DPrintf ("gamedate: %s\n", __DATE__);
-#else
-	G_Printf ("------- Game Initialization -------\n");
-	G_Printf ("gamename: %s\n", GAMEVERSION);
-	G_Printf ("gamedate: %s\n", __DATE__);
-#endif
 
 	srand( randomSeed );
 
@@ -668,11 +656,7 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	SaveRegisteredNPCs();
 #endif
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	G_DPrintf ("-----------------------------------\n");
-#else
-	G_Printf ("-----------------------------------\n");
-#endif
 
 #ifndef TA_SP
 	if( g_gametype.integer == GT_SINGLE_PLAYER || trap_Cvar_VariableIntegerValue( "com_buildScript" ) ) {
@@ -698,11 +682,7 @@ G_ShutdownGame
 =================
 */
 void G_ShutdownGame( int restart ) {
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	G_DPrintf ("==== ShutdownGame ====\n");
-#else
-	G_Printf ("==== ShutdownGame ====\n");
-#endif
 
 	if ( level.logFile ) {
 		G_LogPrintf("ShutdownGame:\n" );
@@ -749,6 +729,17 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	va_end (argptr);
 
 	G_Printf ("%s", text);
+}
+
+void QDECL Com_DPrintf( const char *msg, ... ) {
+	va_list		argptr;
+	char		text[1024];
+
+	va_start (argptr, msg);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);
+	va_end (argptr);
+
+	G_DPrintf ("%s", text);
 }
 
 /*

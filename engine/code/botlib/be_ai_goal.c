@@ -326,10 +326,7 @@ itemconfig_t *LoadItemConfig(char *filename)
 	FreeSource(source);
 	//
 	if (!ic->numiteminfo) botimport.Print(PRT_WARNING, "no item info loaded\n");
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", path);
 	return ic;
 } //end of the function LoadItemConfig
 #ifdef TA_WEAPSYS // BOT_ITEM_INFOS
@@ -624,11 +621,8 @@ void BotInitInfoEntities(void)
 			numcampspots++;
 		} //end else if
 	} //end for
-	if (botDeveloper)
-	{
-		botimport.Print(PRT_MESSAGE, "%d map locations\n", numlocations);
-		botimport.Print(PRT_MESSAGE, "%d camp spots\n", numcampspots);
-	} //end if
+	botimport.Print(PRT_DEVELOPER, "%d map locations\n", numlocations);
+	botimport.Print(PRT_DEVELOPER, "%d camp spots\n", numcampspots);
 } //end of the function BotInitInfoEntities
 //===========================================================================
 //
@@ -811,10 +805,7 @@ void BotInitLevelItems(void)
 		//
 		AddLevelItemToList(li);
 	} //end for
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "found %d level items\n", numlevelitems);
+	botimport.Print(PRT_DEVELOPER, "found %d level items\n", numlevelitems);
 } //end of the function BotInitLevelItems
 //===========================================================================
 //

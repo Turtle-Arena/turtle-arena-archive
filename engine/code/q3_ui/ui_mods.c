@@ -141,11 +141,7 @@ static void UI_Mods_LoadMods( void ) {
     dirptr += dirlen + strlen(descptr) + 1;
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf("%i mods parsed\n", s_mods.list.numitems);
-#else
-	trap_Print( va( "%i mods parsed\n", s_mods.list.numitems ) );
-#endif
 	if (s_mods.list.numitems > MAX_MODS) {
 		s_mods.list.numitems = MAX_MODS;
 	}

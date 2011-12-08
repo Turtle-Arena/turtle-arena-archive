@@ -756,11 +756,7 @@ void CG_LoadVoiceChats( void ) {
 	numVoiceChats = 8;
 #endif
 #endif
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	CG_DPrintf("voice chat memory size = %d\n", size - trap_MemoryRemaining());
-#else
-	CG_Printf("voice chat memory size = %d\n", size - trap_MemoryRemaining());
-#endif
 }
 
 /*

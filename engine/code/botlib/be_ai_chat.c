@@ -761,10 +761,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 			return NULL;
 		} //end if
 	} //end for
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", filename);
 	//
 	//BotDumpSynonymList(synlist);
 	//
@@ -1054,13 +1051,10 @@ bot_randomlist_t *BotLoadRandomStrings(char *filename)
 		//free the source after one pass
 		FreeSource(source);
 	} //end for
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", filename);
 	//
 #ifdef DEBUG
-	botimport.Print(PRT_MESSAGE, "random strings %d msec\n", Sys_MilliSeconds() - starttime);
+	botimport.Print(PRT_DEVELOPER, "random strings %d msec\n", Sys_MilliSeconds() - starttime);
 	//BotDumpRandomStringList(randomlist);
 #endif //DEBUG
 	//
@@ -1369,10 +1363,7 @@ bot_matchtemplate_t *BotLoadMatchTemplates(char *matchfile)
 	} //end while
 	//free the source
 	FreeSource(source);
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", matchfile);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", matchfile);
 	//
 	//BotDumpMatchTemplates(matches);
 	//
@@ -1997,10 +1988,7 @@ bot_replychat_t *BotLoadReplyChat(char *filename)
 		} //end while
 	} //end while
 	FreeSource(source);
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", filename);
 	//
 	//BotDumpReplyChat(replychatlist);
 	if (botDeveloper)
@@ -2199,10 +2187,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 		} //end if
 	} //end for
 	//
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s from %s\n", chatname, chatfile);
+	botimport.Print(PRT_DEVELOPER, "loaded %s from %s\n", chatname, chatfile);
 	//
 	//BotDumpInitialChat(chat);
 	if (botDeveloper)
@@ -2210,7 +2195,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 		BotCheckInitialChatIntegrety(chat);
 	} //end if
 #ifdef DEBUG
-	botimport.Print(PRT_MESSAGE, "initial chats loaded in %d msec\n", Sys_MilliSeconds() - starttime);
+	botimport.Print(PRT_DEVELOPER, "initial chats loaded in %d msec\n", Sys_MilliSeconds() - starttime);
 #endif //DEBUG
 	//character was read successfully
 	return chat;
