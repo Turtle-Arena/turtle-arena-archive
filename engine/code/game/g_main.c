@@ -635,10 +635,6 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// reserve some spots for dead player bodies
 	InitBodyQue();
 
-	ClearRegisteredItems();
-#ifdef TA_NPCSYS
-	ClearRegisteredNPCs();
-#endif
 #ifdef TA_ITEMSYS
 	BG_InitItemInfo();
 #endif
@@ -650,6 +646,10 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 #endif
 #ifdef IOQ3ZTM // MAP_ROTATION
 	G_LoadArenas();
+#endif
+	ClearRegisteredItems();
+#ifdef TA_NPCSYS
+	ClearRegisteredNPCs();
 #endif
 
 	// parse the key/value pairs and spawn gentities
