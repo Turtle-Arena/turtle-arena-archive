@@ -1426,21 +1426,24 @@ void ClientThink_real( gentity_t *ent ) {
 #endif
 
 #ifdef TURTLEARENA // LOCKON
-	if (ent->enemy && (ent->enemy == ent || !ent->enemy->takedamage))
-	{
-		ent->enemy = NULL;
-	}
-
 	// Set Vieworigin
 	VectorCopy(client->ps.origin, vieworigin);
 	vieworigin[2] += client->ps.viewheight;
 
 	// Check if current target is valid.
-	if (!(client->ps.eFlags & EF_LOCKON)
-		|| !G_ValidTarget(ent, ent->enemy, vieworigin, client->ps.viewangles, 768.0f, 90.0f, 2))
-	{
-		// Search for a new target
-		ent->enemy = G_FindTarget(ent, vieworigin, client->ps.viewangles, 768.0f, 90.0f);
+	if (client->sess.sessionTeam == TEAM_SPECTATOR) {
+		ent->enemy = NULL;
+	} else {
+		if (ent->enemy && (ent->enemy == ent || !ent->enemy->takedamage)) {
+			ent->enemy = NULL;
+		}
+
+		if (!(client->ps.eFlags & EF_LOCKON)
+			|| !G_ValidTarget(ent, ent->enemy, vieworigin, client->ps.viewangles, 768.0f, 90.0f, 2))
+		{
+			// Search for a new target
+			ent->enemy = G_FindTarget(ent, vieworigin, client->ps.viewangles, 768.0f, 90.0f);
+		}
 	}
 
 	// Set origin of target origin
