@@ -1290,11 +1290,8 @@ void R_StitchAllPatches( void ) {
 		}
 	}
 	while (stitched);
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "stitched %d LoD cracks\n", numstitches );
-#else
-	ri.Printf( PRINT_ALL, "stitched %d LoD cracks\n", numstitches );
-#endif
+
+	ri.Printf(PRINT_DEVELOPER, "stitched %d LoD cracks\n", numstitches);
 }
 
 /*
@@ -1399,13 +1396,8 @@ static	void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	R_MovePatchSurfacesToHunk();
 #endif
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "...loaded %d faces, %i meshes, %i trisurfs, %i flares\n", 
-		numFaces, numMeshes, numTriSurfs, numFlares );
-#else
-	ri.Printf( PRINT_ALL, "...loaded %d faces, %i meshes, %i trisurfs, %i flares\n", 
-		numFaces, numMeshes, numTriSurfs, numFlares );
-#endif
+	ri.Printf(PRINT_DEVELOPER, "...loaded %d faces, %i meshes, %i trisurfs, %i flares\n", 
+		numFaces, numMeshes, numTriSurfs, numFlares);
 }
 
 

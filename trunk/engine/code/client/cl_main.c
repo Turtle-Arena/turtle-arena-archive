@@ -2513,11 +2513,7 @@ void CL_ServersResponsePacket( const netadr_t* from, msg_t *msg, qboolean extend
 	byte*			buffptr;
 	byte*			buffend;
 	
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf("CL_ServersResponsePacket\n");
-#else
-	Com_Printf("CL_ServersResponsePacket\n");
-#endif
 
 	if (cls.numglobalservers == -1) {
 		// state to detect lack of servers or lack of response

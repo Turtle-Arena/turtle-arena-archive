@@ -346,10 +346,7 @@ int AAS_LoadAASFile(char *filename)
 	aas_header_t header;
 	int offset, length, lastoffset;
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "trying to load %s\n", filename);
+	botimport.Print(PRT_DEVELOPER, "trying to load %s\n", filename);
 	//dump current loaded aas file
 	AAS_DumpAASData();
 	//open the file

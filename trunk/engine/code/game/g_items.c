@@ -1238,11 +1238,7 @@ void SaveRegisteredItems( void ) {
 	string[ bg_numItems ] = 0;
 #endif
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	G_DPrintf( "%i items registered\n", count );
-#else
-	G_Printf( "%i items registered\n", count );
-#endif
 	trap_SetConfigstring(CS_ITEMS, string);
 }
 

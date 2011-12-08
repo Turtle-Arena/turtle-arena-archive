@@ -323,7 +323,7 @@ weaponconfig_t *LoadWeaponConfig(char *filename)
 		} //end if
 	} //end for
 	if (!wc->numweapons) botimport.Print(PRT_WARNING, "no weapon info loaded\n");
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", path);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", path);
 	return wc;
 } //end of the function LoadWeaponConfig
 //===========================================================================

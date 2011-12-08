@@ -83,6 +83,7 @@ struct weaponinfo_s;
 #define LINECOLOR_ORANGE		5//0xe0e1e2e3L
 
 //Print types
+#define PRT_DEVELOPER			0
 #define PRT_MESSAGE				1
 #define PRT_WARNING				2
 #define PRT_ERROR				3

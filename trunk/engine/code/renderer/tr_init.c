@@ -178,10 +178,8 @@ int		max_polyverts;
 */
 static void InitOpenGL( void )
 {
+	static qboolean firstTime = qtrue;
 	char renderer_buffer[1024];
-#ifdef IOQ3ZTM
-	static qboolean first_time = qtrue;
-#endif
 
 	//
 	// initialize OS specific portions of the renderer
@@ -217,18 +215,13 @@ static void InitOpenGL( void )
 	// init command buffers and SMP
 	R_InitCommandBuffers();
 
-#ifdef IOQ3ZTM // Only print OpenGL stuff to the log file once.
-	if (first_time == qtrue)
+	if (firstTime)
 	{
-		first_time = qfalse;
+		firstTime = qfalse;
 
 		// print info
 		GfxInfo_f();
 	}
-#else
-	// print info
-	GfxInfo_f();
-#endif
 
 	// set default state
 	GL_SetDefaultState();
@@ -1373,11 +1366,7 @@ void R_Init( void ) {
 	int i;
 	byte *ptr;
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "----- R_Init -----\n" );
-#else
-	ri.Printf( PRINT_ALL, "----- R_Init -----\n" );
-#endif
+	ri.Printf(PRINT_DEVELOPER, "----- R_Init -----\n");
 
 	// clear all our internal state
 	Com_Memset( &tr, 0, sizeof( tr ) );
@@ -1479,11 +1468,7 @@ void R_Init( void ) {
 	if ( err != GL_NO_ERROR )
 		ri.Printf (PRINT_ALL, "glGetError() = 0x%x\n", err);
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "----- finished R_Init -----\n" );
-#else
-	ri.Printf( PRINT_ALL, "----- finished R_Init -----\n" );
-#endif
+	ri.Printf(PRINT_DEVELOPER, "----- finished R_Init -----\n");
 }
 
 /*
@@ -1493,11 +1478,7 @@ RE_Shutdown
 */
 void RE_Shutdown( qboolean destroyWindow ) {	
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow );
-#else
-	ri.Printf( PRINT_ALL, "RE_Shutdown( %i )\n", destroyWindow );
-#endif
+	ri.Printf(PRINT_DEVELOPER, "RE_Shutdown( %i )\n", destroyWindow);
 
 	ri.Cmd_RemoveCommand ("modellist");
 	ri.Cmd_RemoveCommand ("screenshotJPEG");

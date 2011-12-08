@@ -431,15 +431,9 @@ weightconfig_t *ReadWeightConfig(char *filename)
 	//free the source at the end of a pass
 	FreeSource(source);
 	//if the file was located in a pak file
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (botDeveloper)
-#endif
-	botimport.Print(PRT_MESSAGE, "loaded %s\n", filename);
+	botimport.Print(PRT_DEVELOPER, "loaded %s\n", filename);
 #ifdef DEBUG
-	if (botDeveloper)
-	{
-		botimport.Print(PRT_MESSAGE, "weights loaded in %d msec\n", Sys_MilliSeconds() - starttime);
-	} //end if
+	botimport.Print(PRT_DEVELOPER, "weights loaded in %d msec\n", Sys_MilliSeconds() - starttime);
 #endif //DEBUG
 	//
 	if (!LibVarGetValue("bot_reloadcharacters"))

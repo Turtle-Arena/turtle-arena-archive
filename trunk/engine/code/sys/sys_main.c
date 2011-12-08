@@ -487,11 +487,7 @@ void *Sys_LoadGameDll(const char *name,
 
 	assert(name);
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf( "Loading DLL file: %s\n", name);
-#else
-	Com_Printf( "Loading DLL file: %s\n", name);
-#endif
 	libHandle = Sys_LoadLibrary(name);
 
 	if(!libHandle)
@@ -511,11 +507,7 @@ void *Sys_LoadGameDll(const char *name,
 		return NULL;
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf ( "Sys_LoadGameDll(%s) found vmMain function at %p\n", name, *entryPoint );
-#else
-	Com_Printf ( "Sys_LoadGameDll(%s) found vmMain function at %p\n", name, *entryPoint );
-#endif
 	dllEntry( systemcalls );
 
 	return libHandle;

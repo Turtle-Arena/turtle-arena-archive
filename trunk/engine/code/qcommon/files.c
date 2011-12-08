@@ -3408,15 +3408,13 @@ qboolean FS_PortableMode(void)
 FS_Startup
 ================
 */
-static void FS_Startup( const char *gameName )
+static void FS_Startup( const char *gameName, qboolean quiet )
 {
 	const char *homePath;
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	static int firstTime = 1;
-	
-	if (firstTime)
-#endif
-	Com_Printf( "----- FS_Startup -----\n" );
+
+	if (!quiet) {
+		Com_Printf( "----- FS_Startup -----\n" );
+	}
 
 	fs_packFiles = 0;
 
@@ -3492,31 +3490,21 @@ static void FS_Startup( const char *gameName )
 	// reorder the pure pk3 files according to server order
 	FS_ReorderPurePaks();
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (firstTime)
-#endif
-	// print the current search paths
-	FS_Path_f();
-
 	fs_gamedirvar->modified = qfalse; // We just loaded, it's not modified
-
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (firstTime)
-#endif
-	Com_Printf( "----------------------\n" );
 
 #ifdef FS_MISSING
 	if (missingFiles == NULL) {
 		missingFiles = fopen( "\\missing.txt", "ab" );
 	}
 #endif
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (firstTime)
-#endif
-	Com_Printf( "%d files in pk3 files\n", fs_packFiles );
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	firstTime = 0;
-#endif
+
+	if (!quiet) {
+		// print the current search paths
+		FS_Path_f();
+
+		Com_Printf( "----------------------\n" );
+		Com_Printf( "%d files in pk3 files\n", fs_packFiles );
+	}
 }
 
 /*
@@ -3985,7 +3973,7 @@ void FS_InitFilesystem( void ) {
 		Cvar_Set("fs_game", "");
 
 	// try to start up normally
-	FS_Startup(com_basegame->string);
+	FS_Startup(com_basegame->string, qfalse);
 
 	FS_CheckPaks();
 
@@ -4018,7 +4006,7 @@ void FS_Restart( int checksumFeed ) {
 	FS_ClearPakReferences(0);
 
 	// try to start up normally
-	FS_Startup(com_basegame->string);
+	FS_Startup(com_basegame->string, qtrue);
 
 	FS_CheckPaks();
 

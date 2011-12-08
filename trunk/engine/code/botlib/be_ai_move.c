@@ -818,10 +818,7 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum,
 		if (i != MAX_AVOIDREACH && avoidreachtries[i] > AVOIDREACH_TRIES)
 		{
 #ifdef DEBUG
-			if (botDeveloper)
-			{
-				botimport.Print(PRT_MESSAGE, "avoiding reachability %d\n", avoidreach[i]);
-			} //end if
+			botimport.Print(PRT_DEVELOPER, "avoiding reachability %d\n", avoidreach[i]);
 #endif //DEBUG
 			continue;
 		} //end if
@@ -3180,10 +3177,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 						} //end if
 						else
 						{
-							if (botDeveloper)
-							{
-								botimport.Print(PRT_MESSAGE, "client %d: on func_plat without reachability\n", ms->client);
-							} //end if
+							botimport.Print(PRT_DEVELOPER, "client %d: on func_plat without reachability\n", ms->client);
 							result->blocked = qtrue;
 							result->blockentity = ent;
 							result->flags |= MOVERESULT_ONTOPOFOBSTACLE;
@@ -3210,10 +3204,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 						} //end if
 						else
 						{
-							if (botDeveloper)
-							{
-								botimport.Print(PRT_MESSAGE, "client %d: on func_bobbing without reachability\n", ms->client);
-							} //end if
+							botimport.Print(PRT_DEVELOPER, "client %d: on func_bobbing without reachability\n", ms->client);
 							result->blocked = qtrue;
 							result->blockentity = ent;
 							result->flags |= MOVERESULT_ONTOPOFOBSTACLE;
@@ -3350,10 +3341,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			if (!AAS_AreaReachability(ms->areanum))
 			{
 #ifdef DEBUG
-				if (botDeveloper)
-				{
-					botimport.Print(PRT_MESSAGE, "area %d no reachability\n", ms->areanum);
-				} //end if
+				botimport.Print(PRT_DEVELOPER, "area %d no reachability\n", ms->areanum);
 #endif //DEBUG
 			} //end if
 			//get a new reachability leading towards the goal

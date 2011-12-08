@@ -812,11 +812,9 @@ void CL_InitCGame( void ) {
 
 	clc.state = CA_LOADING;
 
-#ifdef IOQ3ZTM
 	if (!com_sv_running->integer) {
 		Com_Printf("Loading level %s...\n", mapname);
 	}
-#endif
 
 	// init for this gamestate
 	// use the lastExecutedServerCommand instead of the serverCommandSequence
@@ -833,11 +831,7 @@ void CL_InitCGame( void ) {
 
 	t2 = Sys_Milliseconds();
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
-#else
-	Com_Printf( "CL_InitCGame: %5.2f seconds\n", (t2-t1)/1000.0 );
-#endif
 
 	// have the renderer touch all its images, so they are present
 	// on the card even if the driver does deferred loading

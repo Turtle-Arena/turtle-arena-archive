@@ -375,23 +375,12 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc, qboolean unpure)
 
 	// load the image
 	Com_sprintf( filename, sizeof(filename), "vm/%s.qvm", vm->name );
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf( "Loading vm file %s...\n", filename );
-#else
-	Com_Printf( "Loading vm file %s...\n", filename );
-#endif
 
 	FS_ReadFileDir(filename, vm->searchPath, unpure, &header.v);
 
 	if ( !header.h ) {
-#ifdef IOQ3ZTM // LESS_VERBOSE
-		if (!com_developer || !com_developer->integer)
-			Com_Printf( "Loading vm file %s failed.\n", filename );
-		else
-			Com_DPrintf( "Failed.\n" );
-#else
-		Com_Printf( "Failed.\n" );
-#endif
+		Com_Printf("Loading vm file %s failed.\n", filename);
 		VM_Free( vm );
 
 		Com_Printf(S_COLOR_YELLOW "Warning: Couldn't open VM file %s\n", filename);
@@ -399,18 +388,13 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc, qboolean unpure)
 		return NULL;
 	}
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	if (com_developer->integer)
-#endif
-	// show where the qvm was loaded from
-	FS_Which(filename, vm->searchPath);
+	if (com_developer->integer) {
+		// show where the qvm was loaded from
+		FS_Which(filename, vm->searchPath);
+	}
 
 	if( LittleLong( header.h->vmMagic ) == VM_MAGIC_VER2 ) {
-#ifdef IOQ3ZTM // LESS_VERBOSE
 		Com_DPrintf( "...which has vmMagic VM_MAGIC_VER2\n" );
-#else
-		Com_Printf( "...which has vmMagic VM_MAGIC_VER2\n" );
-#endif
 
 		// byte swap the header
 		for ( i = 0 ; i < sizeof( vmHeader_t ) / 4 ; i++ ) {
@@ -504,11 +488,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc, qboolean unpure)
 		header.h->jtrgLength &= ~0x03;
 
 		vm->numJumpTableTargets = header.h->jtrgLength >> 2;
-#ifdef IOQ3ZTM // LESS_VERBOSE
 		Com_DPrintf("Loading %d jump table targets\n", vm->numJumpTableTargets);
-#else
-		Com_Printf("Loading %d jump table targets\n", vm->numJumpTableTargets);
-#endif
 
 		if(alloc)
 		{
@@ -641,11 +621,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 #ifdef NO_NATIVE_SUPPORT
 			Com_Printf("Skipping dll file %s, not supported\n", filename);
 #else
-#ifdef IOQ3ZTM // LESS_VERBOSE
 			Com_DPrintf("Try loading dll file %s\n", filename);
-#else
-			Com_Printf("Try loading dll file %s\n", filename);
-#endif
 
 			vm->dllHandle = Sys_LoadGameDll(filename, &vm->entryPoint, VM_DllSyscall);
 			
@@ -711,11 +687,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 	vm->programStack = vm->dataMask + 1;
 	vm->stackBottom = vm->programStack - PROGRAM_STACK_SIZE;
 
-#ifdef IOQ3ZTM // LESS_VERBOSE
 	Com_DPrintf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
-#else
-	Com_Printf("%s loaded in %d bytes on the hunk\n", module, remaining - Hunk_MemoryRemaining());
-#endif
 
 	return vm;
 }

@@ -1032,12 +1032,7 @@ void RB_ShowImages( void ) {
 	qglFinish();
 
 	end = ri.Milliseconds();
-#ifdef IOQ3ZTM // LESS_VERBOSE
-	ri.Printf( PRINT_DEVELOPER, "%i msec to draw all images\n", end - start );
-#else
-	ri.Printf( PRINT_ALL, "%i msec to draw all images\n", end - start );
-#endif
-
+	ri.Printf(PRINT_DEVELOPER, "%i msec to draw all images\n", end - start);
 }
 
 /*
