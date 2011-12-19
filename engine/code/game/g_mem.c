@@ -29,7 +29,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 
 
 #ifdef IOQ3ZTM
-#define POOLSIZE	(512 * 1024)
+#define POOLSIZE	(1024 * 1024)
 #else
 #define POOLSIZE	(256 * 1024)
 #endif
