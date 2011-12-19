@@ -50,16 +50,18 @@ int demo_protocols[] =
 #ifdef __wii__
 #define MIN_COMHUNKMEGS		16
 #define DEF_COMHUNKMEGS		26
+#define DEF_COMZONEMEGS		24
 #else
 #define MIN_COMHUNKMEGS		64
-#define DEF_COMHUNKMEGS		128
+#define DEF_COMHUNKMEGS		256
+#define DEF_COMZONEMEGS		48
 #endif
 #else
 #define MIN_DEDICATED_COMHUNKMEGS 1
 #define MIN_COMHUNKMEGS		56
 #define DEF_COMHUNKMEGS		64
-#endif
 #define DEF_COMZONEMEGS		24
+#endif
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
 
