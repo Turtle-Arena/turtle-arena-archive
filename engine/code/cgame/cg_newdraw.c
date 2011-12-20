@@ -1012,12 +1012,16 @@ static void CG_DrawAreaPowerUp(rectDef_t *rect, int align, float special, float 
 }
 
 float CG_GetValue(int ownerDraw) {
+#ifndef TA_WEAPSYS_EX
 	centity_t	*cent;
+#endif
  	clientInfo_t *ci;
 	playerState_t	*ps;
 
 	ps = cg.cur_ps;
+#ifndef TA_WEAPSYS_EX
 	cent = &cg_entities[ps->clientNum];
+#endif
 
   switch (ownerDraw) {
 #ifndef TURTLEARENA // NOARMOR
