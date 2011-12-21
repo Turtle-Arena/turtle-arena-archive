@@ -1613,18 +1613,14 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			qboolean localHasRed = qfalse;
 			qboolean localHasNeutral = qfalse;
 
-			for (i = 0; i < MAX_SPLITVIEW; i++) {
-				if (cg.snap->lcIndex[i] == -1) {
-					continue;
-				}
-
-				if (cg.localClients[i].predictedPlayerState.powerups[PW_BLUEFLAG]) {
+			for (i = 0; i < cg.snap->numPSs; i++) {
+				if (cg.snap->pss[i].powerups[PW_BLUEFLAG]) {
 					localHasBlue = qtrue;
 				}
-				if (cg.localClients[i].predictedPlayerState.powerups[PW_REDFLAG]) {
+				if (cg.snap->pss[i].powerups[PW_REDFLAG]) {
 					localHasRed = qtrue;
 				}
-				if (cg.localClients[i].predictedPlayerState.powerups[PW_NEUTRALFLAG]) {
+				if (cg.snap->pss[i].powerups[PW_NEUTRALFLAG]) {
 					localHasNeutral = qtrue;
 				}
 			}

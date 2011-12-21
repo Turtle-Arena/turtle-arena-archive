@@ -9,7 +9,20 @@
 
 The intent of this project is to provide a version of ioquake3 which may be used
 for further development of standalone games.
-Some of the major ioq3 features currently implemented are:
+Some of the major ioq3ztm features currently implemented are:
+
+  * Four player splitscreen, with support for connecting to network servers
+  * Improvements not compatible with quake3 1.32b
+  * Better Virtual Machine (QVM/DLL/SO/DYLIB) API handling
+  * Improved Virtual Machine system calls (unified shared calls and acos)
+  * Modified pure pk3 system
+  * Removed code not needed for standalone games
+           (CD Key handling, authentication server code, and punkbuster ui code)
+  * Ogg Vorbis support, enabled by default
+           (with source headers and libraries for easy compiling using MinGW)
+  * Joystick select menu
+
+Some of the major ioquake3 features currently implemented are:
 
   * SDL backend
   * OpenAL sound API support (multiple speaker support and better sound
@@ -295,7 +308,7 @@ Using shared libraries instead of qvm
   To force Q3 to use shared libraries instead of qvms run it with the following
   parameters: +set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0
 
-Using Demo Data Files
+Using Quake III Arena Demo Data Files
   Copy demoq3/pak0.pk3 from the demo installer to your baseq3 directory. The
   qvm files in this pak0.pk3 will not work, so you have to use the native
   shared libraries or qvms from this project. To use the new qvms, they must be
@@ -473,33 +486,6 @@ QuakeLive mouse acceleration (patch and this text written by TTimo from id)
 
 ---------------------------------------------------- README for Developers -----
 
-64bit mods
-  If you wish to compile external mods as shared libraries on a 64bit platform,
-  and the mod source is derived from the id Q3 SDK, you will need to modify the
-  interface code a little. Open the files ending in _syscalls.c and change
-  every instance of int to intptr_t in the declaration of the syscall function
-  pointer and the dllEntry function. Also find the vmMain function for each
-  module (usually in cg_main.c g_main.c etc.) and similarly replace the return
-  value in the prototype with intptr_t (arg0, arg1, ...stay int).
-
-  Add the following code snippet to q_shared.h:
-
-    #ifdef Q3_VM
-    typedef int intptr_t;
-    #else
-    #include <stdint.h>
-    #endif
-
-  Note if you simply wish to run mods on a 64bit platform you do not need to
-  recompile anything since by default Q3 uses a virtual machine system.
-
-Creating mods compatible with Q3 1.32b
-  If you're using this package to create mods for the last official release of
-  Q3, it is necessary to pass the commandline option '-vq3' to your invocation
-  of q3asm. This is because by default q3asm outputs an updated qvm format that
-  is necessary to fix a bug involving the optimizing pass of the x86 vm JIT
-  compiler.
-
 Creating standalone games
   Have you finished the daunting task of removing all dependencies on the Q3
   game data? You probably now want to give your users the opportunity to play
@@ -516,12 +502,12 @@ Creating standalone games
   binary. Just run make. Don't forget to edit the PRODUCT_NAME and subsequent
   #defines in qcommon/q_shared.h with information appropriate for your project.
 
-  While a lot of work has been put into ioquake3 that you can benefit from free
+  While a lot of work has been put into ioq3ztm that you can benefit from free
   of charge, it does not mean that you have no obligations to fulfill. Please be
   aware that as soon as you start distributing your game with an engine based on
   our sources we expect you to fully comply with the requirements as stated in
   the GPL. That includes making sources and modifications you made to the
-  ioquake3 engine as well as the game-code used to compile the .qvm files for
+  ioq3ztm engine as well as the game-code used to compile the .qvm files for
   the game logic freely available to everyone. Furthermore, note that the "QIIIA
   Game Source License" prohibits distribution of mods that are intended to
   operate on a version of Q3 not sanctioned by id software:
@@ -571,8 +557,7 @@ Network protocols
 cl_guid Support
   cl_guid is a cvar which is part of the client's USERINFO string.  Its value
   is a 32 character string made up of [a-f] and [0-9] characters.  This
-  value is pseudo-unique for every player.  Id's Quake 3 Arena client also
-  sets cl_guid, but only if Punkbuster is enabled on the client.
+  value is pseudo-unique for every player.
 
   If cl_guidServerUniq is non-zero (the default), then this value is also
   pseudo-unique for each server a client connects to (based on IP:PORT of
@@ -618,9 +603,9 @@ Building with MinGW for pre Windows XP
 ------------------------------------------------------------- Contributing -----
 
 Please send all patches to bugzilla (https://bugzilla.icculus.org), or join the
-mailing list (quake3-subscribe@icculus.org) and submit your patch there.  The
-best case scenario is that you submit your patch to bugzilla, and then post the
-URL to the mailing list.
+mailing list (http://lists.ioquake.org/listinfo.cgi/ioquake3-ioquake.org) and 
+submit your patch there.  The best case scenario is that you submit your patch 
+to bugzilla, and then post the URL to the mailing list.
 
 The focus for ioq3 is to develop a stable base suitable for further development
 and provide players with the same Quake 3 experience they've had for years. As
