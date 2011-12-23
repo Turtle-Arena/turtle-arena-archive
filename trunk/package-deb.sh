@@ -10,7 +10,7 @@
 #			and debian_main/wiimote/debian/changelog)
 #
 # NOTE: You must have the .orig.tar.gz files when creating
-#  patches (0.2-2, 0.2-3, etc et) (You can download them from the Ubuntu PPA)
+#  patches (0.2-2, 0.2-3, etc) (You can download them from the Ubuntu PPA)
 #
 
 # data package contains the game assets used by the client and server
@@ -438,7 +438,7 @@ then
 	find $DEBINSTALL/$ORIGDIR/misc/code_blocks/ -type f -name '*.depend' -exec rm -rf '{}' \; 2>/dev/null
 
 	# Remove lcc as Debian calls it non-free and removes it
-	rm -r $DEBINSTALL/$ORIGDIR/code/tools/lcc
+	rm -rf $DEBINSTALL/$ORIGDIR/code/tools/lcc
 
 	# Remove non-free Windows header
 	if [ -f $DEBINSTALL/$ORIGDIR/code/qcommon/wspiapi.h ]
@@ -447,7 +447,7 @@ then
 	fi
 
 	# Remove libs for win32 and mac
-	rm -r $DEBINSTALL/$ORIGDIR/code/libs/
+	rm -rf $DEBINSTALL/$ORIGDIR/code/libs/
 
 	#
 	# Create orig.tar.gz
@@ -500,7 +500,7 @@ then
 	then
 		# build .deb
 		dpkg-buildpackage -rfakeroot -uc -b $KEY
-		rm -r build
+		rm -rf build
 	fi
 fi
 
