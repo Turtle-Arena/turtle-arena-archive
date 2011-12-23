@@ -1,3 +1,5 @@
+COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
+
 ifndef VERSION
 VERSION=0.5.2
 endif
@@ -71,7 +73,13 @@ turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe: turtlearena.$(ARCH).nsi
 	cp "../../../COPYRIGHTS.txt" .
 	cp "../../../CREDITS.txt" .
 	cp "../../../INSTALLER_README.txt" "README.txt"
-	todos "$(CURDIR)/*.txt"
+ifneq ($(COMPILE_PLATFORM),mingw32)
+	todos GPL-2.txt
+	todos CC-BY-SA-3.0.txt
+	todos COPYRIGHTS.txt
+	todos CREDITS.txt
+	todos README.txt
+endif
 	makensis $(DEFINES) turtlearena.$(ARCH).nsi
 
 clean:
