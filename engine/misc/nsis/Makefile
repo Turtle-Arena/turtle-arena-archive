@@ -1,7 +1,7 @@
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
 ifndef VERSION
-VERSION=0.5.2
+VERSION=0.5.3
 endif
 ifndef RELEASE
 RELEASE=0
