@@ -1,0 +1,9 @@
+turtlearena etc/cwiid/wminput
+turtlearena_side etc/cwiid/wminput
+turtlearena_nun etc/cwiid/wminput
+turtlearena-wiimote usr/games
+turtlearena-wiimote-side usr/games
+turtlearena-wiimote-nun usr/games
+debian/turtlearena-wiimote.desktop usr/share/applications
+debian/turtlearena-wiimote-side.desktop usr/share/applications
+debian/turtlearena-wiimote-nun.desktop usr/share/applications
