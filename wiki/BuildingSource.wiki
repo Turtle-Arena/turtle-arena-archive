@@ -14,11 +14,15 @@ For all platforms the first step is to get the source code.
 
 == Get the Source ==
 === Archive ===
-You can download the engine/game-logic source on the download page for Turtle Arena 0.4 (and later) released version. Earlier versions included a zip of the full source in main download.
+There are  source tarballs on the download page for Turtle Arena 0.4 (and later) released versions. Earlier versions included a zip of the source in main download.
+
+Notes;
+  * 0.4.x does not include data files or data source files in the tarball, they are in subversion.
+  * 0.5.x does not include data files in the tarball, they are in subversion.
+
+The data files are zipped and included in the game downloads (see `base/assets*.pk3`).
 
 === Subversion ==
-To get the full source, including data source files, for Turtle Arena 0.4 or later you will need to download it from subversion.
-
 You will need a subversion client, such as [http://tortoisesvn.tigris.org/ TortoiseSVN] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the command line program "svn"
 
 Next you will need to do a source checkout, this varies by program.
@@ -27,7 +31,8 @@ Latest development code is located at
 	http://turtlearena.googlecode.com/svn/trunk/
 
 You can also get the source for released versions
-	http://turtlearena.googlecode.com/svn/tags/0.4.2/
+	http://turtlearena.googlecode.com/svn/tags/0.5.3/
+	http://turtlearena.googlecode.com/svn/tags/0.4.3/
 	http://turtlearena.googlecode.com/svn/tags/0.2/
 
 = Windows =
