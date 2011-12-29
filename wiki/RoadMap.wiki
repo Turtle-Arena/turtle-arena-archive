@@ -19,11 +19,10 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * DONE: Redesign HUD (with health bar)
   * Fixed various usability issues.
 
-=== 0.5.3 ===
-  * Add "Arcade Mode".
+=== 0.5.3 (Completed) ===
+  * Added initial "Arcade Mode".
   * DONE: Create new icon and loading screen.
   * DONE: Replace usage of GNU Freefont fonts with M+ Outline Fonts.
-  * ...
 
 === 0.5.4 ===
   * Make changes to player model system for future models.
