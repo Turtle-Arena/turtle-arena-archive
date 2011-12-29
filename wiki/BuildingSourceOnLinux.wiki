@@ -69,17 +69,23 @@ Code::Blocks does not build the game logic '.qvm', only the game logic '.so'. So
   # Run in the terminal; (Example) ./engine/build/release-linux-i386/turtlearena.i386 +set fs_basepath "." +set vm_game 0 +set vm_cgame 0 +set vm_ui 0
     * Setting vm_game/vm_cgame/vm_ui to 0 tells the game to use the '.so' files.
 
-=== Allowing sv_pure to be enabled ===
-==== Stable release ====
-To allow sv_pure to be enable you should download the assets0.pk3 included with the stable release. You could try zipping it yourself but it is likely that the checksum will be different.
+=== Playing on pure servers ===
+To play on pure servers the server and client must have the same asset pk3 files.
 
-If you want to try it anyway, run the package-assets.sh script.
-  # ./package-assets.sh
-  # Copy assets0.pk3 from ./install/base to ./base
+==== Released version ====
+To allow pure mode to be enable you should download the `base/assets*.pk3` files included with the 'portable zip' game download.
 
-==== Development release ====
-For the development release you need to create assets0.pk3, but also set the checksum in the engine.
+You could try creating the pk3s yourself but it is likely that the checksums will be different (which will break compatibility with the main release). You also need to check out the tagged source from subversion (which has the "base" directory containing the data files).
 
-The script package.sh has a helper function for setting the checksum, but currently must be manually done.
-  # ./package.sh --no-win32 --no-linux
-  # Copy assets0.pk3 from ./install/base to ./base
+  # make assets
+  # Copy the `assets*.pk3` files from ./install/base to ./base
+  # Run the game, if it shows warnings about the checksums in the console the generated pk3s are incompatible with the main release; download the pk3s from the main release instead
+
+==== Subversion Trunk ====
+If you checked out subversion trunk you need to create the `base/assets*.pk3` files and set the pk3 checksums in the engine to allow pure mode. It allows pure mode to be enable, but unable to play with people whose pk3s have a different checksum. This probably isn't useful, unless you distribute copies of server/client/pk3s to other people.
+
+  # make assets
+  # Copy the `assets*.pk3` files from ./install/base to ./base
+  # Run the game, it will (most likely) show warnings about incorrect pk3 checksums in the console (and the current pk3 checksums)
+  # Update checksums in engine/code/qcommon/files.c
+  # Rebuild client/server
