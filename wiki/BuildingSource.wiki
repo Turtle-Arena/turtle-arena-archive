@@ -9,9 +9,6 @@ This is the main page for how to compile and run Turtle Arena. It may seem a lit
 
 For all platforms the first step is to get the source code.
 
-  * If you are using the source zip from the Turtle Arena zip releases, you can simply unzip the source.
-  * Otherwise you can get the source code for a stable release or the current development version from the subversion repository.
-
 == Get the Source ==
 === Archive ===
 There are  source tarballs on the download page for Turtle Arena 0.4 (and later) released versions. Earlier versions included a zip of the source in main download.
@@ -40,7 +37,7 @@ You can also get the source for released versions
 See [BuildingSourceOnWindows Building source on Windows].
 
 = Linux =
-Should also work on other Unix-like operating systems, like FreeBSD, but have not been untested.
+Should also work on other Unix-like operating systems, like FreeBSD, but have not been tested.
 
 See [BuildingSourceOnLinux Building source on Linux].
 
