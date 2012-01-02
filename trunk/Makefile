@@ -133,36 +133,6 @@ BUILD_FINAL=1
 endif
 
 
-# Choose assets zips to create
-ASSETS0=1
-ASSETS1=1
-ASSETS2=1
-
-if [ -f $(DATADIR)/base/assets0.pk3 ]; then \
-	export ASSETS0=0; \
-	ASSETS0=0; \
-fi
-if [ -f $(DATADIR)/base/assets1-qvms.pk3 ]; then \
-	export ASSETS1=0; \
-	ASSETS1=0; \
-fi
-if [ -f $(DATADIR)/base/assets2-music.pk3 ]; then \
-	export ASSETS2=0; \
-	ASSETS2=0; \
-fi
-
-ASSETS=
-ifeq ($(ASSETS0),1)
-	ASSETS+=$(DATADIR)/base/assets0.pk3
-endif
-ifeq ($(ASSETS1),1)
-	ASSETS+=$(DATADIR)/base/assets1-qvms.pk3
-endif
-ifeq ($(ASSETS2),1)
-	ASSETS+=$(DATADIR)/base/assets2-music.pk3
-endif
-
-
 #
 # Misc
 #
@@ -202,7 +172,7 @@ qvms-clean:
 #
 # Asset packages (pk3 files)
 #
-assets: $(ASSETS)
+assets: $(DATADIR)/base/assets0.pk3 $(DATADIR)/base/assets1-qvms.pk3 $(DATADIR)/base/assets2-music.pk3
 
 assets-clean: qvms-clean
 	rm -fr $(DATADIR)/base/
