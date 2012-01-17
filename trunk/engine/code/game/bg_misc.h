@@ -1372,11 +1372,6 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 					float speed, float *angle, qboolean *swinging, int frametime );
 #endif
 
-#ifdef IOQ3ZTM // PLAYER_DIR
-#define MAX_PLAYER_DIRS 3
-extern const char *bg_playerDirs[MAX_PLAYER_DIRS];
-#endif
-
 #ifdef TA_PLAYERSYS
 #ifdef TURTLEARENA // DEFAULT_PLAYER
 #define	DEFAULT_MODEL			"raph"

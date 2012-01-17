@@ -908,9 +908,6 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 #endif
 #ifdef TA_GAME_MODELS
     char filename[MAX_QPATH];
-#ifdef IOQ3ZTM // PLAYER_DIR
-	int i;
-#endif
 #endif
 
 	ent = &g_entities[clientNum];
@@ -932,38 +929,18 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	// Load model tags (Currently loads the whole model.)
 	// Game and cgame share the same models so an extra ClientUserinfoChanged is called on model reset (R_ModelInit),
 	//   otherwise the model number were incorrent for bots (and maybe other clients).
-	client->pers.torsoModel = 0;
-	client->pers.legsModel = 0;
-
-#ifdef IOQ3ZTM // PLAYER_DIR
-	for (i = 0; bg_playerDirs[i] != NULL; i++)
-	{
-		if (i == 0 || !client->pers.torsoModel)
-		{
-			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], model );
-			client->pers.torsoModel = trap_R_RegisterModel(filename);
-		}
-		if (i == 0 || !client->pers.legsModel)
-		{
-			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], model );
-			client->pers.legsModel = trap_R_RegisterModel(filename);
-		}
-	}
-#else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
 	client->pers.torsoModel = trap_R_RegisterModel(filename);
 
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", model );
 	client->pers.legsModel = trap_R_RegisterModel(filename);
-#endif
-	// Server doesn't have the player,,, fall back to DEFAULT_MODEL
-	if (!client->pers.torsoModel)
-	{
+
+	// Server doesn't have the player... fall back to DEFAULT_MODEL
+	if (!client->pers.torsoModel) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
 		client->pers.torsoModel = trap_R_RegisterModel(filename);
 	}
-	if (!client->pers.legsModel)
-	{
+	if (!client->pers.legsModel) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
 		client->pers.legsModel = trap_R_RegisterModel(filename);
 	}

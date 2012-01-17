@@ -6473,7 +6473,6 @@ Load animation.cfg for model into playercfg
 qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, const char *headModel)
 {
 	char filename[MAX_QPATH];
-	qboolean foundConfig;
 	int i;
 
 	if (!model)
@@ -6580,37 +6579,18 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 	animations[FLAG_STAND2RUN].reversed = qtrue;
 #endif
 
-#ifdef IOQ3ZTM // PLAYER_DIR
-	// load animation.cfg
-	foundConfig = qfalse;
-	for (i=0; bg_playerDirs[i] != NULL; i++)
-	{
-		Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], model );
-		foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qfalse);
-
-		if (foundConfig)
-			break;
-	}
-
-	if (!foundConfig) {
-		Com_Printf( "Failed to load animation.cfg for %s\n", model );
-		return qfalse;
-	}
-#else
 	// load animation.cfg
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", model );
 	if ( !BG_ParsePlayerCFGFile(filename, playercfg, qfalse) ) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/animation.cfg", model );
-		if ( !BG_ParsePlayerCFGFile(filename, playercfg, qfalse) ) {
-			Com_Printf( "Failed to load animation.cfg for %s\n", model );
-			return qfalse;
-		}
+		Com_Printf( "Failed to load animation.cfg for %s\n", model );
+		return qfalse;
 	}
-#endif
 
-	// If using a different head model load the correct head settings.
+	// If using a different head model, load the correct head settings.
 	if (Q_stricmp(model, headModel) != 0)
 	{
+		qboolean foundConfig;
+
 		if (headModel[0] == '*') {
 			Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/animation.cfg", headModel );
 			foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qtrue);
@@ -6631,14 +6611,8 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 			else
 				head = headModel;
 
-			for (i=0; bg_playerDirs[i] != NULL; i++)
-			{
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/animation.cfg", bg_playerDirs[i], head );
-				foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qtrue);
-
-				if (foundConfig)
-					break;
-			}
+			Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", head );
+			foundConfig = BG_ParsePlayerCFGFile(filename, playercfg, qtrue);
 
 			// If found animation.cfg and didn't set soundpath
 			if (foundConfig && !strlen(playercfg->soundpath))
@@ -7118,16 +7092,4 @@ bg_objectcfg_t *BG_ParseObjectCFGFile(const char *filename)
 
 	return objectcfg;
 }
-#endif
-
-#ifdef IOQ3ZTM // PLAYER_DIR
-// Quake3 (Team Arena) attempts to load players from
-//   "models/players" and "models/players/characters" but in the final game
-//   there is no players in "models/players/characters" ...
-const char *bg_playerDirs[MAX_PLAYER_DIRS] =
-{
-	"models/players",
-	"models/players/characters",
-	NULL
-};
 #endif

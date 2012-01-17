@@ -3655,29 +3655,12 @@ static int UI_MapCountByGameType(qboolean singlePlayer) {
 
 qboolean UI_hasSkinForBase(const char *base, const char *team) {
 	char	test[MAX_QPATH];
-#ifdef IOQ3ZTM // PLAYER_DIR
-	int i;
 
-	for (i=0; bg_playerDirs[i] != NULL; i++)
-	{
-		Com_sprintf( test, sizeof( test ), "%s/%s/%s/lower_default.skin", bg_playerDirs[i], base, team );
-	
-		if (trap_FS_FOpenFile(test, NULL, FS_READ)) {
-			return qtrue;
-		}
-	}
-#else
 	Com_sprintf( test, sizeof( test ), "models/players/%s/%s/lower_default.skin", base, team );
 
 	if (trap_FS_FOpenFile(test, NULL, FS_READ)) {
 		return qtrue;
 	}
-	Com_sprintf( test, sizeof( test ), "models/players/characters/%s/%s/lower_default.skin", base, team );
-
-	if (trap_FS_FOpenFile(test, NULL, FS_READ)) {
-		return qtrue;
-	}
-#endif
 	return qfalse;
 }
 
