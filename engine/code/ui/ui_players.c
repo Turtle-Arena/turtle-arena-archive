@@ -1277,45 +1277,14 @@ UI_RegisterClientSkin
 ==========================
 */
 static qboolean	UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, const char *skinName, const char *headModelName, const char *headSkinName , const char *teamName) {
-	char		filename[MAX_QPATH*2];
-#ifdef IOQ3ZTM // PLAYER_DIR
-	int i;
+	char		filename[MAX_QPATH];
 
-	for (i=0; bg_playerDirs[i] != NULL; i++)
-	{
-		if (i == 0 || !pi->legsSkin) {
-			if (teamName && *teamName) {
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/%s/lower_%s.skin", bg_playerDirs[i], modelName, teamName, skinName );
-			} else {
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/lower_%s.skin", bg_playerDirs[i], modelName, skinName );
-			}
-			pi->legsSkin = trap_R_RegisterSkin( filename );
-		}
-
-		if (i == 0 || !pi->torsoSkin) {
-			if (teamName && *teamName) {
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/%s/upper_%s.skin", bg_playerDirs[i], modelName, teamName, skinName );
-			} else {
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/upper_%s.skin", bg_playerDirs[i], modelName, skinName );
-			}
-			pi->torsoSkin = trap_R_RegisterSkin( filename );
-		}
-	}
-#else
 	if (teamName && *teamName) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/%s/lower_%s.skin", modelName, teamName, skinName );
 	} else {
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower_%s.skin", modelName, skinName );
 	}
 	pi->legsSkin = trap_R_RegisterSkin( filename );
-	if (!pi->legsSkin) {
-		if (teamName && *teamName) {
-			Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/%s/lower_%s.skin", modelName, teamName, skinName );
-		} else {
-			Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/lower_%s.skin", modelName, skinName );
-		}
-		pi->legsSkin = trap_R_RegisterSkin( filename );
-	}
 
 	if (teamName && *teamName) {
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/%s/upper_%s.skin", modelName, teamName, skinName );
@@ -1323,15 +1292,6 @@ static qboolean	UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, 
 		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper_%s.skin", modelName, skinName );
 	}
 	pi->torsoSkin = trap_R_RegisterSkin( filename );
-	if (!pi->torsoSkin) {
-		if (teamName && *teamName) {
-			Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/%s/upper_%s.skin", modelName, teamName, skinName );
-		} else {
-			Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/upper_%s.skin", modelName, skinName );
-		}
-		pi->torsoSkin = trap_R_RegisterSkin( filename );
-	}
-#endif
 
 	if ( UI_FindClientHeadFile( filename, sizeof(filename), teamName, headModelName, headSkinName, "head", "skin" ) ) {
 		pi->headSkin = trap_R_RegisterSkin( filename );
@@ -1482,9 +1442,6 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 	char		headSkinName[MAX_QPATH];
 	char		filename[MAX_QPATH];
 	char		*slash;
-#ifdef IOQ3ZTM // PLAYER_DIR
-	int			i;
-#endif
 
 	pi->torsoModel = 0;
 	pi->headModel = 0;
@@ -1522,89 +1479,18 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 
 	// load cmodels before models so filecache works
 
-#ifdef IOQ3ZTM // PLAYER_DIR // Same code in CG_RegisterClientModelname and q3_ui
-	for (i=0; bg_playerDirs[i] != NULL; i++)
-	{
-		if (i == 0 || !pi->legsModel)
-		{
-			Com_sprintf( filename, sizeof( filename ), "%s/%s/lower.md3", bg_playerDirs[i], modelName );
-			pi->legsModel = trap_R_RegisterModel( filename );
-		}
-		if (i == 0 || !pi->torsoModel )
-		{
-			Com_sprintf( filename, sizeof( filename ), "%s/%s/upper.md3", bg_playerDirs[i], modelName );
-			pi->torsoModel = trap_R_RegisterModel( filename );
-		}
-	}
-
-	// failed?
-	if ( !pi->legsModel ) {
-		Com_Printf( "Failed to load model file %s\n", filename );
-		return qfalse;
-	}
-	if ( !pi->torsoModel ) {
-		Com_Printf( "Failed to load model file %s\n", filename );
-		return qfalse;
-	}
-
-	// load head model
-	pi->headModel = 0;
-
-	if (headModelName[0] == '*' ) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", &headModelName[1], &headModelName[1] );
-		pi->headModel = trap_R_RegisterModel( filename );
-	}
-
-	if (!pi->headModel)
-	{
-		for (i=0; bg_playerDirs[i] != NULL; i++)
-		{
-			if (headModelName[0] == '*')
-			{
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/head.md3", bg_playerDirs[i], &headModelName[1] );
-			}
-			else
-			{
-				Com_sprintf( filename, sizeof( filename ), "%s/%s/head.md3", bg_playerDirs[i], headModelName );
-			}
-			pi->headModel = trap_R_RegisterModel( filename );
-			if (pi->headModel)
-			{
-				break;
-			}
-		}
-	}
-
-	if ( !pi->headModel && headModelName[0] != '*') {
-		Com_sprintf( filename, sizeof( filename ), "models/players/heads/%s/%s.md3", headModelName, headModelName );
-		pi->headModel = trap_R_RegisterModel( filename );
-	}
-
-	if (!pi->headModel) {
-		Com_Printf( "Failed to load model file %s\n", filename );
-		return qfalse;
-	}
-#else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", modelName );
 	pi->legsModel = trap_R_RegisterModel( filename );
 	if ( !pi->legsModel ) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/lower.md3", modelName );
-		pi->legsModel = trap_R_RegisterModel( filename );
-		if ( !pi->legsModel ) {
-			Com_Printf( "Failed to load model file %s\n", filename );
-			return qfalse;
-		}
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
 	}
 
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", modelName );
 	pi->torsoModel = trap_R_RegisterModel( filename );
 	if ( !pi->torsoModel ) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/upper.md3", modelName );
-		pi->torsoModel = trap_R_RegisterModel( filename );
-		if ( !pi->torsoModel ) {
-			Com_Printf( "Failed to load model file %s\n", filename );
-			return qfalse;
-		}
+		Com_Printf( "Failed to load model file %s\n", filename );
+		return qfalse;
 	}
 
 	if (headModelName[0] == '*' ) {
@@ -1623,7 +1509,6 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
-#endif
 
 	// if any skins failed to load, fall back to default
 	if ( !UI_RegisterClientSkin( pi, modelName, skinName, headModelName, headSkinName, teamName) ) {
@@ -1639,11 +1524,8 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 #else
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/animation.cfg", modelName );
 	if ( !UI_ParseAnimationFile( filename, pi->animations ) ) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/characters/%s/animation.cfg", modelName );
-		if ( !UI_ParseAnimationFile( filename, pi->animations ) ) {
-			Com_Printf( "Failed to load animation file %s\n", filename );
-			return qfalse;
-		}
+		Com_Printf( "Failed to load animation file %s\n", filename );
+		return qfalse;
 	}
 
 	return qtrue;
