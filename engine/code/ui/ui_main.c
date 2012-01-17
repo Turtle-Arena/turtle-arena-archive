@@ -3654,7 +3654,7 @@ static int UI_MapCountByGameType(qboolean singlePlayer) {
 }
 
 qboolean UI_hasSkinForBase(const char *base, const char *team) {
-	char	test[1024];
+	char	test[MAX_QPATH];
 #ifdef IOQ3ZTM // PLAYER_DIR
 	int i;
 
