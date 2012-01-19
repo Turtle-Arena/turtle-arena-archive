@@ -1525,7 +1525,7 @@ static const char *RE_JointName(qhandle_t handle, int jointIndex)
 ================
 RE_SetupSkeleton
 
-Creates relative joint skeleton using specified animation informaiton.
+Creates relative joint skeleton using specified animation information.
 Returns qfalse if didn't setup refSkel.
 
 If refSkel is NULL returns qtrue if handle is valid model for skeleton animation.
@@ -1703,7 +1703,7 @@ void R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
 			parent = in->jointParents[i];
 
 			if( parent >= 0 ) {
-				OrientationMultiply(in->joints[parent], in->joints[i], &out->joints[i]);
+				OrientationMultiply(out->joints[parent], in->joints[i], &out->joints[i]);
 			} else {
 				Com_Memcpy(&out->joints[i], &in->joints[i], sizeof (orientation_t));
 			}
