@@ -1183,7 +1183,6 @@ int R_IQMLerpTag( orientation_t *tag, iqmData_t *data,
 		return qfalse;
 	}
 
-	// ZTM: TODO: Only compute single joint!
 	ComputeJointMats( data, startFrame, endFrame, frac, jointMats );
 
 #ifdef IOQ3ZTM // BONES

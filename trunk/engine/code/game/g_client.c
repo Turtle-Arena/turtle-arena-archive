@@ -926,32 +926,60 @@ void G_LoadPlayer(int clientNum, const char *inModelName, const char *inHeadMode
 	}
 
 #ifdef TA_GAME_MODELS
-	// Load model tags (Currently loads the whole model.)
+	// Load model (needed for tags / skeleton)
 	// Game and cgame share the same models so an extra ClientUserinfoChanged is called on model reset (R_ModelInit),
-	//   otherwise the model number were incorrent for bots (and maybe other clients).
-	Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
-	client->pers.torsoModel = trap_R_RegisterModel(filename);
+	//   otherwise the model numbers may be incorrect after video restart.
+	client->pers.torsoModel = 0;
+	client->pers.legsModel = 0;
 
-	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", model );
-	client->pers.legsModel = trap_R_RegisterModel(filename);
+#ifdef IOQ3ZTM // BONES
+	// Try loading single model player
+	Com_sprintf( filename, sizeof( filename ), "models/players/%s/player.iqm", model );
+	client->pers.playerModel = trap_R_RegisterModel(filename);
 
-	// Server doesn't have the player... fall back to DEFAULT_MODEL
-	if (!client->pers.torsoModel) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
+	// Try loading multimodel player
+	if (!client->pers.playerModel) {
+#endif
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", model );
 		client->pers.torsoModel = trap_R_RegisterModel(filename);
-	}
-	if (!client->pers.legsModel) {
-		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
+
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", model );
 		client->pers.legsModel = trap_R_RegisterModel(filename);
+#ifdef IOQ3ZTM // BONES
 	}
+#endif
+
+	// Server doesn't have the player, fall back to default model.
+#ifdef IOQ3ZTM // BONES
+	if (!client->pers.playerModel && (!client->pers.torsoModel || !client->pers.legsModel)) {
+		// Try loading single model player
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/player.iqm", DEFAULT_MODEL );
+		client->pers.playerModel = trap_R_RegisterModel(filename);
+	}
+
+	// Try loading multimodel player
+	if (!client->pers.playerModel) {
+#endif
+		if (!client->pers.torsoModel) {
+			Com_sprintf( filename, sizeof( filename ), "models/players/%s/upper.md3", DEFAULT_MODEL );
+			client->pers.torsoModel = trap_R_RegisterModel(filename);
+		}
+		if (!client->pers.legsModel) {
+			Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", DEFAULT_MODEL );
+			client->pers.legsModel = trap_R_RegisterModel(filename);
+		}
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 #endif
 
 	// Check if player has really changed!
 	if ( Q_stricmpn(inModelName, playercfg->model, MAX_QPATH) == 0
-		&& Q_stricmpn(inHeadModel, playercfg->headModel, MAX_QPATH) == 0 ) {
-			// no change
-			return;
-		}
+		&& Q_stricmpn(inHeadModel, playercfg->headModel, MAX_QPATH) == 0 )
+	{
+		// no change
+		return;
+	}
 
 	// ZTM: NOTE: This message was used to tell when a client get playercfg loaded.
 	//G_Printf("DEBUG: Changed player old=%s, new=%s\n", playercfg->model, model);

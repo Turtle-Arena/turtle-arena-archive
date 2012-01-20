@@ -316,6 +316,11 @@ typedef struct {
 
 	// Player axis, setup using G_PlayerAngles
 	vec3_t legsAxis[3], torsoAxis[3], headAxis[3];
+
+#ifdef IOQ3ZTM // BONES
+	qhandle_t		playerModel;
+	refSkeleton_t	playerSkeleton;
+#endif
 #endif
 } clientPersistant_t;
 
