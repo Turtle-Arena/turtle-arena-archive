@@ -1591,7 +1591,6 @@ qboolean RE_SetupSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int frame, i
 			if (refSkel) {
 				Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
 			}
-			Com_Printf( S_COLOR_YELLOW "WARNING: Failed to setup model skeleton: %s\n", model->name );
 			return qfalse;
 	}
 
@@ -1670,7 +1669,6 @@ qboolean RE_SetupPlayerSkeleton(qhandle_t handle, refSkeleton_t *refSkel, int le
 			if (refSkel) {
 				Com_Memset(refSkel, 0, sizeof (refSkeleton_t));
 			}
-			Com_Printf( S_COLOR_YELLOW "WARNING: Failed to setup player model skeleton: %s\n", model->name );
 			return qfalse;
 	}
 

@@ -610,6 +610,33 @@ static void UI_PlayerAnimation( playerInfo_t *pi, int *legsOld, int *legs, float
 	*torsoBackLerp = pi->torso.backlerp;
 }
 
+#ifdef IOQ3ZTM // BONES
+/*
+===============
+UI_PlayerSkeleton
+===============
+*/
+static void UI_PlayerSkeleton(playerInfo_t *pi, refEntity_t *legs, refEntity_t *torso,
+							refEntity_t *head, refSkeleton_t *absSkeleton)
+{
+	refSkeleton_t skeleton;
+
+	if (!pi->playerModel) {
+		return;
+	}
+
+	if (trap_R_SetupPlayerSkeleton(pi->playerModel, &skeleton,
+								legs->frame, legs->oldframe, legs->backlerp,
+								torso->frame, torso->oldframe, torso->backlerp,
+								head->frame, head->oldframe, head->backlerp))
+	{
+		// ZTM: TODO: Set torso and head axis in skeleton.
+
+		trap_R_MakeSkeletonAbsolute(&skeleton, absSkeleton);
+	}
+}
+#endif
+
 
 #ifndef IOQ3ZTM // BG_SWING_ANGLES
 /*
@@ -864,6 +891,9 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	refEntity_t		legs;
 	refEntity_t		torso;
 	refEntity_t		head;
+#ifdef IOQ3ZTM // BONES
+	refSkeleton_t	skeleton;
+#endif
 #ifdef TA_WEAPSYS
 	refEntity_t		gun[MAX_HANDS];
 #else
@@ -886,6 +916,16 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	char *originalTagNames[3] = { "tag_weapon", "tag_flag", NULL };
 #endif
 
+#ifdef IOQ3ZTM // BONES
+	if ( (!pi->playerModel && (!pi->legsModel || !pi->torsoModel || !pi->headModel))
+#ifdef TA_PLAYERSYS
+	|| !pi->playercfg.animations[0].numFrames ) {
+#else
+	|| !pi->animations[0].numFrames ) {
+#endif
+		return;
+	}
+#else
 	if ( !pi->legsModel || !pi->torsoModel || !pi->headModel
 #ifdef TA_PLAYERSYS
 	|| !pi->playercfg.animations[0].numFrames ) {
@@ -894,6 +934,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #endif
 		return;
 	}
+#endif
 
 	dp_realtime = time;
 
@@ -955,6 +996,35 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 
 	renderfx = RF_LIGHTING_ORIGIN | RF_NOSHADOW;
 
+#ifdef IOQ3ZTM // BONES
+	if (pi->playerModel) {
+		// get skeleton
+		UI_PlayerSkeleton( pi, &legs, &torso, &head, &skeleton );
+
+		//
+		// add the player
+		//
+		legs.hModel = pi->playerModel;
+		legs.customSkin = pi->playerSkin;
+
+		VectorCopy( origin, legs.origin );
+
+		VectorCopy( origin, legs.lightingOrigin );
+		legs.renderfx = renderfx;
+		VectorCopy (legs.origin, legs.oldorigin);
+
+		trap_R_AddRefEntityToScene_CustomSkeleton( &legs, &skeleton );
+
+		// Stuff gets hooked to torso
+		VectorCopy( origin, torso.lightingOrigin );
+		torso.renderfx = renderfx;
+		UI_PositionRotatedEntityOnTag( &torso, &legs, pi->playerModel, "tag_torso");
+
+		VectorCopy( origin, head.lightingOrigin );
+		head.renderfx = renderfx;
+		UI_PositionRotatedEntityOnTag( &head, &torso, pi->playerModel, "tag_head");
+	} else {
+#endif
 	//
 	// add the legs
 	//
@@ -1007,6 +1077,9 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 	head.renderfx = renderfx;
 
 	trap_R_AddRefEntityToScene( &head );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	//
 	// add the gun
@@ -1204,6 +1277,20 @@ UI_RegisterClientSkin
 static qboolean UI_RegisterClientSkin( playerInfo_t *pi, const char *modelName, const char *skinName ) {
 	char		filename[MAX_QPATH];
 
+#ifdef IOQ3ZTM // BONES
+	// single model player has single skin
+	if (pi->playerModel) {
+		Com_sprintf( filename, sizeof( filename ), "models/players/%s/player_%s.skin", modelName, skinName );
+		pi->playerSkin = trap_R_RegisterSkin( filename );
+
+		if (!pi->playerSkin) {
+			return qfalse;
+		}
+
+		return qtrue;
+	}
+#endif
+
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower_%s.skin", modelName, skinName );
 	pi->legsSkin = trap_R_RegisterSkin( filename );
 
@@ -1376,6 +1463,14 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 
 	// load cmodels before models so filecache works
 
+#ifdef IOQ3ZTM // BONES
+	// Try loading single model player
+	Com_sprintf( filename, sizeof( filename ), "models/players/%s/player.iqm", modelName );
+	pi->playerModel = trap_R_RegisterModel( filename );
+
+	// Try loading multimodel player
+	if (!pi->playerModel) {
+#endif
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", modelName );
 	pi->legsModel = trap_R_RegisterModel( filename );
 	if ( !pi->legsModel ) {
@@ -1396,6 +1491,9 @@ qboolean UI_RegisterClientModelname( playerInfo_t *pi, const char *modelSkinName
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// if any skins failed to load, fall back to default
 	if ( !UI_RegisterClientSkin( pi, modelName, skinName ) ) {

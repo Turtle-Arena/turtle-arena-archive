@@ -482,6 +482,21 @@ CG_RegisterClientSkin
 static qboolean	CG_RegisterClientSkin( clientInfo_t *ci, const char *teamName, const char *modelName, const char *skinName, const char *headModelName, const char *headSkinName ) {
 	char filename[MAX_QPATH];
 
+#ifdef IOQ3ZTM // BONES
+	// single model player has single skin
+	if (ci->playerModel) {
+		if ( CG_FindClientModelFile( filename, sizeof(filename), ci, teamName, modelName, skinName, "player", "skin" ) ) {
+			ci->playerSkin = trap_R_RegisterSkin( filename );
+		}
+		if (!ci->playerSkin) {
+			Com_Printf( "Player skin load failure: %s\n", filename );
+			return qfalse;
+		}
+
+		return qtrue;
+	}
+#endif
+
 	/*
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/%slower_%s.skin", modelName, teamName, skinName );
 	ci->legsSkin = trap_R_RegisterSkin( filename );
@@ -540,6 +555,14 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 		headName = headModelName;
 	}
 
+#ifdef IOQ3ZTM // BONES
+	// Try loading single model player
+	Com_sprintf( filename, sizeof( filename ), "models/players/%s/player.iqm", modelName );
+	ci->playerModel = trap_R_RegisterModel( filename );
+
+	// Try loading multimodel player
+	if (!ci->playerModel) {
+#endif
 	Com_sprintf( filename, sizeof( filename ), "models/players/%s/lower.md3", modelName );
 	ci->legsModel = trap_R_RegisterModel( filename );
 	if ( !ci->legsModel ) {
@@ -570,6 +593,9 @@ static qboolean CG_RegisterClientModelname( clientInfo_t *ci, const char *modelN
 		Com_Printf( "Failed to load model file %s\n", filename );
 		return qfalse;
 	}
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// if any skins failed to load, return failure
 	if ( !CG_RegisterClientSkin( ci, teamName, modelName, skinName, headName, headSkinName ) ) {
@@ -900,6 +926,10 @@ static void CG_CopyClientInfoModel( clientInfo_t *from, clientInfo_t *to ) {
 	to->torsoSkin = from->torsoSkin;
 	to->headModel = from->headModel;
 	to->headSkin = from->headSkin;
+#ifdef IOQ3ZTM // BONES
+	to->playerModel = from->playerModel;
+	to->playerSkin = from->playerSkin;
+#endif
 	to->modelIcon = from->modelIcon;
 
 #ifdef TA_WEAPSYS
@@ -1493,6 +1523,33 @@ static void CG_PlayerAnimation( centity_t *cent, int *legsOld, int *legs, float 
 	*torso = cent->pe.torso.frame;
 	*torsoBackLerp = cent->pe.torso.backlerp;
 }
+
+#ifdef IOQ3ZTM // BONES
+/*
+===============
+CG_PlayerSkeleton
+===============
+*/
+static void CG_PlayerSkeleton(clientInfo_t *ci, refEntity_t *legs, refEntity_t *torso,
+							refEntity_t *head, refSkeleton_t *absSkeleton)
+{
+	refSkeleton_t skeleton;
+
+	if (!ci->playerModel) {
+		return;
+	}
+
+	if (trap_R_SetupPlayerSkeleton(ci->playerModel, &skeleton,
+								legs->frame, legs->oldframe, legs->backlerp,
+								torso->frame, torso->oldframe, torso->backlerp,
+								head->frame, head->oldframe, head->backlerp))
+	{
+		// ZTM: TODO: Set torso and head axis in playerSkeleton.
+
+		trap_R_MakeSkeletonAbsolute(&skeleton, absSkeleton);
+	}
+}
+#endif
 
 /*
 =============================================================================
@@ -2836,6 +2893,77 @@ static void CG_PlayerSplash( centity_t *cent ) {
 
 
 
+#ifdef IOQ3ZTM // BONES
+/*
+===============
+CG_AddRefEntityWithPowerups_CustomSkeleton
+
+Adds a piece with modifications or duplications for powerups
+Also called by CG_Missile for quad rockets, but nobody can tell...
+===============
+*/
+void CG_AddRefEntityWithPowerups_CustomSkeleton( refEntity_t *ent, refSkeleton_t *skeleton, entityState_t *state, int team ) {
+#ifdef TURTLEARENA // POWERS
+	if ( state->powerups & ( 1 << PW_FLASHING ) ) {
+		if (state->otherEntityNum2 > 0) {
+			// Death fade out
+			ent->renderfx |= RF_FORCE_ENT_ALPHA;
+			ent->shaderRGBA[3] = state->otherEntityNum2;
+		}
+		trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+
+		ent->customShader = cgs.media.playerTeleportShader;
+		trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+	} else
+#endif
+	if ( state->powerups & ( 1 << PW_INVIS ) ) {
+		ent->customShader = cgs.media.invisShader;
+		trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+	} else {
+		/*
+		if ( state->eFlags & EF_KAMIKAZE ) {
+			if (team == TEAM_BLUE)
+				ent->customShader = cgs.media.blueKamikazeShader;
+			else
+				ent->customShader = cgs.media.redKamikazeShader;
+			trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+		}
+		else {*/
+			trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+		//}
+
+#ifndef TURTLEARENA // POWERS
+		if ( state->powerups & ( 1 << PW_QUAD ) )
+		{
+			if (team == TEAM_RED)
+				ent->customShader = cgs.media.redQuadShader;
+			else
+				ent->customShader = cgs.media.quadShader;
+			trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+		}
+		if ( state->powerups & ( 1 << PW_REGEN ) ) {
+			if ( ( ( cg.time / 100 ) % 10 ) == 1 ) {
+				ent->customShader = cgs.media.regenShader;
+				trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+			}
+		}
+#endif
+		if ( state->powerups & ( 1 << PW_BATTLESUIT ) ) {
+			ent->customShader = cgs.media.battleSuitShader;
+			trap_R_AddRefEntityToScene_CustomSkeleton( ent, skeleton );
+		}
+	}
+}
+
+/*
+===============
+CG_AddRefEntityWithPowerups
+===============
+*/
+void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int team ) {
+	CG_AddRefEntityWithPowerups_CustomSkeleton(ent, NULL, state, team);
+}
+#else
 /*
 ===============
 CG_AddRefEntityWithPowerups
@@ -2896,6 +3024,7 @@ void CG_AddRefEntityWithPowerups( refEntity_t *ent, entityState_t *state, int te
 		}
 	}
 }
+#endif
 
 #ifndef IOQ3ZTM // UNUSED
 /*
@@ -3073,6 +3202,43 @@ void CG_Player( centity_t *cent ) {
 		CG_PlayerTokens( cent, renderfx );
 	}
 #endif
+
+#ifdef IOQ3ZTM // BONES
+	if (ci->playerModel) {
+		refSkeleton_t skeleton;
+
+		// get skeleton
+		CG_PlayerSkeleton(ci, &legs, &torso, &head, &skeleton);
+
+		//
+		// add the player
+		//
+		legs.hModel = ci->playerModel;
+		legs.customSkin = ci->playerSkin;
+#ifdef IOQ3ZTM_NO_COMPAT // DAMAGE_SKINS
+		legs.skinFraction = cent->currentState.skinFraction;
+#endif
+
+		VectorCopy( cent->lerpOrigin, legs.origin );
+
+		VectorCopy( cent->lerpOrigin, legs.lightingOrigin );
+		legs.shadowPlane = shadowPlane;
+		legs.renderfx = renderfx;
+		VectorCopy (legs.origin, legs.oldorigin);	// don't positionally lerp at all
+
+		CG_AddRefEntityWithPowerups_CustomSkeleton( &legs, &skeleton, &cent->currentState, ci->team );
+
+		VectorCopy( cent->lerpOrigin, torso.lightingOrigin );
+		torso.shadowPlane = shadowPlane;
+		torso.renderfx = renderfx;
+		CG_PositionRotatedEntityOnTag( &torso, &legs, ci->playerModel, "tag_torso");
+
+		VectorCopy( cent->lerpOrigin, head.lightingOrigin );
+		head.shadowPlane = shadowPlane;
+		head.renderfx = renderfx;
+		CG_PositionRotatedEntityOnTag( &head, &torso, ci->playerModel, "tag_head");
+	} else {
+#endif
 	//
 	// add the legs
 	//
@@ -3117,6 +3283,10 @@ void CG_Player( centity_t *cent ) {
 	torso.renderfx = renderfx;
 
 	CG_AddRefEntityWithPowerups( &torso, &cent->currentState, ci->team );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
+
 #ifdef MISSIONPACK
 #ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	if ( cent->currentState.eFlags & EF_KAMIKAZE ) {
@@ -3339,6 +3509,9 @@ void CG_Player( centity_t *cent ) {
 	}
 #endif // MISSIONPACK
 
+#ifdef IOQ3ZTM // BONES
+	if (!ci->playerModel) {
+#endif
 	//
 	// add the head
 	//
@@ -3359,6 +3532,9 @@ void CG_Player( centity_t *cent ) {
 	head.renderfx = renderfx;
 
 	CG_AddRefEntityWithPowerups( &head, &cent->currentState, ci->team );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 #ifdef IOQ3ZTM
 	// add the talk baloon or disconnect icon
