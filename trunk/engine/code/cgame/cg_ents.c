@@ -33,15 +33,39 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
+#ifdef IOQ3ZTM // BONES
 qboolean CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName ) {
+							qhandle_t parentModel, const refSkeleton_t *parentSkeleton, char *tagName )
+#else
+qboolean CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							qhandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	qboolean		returnValue;
-	
+
+#ifdef IOQ3ZTM // BONES
+	if (parentSkeleton && parentSkeleton->type == ST_ABSOLUTE) {
+		int joint = trap_R_JointIndexForName(parentModel, tagName);
+
+		returnValue = (joint >= 0 && joint < parentSkeleton->numJoints);
+
+		if (returnValue) {
+			// Found joint
+			memcpy(&lerped, &parentSkeleton->joints[joint], sizeof (lerped));
+		} else {
+			// Joint not found
+			memset(&lerped, 0, sizeof (lerped));
+		}
+	} else {
+#endif
 	// lerp the tag
 	returnValue = trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -65,17 +89,41 @@ Modifies the entities position and axis by the given
 tag location
 ======================
 */
+#ifdef IOQ3ZTM // BONES
 qboolean CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							qhandle_t parentModel, char *tagName ) {
+							qhandle_t parentModel, const refSkeleton_t *parentSkeleton, char *tagName )
+#else
+qboolean CG_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							qhandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
 	qboolean		returnValue;
 
 //AxisClear( entity->axis );
+#ifdef IOQ3ZTM // BONES
+	if (parentSkeleton && parentSkeleton->type == ST_ABSOLUTE) {
+		int joint = trap_R_JointIndexForName(parentModel, tagName);
+
+		returnValue = (joint >= 0 && joint < parentSkeleton->numJoints);
+
+		if (returnValue) {
+			// Found joint
+			memcpy(&lerped, &parentSkeleton->joints[joint], sizeof (lerped));
+		} else {
+			// Joint not found
+			memset(&lerped, 0, sizeof (lerped));
+		}
+	} else {
+#endif
 	// lerp the tag
 	returnValue = trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -464,7 +512,7 @@ static void CG_MiscObject( centity_t *cent ) {
 		weapon.shadowPlane = ent.shadowPlane;
 		weapon.renderfx = ent.renderfx;
 
-		CG_PositionRotatedEntityOnTag( &weapon, &ent, weapon.hModel, "tag_weapon" );
+		CG_PositionRotatedEntityOnTag( &weapon, &ent, weapon.hModel, NULL, "tag_weapon" );
 
 		AxisCopy( ent.axis, weapon.axis );
 		weapon.nonNormalizedAxes = ent.nonNormalizedAxes;
@@ -485,7 +533,7 @@ static void CG_MiscObject( centity_t *cent ) {
 			barrel.shadowPlane = weapon.shadowPlane;
 			barrel.renderfx = weapon.renderfx;
 
-			CG_PositionRotatedEntityOnTag( &barrel, &weapon, weapon.hModel, "tag_barrel" );
+			CG_PositionRotatedEntityOnTag( &barrel, &weapon, weapon.hModel, NULL, "tag_barrel" );
 
 			AxisCopy( weapon.axis, barrel.axis );
 			barrel.nonNormalizedAxes = weapon.nonNormalizedAxes;
@@ -848,9 +896,9 @@ static void CG_Item( centity_t *cent ) {
 #endif
 
 #ifdef TA_WEAPSYS
-		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel" ))
+		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], NULL, "tag_barrel" ))
 #else
-		CG_PositionRotatedEntityOnTag( &barrel, &ent, wi->weaponModel, "tag_barrel" );
+		CG_PositionRotatedEntityOnTag( &barrel, &ent, wi->weaponModel, NULL, "tag_barrel" );
 #endif
 		{
 			AxisCopy( ent.axis, barrel.axis );
@@ -862,7 +910,7 @@ static void CG_Item( centity_t *cent ) {
 #ifdef TA_WEAPSYS
 		barrel.hModel = cg_weapons[bg_weapongroupinfo[item->giTag].weaponnum[1]].barrelModel;
 
-		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], "tag_barrel2" ))
+		if (CG_PositionRotatedEntityOnTag( &barrel, &ent, cg_items[es->modelindex].models[0], NULL, "tag_barrel2" ))
 		{
 			AxisCopy( ent.axis, barrel.axis );
 			barrel.nonNormalizedAxes = ent.nonNormalizedAxes;
@@ -891,7 +939,7 @@ static void CG_Item( centity_t *cent ) {
 		flap.shaderRGBA[3] = ent.shaderRGBA[3];
 #endif
 
-		CG_PositionRotatedEntityOnTag( &flap, &ent, cg_items[es->modelindex].models[0], "tag_flag" );
+		CG_PositionRotatedEntityOnTag( &flap, &ent, cg_items[es->modelindex].models[0], NULL, "tag_flag" );
 
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS // FLAG_ANIMATIONS
 		// lerp the flag animation frames

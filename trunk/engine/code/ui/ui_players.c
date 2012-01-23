@@ -387,15 +387,39 @@ static void UI_LegsSequencing( playerInfo_t *pi ) {
 UI_PositionEntityOnTag
 ======================
 */
+#ifdef IOQ3ZTM // BONES
 static qboolean UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							clipHandle_t parentModel, char *tagName ) {
+							clipHandle_t parentModel, const refSkeleton_t *parentSkeleton, char *tagName )
+#else
+static qboolean UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							clipHandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	qboolean		returnValue;
-	
+
+#ifdef IOQ3ZTM // BONES
+	if (parentSkeleton && parentSkeleton->type == ST_ABSOLUTE) {
+		int joint = trap_R_JointIndexForName(parentModel, tagName);
+
+		returnValue = (joint >= 0 && joint < parentSkeleton->numJoints);
+
+		if (returnValue) {
+			// Found joint
+			memcpy(&lerped, &parentSkeleton->joints[joint], sizeof (lerped));
+		} else {
+			// Joint not found
+			memset(&lerped, 0, sizeof (lerped));
+		}
+	} else {
+#endif
 	// lerp the tag
 	returnValue = trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -416,16 +440,40 @@ static qboolean UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *
 UI_PositionRotatedEntityOnTag
 ======================
 */
+#ifdef IOQ3ZTM // BONES
 static qboolean UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
-							clipHandle_t parentModel, char *tagName ) {
+							clipHandle_t parentModel, const refSkeleton_t *parentSkeleton, char *tagName )
+#else
+static qboolean UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
+							clipHandle_t parentModel, char *tagName )
+#endif
+{
 	int				i;
 	orientation_t	lerped;
 	vec3_t			tempAxis[3];
 	qboolean		returnValue;
 
+#ifdef IOQ3ZTM // BONES
+	if (parentSkeleton && parentSkeleton->type == ST_ABSOLUTE) {
+		int joint = trap_R_JointIndexForName(parentModel, tagName);
+
+		returnValue = (joint >= 0 && joint < parentSkeleton->numJoints);
+
+		if (returnValue) {
+			// Found joint
+			memcpy(&lerped, &parentSkeleton->joints[joint], sizeof (lerped));
+		} else {
+			// Joint not found
+			memset(&lerped, 0, sizeof (lerped));
+		}
+	} else {
+#endif
 	// lerp the tag
 	returnValue = trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent->origin, entity->origin );
@@ -1021,15 +1069,6 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		VectorCopy (legs.origin, legs.oldorigin);
 
 		trap_R_AddRefEntityToScene_CustomSkeleton( &legs, &skeleton );
-
-		// Stuff gets hooked to torso
-		VectorCopy( origin, torso.lightingOrigin );
-		torso.renderfx = renderfx;
-		UI_PositionRotatedEntityOnTag( &torso, &legs, pi->playerModel, "tag_torso");
-
-		VectorCopy( origin, head.lightingOrigin );
-		head.renderfx = renderfx;
-		UI_PositionRotatedEntityOnTag( &head, &torso, pi->playerModel, "tag_head");
 	} else {
 #endif
 	//
@@ -1062,7 +1101,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 
 	VectorCopy( origin, torso.lightingOrigin );
 
-	UI_PositionRotatedEntityOnTag( &torso, &legs, pi->legsModel, "tag_torso");
+	UI_PositionRotatedEntityOnTag( &torso, &legs, pi->legsModel, NULL, "tag_torso");
 
 	torso.renderfx = renderfx;
 
@@ -1079,7 +1118,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 
 	VectorCopy( origin, head.lightingOrigin );
 
-	UI_PositionRotatedEntityOnTag( &head, &torso, pi->torsoModel, "tag_head");
+	UI_PositionRotatedEntityOnTag( &head, &torso, pi->torsoModel, NULL, "tag_head");
 
 	head.renderfx = renderfx;
 
@@ -1116,11 +1155,25 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 				continue;
 			}
 
+#ifdef IOQ3ZTM // BONES
+			if (pi->playerModel) {
+				if (
+#ifdef TURTLEARENA // PLAYERS
+					!UI_PositionEntityOnTag( &gun[i], &legs, pi->playerModel, &skeleton, newTagNames[i]) &&
+#endif
+					!UI_PositionEntityOnTag( &gun[i], &legs, pi->playerModel, &skeleton, originalTagNames[i]))
+				{
+					// Failed to find tag
+					continue;
+				}
+			}
+			else
+#endif
 			if (
 #ifdef TURTLEARENA // PLAYERS
-				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, newTagNames[i]) &&
+				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, NULL, newTagNames[i]) &&
 #endif
-				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, originalTagNames[i]))
+				!UI_PositionEntityOnTag( &gun[i], &torso, pi->torsoModel, NULL, originalTagNames[i]))
 			{
 				// Failed to find tag
 				continue;
@@ -1141,7 +1194,12 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		}
 #endif
 		VectorCopy( origin, gun.lightingOrigin );
-		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, "tag_weapon");
+#ifdef IOQ3ZTM // BONES
+		if (pi->playerModel)
+			UI_PositionEntityOnTag( &gun, &legs, pi->playerModel, &skeleton, "tag_weapon");
+		else
+#endif
+		UI_PositionEntityOnTag( &gun, &torso, pi->torsoModel, NULL, "tag_weapon");
 		gun.renderfx = renderfx;
 		trap_R_AddRefEntityToScene( &gun );
 #endif
@@ -1188,9 +1246,9 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 		AnglesToAxis( angles, barrel.axis );
 
 #ifdef TA_WEAPSYS
-		UI_PositionRotatedEntityOnTag( &barrel, &gun[i], pi->weaponModel[i], "tag_barrel");
+		UI_PositionRotatedEntityOnTag( &barrel, &gun[i], pi->weaponModel[i], NULL, "tag_barrel");
 #else
-		UI_PositionRotatedEntityOnTag( &barrel, &gun, pi->weaponModel, "tag_barrel");
+		UI_PositionRotatedEntityOnTag( &barrel, &gun, pi->weaponModel, NULL, "tag_barrel");
 #endif
 
 		trap_R_AddRefEntityToScene( &barrel );
@@ -1214,7 +1272,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 				continue;
 
 			VectorCopy( origin, flash.lightingOrigin );
-			UI_PositionEntityOnTag( &flash, &gun[i], pi->weaponModel[i], "tag_flash");
+			UI_PositionEntityOnTag( &flash, &gun[i], pi->weaponModel[i], NULL, "tag_flash");
 			flash.renderfx = renderfx;
 			trap_R_AddRefEntityToScene( &flash );
 
@@ -1237,7 +1295,7 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 			}
 #endif
 			VectorCopy( origin, flash.lightingOrigin );
-			UI_PositionEntityOnTag( &flash, &gun, pi->weaponModel, "tag_flash");
+			UI_PositionEntityOnTag( &flash, &gun, pi->weaponModel, NULL, "tag_flash");
 			flash.renderfx = renderfx;
 			trap_R_AddRefEntityToScene( &flash );
 		}

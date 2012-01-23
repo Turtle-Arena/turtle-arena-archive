@@ -2488,7 +2488,7 @@ void CG_AddWeaponTrailOld(centity_t *cent, refEntity_t *gun, int weaponHand)
 
 	AnglesToAxis( angles, trail.axis );
 	VectorScale(trail.axis[0], scale, trail.axis[0]);
-	CG_PositionRotatedEntityOnTag( &trail, gun, gun->hModel, "tag_weapon" );
+	CG_PositionRotatedEntityOnTag( &trail, gun, gun->hModel, NULL, "tag_weapon" );
 
 	trap_R_AddRefEntityToScene( &trail );
 
@@ -2569,8 +2569,7 @@ Draw default weapon(s) at "tag_wp_away_primary" and "tag_wp_away_secondary"
 	when not in use.
 =============
 */
-void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
-{
+void CG_AddPlayerDefaultWeapon( refEntity_t *parent, refSkeleton_t *parentSkeleton, centity_t *cent, int team) {
 	weapon_t			weaponGroupNum;
 	bg_weapongroupinfo_t *weaponGroup;
 	qboolean			drawWeapon[MAX_HANDS];
@@ -2580,7 +2579,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 	int					i;
 	clientInfo_t		*ci;
 	qboolean			foundModel;
-	char *awayTagNames[3] = { "tag_wp_away_primary", "tag_wp_away_secondary", NULL};
+	char				*awayTagNames[MAX_HANDS] = { "tag_wp_away_primary", "tag_wp_away_secondary" };
 
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 
@@ -2589,19 +2588,15 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 
 	CG_RegisterWeaponGroup(weaponGroupNum);
 
-	for (i = 0; i < MAX_HANDS; i++)
-	{
+	for (i = 0; i < MAX_HANDS; i++) {
 		drawWeapon[i] = (weaponGroup->weaponnum[i] > 0);
 	}
 
 	// get hands from cent, holding default weaponGroup
-	if (cent->currentState.weapon == weaponGroupNum)
-	{
+	if (cent->currentState.weapon == weaponGroupNum) {
 		// If player is holding the weapon, don't draw it "away"
-		for (i = 0; i < MAX_HANDS; i++)
-		{
-			if (cent->currentState.weaponHands & HAND_TO_HB(i))
-			{
+		for (i = 0; i < MAX_HANDS; i++) {
+			if (cent->currentState.weaponHands & HAND_TO_HB(i)) {
 				drawWeapon[i] = qfalse;
 			}
 		}
@@ -2624,7 +2619,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 		return;
 	}
 
-	// add the weapon
+	// add the weapons
 	memset( &gun, 0, sizeof( gun ) );
 	foundModel = qfalse;
 
@@ -2647,30 +2642,23 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 	for (i = 0; i < MAX_HANDS; i++)
 	{
 		if (awayTagNames[i] == NULL) {
-			break;
+			continue;
 		}
 
-		if (drawWeapon[i] && gun[i].hModel)
-		{
-			if (!CG_PositionEntityOnTag( &gun[i], parent, parent->hModel, awayTagNames[i]))
-			{
-				// no weapon tag
-				drawWeapon[i] = qfalse;
-			} else {
-				CG_AddWeaponWithPowerups( &gun[i], &cent->currentState );
-			}
+		if (drawWeapon[i] && gun[i].hModel) {
+			drawWeapon[i] = CG_PositionEntityOnTag( &gun[i], parent, parent->hModel, parentSkeleton, awayTagNames[i]);
 		}
-	}
 
-	// add the barrel for the weapons
-	for (i = 0; i < MAX_HANDS; i++)
-	{
 		if (!drawWeapon[i]) {
 			continue;
 		}
 
-		if (!cg_weapons[weaponGroup->weaponnum[i]].barrelModel)
+		CG_AddWeaponWithPowerups( &gun[i], &cent->currentState );
+
+		// add the barrel for the weapon
+		if (!cg_weapons[weaponGroup->weaponnum[i]].barrelModel) {
 			continue;
+		}
 
 		memset( &barrel, 0, sizeof( barrel ) );
 		VectorCopy( parent->lightingOrigin, barrel.lightingOrigin );
@@ -2685,7 +2673,7 @@ void CG_AddPlayerDefaultWeapon( refEntity_t *parent, centity_t *cent, int team)
 
 		CG_PositionRotatedEntityOnTag( &barrel, &gun[i],
 			cg_weapons[weaponGroup->weaponnum[i]].weaponModel,
-			"tag_barrel" );
+			NULL, "tag_barrel" );
 
 		CG_AddWeaponWithPowerups( &barrel, &cent->currentState );
 	}
@@ -2701,7 +2689,7 @@ The main player will have this called for BOTH cases, so effects like light and
 sound should only be done on the world model case.
 =============
 */
-void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent, int team) {
+void CG_AddPlayerWeapon( refEntity_t *parent, refSkeleton_t *parentSkeleton, playerState_t *ps, centity_t *cent, int team) {
 #ifndef TA_WEAPSYS
 	refEntity_t	gun;
 #endif
@@ -2749,7 +2737,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 #ifdef TA_WEAPSYS
 	// If world model, add default weapon
 	if (ps == NULL) {
-		CG_AddPlayerDefaultWeapon(parent, cent, team);
+		CG_AddPlayerDefaultWeapon(parent, parentSkeleton, cent, team);
 	}
 
 	if (cent->currentState.weapon <= 0 || cent->currentState.weapon >= BG_NumWeaponGroups()) {
@@ -2927,9 +2915,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 			// Use ci->tagInfo to speed up tests
 			if (
 #ifdef TURTLEARENA // PLAYERS
-				(!(ci->tagInfo & newTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, newTagNames[i])) &&
+				(!(ci->tagInfo & newTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, parentSkeleton, newTagNames[i])) &&
 #endif
-				(!(ci->tagInfo & originalTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, originalTagNames[i])))
+				(!(ci->tagInfo & originalTagInfo[i]) || !CG_PositionEntityOnTag(&gun[i], parent, parent->hModel, parentSkeleton, originalTagNames[i])))
 			{
 				// Failed to find tag
 				continue;
@@ -3013,9 +3001,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 		AnglesToAxis( angles, barrel.axis );
 
 #ifdef TA_WEAPSYS
-		CG_PositionRotatedEntityOnTag( &barrel, &gun[i], gun[i].hModel, "tag_barrel" );
+		CG_PositionRotatedEntityOnTag( &barrel, &gun[i], gun[i].hModel, NULL, "tag_barrel" );
 #else
-		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, "tag_barrel" );
+		CG_PositionRotatedEntityOnTag( &barrel, &gun, weapon->weaponModel, NULL, "tag_barrel" );
 #endif
 
 		CG_AddWeaponWithPowerups( &barrel, &cent->currentState );
@@ -3074,9 +3062,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 					}
 
 #ifdef TA_WEAPSYS
-					CG_PositionRotatedEntityOnTag( &flash, &gun[i], gun[i].hModel, "tag_flash");
+					CG_PositionRotatedEntityOnTag( &flash, &gun[i], gun[i].hModel, NULL, "tag_flash");
 #else
-					CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
+					CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, NULL, "tag_flash");
 #endif
 
 #ifdef TA_WEAPSYS
@@ -3151,9 +3139,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, playerState_t *ps, centity_t *cent
 
 
 #ifdef TA_WEAPSYS
-		CG_PositionRotatedEntityOnTag( &flash, &gun[i], gun[i].hModel, "tag_flash");
+		CG_PositionRotatedEntityOnTag( &flash, &gun[i], gun[i].hModel, NULL, "tag_flash");
 #else
-		CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, "tag_flash");
+		CG_PositionRotatedEntityOnTag( &flash, &gun, weapon->weaponModel, NULL, "tag_flash");
 #endif
 		trap_R_AddRefEntityToScene( &flash );
 
@@ -3351,6 +3339,8 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 
+	#warning "ZTM: This doesn't support single model or custom skeleton!"
+
 	// map torso animations to weapon animations
 	if ( cg_gun_frame.integer ) {
 		// development tool
@@ -3387,7 +3377,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 #endif
 
 	// add everything onto the hand
-	CG_AddPlayerWeapon( &hand, ps, &cg.cur_lc->predictedPlayerEntity, ps->persistant[PERS_TEAM] );
+	CG_AddPlayerWeapon( &hand, NULL, ps, &cg.cur_lc->predictedPlayerEntity, ps->persistant[PERS_TEAM] );
 }
 
 #ifndef TA_WEAPSYS_EX

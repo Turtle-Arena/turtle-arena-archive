@@ -187,15 +187,33 @@ tag location
 ======================
 */
 static qboolean G_PositionEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
-	orientation_t parent, qhandle_t parentTags, char *tagName )
+	orientation_t parent, qhandle_t parentModel, refSkeleton_t *parentSkeleton, char *tagName )
 {
 	int				i;
 	orientation_t	lerped;
 	qboolean		returnValue;
 
+#ifdef IOQ3ZTM // BONES
+	if (parentSkeleton && parentSkeleton->type == ST_ABSOLUTE) {
+		int joint = trap_R_JointIndexForName(parentModel, tagName);
+
+		returnValue = (joint >= 0 && joint < parentSkeleton->numJoints);
+
+		if (returnValue) {
+			// Found joint
+			memcpy(&lerped, &parentSkeleton->joints[joint], sizeof (lerped));
+		} else {
+			// Joint not found
+			memset(&lerped, 0, sizeof (lerped));
+		}
+	} else {
+#endif
 	// lerp the tag
-	returnValue = trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
+	returnValue = trap_R_LerpTag( &lerped, parentModel, parentLF->oldFrame, parentLF->frame,
 		1.0 - parentLF->backlerp, tagName );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent.origin, child->origin );
@@ -218,7 +236,7 @@ tag location
 ======================
 */
 static qboolean G_PositionRotatedEntityOnTag( orientation_t *child, lerpFrame_t *parentLF,
-	orientation_t parent, qhandle_t parentTags, char *tagName )
+	orientation_t parent, qhandle_t parentModel, refSkeleton_t *parentSkeleton, char *tagName )
 {
 	int				i;
 	orientation_t	lerped;
@@ -226,9 +244,27 @@ static qboolean G_PositionRotatedEntityOnTag( orientation_t *child, lerpFrame_t 
 	qboolean		returnValue;
 
 //AxisClear( entity->axis );
+#ifdef IOQ3ZTM // BONES
+	if (parentSkeleton && parentSkeleton->type == ST_ABSOLUTE) {
+		int joint = trap_R_JointIndexForName(parentModel, tagName);
+
+		returnValue = (joint >= 0 && joint < parentSkeleton->numJoints);
+
+		if (returnValue) {
+			// Found joint
+			memcpy(&lerped, &parentSkeleton->joints[joint], sizeof (lerped));
+		} else {
+			// Joint not found
+			memset(&lerped, 0, sizeof (lerped));
+		}
+	} else {
+#endif
 	// lerp the tag
-	returnValue = trap_R_LerpTag( &lerped, parentTags, parentLF->oldFrame, parentLF->frame,
+	returnValue = trap_R_LerpTag( &lerped, parentModel, parentLF->oldFrame, parentLF->frame,
 		1.0 - parentLF->backlerp, tagName );
+#ifdef IOQ3ZTM // BONES
+	}
+#endif
 
 	// FIXME: allow origin offsets along tag?
 	VectorCopy( parent.origin, child->origin );
@@ -250,117 +286,34 @@ G_SetupPlayerTagOrientation
 Sets up the orientation to use G_PositionEntityOnTag and G_PositionRotatedEntityOnTag.
 ======================
 */
-qboolean G_SetupPlayerTagOrientation(gentity_t *ent, orientation_t *legsOrientation, orientation_t *torsoOrientation, orientation_t *tagOrientation)
+qboolean G_SetupPlayerTagOrientation(gentity_t *ent, orientation_t *legsOrientation, orientation_t *torsoOrientation)
 {
-#if 0
-	// Debug messages (Should only print once. Server is spammed...)
-	if (!ent->client->pers.legsModel && !ent->client->pers.torsoModel)
-	{
-		G_Printf("DEBUG: G_GetPlayerTagOrientation: Invalid tags for legs and torso model.\n");
-		return qfalse;
-	}
-	if (!ent->client->pers.legsModel)
-	{
-		G_Printf("DEBUG: G_GetPlayerTagOrientation: Invalid tags for legs model.\n");
-		return qfalse;
-	}
-	if (!ent->client->pers.torsoModel)
-	{
-		G_Printf("DEBUG: G_GetPlayerTagOrientation: Invalid tags for torso model.\n");
-		return qfalse;
-	}
-#endif
+	qhandle_t model;
+	refSkeleton_t *skeleton;
 
-	if (tagOrientation != NULL)
-	{
-		// Clear memory
-		memset(tagOrientation, 0, sizeof (*tagOrientation));
-	}
-
-	if (legsOrientation != NULL)
-	{
-		// Clear memory
-		memset(legsOrientation, 0, sizeof (*legsOrientation));
-
-		// Set to player's origin
-		VectorCopy(ent->r.currentOrigin, legsOrientation->origin);
-
-		// Use pre-calculated legsAxis
-		AxisCopy(ent->client->pers.legsAxis, legsOrientation->axis);
-	}
-
-	if (torsoOrientation != NULL)
-	{
-		// Clear memory
-		memset(torsoOrientation, 0, sizeof (*torsoOrientation));
-
-		// Use pre-calculated torsoAxis
-		AxisCopy(ent->client->pers.torsoAxis, torsoOrientation->axis);
-
-		if (legsOrientation != NULL)
-		{
-			// Find torso origin
-			if (!G_PositionRotatedEntityOnTag(torsoOrientation, &ent->client->pers.legs,
-				*legsOrientation, ent->client->pers.legsModel, "tag_torso"))
-			{
-				G_Printf("DEBUG: G_GetPlayerTagOrientation: Failed to find tag_torso\n");
-				return qfalse;
-			}
-		}
-	}
-
-	return qtrue;
-}
-
-/*
-======================
-G_GetPlayerTagOrientation
-
-This function makes it easy to find a tag on the torso or legs
-If onLegs find tag on legs, else torso (maybe later find tags on head?)
-======================
-*/
-qboolean G_GetPlayerTagOrientation(gentity_t *ent, char *tagName, qboolean onLegs, orientation_t *tagOrientation)
-{
-	orientation_t	legsOrientation;
-	orientation_t	torsoOrientation;
-
-	if (!onLegs) // torso
-	{
-		if (!G_SetupPlayerTagOrientation(ent, &legsOrientation, &torsoOrientation, tagOrientation))
-		{
-			return qfalse;
-		}
-	}
-	else
-	{
-		if (!G_SetupPlayerTagOrientation(ent, &legsOrientation, NULL, tagOrientation))
-		{
-			return qfalse;
-		}
-	}
-
-	if (tagOrientation == NULL)
-	{
+	if (!ent->client->pers.playerModel && (!ent->client->pers.legsModel || !ent->client->pers.torsoModel)) {
+		//G_Printf("DEBUG: G_SetupPlayerTagOrientation: Failed to load model.\n");
 		return qfalse;
 	}
 
-	if (!onLegs) // torso
-	{
-		if (!G_PositionEntityOnTag(tagOrientation, &ent->client->pers.torso,
-					torsoOrientation, ent->client->pers.torsoModel, tagName))
-		{
-			return qfalse;
-		}
+	// Set to player's origin
+	VectorCopy(ent->r.currentOrigin, legsOrientation->origin);
+
+	// Use pre-calculated axes
+	AxisCopy(ent->client->pers.legsAxis, legsOrientation->axis);
+	AxisCopy(ent->client->pers.torsoAxis, torsoOrientation->axis);
+
+	model = ent->client->pers.playerModel;
+	skeleton =  &ent->client->pers.playerSkeleton;
+	if (!model) {
+		model = ent->client->pers.legsModel;
+		skeleton = NULL;
 	}
-	else
-	{
-		// Find tag on legs
-		if (!G_PositionEntityOnTag(tagOrientation, &ent->client->pers.legs,
-			legsOrientation, ent->client->pers.legsModel, tagName))
-		{
-			return qfalse;
-		}
+
+	// Find torso origin
+	if (!G_PositionRotatedEntityOnTag(torsoOrientation, &ent->client->pers.legs, *legsOrientation, model, skeleton, "tag_torso")) {
+		//G_Printf("DEBUG: G_SetupPlayerTagOrientation: Failed to find tag_torso\n");
+		return qfalse;
 	}
 
 	return qtrue;
@@ -383,6 +336,9 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 	bg_weaponinfo_t	*weapon;
 	int				i;
 	qboolean		traceHit;
+	qhandle_t		bodyModel;
+	refSkeleton_t	*bodySkeleton;
+	lerpFrame_t		*bodyLerp;
 	orientation_t	weaponOrientation;
 #ifdef TA_GAME_MODELS
 	orientation_t	legsOrientation;
@@ -395,14 +351,24 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 
 #ifdef TA_GAME_MODELS // Use the weapon tag angles and pos!
 	// Setup the orientations
-	if (!G_SetupPlayerTagOrientation(ent, &legsOrientation, &torsoOrientation, &weaponOrientation))
-	{
+	if (!G_SetupPlayerTagOrientation(ent, &legsOrientation, &torsoOrientation)) {
 		return qfalse;
 	}
+
+	memset(&weaponOrientation, 0, sizeof (weaponOrientation));
 #endif
 
 	dflags = 0;
 	weaponGroupNum = ent->client->ps.weapon;
+
+	bodyModel = ent->client->pers.playerModel;
+	bodySkeleton = &ent->client->pers.playerSkeleton;
+	bodyLerp = &ent->client->pers.legs;
+	if (!bodyModel) {
+		bodyModel = ent->client->pers.torsoModel;
+		bodySkeleton = NULL;
+		bodyLerp = &ent->client->pers.torso;
+	}
 
 	// Use hand to select the weapon tag.
 	if (hand == HAND_PRIMARY)
@@ -415,13 +381,13 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 #ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
 #ifdef TURTLEARENA // PLAYERS
-		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
-			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_primary"))
+		if (!G_PositionEntityOnTag(&weaponOrientation, bodyLerp,
+			torsoOrientation, bodyModel, bodySkeleton, "tag_hand_primary"))
 #endif
 		{
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3 // PLAYERS
-			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
-				torsoOrientation, ent->client->pers.torsoModel, "tag_weapon"))
+			if (!G_PositionEntityOnTag(&weaponOrientation, bodyLerp,
+				torsoOrientation, bodyModel, bodySkeleton, "tag_weapon"))
 #endif
 			{
 				// Failed to put weapon on torso!
@@ -445,13 +411,13 @@ qboolean G_MeleeDamageSingle(gentity_t *ent, qboolean checkTeamHit, int hand, we
 #ifdef TA_GAME_MODELS // TA_WEAPSYS
 		// put weapon on torso
 #ifdef TURTLEARENA // PLAYERS
-		if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
-			torsoOrientation, ent->client->pers.torsoModel, "tag_hand_secondary"))
+		if (!G_PositionEntityOnTag(&weaponOrientation, bodyLerp,
+			torsoOrientation, bodyModel, bodySkeleton, "tag_hand_secondary"))
 #endif
 		{
 #if !defined TURTLEARENA || defined TA_SUPPORTQ3 // PLAYERS
-			if (!G_PositionEntityOnTag(&weaponOrientation, &ent->client->pers.torso,
-				torsoOrientation, ent->client->pers.torsoModel, "tag_flag"))
+			if (!G_PositionEntityOnTag(&weaponOrientation, bodyLerp,
+				torsoOrientation, bodyModel, bodySkeleton, "tag_flag"))
 #endif
 			{
 				// Failed to put weapon on torso!
