@@ -1818,7 +1818,7 @@ typedef enum {
 #define	MAX_POLYVERTS	3000
 
 #ifdef IOQ3ZTM // BONES
-#define MAX_CUSTOM_SKELETONS 128
+#define MAX_CUSTOM_SKELETONS (MAX_CLIENTS*MAX_SPLITVIEW)
 #endif
 
 // all of the information needed by the back end must be
