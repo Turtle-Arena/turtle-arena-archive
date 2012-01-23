@@ -2117,9 +2117,9 @@ CG_PlayerFlag
 ===============
 */
 #ifdef IOQ3ZTM // FLAG
-static void CG_PlayerFlag( centity_t *cent, powerup_t flagPower, refEntity_t *torso )
+static void CG_PlayerFlag( centity_t *cent, powerup_t flagPower, refEntity_t *parent, refSkeleton_t *parentSkeleton )
 #else
-static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso )
+static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *parent, refSkeleton_t *parentSkeleton )
 #endif
 {
 	clientInfo_t	*ci;
@@ -2182,13 +2182,13 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #else
 	pole.hModel = cgs.media.flagPoleModel;
 #endif
-	VectorCopy( torso->lightingOrigin, pole.lightingOrigin );
-	pole.shadowPlane = torso->shadowPlane;
-	pole.renderfx = torso->renderfx;
+	VectorCopy( parent->lightingOrigin, pole.lightingOrigin );
+	pole.shadowPlane = parent->shadowPlane;
+	pole.renderfx = parent->renderfx;
 #ifdef TA_WEAPSYS
 	if (ci->tagInfo & TI_TAG_HAND_SECONDARY)
 	{
-		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_hand_secondary" ))
+		if (CG_PositionEntityOnTag( &pole, parent, parent->hModel, parentSkeleton, "tag_hand_secondary" ))
 		{
 #ifdef TA_DATA // FLAG_MODEL
 			trailItem = qfalse;
@@ -2198,7 +2198,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 #ifdef TA_SUPPORTQ3
 	else if (ci->tagInfo & TI_TAG_FLAG)
 	{
-		if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
+		if (CG_PositionEntityOnTag( &pole, parent, parent->hModel, parentSkeleton, "tag_flag" ))
 		{
 #ifdef TA_DATA // FLAG_MODEL
 			trailItem = qfalse;
@@ -2207,14 +2207,14 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	}
 #endif
 #elif defined IOQ3ZTM
-	if (CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" ))
+	if (CG_PositionEntityOnTag( &pole, parent, parent->hModel, parentSkeleton, "tag_flag" ))
 	{
 #ifdef TA_DATA // FLAG_MODEL
 		trailItem = qfalse;
 #endif
 	}
 #else
-	CG_PositionEntityOnTag( &pole, torso, torso->hModel, "tag_flag" );
+	CG_PositionEntityOnTag( &pole, parent, parent->hModel, parentSkeleton, "tag_flag" );
 #endif
 
 #ifdef TA_DATA // FLAG_MODEL
@@ -2257,9 +2257,9 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	flag.hModel = cgs.media.flagFlapModel;
 	flag.customSkin = hSkin;
 #endif
-	VectorCopy( torso->lightingOrigin, flag.lightingOrigin );
-	flag.shadowPlane = torso->shadowPlane;
-	flag.renderfx = torso->renderfx;
+	VectorCopy( parent->lightingOrigin, flag.lightingOrigin );
+	flag.shadowPlane = parent->shadowPlane;
+	flag.renderfx = parent->renderfx;
 
 	VectorClear(angles);
 
@@ -2363,7 +2363,7 @@ static void CG_PlayerFlag( centity_t *cent, qhandle_t hSkin, refEntity_t *torso 
 	flag.backlerp = cent->pe.flag.backlerp;
 
 	AnglesToAxis( angles, flag.axis );
-	CG_PositionRotatedEntityOnTag( &flag, &pole, pole.hModel, "tag_flag" );
+	CG_PositionRotatedEntityOnTag( &flag, &pole, pole.hModel, NULL, "tag_flag" );
 
 	trap_R_AddRefEntityToScene( &flag );
 }
@@ -2442,7 +2442,7 @@ static void CG_PlayerTokens( centity_t *cent, int renderfx ) {
 CG_PlayerPowerups
 ===============
 */
-static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
+static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso, refSkeleton_t *torsoSkeleton ) {
 	int		powerups;
 #ifndef IOQ3ZTM // FLAG
 	clientInfo_t	*ci;
@@ -2471,10 +2471,10 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 	// redflag
 	if ( powerups & ( 1 << PW_REDFLAG ) ) {
 #ifdef IOQ3ZTM // FLAG
-		CG_PlayerFlag( cent, PW_REDFLAG, torso );
+		CG_PlayerFlag( cent, PW_REDFLAG, torso, torsoSkeleton );
 #else
 		if (ci->newAnims) {
-			CG_PlayerFlag( cent, cgs.media.redFlagFlapSkin, torso );
+			CG_PlayerFlag( cent, cgs.media.redFlagFlapSkin, torso, torsoSkeleton );
 		} else {
 			CG_TrailItem( cent, cgs.media.redFlagModel );
 		}
@@ -2485,10 +2485,10 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 	// blueflag
 	if ( powerups & ( 1 << PW_BLUEFLAG ) ) {
 #ifdef IOQ3ZTM // FLAG
-		CG_PlayerFlag( cent, PW_BLUEFLAG, torso );
+		CG_PlayerFlag( cent, PW_BLUEFLAG, torso, torsoSkeleton );
 #else
 		if (ci->newAnims){
-			CG_PlayerFlag( cent, cgs.media.blueFlagFlapSkin, torso );
+			CG_PlayerFlag( cent, cgs.media.blueFlagFlapSkin, torso, torsoSkeleton );
 		} else {
 			CG_TrailItem( cent, cgs.media.blueFlagModel );
 		}
@@ -2499,10 +2499,10 @@ static void CG_PlayerPowerups( centity_t *cent, refEntity_t *torso ) {
 	// neutralflag
 	if ( powerups & ( 1 << PW_NEUTRALFLAG ) ) {
 #ifdef IOQ3ZTM // FLAG
-		CG_PlayerFlag( cent, PW_NEUTRALFLAG, torso );
+		CG_PlayerFlag( cent, PW_NEUTRALFLAG, torso, torsoSkeleton );
 #else
 		if (ci->newAnims) {
-			CG_PlayerFlag( cent, cgs.media.neutralFlagFlapSkin, torso );
+			CG_PlayerFlag( cent, cgs.media.neutralFlagFlapSkin, torso, torsoSkeleton );
 		} else {
 			CG_TrailItem( cent, cgs.media.neutralFlagModel );
 		}
@@ -3086,6 +3086,9 @@ void CG_Player( centity_t *cent ) {
 	refEntity_t		legs;
 	refEntity_t		torso;
 	refEntity_t		head;
+#ifdef IOQ3ZTM // BONES
+	refSkeleton_t	skeleton;
+#endif
 	int				clientNum;
 	int				renderfx;
 	qboolean		shadow;
@@ -3160,6 +3163,9 @@ void CG_Player( centity_t *cent ) {
 	memset( &legs, 0, sizeof(legs) );
 	memset( &torso, 0, sizeof(torso) );
 	memset( &head, 0, sizeof(head) );
+#ifdef IOQ3ZTM // BONES
+	memset( &skeleton, 0, sizeof(skeleton) );
+#endif
 
 	// get the rotation information
 	CG_PlayerAngles( cent, legs.axis, torso.axis, head.axis );
@@ -3167,6 +3173,13 @@ void CG_Player( centity_t *cent ) {
 	// get the animation state (after rotation, to allow feet shuffle)
 	CG_PlayerAnimation( cent, &legs.oldframe, &legs.frame, &legs.backlerp,
 		 &torso.oldframe, &torso.frame, &torso.backlerp );
+
+#ifdef IOQ3ZTM // BONES
+	if (ci->playerModel) {
+		// get skeleton
+		CG_PlayerSkeleton(ci, &legs, &torso, &head, &skeleton);
+	}
+#endif
 
 #ifndef IOQ3ZTM
 	// add the talk baloon or disconnect icon
@@ -3176,11 +3189,15 @@ void CG_Player( centity_t *cent ) {
 	// add the shadow
 #ifdef IOQ3ZTM // SHADOW
 	memcpy(&shadowRef, &torso, sizeof(shadowRef));
-	shadowRef.hModel = ci->torsoModel;
 	VectorCopy(cent->lerpOrigin, legs.origin);
 
 	// Shadow from the torso origin
-	if (CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->legsModel, "tag_torso")) {
+#ifdef IOQ3ZTM // BONES
+	if (ci->playerModel && CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->playerModel, &skeleton, "tag_torso")) {
+		VectorCopy(shadowRef.origin, shadowOrigin);
+	} else
+#endif
+	if (CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->legsModel, NULL, "tag_torso")) {
 		VectorCopy(shadowRef.origin, shadowOrigin);
 	} else {
 		VectorCopy(cent->lerpOrigin, shadowOrigin);
@@ -3205,11 +3222,6 @@ void CG_Player( centity_t *cent ) {
 
 #ifdef IOQ3ZTM // BONES
 	if (ci->playerModel) {
-		refSkeleton_t skeleton;
-
-		// get skeleton
-		CG_PlayerSkeleton(ci, &legs, &torso, &head, &skeleton);
-
 		//
 		// add the player
 		//
@@ -3231,12 +3243,12 @@ void CG_Player( centity_t *cent ) {
 		VectorCopy( cent->lerpOrigin, torso.lightingOrigin );
 		torso.shadowPlane = shadowPlane;
 		torso.renderfx = renderfx;
-		CG_PositionRotatedEntityOnTag( &torso, &legs, ci->playerModel, "tag_torso");
+		CG_PositionRotatedEntityOnTag( &torso, &legs, ci->playerModel, &skeleton, "tag_torso");
 
 		VectorCopy( cent->lerpOrigin, head.lightingOrigin );
 		head.shadowPlane = shadowPlane;
 		head.renderfx = renderfx;
-		CG_PositionRotatedEntityOnTag( &head, &torso, ci->playerModel, "tag_head");
+		CG_PositionRotatedEntityOnTag( &head, &torso, ci->playerModel, &skeleton, "tag_head");
 	} else {
 #endif
 	//
@@ -3277,7 +3289,7 @@ void CG_Player( centity_t *cent ) {
 
 	VectorCopy( cent->lerpOrigin, torso.lightingOrigin );
 
-	CG_PositionRotatedEntityOnTag( &torso, &legs, ci->legsModel, "tag_torso");
+	CG_PositionRotatedEntityOnTag( &torso, &legs, ci->legsModel, NULL, "tag_torso");
 
 	torso.shadowPlane = shadowPlane;
 	torso.renderfx = renderfx;
@@ -3526,7 +3538,7 @@ void CG_Player( centity_t *cent ) {
 
 	VectorCopy( cent->lerpOrigin, head.lightingOrigin );
 
-	CG_PositionRotatedEntityOnTag( &head, &torso, ci->torsoModel, "tag_head");
+	CG_PositionRotatedEntityOnTag( &head, &torso, ci->torsoModel, NULL, "tag_head");
 
 	head.shadowPlane = shadowPlane;
 	head.renderfx = renderfx;
@@ -3550,10 +3562,20 @@ void CG_Player( centity_t *cent ) {
 	//
 	// add the gun / barrel / flash
 	//
-	CG_AddPlayerWeapon( &torso, NULL, cent, ci->team );
+#ifdef IOQ3ZTM // BONES
+	if (ci->playerModel)
+		CG_AddPlayerWeapon( &legs, &skeleton, NULL, cent, ci->team );
+	else
+#endif
+	CG_AddPlayerWeapon( &torso, NULL, NULL, cent, ci->team );
 
 	// add powerups floating behind the player
-	CG_PlayerPowerups( cent, &torso );
+#ifdef IOQ3ZTM // BONES
+	if (ci->playerModel)
+		CG_PlayerPowerups( cent, &legs, &skeleton );
+	else
+#endif
+	CG_PlayerPowerups( cent, &torso, NULL );
 
 #if 0 //#ifdef IOQ3ZTM // ZTM: TODO: Add a speed effect?
 	if ((cent->currentState.powerups & ( 1 << PW_HASTE )
