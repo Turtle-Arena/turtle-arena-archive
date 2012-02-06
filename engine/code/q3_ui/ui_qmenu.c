@@ -694,9 +694,6 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 			}
 #endif
 		case K_LEFTARROW:
-#if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE.
-		case K_MOUSE2:
-#endif
 			if (s->curvalue > s->minvalue)
 			{
 				s->curvalue--;

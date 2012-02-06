@@ -1779,12 +1779,7 @@ qboolean Item_ListBox_HandleKey(itemDef_t *item, int key, qboolean down, qboolea
 		max = Item_ListBox_MaxScroll(item);
 		if (item->window.flags & WINDOW_HORIZONTAL) {
 			viewmax = (item->window.rect.w / listPtr->elementWidth);
-			if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock )
-#if 0 //#ifdef TA_MISC // MENU: Right Mouse button = left arrow // not here
-				|| key == K_MOUSE2
-#endif
-			)
-			{
+			if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock ) ) {
 				if (!listPtr->notselectable) {
 					listPtr->cursorPos--;
 					if (listPtr->cursorPos < 0) {
@@ -2203,12 +2198,7 @@ qboolean Item_TextField_HandleKey(itemDef_t *item, int key) {
 				return qtrue;
 			}
 
-			if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock )
-#if 0 // #ifdef TA_MISC // MENU: Right Mouse button = left arrow // NOT HERE
-				|| key == K_MOUSE2
-#endif
-			)
-			{
+			if ( key == K_LEFTARROW || ( key == K_KP_LEFTARROW && !numLock ) ) {
 				if ( item->cursorPos > 0 ) {
 					item->cursorPos--;
 				}
