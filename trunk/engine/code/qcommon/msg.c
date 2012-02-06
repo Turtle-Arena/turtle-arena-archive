@@ -1251,7 +1251,7 @@ netField_t	playerStateFields[] =
 { PSF(grapplePoint[0]), 0 },
 { PSF(grapplePoint[1]), 0 },
 { PSF(grapplePoint[2]), 0 },
-#if defined TA_PATHSYS || defined NET_COMPAT
+#ifdef TA_PATHSYS
 { PSF(nextPoint[0]), 0 },
 { PSF(nextPoint[1]), 0 },
 { PSF(nextPoint[2]), 0 },
@@ -1267,10 +1267,10 @@ netField_t	playerStateFields[] =
 #ifdef TA_HOLDSYS
 ,{ PSF(holdableIndex), 5 }
 #endif
-#if defined TURTLEARENA || defined NET_COMPAT // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 ,{ PSF(holdableTime), -16 }
 #endif
-#if defined TURTLEARENA || defined NET_COMPAT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 ,{ PSF(enemyEnt), GENTITYNUM_BITS },
 { PSF(enemyOrigin[0]), 0 },
 { PSF(enemyOrigin[1]), 0 },
