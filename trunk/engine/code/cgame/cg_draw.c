@@ -718,27 +718,14 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 		hcolor[1] = 0;
 		hcolor[2] = 1;
 	} else {
-#ifdef TURTLEARENA
-		if (clientNum < 0 || clientNum >= MAX_CLIENTS) {
-			clientNum = 0;
-		}
-
-		// Use client's effect color2
-		VectorCopy(cgs.clientinfo[clientNum].prefcolor2, hcolor);
-#else
 		return;
-#endif
 	}
 	trap_R_SetColor( hcolor );
 #ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	// ZTM: Hacky (Don't have Turtle Arena status fit screen)
-	if (w == SCREEN_WIDTH)
-	{
-		CG_DrawPicFit( x, y, w, h, cgs.media.teamStatusBar );
-	}
-	else
-#endif
+	CG_DrawPicFit( x, y, w, h, cgs.media.teamStatusBar );
+#else
 	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
+#endif
 	trap_R_SetColor( NULL );
 }
 
@@ -1043,9 +1030,6 @@ static void CG_DrawStatusBar( void ) {
 
 	start_x = x = HUD_X;
 	y = HUD_Y;
-
-	// Draw hud background
-	//CG_DrawTeamBackground( HUD_X, HUD_Y, HUD_WIDTH, HUD_HEIGHT, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum );
 
 	// Flag
 	if( cg.cur_lc->predictedPlayerState.powerups[PW_REDFLAG] ) {
@@ -3272,8 +3256,6 @@ static qboolean CG_DrawUseEntity(void)
 #endif
 	x = ( SCREEN_WIDTH - w ) * 0.5f;
 	y = SCREEN_HEIGHT-h-12;
-
-	CG_DrawTeamBackground(x - 6, y - 6, w + 6*2, h + 6*2, 0.33f, cg.cur_ps->persistant[PERS_TEAM], cg.cur_ps->clientNum);
 
 	CG_DrawBigString(x, y, s, 1);
 
