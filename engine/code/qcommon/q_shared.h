@@ -1199,9 +1199,9 @@ typedef struct playerState_s {
 								// used to twist the legs during strafing
 
 	vec3_t		grapplePoint;	// location of grapple to pull towards if PMF_GRAPPLE_PULL
-#if defined TA_PATHSYS || defined NET_COMPAT
+#ifdef TA_PATHSYS
 	// grapplePoint is NiGHTS mode previous point
-	vec3_t		nextPoint;	// NiGHTS mode next point
+	vec3_t		nextPoint;		// NiGHTS mode next point
 #endif
 
 	int			eFlags;			// copied to entityState_t->eFlags
@@ -1221,7 +1221,7 @@ typedef struct playerState_s {
 #ifdef TA_HOLDSYS
 	int			holdableIndex; // Index of holdable items, for shurikens.
 #endif
-#if defined TURTLEARENA || defined NET_COMPAT // HOLD_SHURIKEN
+#ifdef TURTLEARENA // HOLD_SHURIKEN
 	int			holdableTime;  // Like weaponTime, but for shurikens.
 #endif
 
@@ -1248,7 +1248,7 @@ typedef struct playerState_s {
 	int			loopSound;
 	int			jumppad_ent;	// jumppad entity hit this frame
 
-#if defined TURTLEARENA || defined NET_COMPAT // LOCKON
+#ifdef TURTLEARENA // LOCKON
 	// Target for lockon
 	int			enemyEnt;
 	vec3_t		enemyOrigin;
