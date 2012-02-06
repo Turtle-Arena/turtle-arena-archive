@@ -2478,10 +2478,10 @@ int	FS_GetFileList(  const char *path, const char *extension, char *listbuf, int
 		pFiles = FS_ListFilesEx(path, extensions, extNamesSize, &nFiles, qfalse);
 	}
 	// Allow extension to be a list
-	// Example "RoQ;roq;ogv;ogm"
+	// Example "RoQ;roq;jpg;wav"
 	else if (strstr(extension, ";"))
 	{
-		#define MAX_EXTS 8
+		const int MAX_EXTS = 8;
 		char buffer[MAX_QPATH];
 		const char *extensions[MAX_EXTS];
 		int numExts;

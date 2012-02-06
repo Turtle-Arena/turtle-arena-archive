@@ -604,18 +604,10 @@ issues.
 
 #define	MAX_FILE_HANDLES	64
 
-#ifdef TA_MAIN // BRANDING
 #ifdef DEDICATED
 #	define Q3CONFIG_CFG "config_server.cfg"
 #else
 #	define Q3CONFIG_CFG "config.cfg"
-#endif
-#else
-#ifdef DEDICATED
-#	define Q3CONFIG_CFG "q3config_server.cfg"
-#else
-#	define Q3CONFIG_CFG "q3config.cfg"
-#endif
 #endif
 
 qboolean FS_Initialized( void );
@@ -1087,7 +1079,7 @@ void	Sys_Init (void);
 // general development dll loading for virtual machine testing
 #ifndef NO_NATIVE_SUPPORT
 void	* QDECL Sys_LoadGameDll( const char *name, intptr_t (QDECL **entryPoint)(int, ...),
- 				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
+				  intptr_t (QDECL *systemcalls)(intptr_t, ...) );
 void	Sys_UnloadDll( void *dllHandle );
 #endif
 
