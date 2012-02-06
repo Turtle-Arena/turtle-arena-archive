@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2011 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2012 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena and is based upon botfiles by
 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
@@ -22,8 +22,6 @@ along with Turtle Arena; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
-
-// ZTM: "Cleaned up" chat, for till I rewrite it.
 
 // group A sayings
 

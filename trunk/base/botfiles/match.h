@@ -2,20 +2,20 @@
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Turtle Arena.
+This file is part of Quake III Arena source code.
 
-Turtle Arena source code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
 published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Turtle Arena source code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Turtle Arena; if not, write to the Free Software
+along with Quake III Arena source code; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
@@ -65,7 +65,9 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MSG_WHICHTEAM					29		//ask which team a bot is in
 #define MSG_TASKPREFERENCE				30		//tell your teamplay task preference
 #define MSG_ATTACKENEMYBASE				31		//attack the enemy base
+#ifdef MISSIONPACK_HARVESTER
 #define MSG_HARVEST						32		//go harvest
+#endif
 #define MSG_SUICIDE						33		//order to suicide
 //
 #define MSG_ME							100
@@ -84,10 +86,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MSG_CHATTELL					202
 //
 #define MSG_CTF							300		//ctf message
-
-//Double Domination messages
-#define MSG_TAKEA					90
-#define MSG_TAKEB					91
 
 //command sub types
 #define ST_SOMEWHERE					0
@@ -134,4 +132,5 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define TIME							6
 #define NAME							6
 #define MORE							6
+
 
