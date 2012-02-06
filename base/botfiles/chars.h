@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2009-2011 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2012 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena.
 
@@ -115,5 +115,4 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //how much the bot fires it's weapon
 #define CHARACTERISTIC_FIRETHROTTLE					35	//float [0, 1]
 
-// NEW TURTLE ARENA CHARACTERISTICS WILL GO HERE.
 

@@ -78,8 +78,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //========================================================
 #ifdef TURTLEARENA // WEAPONS
 // ZTM: Why can't this be a enum?...
-//    OK it turns out that THIS file is used in pak0.pk3/botfiles/chars.h and the
-//    bot lib supports defines, but not enums?
+//    Okay it turns out that THIS file is used in base/botfiles/chars.h and the
+//    botlib supports defines, but not enums?
 
 //file with chats
 #define CHARACTERISTIC_CHAT_FILE					9	//string
@@ -144,7 +144,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //how much the bot fires it's weapon
 #define CHARACTERISTIC_FIRETHROTTLE					35	//float [0, 1]
 
-// NEW TURTLE ARENA CHARACTERISTICS WILL GO HERE.
 
 #else // !TURTLEARENA =============== !!!!!!END OF RENUMBER!!!!!!! ===========
 

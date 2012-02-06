@@ -107,18 +107,23 @@ typedef struct iteminfo_s
 {
 	char classname[32];					//classname of the item
 	char name[MAX_STRINGFIELD];			//name of the item
+#ifndef TA_DATA // UNUSED
 	char model[MAX_STRINGFIELD];		//model of the item
+#endif
 	int modelindex;						//model index
+#ifndef TA_DATA // UNUSED
 	int type;							//item type
 	int index;							//index in the inventory
+#endif
 	float respawntime;					//respawn time
 	vec3_t mins;						//mins of the item
 	vec3_t maxs;						//maxs of the item
-	int number;							//number of the item info
 #ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 	int defaultWeight;					//inline weight, for if only a constant value is needed.
 	int inventory;						//inline inventory number
 #endif
+
+	int number;							//number of the item info
 } iteminfo_t;
 
 #define ITEMINFO_OFS(x)	(size_t)&(((iteminfo_t *)0)->x)
@@ -126,10 +131,14 @@ typedef struct iteminfo_s
 fielddef_t iteminfo_fields[] =
 {
 {"name", ITEMINFO_OFS(name), FT_STRING},
+#ifndef TA_DATA // UNUSED
 {"model", ITEMINFO_OFS(model), FT_STRING},
+#endif
 {"modelindex", ITEMINFO_OFS(modelindex), FT_INT},
+#ifndef TA_DATA // UNUSED
 {"type", ITEMINFO_OFS(type), FT_INT},
 {"index", ITEMINFO_OFS(index), FT_INT},
+#endif
 {"respawntime", ITEMINFO_OFS(respawntime), FT_FLOAT},
 {"mins", ITEMINFO_OFS(mins), FT_FLOAT|FT_ARRAY, 3},
 {"maxs", ITEMINFO_OFS(maxs), FT_FLOAT|FT_ARRAY, 3},
@@ -674,17 +683,20 @@ void BotInitLevelItems(void)
 
 			Q_strncpyz(ic->iteminfo[i].classname, itemInfos[j].classname, 32);
 			Q_strncpyz(ic->iteminfo[i].name, itemInfos[j].name, MAX_QPATH);
+#ifndef TA_DATA // UNUSED
 			Q_strncpyz(ic->iteminfo[i].model, itemInfos[j].model, MAX_QPATH);
+#endif
 			ic->iteminfo[i].modelindex = itemInfos[j].modelindex;
 			ic->iteminfo[i].respawntime = itemInfos[j].respawntime;
 			ic->iteminfo[i].defaultWeight = itemInfos[j].defaultWeight;
 			ic->iteminfo[i].inventory = itemInfos[j].inventory;
 
-			// Unused
-			//ic->iteminfo[i].type = 0;
-			//ic->iteminfo[i].index = 0;
+#ifndef TA_DATA // UNUNSED
+			ic->iteminfo[i].type = 0;
+			ic->iteminfo[i].index = 0;
+#endif
 
-			// Set default mins/maxs, its currently the same for all of the items in botfiles/items.c
+			// Set mins/maxs
 			VectorSet(ic->iteminfo[i].mins, -13, -13, -13);
 			VectorSet(ic->iteminfo[i].maxs, 13, 13, 13);
 

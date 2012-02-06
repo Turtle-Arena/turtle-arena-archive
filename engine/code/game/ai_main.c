@@ -1074,6 +1074,7 @@ int BotAI(int client, float thinktime) {
 	//get the area the bot is in
 	bs->areanum = BotPointAreaNum(bs->origin);
 #ifdef TA_WEAPSYS_EX
+	//
     BotChooseWeapon(bs);
 #endif
 	//the real AI

@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 2006 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com))
-Copyright (C) 2009-2011 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2012 Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena and is based upon botfiles by
 Dmn_clown (aka: Bob Isaac (rjisaac@gmail.com)) from Open Arena which
@@ -167,7 +167,7 @@ CONTEXT_NORMAL
 
 	[("defense", 1), ("defence", 0)]
 	[("offense", 1), ("offence", 0)]
-} 
+}
 
 CONTEXT_REPLY
 {
@@ -184,7 +184,7 @@ CONTEXT_REPLY
 	[("are", 0), ("am", 0)]
 	[("yourself", 0), ("myself", 0)]
 	[("myself", 0), ("yourself", 0)]
-} 
+}
 
 CONTEXT_NAMES
 {

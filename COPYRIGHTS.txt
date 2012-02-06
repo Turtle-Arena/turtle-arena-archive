@@ -1,7 +1,7 @@
 Turtle Arena data copyrights for base and base-src directories ("the data files"), excludes any files compiled from the engine source code (including but not limited to QVM, DLL, SO, and DYLIB files).
 
 == ZTM ==
-All of the data files, unless otherwise noted, are copyright (c) 2009-2011 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version and licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported.
+All of the data files, unless otherwise noted, are copyright (c) 2009-2012 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version and licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported.
 	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
 
 The data files in the base directory that have source files are included in the base-src directory.
@@ -97,16 +97,13 @@ music/zero-project_-_Whispering_Wind.ogg
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.
 base/scripts/male1.voice is based on file from OpenArena.
 
-The following are based on files from OpenArena and are copyright (c) 2006 Dmn_clown and 2009-2011 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
+The following are based on files from OpenArena and are copyright (c) 2006 Dmn_clown and 2009-2012 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
 base/botfiles/bots/default_c.c
-base/botfiles/bots/default_i.c
 base/botfiles/bots/default_t.c
 base/botfiles/bots/raph_c.c
-base/botfiles/bots/raph_i.c
 base/botfiles/bots/raph_t.c
 base/botfiles/fuzi.c
-base/botfiles/items.c
 base/botfiles/match.c
 base/botfiles/rchat.c
 base/botfiles/rnd.c

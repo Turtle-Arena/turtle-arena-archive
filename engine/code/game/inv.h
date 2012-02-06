@@ -21,49 +21,27 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #ifdef TURTLEARENA
-// inventory
-//
-// none - 0
-// health - 1
-// weapon stuff - 2,3,4
-// persistant power - 5
-// free slots (for stuff like missionpack cubes)
-// holdables - start at 15
-// powerups - start at 30
-// weapons - start at 45
-// ammo - start at 76 (weapons + 31) (31 is MAX_BG_WEAPONS-1)
-// 
-// bot stuff - start at 200
-
 #define INVENTORY_NONE				0
 #define INVENTORY_HEALTH			1
 
 //#ifdef TA_WEAPSYS_EX
-// The most weapons a player can have is 2!
-//  (well they do have 3 when switching pickup for pickup and have a default weapon)
-// Default weapon for the player,
-// If INVENTORY_WAEPON is different, the default can be used by dropping current weapon.
-#define INVENTORY_DEFAULTWEAPON		2
-// Weapon the player is using
-#define INVENTORY_WEAPON			3
-// Ammo for current weapon,
-#define INVENTORY_AMMO 				4
+// If INVENTORY_WAEPON is different than INVENTORY_DEFAULTWEAPON,
+//   the default can be used by dropping current weapon.
+#define INVENTORY_DEFAULTWEAPON		2 // player's default weapon
+#define INVENTORY_WEAPON			3 // weapon player is holding
+#define INVENTORY_AMMO 				4 // ammo for weapon player is holding
 //#endif
 
 // MISSIONPACK
 #define INVENTORY_PERSISTANT_POWER	5
 //#ifdef MISSIONPACK_HARVESTER
-//#define INVENTORY_REDCUBE			0
-//#define INVENTORY_BLUECUBE		0
+//#define INVENTORY_REDCUBE			6
+//#define INVENTORY_BLUECUBE		7
 //#endif
 
 // holdable items
-// Q3 holdables
 #define INVENTORY_MEDKIT			15
-// MISSIONPACK holdables
 #define INVENTORY_PORTAL			16
-
-// TURTLEARENA // HOLDABLE
 #define INVENTORY_SHURIKEN			17
 #define INVENTORY_ELECTRICSHURIKEN	18
 #define INVENTORY_FIRESHURIKEN		19
@@ -75,7 +53,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define INVENTORY_HASTE				32
 #define INVENTORY_INVISIBILITY		33
 #define INVENTORY_FLIGHT			34
-#define INVENTORY_INVUL				35 // TURTLEARENA // POWERS
+#define INVENTORY_INVUL				35
 #define INVENTORY_REDFLAG			36
 #define INVENTORY_BLUEFLAG			37
 #define INVENTORY_NEUTRALFLAG		38
@@ -89,105 +67,14 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 45-49 are free
 
 //TA_WEAPSYS
-#define INVENTORY_WEAPON_START 50 // 31 slots starting here
-#define INVENTORY_AMMO_START 81 // 31 slots starting here
+#define INVENTORY_WEAPON_START		50 // MAX_BG_WEAPONS-1 (31) slots starting here
+#define INVENTORY_AMMO_START		81 // MAX_BG_WEAPONS-1 (31) slots starting here
 
 //enemy stuff
 #define ENEMY_HORIZONTAL_DIST		200
 #define ENEMY_HEIGHT				201
 #define NUM_VISIBLE_ENEMIES			202
 #define NUM_VISIBLE_TEAMMATES		203
-
-// MODELINDEX_*
-//item numbers (make sure they are in sync with bg_itemlist in bg_misc.c)
-#define MODELINDEX_HEALTHSMALL		1
-#define MODELINDEX_HEALTH			2
-#define MODELINDEX_HEALTHLARGE		3
-#define MODELINDEX_HEALTHMEGA		4
-
-#define MODELINDEX_MEDKIT			5
-#define MODELINDEX_SHURIKEN			6
-#define MODELINDEX_ELECTRICSHURIKEN	7
-#define MODELINDEX_FIRESHURIKEN		8
-#define MODELINDEX_LASERSHURIKEN	9
-
-#define MODELINDEX_QUAD				10
-#define MODELINDEX_ENVIRONMENTSUIT	11
-#define MODELINDEX_HASTE			12
-#define MODELINDEX_INVISIBILITY		13
-#define MODELINDEX_FLIGHT			14
-#define MODELINDEX_INVUL			15 // TURTLEARENA // POWERS
-#define MODELINDEX_REDFLAG			16
-#define MODELINDEX_BLUEFLAG			17
-
-// mission pack only defines
-#define MODELINDEX_PORTAL			18
-
-#define MODELINDEX_SCOUT			19
-#define MODELINDEX_GUARD			20
-#define MODELINDEX_DOUBLER			21
-#define MODELINDEX_AMMOREGEN		22
-
-#define MODELINDEX_NEUTRALFLAG		23
-//#ifdef MISSIONPACK_HARVESTER
-//#define MODELINDEX_REDCUBE			0
-//#define MODELINDEX_BLUECUBE			0
-//#endif
-
-#define MODELINDEX_DEFAULTWEAPON	24 // weapon index -1
-
-// NIGHTS_ITEMS
-#define MODELINDEX_STAR				25
-#define MODELINDEX_SPHERE			26
-
-#ifdef TA_WEAPSYS
-
-// In botfiles setup WEAPONINDEX_*s and INVENTORY_*s for weapons?
-
-#else
-
-#define WEAPONINDEX_GAUNTLET			1
-#define WEAPONINDEX_MACHINEGUN			2
-#define WEAPONINDEX_SHOTGUN				3
-#define WEAPONINDEX_GRENADE_LAUNCHER	4
-#define WEAPONINDEX_ROCKET_LAUNCHER		5
-#define WEAPONINDEX_LIGHTNING			6
-#define WEAPONINDEX_RAILGUN				7
-#define WEAPONINDEX_PLASMAGUN			8
-#define WEAPONINDEX_BFG					9
-#define WEAPONINDEX_GRAPPLING_HOOK		10
-#define WEAPONINDEX_NAILGUN				11
-#define WEAPONINDEX_PROXLAUNCHER		12
-#define WEAPONINDEX_CHAINGUN			13
-
-
-#define INVENTORY_GAUNTLET			4
-#define INVENTORY_SHOTGUN			5
-#define INVENTORY_MACHINEGUN		6
-#define INVENTORY_GRENADELAUNCHER	7
-#define INVENTORY_ROCKETLAUNCHER	8
-#define INVENTORY_LIGHTNING			9
-#define INVENTORY_RAILGUN			10
-#define INVENTORY_PLASMAGUN			11
-#define INVENTORY_BFG10K			13
-#define INVENTORY_GRAPPLINGHOOK		14
-#define INVENTORY_NAILGUN			15
-#define INVENTORY_PROXLAUNCHER		16
-#define INVENTORY_CHAINGUN			17
-//ammo
-#define INVENTORY_SHELLS			18
-#define INVENTORY_BULLETS			19
-#define INVENTORY_GRENADES			20
-#define INVENTORY_CELLS				21
-#define INVENTORY_LIGHTNINGAMMO		22
-#define INVENTORY_ROCKETS			23
-#define INVENTORY_SLUGS				24
-#define INVENTORY_BFGAMMO			25
-#define INVENTORY_NAILS				26
-#define INVENTORY_MINES				27
-#define INVENTORY_BELT				28
-
-#endif
 
 #else // NOT TURTLEARENA ===================================================
 
