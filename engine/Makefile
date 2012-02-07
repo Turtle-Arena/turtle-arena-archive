@@ -62,184 +62,96 @@ ifneq ($(PLATFORM),darwin)
   BUILD_CLIENT_SMP = 0
 endif
 
-ifndef BUILD_IOQ3ZTM
-  BUILD_IOQ3ZTM=
-endif
-ifndef BUILD_IOQ3TURTLE
-  BUILD_IOQ3TURTLE=
-endif
 
+###################################################################
+# Default Turtle Arena config
+#  - All of this can be overriden by Makefile.local
+###################################################################
+
+# Some of the defines aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS, etc
+# Please note: TA_*SYS defines are general system changes, not 'totally' specifiy for Turtle Arena
+
+# USE_FREETYPE Currently doesn't work when using pk3 files instead of using unzipped files?
+
+##### ioquake3 defines
+# RAVENMD4				Enable support for loading MDR models.
+# MISSIONPACK			Code for the official Quake III Arena expansion pack, Quake III: Team Arena.
+##### Split from MISSIONPACK define
+# MISSIONPACK_HUD		Use MISSIONPACK UI scripting in cgame for hud and menus.
+# MISSIONPACK_HARVESTER	Enable MISSIONPACK harvester gametype
+
+
+# Turtle Arena "general" defines
+#####
+# IOQ3ZTM				ZTurtleMan's misc changes and fixes to ioquake3 (might be q3 mod compatible)
+# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
 #
-# Start build type
+#   DAMAGE_SKINS; Allows player skins to have shaders to use when damaged.
+#       Adds a new var "skinFraction" to entityState_t and refEntity_t
 #
-ifeq ($(BUILD_IOQ3TURTLE),1)
-QUAKE3=1
+# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
+#####
+# NOTRATEDM				Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
+#							remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
+#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
+#							ZTM: TODO: Rename this define to ...?
+# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
+# TA_BLOOM				Post-process bloom light effect, based on code from OpenArena.
+#####
+# TA_ITEMSYS			Load items from external text files. Required for TA_WEAPSYS.
+# TA_ITEMSYS_USE_INTERNAL Use the internal item data. The data can be overriden by external items.
+# TA_WEAPSYS			This is the core changes to the weapon system
+#							loads the weapons from a text file, allowing for easy modifing,
+#							and new custom default weapons for players.
+# TA_WEAPSYS_EX			Changes from holding multiple weapons to only one default and one pickup.
+# TA_WEAPSYS_EX_COMPAT	Keeps compatibility with mods not using TA_WEAPSYS_EX
+# TA_GAME_MODELS		Allow "game" to use model tags. Player tags are used for melee weapon attacking.
+# TA_HOLDSYS			Allow players to hold multiple holdable items and change to any holdable.
+#							(Based on Q3's weapon changing)
+# TA_PLAYERSYS			Allows player config to be used in "game", allowing for per-player settings.
+# TA_PATHSYS			General path system using entities like path_corner
+# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
+# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
+# TA_ATMEFFECTS			TODO: Atmospheric effects.
+# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
+#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
+# TA_SPLITVIEW			Allow a single game client to connect and play using multiple local clients, commonly called splitscreen.
+#						TODO: Split view system for viewing multiple network clients at once.
+
+
+# Turtle Arena specific defines
+#####
+# TURTLEARENA			Turtle Arena game logic changes
+# TA_MISC				Stuff that I don't want in ioq3ztm, but would use in another standalone mod
+#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
+# TA_SP					Single player / co-op mode code
+# TA_DATA				Changes for Turtle Arena data.
+#####
+# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
+
+BUILD_DEFINES = -DNOTRATEDM -DNOBLOOD \
+					-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
+					-DTA_HOLDSYS -DTA_ITEMSYS \
+					-DTA_WEAPSYS -DTA_PLAYERSYS \
+					-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
+					-DTA_WEAPSYS_EX_COMPAT \
+					-DTA_BLOOM -DTA_SPLITVIEW
+
+BUILD_DEFINES += -DTURTLEARENA -DTA_MISC -DTA_SP \
+					-DTA_WEAPSYS_EX -DTA_DATA \
+					-DNIGHTSMODE
+
+# Use model tags for true melee attacking
+DED_USE_MODELS=1
+BUILD_DEFINES += -DTA_GAME_MODELS
+
+# Turtle Arena's intro video will be ogg theora
+USE_CODEC_THEORA=1
+
+# Turtle Arena currently just keeps renderer internal
+ifneq ($(USE_RENDERER_DLOPEN), 1)
+	USE_RENDERER_DLOPEN=0
 endif
-ifeq ($(BUILD_IOQ3ZTM),1)
-QUAKE3=1
-endif
-ifeq ($(QUAKE3),1)
-
-	# Build broken ioq3ztm4Turtle-Arena
-	ifeq ($(BUILD_IOQ3TURTLE),1)
-		ifneq ($(BUILD_CLIENT),1)
-		  BUILD_CLIENT     =0
-		endif
-		ifneq ($(BUILD_CLIENT_SMP),1)
-		  BUILD_CLIENT_SMP =0
-		endif
-		ifneq ($(BUILD_SERVER),1)
-		  BUILD_SERVER     =0
-		endif
-
-		# Copied from Turtle Arena BUILD_DEFINES
-		ENGINE_CFLAGS = -DNOTRATEDM \
-							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-							-DTA_HOLDSYS -DTA_ITEMSYS \
-							-DTA_WEAPSYS -DTA_PLAYERSYS \
-							-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-							-DTA_WEAPSYS_EX_COMPAT \
-							-DTA_BLOOM -DTA_SPLITVIEW
-
-		QUAKE3_CFLAGS =
-
-		# Use model tags for "true" melee attacking (Gauntlet)
-		#  Can't be used as a quake3 mod, as it uses new VM-to-server calls.
-		DED_USE_MODELS=1
-		ENGINE_CFLAGS += -DTA_GAME_MODELS
-		QUAKE3_CFLAGS += -DTA_GAME_MODELS
-
-		VERSION=1.36turtle
-		BASEGAME=baseq3
-		# Enable most of the MISSIONPACK in 'baseq3'
-		BASEGAME_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) -DMISSIONPACK
-		MISSIONPACK_FLAGS = $(ENGINE_CFLAGS) $(QUAKE3_CFLAGS) \
-					-DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-
-		#
-		# Server/Client-Only
-		#
-		USE_CODEC_THEORA=1
-
-		BUILD_DIR=build-ioq3turtle
-	else
-		ifeq ($(BUILD_IOQ3ZTM),1)
-			# Build modified ioquake3, it only runs using its own sever/client binaries
-			#   and currently doesn't support Q3 mods.
-			BUILD_DEFINES = -DIOQ3ZTM -DNOTRATEDM -DNOBLOOD \
-								-DTA_PLAYERSYS -DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_PATHSYS \
-								-DTA_ITEMSYS -DTA_ITEMSYS_USE_INTERNAL -DTA_WEAPSYS -DTA_BLOOM -DTA_SPLITVIEW
-
-			VERSION=1.36ztm
-			BASEGAME=baseq3
-			BASEGAME_FLAGS =
-			MISSIONPACK_FLAGS = -DMISSIONPACK -DMISSIONPACK_HARVESTER -DMISSIONPACK_HUD
-			COPYDIR="/usr/local/games/quake3"
-
-			#
-			# Server/Client-Only
-			#
-			USE_CODEC_THEORA=1
-
-			SERVERBIN=ioq3ztm-server
-			CLIENTBIN=ioq3ztm
-			BUILD_DIR=build-ioq3ztm
-		endif
-	endif
-
-else # END QUAKE3
-
-	###################################################################
-	# Default Turtle Arena config
-	#  - All of this can be overriden by Makefile.local
-	###################################################################
-
-	# Some of the defines aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS, etc
-	# Please note: TA_*SYS defines are general system changes, not 'totally' specifiy for Turtle Arena
-
-	# USE_FREETYPE Currently doesn't work when using pk3 files instead of using unzipped files?
-
-	##### ioquake3 defines
-	# RAVENMD4				Enable support for loading MDR models.
-	# MISSIONPACK			Code for the official Quake III Arena expansion pack, Quake III: Team Arena.
-	##### "new ioquake3 defines"
-	# MISSIONPACK_HUD		Use MISSIONPACK UI scripting in cgame for hud and menus. (ZTM: Split from MISSIONPACK define)
-	# MISSIONPACK_HARVESTER	Enable MISSIONPACK harvester gametype (ZTM: Split from MISSIONPACK define)
-
-
-	# Turtle Arena "general" defines
-	#####
-	# IOQ3ZTM				ZTurtleMan's misc changes and fixes to ioquake3 (might be q3 mod compatible)
-	# IOQ3ZTM_NO_COMPAT		Changes that are not compatible with quake3 mods
-	#
-	#   DAMAGE_SKINS; Allows player skins to have shaders to use when damaged.
-	#       Adds a new var "skinFraction" to entityState_t and refEntity_t
-	#
-	# IOQ3ZTM_NO_TEAM_MODEL	Removes team_model and team_headmodel cvars. (Could break Quake III: Team Arena and other mods?)
-	#####
-	# NOTRATEDM				Disable stuff in Quake3 engine that made it rated M. (default blood to off, remove gibs,
-	#							remove strong lang) This however doesn't change the gamedata, like the botfiles strong lang,
-	#							bloody textures, netgamers, etc NOTE: This can be defined without defining "NOBLOOD"
-	#							ZTM: TODO: Rename this define to ...?
-	# NOBLOOD				Removes blood. If this is defined, NOTRATEDM must also be defined.
-	# TA_BLOOM				Post-process bloom light effect, based on code from OpenArena.
-	#####
-	# TA_ITEMSYS			Load items from external text files. Required for TA_WEAPSYS.
-	# TA_ITEMSYS_USE_INTERNAL Use the internal item data. The data can be overriden by external items.
-	# TA_WEAPSYS			This is the core changes to the weapon system
-	#							loads the weapons from a text file, allowing for easy modifing,
-	#							and new custom default weapons for players.
-	# TA_WEAPSYS_EX			Changes from holding multiple weapons to only one default and one pickup.
-	# TA_WEAPSYS_EX_COMPAT	Keeps compatibility with mods not using TA_WEAPSYS_EX
-	# TA_GAME_MODELS		Allow "game" to use model tags. Player tags are used for melee weapon attacking.
-	# TA_HOLDSYS			Allow players to hold multiple holdable items and change to any holdable.
-	#							(Based on Q3's weapon changing)
-	# TA_PLAYERSYS			Allows player config to be used in "game", allowing for per-player settings.
-	# TA_PATHSYS			General path system using entities like path_corner
-	# TA_ENTSYS				Adds new entities and allows all ET_MOVER entities to be breakable.
-	# TA_NPCSYS   			WIP NPC system, based on TDC_NPC system and code in Quake3
-	# TA_ATMEFFECTS			TODO: Atmospheric effects.
-	# TA_SUPPORTQ3			Support falling back to Quake3 player tags, shader names, and stuff...
-	#							Currently required as my players use Q3 tag_weapon instead of Turtle Arena tag_hand_primary...
-	# TA_SPLITVIEW			Allow a single game client to connect and play using multiple local clients, commonly called splitscreen.
-	#						TODO: Split view system for viewing multiple network clients at once.
-
-
-	# Turtle Arena specific defines
-	#####
-	# TURTLEARENA			Turtle Arena game logic changes
-	# TA_MISC				Stuff that I don't want in ioq3ztm, but would use in another standalone mod
-	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
-	# TA_SP					Single player / co-op mode code
-	# TA_DATA				Changes for Turtle Arena data.
-	#####
-	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
-
-	BUILD_DEFINES = -DNOTRATEDM -DNOBLOOD \
-						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
-						-DTA_HOLDSYS -DTA_ITEMSYS \
-						-DTA_WEAPSYS -DTA_PLAYERSYS \
-						-DTA_SUPPORTQ3 -DTA_ENTSYS -DTA_NPCSYS -DTA_PATHSYS \
-						-DTA_WEAPSYS_EX_COMPAT \
-						-DTA_BLOOM -DTA_SPLITVIEW
-
-	BUILD_DEFINES += -DTURTLEARENA -DTA_MISC -DTA_SP \
-						-DTA_WEAPSYS_EX -DTA_DATA \
-						-DNIGHTSMODE
-
-	# Use model tags for true melee attacking
-	DED_USE_MODELS=1
-	BUILD_DEFINES += -DTA_GAME_MODELS
-
-	# Turtle Arena's intro video will be ogg theora
-	USE_CODEC_THEORA=1
-
-	# Turtle Arena currently just keeps renderer internal
-	ifneq ($(USE_RENDERER_DLOPEN), 1)
-		USE_RENDERER_DLOPEN=0
-	endif
-
-endif # QUAKE3
 
 #############################################################################
 #
@@ -1160,11 +1072,6 @@ ifneq ($(HAVE_VM_COMPILED),true)
 endif
 
 TARGETS =
-
-ifeq ($(IOQ3TURTLE),1)
-  CLIENT_CFLAGS+=$(ENGINE_CFLAGS)
-  SERVER_CFLAGS+=$(ENGINE_CFLAGS)
-endif
 
 ifeq ($(USE_FREETYPE),1)
   BASE_CFLAGS += -DBUILD_FREETYPE
