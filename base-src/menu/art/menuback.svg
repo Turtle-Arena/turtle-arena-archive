@@ -18,9 +18,8 @@
    version="1.0"
    sodipodi:docname="menuback.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
-   inkscape:export-xdpi="360"
-   inkscape:export-ydpi="360"
-   inkscape:export-filename="/home/zack/turtlearena/svn/trunk/base-src/menu/art/menuback.png">
+   inkscape:export-xdpi="768"
+   inkscape:export-ydpi="768">
   <defs
      id="defs8747">
     <marker
@@ -151,8 +150,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2"
-     inkscape:cx="202.09517"
-     inkscape:cy="123.38101"
+     inkscape:cx="168.59517"
+     inkscape:cy="119.88101"
      inkscape:current-layer="svg8745"
      inkscape:document-units="px"
      showgrid="false"
