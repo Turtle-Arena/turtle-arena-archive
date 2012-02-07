@@ -33,19 +33,13 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #include <winsock.h>
 #endif
 
-#ifdef TA_MAIN
 // List of demo protocols that are supported for playback.
 // Also plays protocol com_protocol
 int demo_protocols[] =
 { PROTOCOL_VERSION, 0 };
-#else
-int demo_protocols[] =
-{ 67, 66, 0 };
-#endif
 
 #define MAX_NUM_ARGVS	50
 
-#ifdef TA_MAIN // ZTM: Turtle Arena uses more memory.
 #define MIN_DEDICATED_COMHUNKMEGS 16
 #ifdef __wii__
 #define MIN_COMHUNKMEGS		16
@@ -55,12 +49,6 @@ int demo_protocols[] =
 #define MIN_COMHUNKMEGS		64
 #define DEF_COMHUNKMEGS		256
 #define DEF_COMZONEMEGS		48
-#endif
-#else
-#define MIN_DEDICATED_COMHUNKMEGS 1
-#define MIN_COMHUNKMEGS		56
-#define DEF_COMHUNKMEGS		64
-#define DEF_COMZONEMEGS		24
 #endif
 #define DEF_COMHUNKMEGS_S	XSTRING(DEF_COMHUNKMEGS)
 #define DEF_COMZONEMEGS_S	XSTRING(DEF_COMZONEMEGS)
