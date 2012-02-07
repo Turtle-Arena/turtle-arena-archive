@@ -4,18 +4,9 @@
 clientLoading
 {
 	nomipmaps
-if vertexlight
 	{
-		// 512x512 image
-		map gfx/clientLoading_low.png
-	}
-endif
-if novertexlight
-	{
-		// 1024x1024 image
 		map gfx/clientLoading.png
 	}
-endif
 
 	// ZTM: HACK: For some reason it needs two stages, otherwise it just shows white...
 	// so I added an invisable stage.
