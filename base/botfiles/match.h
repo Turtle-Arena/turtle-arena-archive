@@ -65,9 +65,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define MSG_WHICHTEAM					29		//ask which team a bot is in
 #define MSG_TASKPREFERENCE				30		//tell your teamplay task preference
 #define MSG_ATTACKENEMYBASE				31		//attack the enemy base
-#ifdef MISSIONPACK_HARVESTER
-#define MSG_HARVEST						32		//go harvest
-#endif
+//#define MSG_HARVEST					32		//go harvest
 #define MSG_SUICIDE						33		//order to suicide
 //
 #define MSG_ME							100
