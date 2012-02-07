@@ -99,9 +99,9 @@ MTCONTEXT_INITIALTEAMCHAT
 	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " attack ", "enemy "|"the enemy "|"the red "|"the blue "|"their ", "base"|"flag"|"obelisk" = (MSG_ATTACKENEMYBASE, ST_ADDRESSED);
 
 	//go harvesting
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " harvest" = (MSG_HARVEST, ST_ADDRESSED);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " go harvesting" = (MSG_HARVEST, ST_ADDRESSED);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " collect ","skulls"|"cubes" = (MSG_HARVEST, ST_ADDRESSED);
+	//EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " harvest" = (MSG_HARVEST, ST_ADDRESSED);
+	//EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " go harvesting" = (MSG_HARVEST, ST_ADDRESSED);
+	//EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " collect ","skulls"|"cubes" = (MSG_HARVEST, ST_ADDRESSED);
 	
 	
 
@@ -137,12 +137,6 @@ MTCONTEXT_INITIALTEAMCHAT
 	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " camp ", "near "|"at ", "the checkpoint "|"the waypoint ", KEYAREA = (MSG_CAMP, $evalint(ST_ADDRESSED|ST_NEARITEM));
 	//go to (same as camp)
 	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " go to ", "the "|"checkpoint "|"waypoint ", KEYAREA = (MSG_CAMP, $evalint(ST_ADDRESSED|ST_NEARITEM));
-
-	//Double Domination orders
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", "take"|"dominate"|"hold", " point A"|" red base" = (MSG_TAKEA, 0);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", "take"|"dominate"|"hold", " point B"|" blue base" = (MSG_TAKEB, 0);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " take"|" dominate"|" hold", " point A"|"red base" = (MSG_TAKEA, ST_ADDRESSED);
-	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " take"|" dominate"|" hold", " point B"|"blue base" = (MSG_TAKEB, ST_ADDRESSED);
 
 	//rush to the base in CTF
 	EC"("|EC"[", NETNAME, EC")"|EC"]", PLACE, EC": ", ADDRESSEE, " rush ", "to "|"to the "|"the ", "base" = (MSG_RUSHBASE, ST_ADDRESSED);
