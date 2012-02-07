@@ -37,7 +37,7 @@ menuback
 	nomipmaps
 	{
 		map menu/art/menuback.png
-		tcMod scroll 0.04 0.02
+		tcMod scroll 0.02 0.01
 	}
 }
 
@@ -47,7 +47,7 @@ menubackRagePro
 	nomipmaps
 	{
 		map menu/art/menuback.png
-		tcMod scroll 0.04 0.02
+		tcMod scroll 0.02 0.01
 	}
 }
 
