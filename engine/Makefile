@@ -93,8 +93,7 @@ ifeq ($(QUAKE3),1)
 		endif
 
 		# Copied from Turtle Arena BUILD_DEFINES
-		ENGINE_CFLAGS = -DRAVENMD4 -DTA_MAIN \
-							-DNOTRATEDM \
+		ENGINE_CFLAGS = -DNOTRATEDM \
 							-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 							-DTA_HOLDSYS -DTA_ITEMSYS \
 							-DTA_WEAPSYS -DTA_PLAYERSYS \
@@ -208,9 +207,7 @@ else # END QUAKE3
 
 	# Turtle Arena specific defines
 	#####
-	# TA_MAIN				Turtle Arena branding, version, file/directory name, and more
-	#							Must be defined for Turtle Arena and Turtle Arena mods
-	# TURTLEARENA			Turtle Arena game logic changes (and things that should be TA_MAIN?)
+	# TURTLEARENA			Turtle Arena game logic changes
 	# TA_MISC				Stuff that I don't want in ioq3ztm, but would use in another standalone mod
 	#							(Like a NiGHTS into Dreams clone or Sonic Robo Blast Arena...)
 	# TA_SP					Single player / co-op mode code
@@ -218,8 +215,7 @@ else # END QUAKE3
 	#####
 	# NIGHTSMODE			Hardly started NiGHTS into Dreams mode.
 
-	BUILD_DEFINES = -DRAVENMD4 -DTA_MAIN \
-						-DNOTRATEDM -DNOBLOOD \
+	BUILD_DEFINES = -DNOTRATEDM -DNOBLOOD \
 						-DIOQ3ZTM -DIOQ3ZTM_NO_COMPAT -DIOQ3ZTM_NO_TEAM_MODEL \
 						-DTA_HOLDSYS -DTA_ITEMSYS \
 						-DTA_WEAPSYS -DTA_PLAYERSYS \

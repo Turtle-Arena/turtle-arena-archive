@@ -254,7 +254,6 @@ PROTOCOL
 ==============================================================
 */
 
-#ifdef TA_MAIN
 #define	PROTOCOL_VERSION	8
 #define PROTOCOL_LEGACY_VERSION	0
 // 8 TA 0.5.3
@@ -265,11 +264,6 @@ PROTOCOL
 // 3 TA 0.3 development (unreleased)
 // 2 TA 0.2
 // 1 Initial release
-#else
-#define	PROTOCOL_VERSION	71
-#define PROTOCOL_LEGACY_VERSION	68
-// 1.31 - 67
-#endif
 
 // maintain a list of compatible protocols for demo playing
 // NOTE: that stuff only works with two digits protocols
@@ -278,11 +272,7 @@ extern int demo_protocols[];
 //#define	UPDATE_SERVER_NAME	"update.quake3arena.com"
 // override on command line, config files etc.
 #ifndef MASTER_SERVER_NAME
-#ifdef TA_MAIN
 #define MASTER_SERVER_NAME	"dpmaster.deathmask.net"
-#else
-#define MASTER_SERVER_NAME	"master.quake3arena.com"
-#endif
 #endif
 
 #define	PORT_MASTER			27950

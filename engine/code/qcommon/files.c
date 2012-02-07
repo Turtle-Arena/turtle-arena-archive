@@ -188,30 +188,9 @@ typedef struct
 // Only requires paks for gamenames which are used (and aren't flagged as optional).
 const purePak_t com_purePaks[] =
 {
-#ifdef TA_MAIN // Turtle Arena uses assets*.pk3
 	{BASEGAME, "assets0", 3676351063u, 0},
 	{BASEGAME, "assets1-qvms", 3914725605u, 0},
 	{BASEGAME, "assets2-music", 3128159308u, PAK_OPTIONAL},
-#else
-	// pak3 and pak7 only contain qvms, which are over-ridden by qvms in pak8
-	{BASEQ3, "pak0", 1566731103u, 0},
-	{BASEQ3, "pak1", 298122907u, 0},
-	{BASEQ3, "pak2", 412165236u, 0},
-	{BASEQ3, "pak3", 2991495316u, PAK_OPTIONAL},
-	{BASEQ3, "pak4", 1197932710u, 0},
-	{BASEQ3, "pak5", 4087071573u, 0},
-	{BASEQ3, "pak6", 3709064859u, 0},
-	{BASEQ3, "pak7", 908855077u, PAK_OPTIONAL},
-	{BASEQ3, "pak8", 977125798u, 0},
-
-	#define	DEMO_PAK0_CHECKSUM	2985612116u
-	{"demoq3", "pak0", DEMO_PAK0_CHECKSUM, 0},
-
-	{BASETA, "pak0", 2430342401u, 0},
-	{BASETA, "pak1", 511014160u, 0},
-	{BASETA, "pak2", 2662638993u, 0},
-	{BASETA, "pak3", 1438664554u, 0},
-#endif
 
 	{NULL, NULL, 0, 0}
 };
