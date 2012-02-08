@@ -55,20 +55,12 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * Fix any issues that are found.
 
 == 0.6 ==
-Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
 
-  * Rename the game to Extraordinary Beat X (EBX).
-  * Replace logo.
-  * DONE: Replace icon and loading screen.
-  * Create new menu background.
   * Replace teams (names and icons), currently Katanas and Sais.
   * Create new CTF flag skins (using new default team icons).
 
   * Make changes to player model system for future models.
   * Make sure IQM support is fully working.
-
-  * Remove the current player models, replace with new player models designed for the game.
-  * Add weapons for new players.
 
   * DONE: Remove remaining OpenArena images and sounds.
   * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
@@ -79,11 +71,32 @@ Focus on finalizing the game's branding (name, logo, etc), making it completely 
 
 Optional goals;
   * Clean up / rewrite shaders (do not have clear licensing for them)?
+
+== EBX 0.8 ==
+Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
+
+  * Rename the game to Extraordinary Beat X (EBX).
+  * Replace logo.
+  * DONE: Replace icon and loading screen.
+  * Create new menu background.
+
+  * Make changes to player model system for future models.
+  * Make sure IQM support is fully working.
+
+  * Remove the current player models, replace with new player models designed for the game.
+  * Add weapons for new players.
+
+  * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution. (Many are already 2x or 4x quake3 resolution.)
+
+  * Finish breakable/pushable objects and brushes code.
+
+Optional goals;
+  * Clean up / rewrite shaders (do not have clear licensing for them)?
   * Remake all (non-texture) images that do not have a svg source file?
   * Switch to missionpack ui?
   * Remake some of the sound effects / add some of the missing sounds effects?
 
-== Complete Multiplayer Game (EBX 0.8) ==
+== Complete Multiplayer Game (EBX 1.0) ==
 Focus on map themes and multiplayer maps. The goal is the develop assets/skills for single player. The overall goal is to hopefully make Turtle Arena a complete (fully working) multiplayer game, comparable to commercial games.
 
   * Create scenery objects and brushes
@@ -106,66 +119,42 @@ Focus on map themes and multiplayer maps. The goal is the develop assets/skills 
 
   * Create 10 new maps, one map for FFA/Duel/TDM and one for CTF/1Flag/Overload using each of the 5 map themes.
 
-== Main Game Focus (EBX 1.0) ==
+== Main Game Focus (EBX 1.2) ==
 Complete the majority of the Main Game (Single Player) / Co-op code and have it playable.
 
   * Add proper co-op end of level screen.
-
   * Add main game end of game stuff.
 
-
-
   * Create NPC system.
-
   * Create NPCs (models, sounds, and scripts that tell game info about NPCs).
-
   * Update radiant config and HTML docs.
 
-
-
   * Remove current co-op maps.
-
   * Remove code for enemy co-op bots?
 
-
-
   * Create 3 new co-op maps (a single stage) using map theme from 0.8 with NPCs.
-
   * Create a second stage?
-
-
 
   * Add co-op bot AI.
 
-
-
   * Finish splitscreen sound support.
 
-== Complete Main Game (EBX 1.2) ==
+== Complete Main Game (EBX 1.4) ==
   * Create remaining main game maps (3 or 4 stages, each with 3 maps)
   * Add main game ending.
 
   * Add hidden items (one for each of the main characters in each main gmae map).
 
-== Multiplayer Expanded (EBX 1.4) ==
+== Multiplayer Expanded (EBX 1.6) ==
 
-  * Add more non-co-op maps (10 more maps?)
-
+  * Add more non-main-game maps (10 more maps?)
   * Improve existing non-co-op maps.
 
-
-
   * Add more non-main-game characters.
-
-
 
   * Expand map themes by adding more map objects, skies, etc?
 
 == Completed (EBX 2.0) ==
   * Translation support.
-
-
   * Polish overall game.
-
-
   * Create complete editing documentation for the game.
