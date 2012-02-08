@@ -16,15 +16,7 @@ ui/assets/out_menuback
 	nomipmaps
 	{
 		map menu/art/menuback.png
-		tcMod scroll 0.04 0.02
-	}
-	{
-		map menu/art/menuback2.png
-		blendFunc blend
-		tcMod scale 0.5 0.5
-		tcMod scroll -0.02 -0.01
-		rgbGen const ( 0.35 0.35 0.35 )
-		alphaGen const 0.95
+		tcMod scroll 0.02 0.01
 	}
 }
 
