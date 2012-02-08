@@ -1394,7 +1394,7 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 #endif // TURTLEARENA
 
 #ifdef TURTLEARENA // DEFAULT_TEAMS
-#define DEFAULT_REDTEAM_NAME		"Foot"
+#define DEFAULT_REDTEAM_NAME		"Clover"
 #define DEFAULT_BLUETEAM_NAME		"Shell"
 #else
 #define DEFAULT_REDTEAM_NAME		"Stroggs"

@@ -76,6 +76,8 @@ base/textures/common/alpha050.png
 base/textures/common/alpha075.png
 base/textures/common/alpha085.png
 base/textures/common/alpha100.png
+base/textures/ctf2/blueteam01.png
+base/textures/ctf2/redteam01.png
 base/textures/fog/fogblack.png
 base/textures/fog/fogwhite.png
 

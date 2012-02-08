@@ -527,12 +527,6 @@ models/flags/pole
 		map $whiteimage
 		rgbGen const ( 0.8 0.8 0.8 )
 	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
 }
 
 models/flags/skull
@@ -558,7 +552,6 @@ models/flags/skull
 
 models/flags/r_flag2
 {
-	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -570,9 +563,6 @@ models/flags/r_flag2
 	{
 		map models/flags/red_fx.png
 		tcGen environment
-		//tcmod scale 9 3
-		//tcmod scroll .1 .7
-
 		blendFunc GL_ONE GL_ONE
 		rgbGen identityLighting
 	}
@@ -581,17 +571,10 @@ models/flags/r_flag2
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identityLighting
 	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
 }
 
 models/flags/b_flag2
 {
-	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -603,8 +586,6 @@ models/flags/b_flag2
 	{
 		map models/flags/blue_fx.png
 		tcGen environment
-		//tcmod scale 9 3
-		//tcmod scroll .1 .7
 		blendFunc GL_ONE GL_ONE
 		rgbGen identityLighting
 	}
@@ -613,19 +594,12 @@ models/flags/b_flag2
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identityLighting
 	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
 }
 
 
 // Below CTF flag shaders from MISSIONPACK demo pak0.pk3/scripts/models2.shader
 models/flags/n_flag2
 {
-	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -645,17 +619,10 @@ models/flags/n_flag2
 		blendFunc blend
 		rgbGen identityLighting
 	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
 }
 
 models/flag2/r_flag2
 {
-	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -667,9 +634,6 @@ models/flag2/r_flag2
 	{
 		map models/flag2/red_fx.png
 		tcGen environment
-		//tcmod scale 9 3
-		//tcmod scroll .1 .7
-
 		blendFunc GL_ONE GL_ONE
 		rgbGen identityLighting
 	}
@@ -678,17 +642,10 @@ models/flag2/r_flag2
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identityLighting
 	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
 }
 
 models/flag2/b_flag2
 {
-	//deformVertexes wave 100 sin 4 3 0 0.3
 	deformVertexes wave 30 sin 0 3 0 .8
 	deformVertexes normal .3 .2
 	cull none
@@ -700,8 +657,6 @@ models/flag2/b_flag2
 	{
 		map models/flag2/blue_fx.png
 		tcGen environment
-		//tcmod scale 9 3
-		//tcmod scroll .1 .7
 		blendFunc GL_ONE GL_ONE
 		rgbGen identityLighting
 	}
@@ -710,47 +665,7 @@ models/flag2/b_flag2
 		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
 		rgbGen identityLighting
 	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
 }
-
-models/flag2/w_flag2
-{
-	//deformVertexes wave 100 sin 4 3 0 0.3
-	deformVertexes wave 30 sin 0 3 0 .8
-	deformVertexes normal .3 .2
-	cull none
-
-	{
-		map models/flag2/w_flag2.png
-		rgbGen identityLighting
-	}
-	{
-		map models/flag2/neutral_fx.png
-		tcGen environment
-		//tcmod scale 9 3
-		//tcmod scroll .1 .7
-
-		blendFunc GL_ONE GL_ONE
-		rgbGen identityLighting
-	}
-	{
-		map models/flag2/w_flag2.png
-		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
-		rgbGen identityLighting
-	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
-	}
-}
-
 
 // overload_base.md3
 models/powerups/ob2_1
