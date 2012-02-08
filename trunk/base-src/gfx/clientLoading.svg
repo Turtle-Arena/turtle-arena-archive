@@ -220,9 +220,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.7"
-     inkscape:cx="644.44918"
-     inkscape:cy="420.8621"
+     inkscape:zoom="0.24748737"
+     inkscape:cx="856.85157"
+     inkscape:cy="398.55517"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -248,12 +248,12 @@
      inkscape:groupmode="layer"
      id="layer1">
     <rect
-       style="fill:#0d0d0d;fill-opacity:1;stroke:#000000;stroke-width:2.50115155999999983;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0"
+       style="fill:#0d0d0d;fill-opacity:1;stroke:none"
        id="rect2993"
-       width="1277.4989"
-       height="957.49884"
-       x="1.2505758"
-       y="1.2505758" />
+       width="1280"
+       height="960"
+       x="0"
+       y="1.0214052e-13" />
     <g
        id="g3229">
       <path
@@ -274,7 +274,7 @@
          transform="matrix(7.7240083,0.67576315,-0.67576315,7.7240083,-38.429406,131.55321)" />
       <path
          sodipodi:type="star"
-         style="fill:#73d216;fill-opacity:1;fill-rule:evenodd;stroke:#2e3436;stroke-width:3.54545449999999995;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
+         style="fill:#73d216;fill-opacity:1;fill-rule:evenodd;stroke:#2e3436;stroke-width:3.5454545;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
          id="tile7-9"
          sodipodi:sides="6"
          sodipodi:cx="72.708336"
@@ -310,7 +310,7 @@
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
          id="tspan3045"
-         x="506.39243"
+         x="373.75644"
          y="741.80701">Loading...</tspan></text>
   </g>
 </svg>
