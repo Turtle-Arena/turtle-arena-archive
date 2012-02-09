@@ -10,14 +10,14 @@
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    version="1.1"
-   width="256"
-   height="256"
+   width="512"
+   height="512"
    id="svg2"
    style="display:inline;enable-background:new"
    inkscape:version="0.48.2 r9819"
    sodipodi:docname="blueteam01.svg">
   <sodipodi:namedview
-     pagecolor="#ffffff"
+     pagecolor="#000000"
      bordercolor="#666666"
      borderopacity="1"
      objecttolerance="10"
@@ -29,9 +29,9 @@
      inkscape:window-height="810"
      id="namedview9"
      showgrid="false"
-     inkscape:zoom="1.84375"
-     inkscape:cx="190.52231"
-     inkscape:cy="117.5937"
+     inkscape:zoom="0.921875"
+     inkscape:cx="274.0206"
+     inkscape:cy="247.70119"
      inkscape:window-x="0"
      inkscape:window-y="26"
      inkscape:window-maximized="1"
@@ -52,27 +52,27 @@
   </metadata>
   <path
      inkscape:connector-curvature="0"
-     style="fill:#204a87;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:7.69499969000000039;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
+     style="fill:#204a87;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:7.69499969;marker-start:none;marker-mid:none"
      id="tile6"
-     d="M 115.57614,176.19448 38.509272,169.4712 5.7983734,99.367684 50.154343,35.987458 l 77.066877,6.723285 32.7109,70.103507 z" />
+     d="M 229.90688,339.12032 75.773137,325.67376 10.351345,185.46672 99.063279,58.70628 253.19704,72.15284 318.61883,212.35986 z" />
   <path
      inkscape:connector-curvature="0"
-     style="fill:#204a87;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5.64300012999999989;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
+     style="fill:#204a87;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:5.64300013;marker-start:none;marker-mid:none"
      id="tile7"
-     d="m 218.91931,233.28118 -56.51571,-4.9304 -23.98799,-51.40925 32.52771,-46.47884 56.51571,4.93041 23.988,51.40925 z" />
+     d="m 436.59321,453.29372 -113.03142,-9.8608 -47.97597,-102.8185 65.05541,-92.95768 113.03142,9.86082 47.976,102.8185 z" />
   <text
      xml:space="preserve"
-     style="font-size:72px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#729fcf;fill-opacity:1;stroke:none;font-family:'M+ 1c';-inkscape-font-specification:'M+ 1c Medium'"
-     x="127.1"
-     y="109.28"
+     style="font-size:144px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#729fcf;fill-opacity:1;stroke:none;font-family:'M+ 1c';-inkscape-font-specification:'M+ 1c Medium'"
+     x="252.95459"
+     y="205.29137"
      id="text2995"
      sodipodi:linespacing="125%"><tspan
        sodipodi:role="line"
        id="tspan2997"
-       x="127.1"
-       y="109.28">Blue</tspan><tspan
+       x="252.95459"
+       y="205.29137">Blue</tspan><tspan
        sodipodi:role="line"
-       x="127.1"
-       y="199.28"
+       x="252.95459"
+       y="385.29135"
        id="tspan2999">Team</tspan></text>
 </svg>
