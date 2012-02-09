@@ -19,7 +19,7 @@
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <sodipodi:namedview
-     pagecolor="#ffffff"
+     pagecolor="#000000"
      bordercolor="#666666"
      borderopacity="1"
      objecttolerance="10"
@@ -32,7 +32,7 @@
      id="namedview3075"
      showgrid="false"
      inkscape:zoom="0.83692715"
-     inkscape:cx="438.16135"
+     inkscape:cx="440.55104"
      inkscape:cy="252.2244"
      inkscape:window-x="0"
      inkscape:window-y="26"
@@ -49,6 +49,8 @@
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
         <dc:title></dc:title>
+        <cc:license
+           rdf:resource="" />
       </cc:Work>
     </rdf:RDF>
   </metadata>

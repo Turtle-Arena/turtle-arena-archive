@@ -19,7 +19,7 @@
   <defs
      id="defs2994" />
   <sodipodi:namedview
-     pagecolor="#ffffff"
+     pagecolor="#000000"
      bordercolor="#666666"
      borderopacity="1"
      objecttolerance="10"
@@ -32,8 +32,8 @@
      id="namedview2992"
      showgrid="false"
      inkscape:zoom="0.65186406"
-     inkscape:cx="266.84629"
-     inkscape:cy="214.30804"
+     inkscape:cx="274.5166"
+     inkscape:cy="231.18272"
      inkscape:window-x="0"
      inkscape:window-y="26"
      inkscape:window-maximized="1"
@@ -50,25 +50,14 @@
       </cc:Work>
     </rdf:RDF>
   </metadata>
-  <rect
-     style="fill:#000000;fill-opacity:1;stroke:none"
-     id="rect3010"
-     width="512"
-     height="512"
-     x="0"
-     y="1.3322676e-14" />
-  <g
-     id="g2999"
-     transform="scale(2,2)">
-    <path
-       d="M 115.57614,176.19448 38.509272,169.4712 5.7983734,99.367684 50.154343,35.987458 l 77.066877,6.723285 32.7109,70.103507 z"
-       id="tile6"
-       style="fill:#a40000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:7.69499969;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
-       inkscape:connector-curvature="0" />
-    <path
-       d="m 218.91931,233.28118 -56.51571,-4.9304 -23.98799,-51.40925 32.52771,-46.47884 56.51571,4.93041 23.988,51.40925 z"
-       id="tile7"
-       style="fill:#a40000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:5.64300013;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
-       inkscape:connector-curvature="0" />
-  </g>
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#a40000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:15.38999938999999983;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
+     id="tile6"
+     d="M 231.15228,352.38896 77.018544,338.9424 11.596747,198.73537 100.30869,71.974916 254.44244,85.421486 319.86424,225.6285 z" />
+  <path
+     inkscape:connector-curvature="0"
+     style="fill:#a40000;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:11.28600025000000073;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:0;stroke-dasharray:none;stroke-dashoffset:0;marker-start:none;marker-mid:none"
+     id="tile7"
+     d="m 437.83862,466.56236 -113.03142,-9.8608 -47.97598,-102.8185 65.05542,-92.95768 113.03142,9.86082 47.976,102.8185 z" />
 </svg>
