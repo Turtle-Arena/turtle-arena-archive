@@ -161,27 +161,80 @@ static void UI_SetSPCharacter(int localClientNum, int character) {
 
 /*
 =================
-UI_SPPlayerMenu_PlayerEvent
+Character_Key
 =================
 */
-static void UI_SPPlayerMenu_PlayerEvent( void *ptr, int notification ) {
-	int		id;
-	int		localClientNum;
-	int		character;
+static sfxHandle_t Character_Key( menubitmap_s *s, int key )
+{
+	sfxHandle_t	sound;
+	int			localClientNum;
+	int			curvalue;
+	int			numitems;
 
+	localClientNum = s->generic.id - ID_CLIENT0;
+	curvalue = playerMenuInfo.selectedCharacter[localClientNum];
+	numitems = NUM_SP_CHARACTERS;
+
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+	if (key == K_MOUSE2 && !(s->generic.flags & QMF_HASMOUSEFOCUS)) {
+		return 0;
+	}
+#endif
+
+	sound = 0;
+	switch (key)
+	{
+		case K_KP_RIGHTARROW:
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
+				break;
+			}
+#endif
+		case K_RIGHTARROW:
+			curvalue++;
+			if (curvalue >= numitems)
+				curvalue = 0;
+			sound = menu_move_sound;
+			break;
+		
+		case K_KP_LEFTARROW:
+#ifdef IOQ3ZTM // CHECK_NUMLOCK
+			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
+				break;
+			}
+#endif
+		case K_LEFTARROW:
+#ifdef TA_MISC // MENU: Right Mouse button = left arrow
+		case K_MOUSE2:
+#endif
+			curvalue--;
+			if (curvalue < 0)
+				curvalue = numitems-1;
+			sound = menu_move_sound;
+			break;
+	}
+
+	if (sound) {
+		UI_CheckCharacterConflicts(localClientNum, playerMenuInfo.selectedCharacter[localClientNum], curvalue);
+
+		UI_SetSPCharacter(localClientNum, curvalue);
+
+		trap_S_StartLocalSound( playerMenuInfo.characterSound[curvalue], CHAN_ANNOUNCER );
+	}
+
+	return (sound);
+}
+
+/*
+=================
+UI_SPPlayerMenu_CharacterEvent
+=================
+*/
+static void UI_SPPlayerMenu_CharacterEvent( void *ptr, int notification ) {
 	if (notification != QM_ACTIVATED)
 		return;
 
-	id = ((menucommon_s*)ptr)->id;
-	localClientNum = id - ID_CLIENT0;
-
-	character = (playerMenuInfo.selectedCharacter[localClientNum] + 1) % NUM_SP_CHARACTERS;
-
-	UI_CheckCharacterConflicts(localClientNum, playerMenuInfo.selectedCharacter[localClientNum], character);
-
-	UI_SetSPCharacter(localClientNum, character);
-
-	trap_S_StartLocalSound( playerMenuInfo.characterSound[character], CHAN_ANNOUNCER );
+	Character_Key((menubitmap_s*)ptr, K_RIGHTARROW);
 }
 
 /*
@@ -266,6 +319,24 @@ UI_SPPlayerMenu_Key
 =================
 */
 static sfxHandle_t UI_SPPlayerMenu_Key( int key ) {
+	sfxHandle_t sound;
+	void *ptr;
+	int id;
+
+	ptr = Menu_ItemAtCursor(&playerMenuInfo.menu);
+
+	if (ptr) {
+		id = ((menucommon_s*)ptr)->id;
+
+		if (id >= ID_CLIENT0 && id < ID_CLIENT0+MAX_SPLITVIEW) {
+			sound = Character_Key((menubitmap_s*)ptr, key);
+	
+			if (sound) {
+				return sound;
+			}
+		}
+	}
+
 	if(
 #ifndef TA_MISC // MENU: Right Mouse button = left arrow
 	key == K_MOUSE2 ||
@@ -363,7 +434,7 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 		playerMenuInfo.clientCharacter[i].generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 		playerMenuInfo.clientCharacter[i].generic.x			= leftOffset+spacing*i;
 		playerMenuInfo.clientCharacter[i].generic.y			= 112;
-		playerMenuInfo.clientCharacter[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
+		playerMenuInfo.clientCharacter[i].generic.callback	= UI_SPPlayerMenu_CharacterEvent;
 		playerMenuInfo.clientCharacter[i].generic.id		= ID_CLIENT0+i;
 		playerMenuInfo.clientCharacter[i].width				= 128;
 		playerMenuInfo.clientCharacter[i].height			= 256;
@@ -379,7 +450,6 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 		playerMenuInfo.clientConflict[i].generic.flags		= QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_HIDDEN;
 		playerMenuInfo.clientConflict[i].generic.x			= leftOffset+spacing*i;
 		playerMenuInfo.clientConflict[i].generic.y			= 112 + 64;
-		playerMenuInfo.clientConflict[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
 		playerMenuInfo.clientConflict[i].generic.id			= ID_CLIENT0+i;
 		playerMenuInfo.clientConflict[i].width				= 128;
 		playerMenuInfo.clientConflict[i].height				= 128;
