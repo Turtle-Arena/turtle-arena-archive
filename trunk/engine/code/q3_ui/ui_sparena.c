@@ -320,10 +320,9 @@ void UI_LoadGameMenu( void ) {
 #define ID_BACK				10
 #define ID_SP_NEWGAME		11
 #define ID_SP_LOADGAME		12
-#define ID_SP_ARCADE		13
-#define ID_SP_DEMOS			14
-#define ID_SP_CINEMATICS	15
-#define ID_SP_MODS			16
+#define ID_SP_DEMOS			13
+#define ID_SP_CINEMATICS	14
+#define ID_SP_MODS			15
 
 typedef struct {
 	menuframework_s	menu;
@@ -332,7 +331,6 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
-	menutext_s		sp_arcade;
 	menutext_s		sp_demos;
 	menutext_s		sp_cinematics;
 	menutext_s		sp_mods;
@@ -390,22 +388,6 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 		case ID_SP_LOADGAME:
 			UI_LoadGameMenu();
 			break;
-
-		case ID_SP_ARCADE:
-			UI_StartServerMenu( qfalse );
-			break;
-
-		case ID_SP_DEMOS:
-			UI_DemosMenu();
-			break;
-
-		case ID_SP_CINEMATICS:
-			UI_CinematicsMenu();
-			break;
-
-		case ID_SP_MODS:
-			UI_ModsMenu();
-			break;
 	}
 }
 
@@ -427,7 +409,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.banner.generic.type		= MTYPE_BTEXT;
 	spMenuInfo.banner.generic.x			= 320;
 	spMenuInfo.banner.generic.y			= 16;
-	spMenuInfo.banner.string			= "PLAY";
+	spMenuInfo.banner.string			= "MAIN GAME";
 	spMenuInfo.banner.color				= text_banner_color;
 	spMenuInfo.banner.style				= UI_CENTER;
 
@@ -447,7 +429,7 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.framer.width  			= 256;
 	spMenuInfo.framer.height  			= 334;
 
-	y = 150;
+	y = (480 - VERTICAL_SPACING*2) / 2;
 	spMenuInfo.sp_newgame.generic.type		= MTYPE_PTEXT;
 	spMenuInfo.sp_newgame.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	spMenuInfo.sp_newgame.generic.x			= 320;
@@ -469,76 +451,6 @@ static void UI_SPMenu_Init( void ) {
 	spMenuInfo.sp_loadgame.color				= text_big_color;
 	spMenuInfo.sp_loadgame.style				= UI_CENTER;
 
-	// Extra space between, "single player" and the others
-	y += VERTICAL_SPACING;
-
-	// Moved here from q3 sp arena select
-	y += VERTICAL_SPACING;
-	spMenuInfo.sp_arcade.generic.type				= MTYPE_PTEXT;
-	spMenuInfo.sp_arcade.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_arcade.generic.x					= 320;
-	spMenuInfo.sp_arcade.generic.y					= y;
-	spMenuInfo.sp_arcade.generic.id					= ID_SP_ARCADE;
-	spMenuInfo.sp_arcade.generic.callback			= UI_SPMenu_Event;
-	spMenuInfo.sp_arcade.string						= "Arcade";
-	spMenuInfo.sp_arcade.color						= text_big_color;
-	spMenuInfo.sp_arcade.style						= UI_CENTER;
-
-	// ZTM: TOOD: Add menu for viewing arcade scores
-
-	// Extra space between, arcade and the others
-	y += VERTICAL_SPACING;
-
-	// Moved here from q3 main menu.
-	y += VERTICAL_SPACING;
-	spMenuInfo.sp_demos.generic.type				= MTYPE_PTEXT;
-	spMenuInfo.sp_demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_demos.generic.x					= 320;
-	spMenuInfo.sp_demos.generic.y					= y;
-	spMenuInfo.sp_demos.generic.id					= ID_SP_DEMOS;
-	spMenuInfo.sp_demos.generic.callback			= UI_SPMenu_Event;
-	spMenuInfo.sp_demos.string						= "Demos";
-	spMenuInfo.sp_demos.color						= text_big_color;
-	spMenuInfo.sp_demos.style						= UI_CENTER;
-
-	y += VERTICAL_SPACING;
-	spMenuInfo.sp_cinematics.generic.type			= MTYPE_PTEXT;
-	spMenuInfo.sp_cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_cinematics.generic.x				= 320;
-	spMenuInfo.sp_cinematics.generic.y				= y;
-	spMenuInfo.sp_cinematics.generic.id				= ID_SP_CINEMATICS;
-	spMenuInfo.sp_cinematics.generic.callback		= UI_SPMenu_Event;
-	spMenuInfo.sp_cinematics.string					= "Cinematics";
-	spMenuInfo.sp_cinematics.color					= text_big_color;
-	spMenuInfo.sp_cinematics.style					= UI_CENTER;
-
-/*
-	if (UI_TeamArenaExists()) {
-		//teamArena = qtrue;
-		y += VERTICAL_SPACING;
-		s_main.teamArena.generic.type			= MTYPE_PTEXT;
-		s_main.teamArena.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-		s_main.teamArena.generic.x				= 320;
-		s_main.teamArena.generic.y				= y;
-		s_main.teamArena.generic.id				= ID_TEAMARENA;
-		s_main.teamArena.generic.callback		= UI_SPMenu_Event;
-		s_main.teamArena.string					= "TEAM ARENA";
-		s_main.teamArena.color					= text_big_color;
-		s_main.teamArena.style					= UI_CENTER;
-	}
-*/
-
-	y += VERTICAL_SPACING;
-	spMenuInfo.sp_mods.generic.type		= MTYPE_PTEXT;
-	spMenuInfo.sp_mods.generic.flags	= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	spMenuInfo.sp_mods.generic.x		= 320;
-	spMenuInfo.sp_mods.generic.y		= y;
-	spMenuInfo.sp_mods.generic.id		= ID_SP_MODS;
-	spMenuInfo.sp_mods.generic.callback	= UI_SPMenu_Event;
-	spMenuInfo.sp_mods.string			= "Mods";
-	spMenuInfo.sp_mods.color			= text_big_color;
-	spMenuInfo.sp_mods.style			= UI_CENTER;
-
 	spMenuInfo.back.generic.type		= MTYPE_BITMAP;
 	spMenuInfo.back.generic.name		= ART_BACK0;
 	spMenuInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -555,10 +467,6 @@ static void UI_SPMenu_Init( void ) {
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.framer );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_newgame );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_loadgame );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_arcade );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_demos );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_cinematics );
-	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.sp_mods );
 	Menu_AddItem( &spMenuInfo.menu, &spMenuInfo.back );
 }
 

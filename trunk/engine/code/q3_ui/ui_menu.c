@@ -33,9 +33,13 @@ MAIN MENU
 
 
 #define ID_SINGLEPLAYER			10
+#ifdef TA_SP
+#define ID_ARCADE				11
+#define ID_MULTIPLAYER			12
+#define ID_SETUP				13
+#else
 #define ID_MULTIPLAYER			11
 #define ID_SETUP				12
-#ifndef TA_SP
 #define ID_DEMOS				13
 #define ID_CINEMATICS			14
 #define ID_TEAMARENA		15
@@ -58,6 +62,9 @@ typedef struct {
 	menubitmap_s	banner_image;
 #endif
 	menutext_s		singleplayer;
+#ifdef TA_SP // ARCADE
+	menutext_s		arcade;
+#endif
 	menutext_s		multiplayer;
 	menutext_s		setup;
 #ifndef TA_SP
@@ -123,6 +130,12 @@ void Main_MenuEvent (void* ptr, int event) {
 		UI_SPLevelMenu();
 #endif
 		break;
+
+#ifdef TA_SP // ARCADE
+	case ID_ARCADE:
+		UI_StartServerMenu(qfalse);
+		break;
+#endif
 
 	case ID_MULTIPLAYER:
 #ifdef TA_MISC
@@ -406,13 +419,26 @@ void UI_MainMenu( void ) {
 	s_main.singleplayer.generic.y			= y;
 	s_main.singleplayer.generic.id			= ID_SINGLEPLAYER;
 	s_main.singleplayer.generic.callback	= Main_MenuEvent; 
-#ifdef TA_SP // Moved to PLAY Menu.
-	s_main.singleplayer.string				= "Play";
+#ifdef TA_SP // Moved to MAIN GAME Menu.
+	s_main.singleplayer.string				= "Main Game";
 #else
 	s_main.singleplayer.string				= "SINGLE PLAYER";
 #endif
 	s_main.singleplayer.color				= text_big_color;
 	s_main.singleplayer.style				= style;
+
+#ifdef TA_SP // ARCADE
+	y += MAIN_MENU_VERTICAL_SPACING;
+	s_main.arcade.generic.type				= MTYPE_PTEXT;
+	s_main.arcade.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_main.arcade.generic.x					= 320;
+	s_main.arcade.generic.y					= y;
+	s_main.arcade.generic.id				= ID_ARCADE;
+	s_main.arcade.generic.callback			= Main_MenuEvent; 
+	s_main.arcade.string					= "Arcade Mode";
+	s_main.arcade.color						= text_big_color;
+	s_main.arcade.style						= style;
+#endif
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.multiplayer.generic.type			= MTYPE_PTEXT;
@@ -512,6 +538,9 @@ void UI_MainMenu( void ) {
 	Menu_AddItem( &s_main.menu,	&s_main.banner_image );
 #endif
 	Menu_AddItem( &s_main.menu,	&s_main.singleplayer );
+#ifdef TA_SP // ARCADE
+	Menu_AddItem( &s_main.menu,	&s_main.arcade );
+#endif
 	Menu_AddItem( &s_main.menu,	&s_main.multiplayer );
 	Menu_AddItem( &s_main.menu,	&s_main.setup );
 #ifndef TA_SP // Moved to PLAY Menu.

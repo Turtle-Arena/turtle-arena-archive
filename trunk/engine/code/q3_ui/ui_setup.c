@@ -50,6 +50,11 @@ SETUP MENU
 #ifdef TURTLEARENA // LONG_CREDITS
 #define ID_CREDITS				18
 #endif
+#ifdef TA_SP
+#define ID_REPLAYS				19
+#define ID_CINEMATICS			20
+#define ID_MODS					21
+#endif
 
 
 typedef struct {
@@ -66,6 +71,11 @@ typedef struct {
 	menutext_s		game;
 #ifdef TURTLEARENA // LONG_CREDITS
 	menutext_s		credits;
+#endif
+#ifdef TA_SP
+	menutext_s		replays;
+	menutext_s		cinematics;
+	menutext_s		mods;
 #endif
 //	menutext_s		load;
 //	menutext_s		save;
@@ -137,6 +147,20 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 		break;
 #endif
 
+#ifdef TA_SP
+	case ID_REPLAYS:
+		UI_DemosMenu();
+		break;
+
+	case ID_CINEMATICS:
+		UI_CinematicsMenu();
+		break;
+
+	case ID_MODS:
+		UI_ModsMenu();
+		break;
+#endif
+
 //	case ID_LOAD:
 //		UI_LoadConfigMenu();
 //		break;
@@ -197,7 +221,11 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.width  					= 256;
 	setupMenuInfo.framer.height  					= 334;
 
+#ifdef TA_SP
+	y = (480 - SETUP_MENU_VERTICAL_SPACING * 8) / 2;
+#else
 	y = 134;
+#endif
 #ifndef TA_MISC
 	setupMenuInfo.setupplayers.generic.type			= MTYPE_PTEXT;
 	setupMenuInfo.setupplayers.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -208,9 +236,9 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.setupplayers.string				= "PLAYERS";
 	setupMenuInfo.setupplayers.color					= text_big_color;
 	setupMenuInfo.setupplayers.style					= UI_CENTER;
-#endif
 
 	y += SETUP_MENU_VERTICAL_SPACING;
+#endif
 	setupMenuInfo.setupcontrols.generic.type		= MTYPE_PTEXT;
 	setupMenuInfo.setupcontrols.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 	setupMenuInfo.setupcontrols.generic.x			= 320;
@@ -254,6 +282,42 @@ static void UI_SetupMenu_Init( void ) {
 #endif
 	setupMenuInfo.game.color						= text_big_color;
 	setupMenuInfo.game.style						= UI_CENTER;
+
+#ifdef TA_SP
+	// Moved here from q3 main menu.
+	y += SETUP_MENU_VERTICAL_SPACING;
+	setupMenuInfo.replays.generic.type				= MTYPE_PTEXT;
+	setupMenuInfo.replays.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	setupMenuInfo.replays.generic.x					= 320;
+	setupMenuInfo.replays.generic.y					= y;
+	setupMenuInfo.replays.generic.id				= ID_REPLAYS;
+	setupMenuInfo.replays.generic.callback			= UI_SetupMenu_Event; 
+	setupMenuInfo.replays.string					= "Replays";
+	setupMenuInfo.replays.color						= text_big_color;
+	setupMenuInfo.replays.style						= UI_CENTER;
+
+	y += SETUP_MENU_VERTICAL_SPACING;
+	setupMenuInfo.cinematics.generic.type			= MTYPE_PTEXT;
+	setupMenuInfo.cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	setupMenuInfo.cinematics.generic.x				= 320;
+	setupMenuInfo.cinematics.generic.y				= y;
+	setupMenuInfo.cinematics.generic.id				= ID_CINEMATICS;
+	setupMenuInfo.cinematics.generic.callback		= UI_SetupMenu_Event; 
+	setupMenuInfo.cinematics.string					= "Cinematics";
+	setupMenuInfo.cinematics.color					= text_big_color;
+	setupMenuInfo.cinematics.style					= UI_CENTER;
+
+	y += SETUP_MENU_VERTICAL_SPACING;
+	setupMenuInfo.mods.generic.type		= MTYPE_PTEXT;
+	setupMenuInfo.mods.generic.flags	= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	setupMenuInfo.mods.generic.x		= 320;
+	setupMenuInfo.mods.generic.y		= y;
+	setupMenuInfo.mods.generic.id		= ID_MODS;
+	setupMenuInfo.mods.generic.callback	= UI_SetupMenu_Event; 
+	setupMenuInfo.mods.string			= "Mods";
+	setupMenuInfo.mods.color			= text_big_color;
+	setupMenuInfo.mods.style			= UI_CENTER;
+#endif
 
 #ifdef TURTLEARENA // LONG_CREDITS
 	y += SETUP_MENU_VERTICAL_SPACING;
@@ -329,6 +393,11 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.game );
+#ifdef TA_SP
+	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.replays );
+	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cinematics );
+	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.mods );
+#endif
 #ifdef TURTLEARENA // LONG_CREDITS
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.credits );
 #endif
