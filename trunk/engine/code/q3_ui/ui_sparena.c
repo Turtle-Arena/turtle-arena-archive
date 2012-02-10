@@ -381,7 +381,7 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 
 			trap_Cvar_Set("g_saveFileName", nowString);
 
-			UI_SPPlayerMenu(UI_GetArenaInfoByNumber(0));
+			UI_SPPlayerMenu(MAX_SPLITVIEW, UI_GetArenaInfoByNumber(0));
 			break;
 		}
 
