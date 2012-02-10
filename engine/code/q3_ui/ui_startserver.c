@@ -1400,17 +1400,17 @@ static void ServerOptions_PlayerNameEvent( void* ptr, int event ) {
 	{
 		int i, j;
 
-		for (i = 0, j = 0; i < NUM_SPPLAYERS; i++)
+		for (i = 0, j = 0; i < NUM_SP_CHARACTERS; i++)
 		{
-			if (Q_stricmp(s_serveroptions.playerNameBuffers[n], spPlayerNames[i]) == 0)
+			if (Q_stricmp(s_serveroptions.playerNameBuffers[n], spCharacterNames[i]) == 0)
 			{
-				j = (i+1)%NUM_SPPLAYERS; // next model
+				j = (i+1)%NUM_SP_CHARACTERS; // next model
 			}
 		}
 
-		trap_Cvar_Set(Com_LocalClientCvarName(n, "spmodel"), spPlayerNames[j]);
-		strcpy(s_serveroptions.playerNameBuffers[n], spPlayerNames[j]);
-		s_serveroptions.playerNameBuffers[n][0] = toupper(spPlayerNames[j][0]);
+		trap_Cvar_Set(Com_LocalClientCvarName(n, "spmodel"), spCharacterNames[j]);
+		strcpy(s_serveroptions.playerNameBuffers[n], spCharacterNames[j]);
+		s_serveroptions.playerNameBuffers[n][0] = toupper(spCharacterNames[j][0]);
 		return;
 	}
 #endif

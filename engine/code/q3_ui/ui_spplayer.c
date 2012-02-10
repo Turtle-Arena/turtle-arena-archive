@@ -33,51 +33,131 @@ SINGLE PLAYER, PLAYER SELECT MENU
 
 #ifdef TA_SP
 
-#define ART_BACK					"menu/art/back_0.tga"
-#define ART_BACK_FOCUS				"menu/art/back_1.tga"
+#define ART_BACK					"menu/art/back_0"
+#define ART_BACK_FOCUS				"menu/art/back_1"
 #ifdef TA_MISC // NO_MENU_FIGHT
-#define ART_FIGHT					"menu/art/play_0"
-#define ART_FIGHT_FOCUS				"menu/art/play_1"
+#define ART_PLAY					"menu/art/play_0"
+#define ART_PLAY_FOCUS				"menu/art/play_1"
 #else
-#define ART_FIGHT					"menu/art/fight_0"
-#define ART_FIGHT_FOCUS				"menu/art/fight_1"
+#define ART_PLAY					"menu/art/fight_0"
+#define ART_PLAY_FOCUS				"menu/art/fight_1"
 #endif
-#define ART_LEO						"menu/art/leo_0"
-#define ART_LEO_FOCUS				"menu/art/leo_1"
-#define ART_DON						"menu/art/don_0"
-#define ART_DON_FOCUS				"menu/art/don_1"
-#define ART_RAPH					"menu/art/raph_0"
-#define ART_RAPH_FOCUS				"menu/art/raph_1"
-#define ART_MIKE					"menu/art/mike_0"
-#define ART_MIKE_FOCUS				"menu/art/mike_1"
+#define ART_LEO						"menu/art/char_leo"
+#define ART_DON						"menu/art/char_don"
+#define ART_RAPH					"menu/art/char_raph"
+#define ART_MIKE					"menu/art/char_mike"
+#define ART_FOCUS					"menu/art/char_focus"
+#define ART_DEFER					"gfx/2d/defer"
 
-#define ID_LEO						10
-#define ID_DON						11
-#define ID_RAPH						12
-#define ID_MIKE						13
-#define ID_BACK						14
-#define ID_FIGHT					15
+#define ID_BACK						10
+#define ID_PLAY						11
+#define ID_CLIENT0					12
+#define ID_CLIENT0_ENABLED			(ID_CLIENT0+MAX_SPLITVIEW)
 
-const char *spPlayerNames[NUM_SPPLAYERS] = { "leo", "don", "raph", "mike" };
+const char *spCharacterNames[NUM_SP_CHARACTERS] = { "leo", "don", "raph", "mike" };
+char *spCharacterShaders[NUM_SP_CHARACTERS] = { ART_LEO, ART_DON, ART_RAPH, ART_MIKE };
+
+// Player#
+char *spPnum[MAX_SPLITVIEW] = { "P1", "P2", "P3", "P4" };
 
 typedef struct {
 	menuframework_s	menu;
 
 	menutext_s		art_banner;
 
-	menubitmap_s	item_players[NUM_SPPLAYERS];
+	menutext_s			item_p1;
+	menuradiobutton_s	clientEnabled[MAX_SPLITVIEW-1];
+	menubitmap_s		clientCharacter[MAX_SPLITVIEW];
+	menubitmap_s		clientConflict[MAX_SPLITVIEW];
 
-	menubitmap_s	item_back;
-	menubitmap_s	item_fight;
+	menubitmap_s	back;
+	menubitmap_s	play;
 
 	const char		*arenaInfo;
 	sfxHandle_t		silenceSound;
-	sfxHandle_t		playerSound[NUM_SPPLAYERS];
-	
-	int				player;
+	sfxHandle_t		characterSound[NUM_SP_CHARACTERS];
+
+	int				selectedCharacter[MAX_SPLITVIEW];
+	int				characterConflict[MAX_SPLITVIEW];
 } playerMenuInfo_t;
 
 static playerMenuInfo_t	playerMenuInfo;
+
+/*
+=================
+UI_CheckCharacterConflicts
+
+Only one client is allowed to use each character, but we have to allow
+selecting the same character so clients can trade characters...
+=================
+*/
+static void UI_CheckCharacterConflicts(int localClientNum, int oldCharacter, int newCharacter) {
+	int i;
+	int oldConflict;
+
+	oldConflict = playerMenuInfo.characterConflict[localClientNum];
+	playerMenuInfo.characterConflict[localClientNum] = 0;
+
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		if (i == localClientNum) {
+			continue;
+		}
+
+		if (playerMenuInfo.clientCharacter[i].generic.flags & QMF_GRAYED) {
+			continue;
+		}
+
+		if (playerMenuInfo.selectedCharacter[i] == newCharacter) {
+			playerMenuInfo.characterConflict[localClientNum]++;
+		}
+
+		if (playerMenuInfo.selectedCharacter[i] == oldCharacter) {
+			// Check if someone else should move up in the que
+			if (playerMenuInfo.characterConflict[i] >= oldConflict) {
+				playerMenuInfo.characterConflict[i]--;
+				if (!playerMenuInfo.characterConflict[i]) {
+					// Remove conflict image
+					playerMenuInfo.clientConflict[i].generic.flags |= QMF_HIDDEN;
+				}
+			}
+		}
+	}
+
+	// Show conflit image when needed.
+	if (playerMenuInfo.characterConflict[localClientNum]) {
+		playerMenuInfo.clientConflict[localClientNum].generic.flags &= ~QMF_HIDDEN;
+	} else {
+		playerMenuInfo.clientConflict[localClientNum].generic.flags |= QMF_HIDDEN;
+	}
+
+	// Don't allow the game to be started while there are character conflicts.
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		if (playerMenuInfo.characterConflict[i]) {
+			playerMenuInfo.play.generic.flags |= QMF_GRAYED;
+			return;
+		}
+	}
+
+	// No character conflicts, allow the user to start the game.
+	playerMenuInfo.play.generic.flags &= ~QMF_GRAYED;
+}
+
+/*
+=================
+UI_SetSPCharacter
+=================
+*/
+static void UI_SetSPCharacter(int localClientNum, int character) {
+	if (playerMenuInfo.selectedCharacter[localClientNum] == character) {
+		return;
+	}
+
+	playerMenuInfo.selectedCharacter[localClientNum] = character;
+
+	// Change shader and force loading it
+	playerMenuInfo.clientCharacter[localClientNum].generic.name = spCharacterShaders[character];
+	playerMenuInfo.clientCharacter[localClientNum].shader = 0;
+}
 
 /*
 =================
@@ -86,39 +166,80 @@ UI_SPPlayerMenu_PlayerEvent
 */
 static void UI_SPPlayerMenu_PlayerEvent( void *ptr, int notification ) {
 	int		id;
-	int		player;
+	int		localClientNum;
+	int		character;
 
 	if (notification != QM_ACTIVATED)
 		return;
 
 	id = ((menucommon_s*)ptr)->id;
-	player = id - ID_LEO;
-	trap_Cvar_Set( "spmodel", spPlayerNames[player] );
-	trap_Cvar_Set( "spheadmodel", spPlayerNames[player] );
+	localClientNum = id - ID_CLIENT0;
 
-	trap_S_StartLocalSound( playerMenuInfo.playerSound[player], CHAN_ANNOUNCER );
+	character = (playerMenuInfo.selectedCharacter[localClientNum] + 1) % NUM_SP_CHARACTERS;
 
-	playerMenuInfo.item_players[player].generic.flags &= ~QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_players[player].generic.flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+	UI_CheckCharacterConflicts(localClientNum, playerMenuInfo.selectedCharacter[localClientNum], character);
 
-	if (playerMenuInfo.player != player)
-	{
-		playerMenuInfo.item_players[playerMenuInfo.player].generic.flags |= QMF_PULSEIFFOCUS;
-		playerMenuInfo.item_players[playerMenuInfo.player].generic.flags &= ~(QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
-	}
+	UI_SetSPCharacter(localClientNum, character);
 
-	playerMenuInfo.player = player;
+	trap_S_StartLocalSound( playerMenuInfo.characterSound[character], CHAN_ANNOUNCER );
 }
-
 
 /*
 =================
-UI_SPPlayerMenu_FightEvent
+UI_SPPlayerMenu_PlayerToggleEvent
 =================
 */
-static void UI_SPPlayerMenu_FightEvent( void *ptr, int notification ) {
+static void UI_SPPlayerMenu_PlayerToggleEvent( void *ptr, int notification ) {
+	int		id;
+	int		localClientNum;
+	int		character;
+
 	if (notification != QM_ACTIVATED)
 		return;
+
+	id = ((menucommon_s*)ptr)->id;
+	localClientNum = id - ID_CLIENT0_ENABLED;
+
+	character = playerMenuInfo.selectedCharacter[localClientNum];
+
+	if (((menuradiobutton_s*)ptr)->curvalue) {
+		playerMenuInfo.clientCharacter[localClientNum].generic.flags &= ~QMF_GRAYED;
+
+		trap_S_StartLocalSound( playerMenuInfo.characterSound[character], CHAN_ANNOUNCER );
+		
+		UI_CheckCharacterConflicts(localClientNum, -1, character);
+	} else {
+		playerMenuInfo.clientCharacter[localClientNum].generic.flags |= QMF_GRAYED;
+		
+		UI_CheckCharacterConflicts(localClientNum, character, -1);
+	}
+}
+
+/*
+=================
+UI_SPPlayerMenu_PlayEvent
+=================
+*/
+static void UI_SPPlayerMenu_PlayEvent( void *ptr, int notification ) {
+	int i, localClients;
+
+	if (notification != QM_ACTIVATED)
+		return;
+
+	// Set bits for enabled local clients.
+	for (i = 1, localClients = 1; i < MAX_SPLITVIEW; ++i) {
+		if (playerMenuInfo.clientEnabled[i-1].curvalue) {
+			localClients |= (1<<i);
+		}
+	}
+
+	trap_Cvar_SetValue( "cl_localClients", localClients );
+
+	// Set characters in cvars.
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		trap_Cvar_Set( Com_LocalClientCvarName(i, "spmodel"), spCharacterNames[playerMenuInfo.selectedCharacter[i]] );
+		trap_Cvar_Set( Com_LocalClientCvarName(i, "spheadmodel"), "" );
+	}
 
 	UI_SPArena_Start( playerMenuInfo.arenaInfo );
 }
@@ -164,22 +285,17 @@ UI_SPPlayerMenu_Cache
 void UI_SPPlayerMenu_Cache( void ) {
 	int i;
 
+	trap_R_RegisterShaderNoMip( ART_FOCUS );
+	trap_R_RegisterShaderNoMip( ART_DEFER );
 	trap_R_RegisterShaderNoMip( ART_BACK );
 	trap_R_RegisterShaderNoMip( ART_BACK_FOCUS );
-	trap_R_RegisterShaderNoMip( ART_FIGHT );
-	trap_R_RegisterShaderNoMip( ART_FIGHT_FOCUS );
-	trap_R_RegisterShaderNoMip( ART_LEO );
-	trap_R_RegisterShaderNoMip( ART_LEO_FOCUS );
-	trap_R_RegisterShaderNoMip( ART_DON );
-	trap_R_RegisterShaderNoMip( ART_DON_FOCUS );
-	trap_R_RegisterShaderNoMip( ART_RAPH );
-	trap_R_RegisterShaderNoMip( ART_RAPH_FOCUS );
-	trap_R_RegisterShaderNoMip( ART_MIKE );
-	trap_R_RegisterShaderNoMip( ART_MIKE_FOCUS );
+	trap_R_RegisterShaderNoMip( ART_PLAY );
+	trap_R_RegisterShaderNoMip( ART_PLAY_FOCUS );
 
-	for (i = 0; i < NUM_SPPLAYERS; i++)
-	{
-		playerMenuInfo.playerSound[i] = trap_S_RegisterSound( va("sound/misc/ui_%s.wav", spPlayerNames[i]), qfalse );
+	for (i = 0; i < NUM_SP_CHARACTERS; i++) {
+		trap_R_RegisterShaderNoMip( spCharacterShaders[i] );
+
+		playerMenuInfo.characterSound[i] = trap_S_RegisterSound( va("sound/misc/ui_%s.wav", spCharacterNames[i]), qfalse );
 	}
 
 	playerMenuInfo.silenceSound = trap_S_RegisterSound( "sound/misc/silence.wav", qfalse );
@@ -191,12 +307,24 @@ void UI_SPPlayerMenu_Cache( void ) {
 UI_SPPlayerMenu_Init
 =================
 */
-static void UI_SPPlayerMenu_Init( void ) {
-	char	playerModel[MAX_QPATH];
+static void UI_SPPlayerMenu_Init( int maxClients ) {
 	int		i;
+	int		spacing;
+	int		leftOffset;
+
+	if (maxClients > MAX_SPLITVIEW) {
+		maxClients = MAX_SPLITVIEW;
+	} else if (maxClients <= 0) {
+		maxClients = 1;
+	}
+
+	// Setup equal spacing for the character select columns
+	spacing = SCREEN_WIDTH / maxClients;
+	leftOffset = (spacing - 128) / 2;
 
 	memset( &playerMenuInfo, 0, sizeof(playerMenuInfo) );
 	playerMenuInfo.menu.fullscreen = qtrue;
+	playerMenuInfo.menu.wrapAround = qtrue;
 	playerMenuInfo.menu.key = UI_SPPlayerMenu_Key;
 
 	UI_SPPlayerMenu_Cache();
@@ -209,106 +337,102 @@ static void UI_SPPlayerMenu_Init( void ) {
 	playerMenuInfo.art_banner.color				= text_banner_color;
 	playerMenuInfo.art_banner.style				= UI_CENTER;
 
-	i = 0;
-	playerMenuInfo.item_players[i].generic.type		= MTYPE_BITMAP;
-	playerMenuInfo.item_players[i].generic.name		= ART_LEO;
-	playerMenuInfo.item_players[i].generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_players[i].generic.x		= 122;
-	playerMenuInfo.item_players[i].generic.y		= 480-194-220;
-	playerMenuInfo.item_players[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
-	playerMenuInfo.item_players[i].generic.id		= ID_LEO;
-	playerMenuInfo.item_players[i].width			= 169;
-	playerMenuInfo.item_players[i].height			= 220;
-	playerMenuInfo.item_players[i].focuspic			= ART_LEO_FOCUS;
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		if (i == 0) {
+			// Main player is always enabled.
+			playerMenuInfo.item_p1.generic.type		= MTYPE_TEXT;
+			playerMenuInfo.item_p1.generic.flags	= QMF_LEFT_JUSTIFY;
+			playerMenuInfo.item_p1.generic.x		= leftOffset+56+spacing*i;
+			playerMenuInfo.item_p1.generic.y		= 112 - 32;
+			playerMenuInfo.item_p1.string			= spPnum[i];
+			playerMenuInfo.item_p1.color			= text_big_color;
+			playerMenuInfo.item_p1.style			= UI_CENTER;
+		} else {
+			playerMenuInfo.clientEnabled[i-1].generic.type		= MTYPE_RADIOBUTTON;
+			playerMenuInfo.clientEnabled[i-1].generic.name		= spPnum[i];
+			playerMenuInfo.clientEnabled[i-1].generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+			playerMenuInfo.clientEnabled[i-1].generic.x			= leftOffset+56+spacing*i;
+			playerMenuInfo.clientEnabled[i-1].generic.y			= 112 - 32;
+			playerMenuInfo.clientEnabled[i-1].generic.callback	= UI_SPPlayerMenu_PlayerToggleEvent;
+			playerMenuInfo.clientEnabled[i-1].generic.id		= ID_CLIENT0_ENABLED+i;
+			playerMenuInfo.clientEnabled[i-1].curvalue			= 0;
+		}
 
-	i++;
-	playerMenuInfo.item_players[i].generic.type		= MTYPE_BITMAP;
-	playerMenuInfo.item_players[i].generic.name		= ART_DON;
-	playerMenuInfo.item_players[i].generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_players[i].generic.x		= 298;
-	playerMenuInfo.item_players[i].generic.y		= 480-240-169;
-	playerMenuInfo.item_players[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
-	playerMenuInfo.item_players[i].generic.id		= ID_DON;
-	playerMenuInfo.item_players[i].width			= 220;
-	playerMenuInfo.item_players[i].height			= 169;
-	playerMenuInfo.item_players[i].focuspic			= ART_DON_FOCUS;
+		playerMenuInfo.clientCharacter[i].generic.type		= MTYPE_BITMAP;
+		//playerMenuInfo.clientCharacter[i].generic.name		= spCharacterShaders[i];
+		playerMenuInfo.clientCharacter[i].generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+		playerMenuInfo.clientCharacter[i].generic.x			= leftOffset+spacing*i;
+		playerMenuInfo.clientCharacter[i].generic.y			= 112;
+		playerMenuInfo.clientCharacter[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
+		playerMenuInfo.clientCharacter[i].generic.id		= ID_CLIENT0+i;
+		playerMenuInfo.clientCharacter[i].width				= 128;
+		playerMenuInfo.clientCharacter[i].height			= 256;
+		playerMenuInfo.clientCharacter[i].focuspic			= ART_FOCUS;
 
-	i++;
-	playerMenuInfo.item_players[i].generic.type		= MTYPE_BITMAP;
-	playerMenuInfo.item_players[i].generic.name		= ART_RAPH;
-	playerMenuInfo.item_players[i].generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_players[i].generic.x		= 122;
-	playerMenuInfo.item_players[i].generic.y		= 480-16-169;
-	playerMenuInfo.item_players[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
-	playerMenuInfo.item_players[i].generic.id		= ID_RAPH;
-	playerMenuInfo.item_players[i].width			= 220;
-	playerMenuInfo.item_players[i].height			= 169;
-	playerMenuInfo.item_players[i].focuspic			= ART_RAPH_FOCUS;
+		if (i > 0) {
+			// Extra players default to disabled.
+			playerMenuInfo.clientCharacter[i].generic.flags |= QMF_GRAYED;
+		}
 
-	i++;
-	playerMenuInfo.item_players[i].generic.type		= MTYPE_BITMAP;
-	playerMenuInfo.item_players[i].generic.name		= ART_MIKE;
-	playerMenuInfo.item_players[i].generic.flags	= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_players[i].generic.x		= 350;
-	playerMenuInfo.item_players[i].generic.y		= 480-16-220;
-	playerMenuInfo.item_players[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
-	playerMenuInfo.item_players[i].generic.id		= ID_MIKE;
-	playerMenuInfo.item_players[i].width			= 169;
-	playerMenuInfo.item_players[i].height			= 220;
-	playerMenuInfo.item_players[i].focuspic			= ART_MIKE_FOCUS;
+		playerMenuInfo.clientConflict[i].generic.type		= MTYPE_BITMAP;
+		playerMenuInfo.clientConflict[i].generic.name		= ART_DEFER;
+		playerMenuInfo.clientConflict[i].generic.flags		= QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_HIDDEN;
+		playerMenuInfo.clientConflict[i].generic.x			= leftOffset+spacing*i;
+		playerMenuInfo.clientConflict[i].generic.y			= 112 + 64;
+		playerMenuInfo.clientConflict[i].generic.callback	= UI_SPPlayerMenu_PlayerEvent;
+		playerMenuInfo.clientConflict[i].generic.id			= ID_CLIENT0+i;
+		playerMenuInfo.clientConflict[i].width				= 128;
+		playerMenuInfo.clientConflict[i].height				= 128;
 
-	playerMenuInfo.item_back.generic.type		= MTYPE_BITMAP;
-	playerMenuInfo.item_back.generic.name		= ART_BACK;
-	playerMenuInfo.item_back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_back.generic.x			= 0;
-	playerMenuInfo.item_back.generic.y			= 480-64;
-	playerMenuInfo.item_back.generic.callback	= UI_SPPlayerMenu_BackEvent;
-	playerMenuInfo.item_back.generic.id			= ID_BACK;
-	playerMenuInfo.item_back.width				= 128;
-	playerMenuInfo.item_back.height				= 64;
-	playerMenuInfo.item_back.focuspic			= ART_BACK_FOCUS;
+		// Set default character
+		playerMenuInfo.selectedCharacter[i] = -1;
+		UI_SetSPCharacter(i, i % NUM_SP_CHARACTERS);
+	}
 
-	playerMenuInfo.item_fight.generic.type		= MTYPE_BITMAP;
-	playerMenuInfo.item_fight.generic.name		= ART_FIGHT;
-	playerMenuInfo.item_fight.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_fight.generic.callback	= UI_SPPlayerMenu_FightEvent;
-	playerMenuInfo.item_fight.generic.id		= ID_FIGHT;
-	playerMenuInfo.item_fight.generic.x			= 640;
-	playerMenuInfo.item_fight.generic.y			= 480-64;
-	playerMenuInfo.item_fight.width				= 128;
-	playerMenuInfo.item_fight.height			= 64;
-	playerMenuInfo.item_fight.focuspic			= ART_FIGHT_FOCUS;
+	playerMenuInfo.back.generic.type		= MTYPE_BITMAP;
+	playerMenuInfo.back.generic.name		= ART_BACK;
+	playerMenuInfo.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+	playerMenuInfo.back.generic.x			= 0;
+	playerMenuInfo.back.generic.y			= 480-64;
+	playerMenuInfo.back.generic.callback	= UI_SPPlayerMenu_BackEvent;
+	playerMenuInfo.back.generic.id			= ID_BACK;
+	playerMenuInfo.back.width				= 128;
+	playerMenuInfo.back.height				= 64;
+	playerMenuInfo.back.focuspic			= ART_BACK_FOCUS;
+
+	playerMenuInfo.play.generic.type		= MTYPE_BITMAP;
+	playerMenuInfo.play.generic.name		= ART_PLAY;
+	playerMenuInfo.play.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
+	playerMenuInfo.play.generic.callback	= UI_SPPlayerMenu_PlayEvent;
+	playerMenuInfo.play.generic.id			= ID_PLAY;
+	playerMenuInfo.play.generic.x			= 640;
+	playerMenuInfo.play.generic.y			= 480-64;
+	playerMenuInfo.play.width				= 128;
+	playerMenuInfo.play.height				= 64;
+	playerMenuInfo.play.focuspic			= ART_PLAY_FOCUS;
 
 	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.art_banner );
 
-	for (i = 0; i < NUM_SPPLAYERS; i++)
-	{
-		Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.item_players[i] );
-	}
-	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.item_back );
-	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.item_fight );
-
-	// Select current player
-	trap_Cvar_VariableStringBuffer( "spmodel", playerModel, sizeof(playerModel) );
-	for (i = 0; i < NUM_SPPLAYERS; i++)
-	{
-		if (Q_stricmp(spPlayerNames[i], playerModel) == 0)
-		{
-			playerMenuInfo.player = i;
-			break;
+	for (i = 0; i < maxClients; ++i) {
+		if (i == 0) {
+			Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.item_p1 );
+		} else {
+			Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.clientEnabled[i-1] );
 		}
+		Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.clientCharacter[i] );
+		Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.clientConflict[i] );
 	}
 
-	playerMenuInfo.item_players[playerMenuInfo.player].generic.flags &= ~QMF_PULSEIFFOCUS;
-	playerMenuInfo.item_players[playerMenuInfo.player].generic.flags |= (QMF_HIGHLIGHT|QMF_HIGHLIGHT_IF_FOCUS);
+	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.back );
+	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.play );
 }
 
 
-void UI_SPPlayerMenu( const char *arenaInfo ) {
-	UI_SPPlayerMenu_Init();
+void UI_SPPlayerMenu( int maxLocalClients, const char *arenaInfo ) {
+	UI_SPPlayerMenu_Init(maxLocalClients);
 	playerMenuInfo.arenaInfo = arenaInfo;
 	UI_PushMenu( &playerMenuInfo.menu );
-	Menu_SetCursorToItem( &playerMenuInfo.menu, &playerMenuInfo.item_fight );
+	Menu_SetCursorToItem( &playerMenuInfo.menu, &playerMenuInfo.clientCharacter[0] );
 }
 
 #endif // TA_SP
