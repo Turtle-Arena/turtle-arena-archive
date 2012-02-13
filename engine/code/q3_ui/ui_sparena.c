@@ -354,6 +354,15 @@ static void UI_SPMenu_BackEvent( void *ptr, int event ) {
 
 /*
 ===============
+UI_SPMenu_StartMainGame
+===============
+*/
+static void UI_SPMenu_StartMainGame(void) {
+	UI_SPArena_Start( UI_GetArenaInfoByNumber(0) );
+}
+
+/*
+===============
 UI_SPMenu_Event
 ===============
 */
@@ -381,7 +390,7 @@ static void UI_SPMenu_Event( void *ptr, int event ) {
 
 			trap_Cvar_Set("g_saveFileName", nowString);
 
-			UI_SPPlayerMenu(MAX_SPLITVIEW, UI_GetArenaInfoByNumber(0));
+			UI_SPPlayerMenu(MAX_SPLITVIEW, UI_SPMenu_StartMainGame);
 			break;
 		}
 
