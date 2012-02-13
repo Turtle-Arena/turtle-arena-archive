@@ -25,40 +25,18 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * DONE: Replace usage of GNU Freefont fonts with M+ Outline Fonts.
 
 === 0.5.4 ===
-  * Make changes to player model system for future models.
-  * Add head model animation support.
-  * Make sure IQM support is fully working.
-  * Create test single model IQM player that uses skeleton blending (for testing and demonstration new player model animation system).
-  * Start making new player models.
+0.5.4 may be kind of a Release Candidate for 0.6.
 
-=== 0.5.5 ===
-  * Remove the TMNT player models.
-  * Add a new player model designed for the game.
-  * Add weapon for new player if needed.
-
-  * Rename the game to Extraordinary Beat X (EBX).
-  * Replace logo.
-  * Create new menu background.
-  * Replace teams (names and icons), currently Katanas and Sais.
-  * Create new CTF flag skins (using new default team icons).
-
-=== 0.5.6 ===
-  * Add new player model(s).
-  * Add weapon(s) for new player(s) if needed.
-  * Finish breakable/pushable objects and brushes code.
-
-=== 0.5.7 ===
-0.5.7 may be kind of a Release Candidate for 0.6.
-
-  * (Finish four main player models)
-  * Improve current maps (but only a little if at all)
-  * Fix any issues that are found.
+  * DONE: Replace teams (names and icons).
+  * DONE: Create new CTF flag skins (using new default team icons).
+  * New character select/setup menus (which also allows choosing local clients for splitscreen).
+  * Complete Arcade mode UI (show scores in main menu, allow entering name at end of game).
+  * Fix compiling BSPC (the bot map AAS compiler).
+  * Polish game for release.
+  * (May create new load save game menu.)
+  * (May finish basic single model IQM player support, need to get joint rotating working.)
 
 == 0.6 ==
-
-  * Replace teams (names and icons), currently Katanas and Sais.
-  * Create new CTF flag skins (using new default team icons).
-
   * Make changes to player model system for future models.
   * Make sure IQM support is fully working.
 
@@ -69,8 +47,38 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
 
   * DONE: Four player splitscreen.
 
-Optional goals;
-  * Clean up / rewrite shaders (do not have clear licensing for them)?
+== 0.7 series ==
+Goals for 0.7.x releases are still a work-in-progress. Will decided more after 0.6 is released.
+
+=== 0.7.0 ===
+  * Make changes to player model system for future models.
+  * Add head model animation support.
+  * Make sure IQM support is fully working.
+  * Create test single model IQM player that uses skeleton blending (for testing and demonstration new player model animation system).
+  * Start making new player models.
+
+=== 0.7.1 ===
+  * Remove the TMNT player models.
+  * Add a new player model designed for the game.
+  * Add weapon for new player if needed.
+
+  * Rename the game to Extraordinary Beat X (EBX).
+  * Replace logo.
+  * Create new menu background.
+  * Replace teams (names and icons), currently Katanas and Sais.
+  * Create new CTF flag skins (using new default team icons).
+
+=== 0.7.2 ===
+  * Add new player model(s).
+  * Add weapon(s) for new player(s) if needed.
+  * Finish breakable/pushable objects and brushes code.
+
+=== 0.7.3 ===
+0.7.3 may be kind of a Release Candidate for 0.8.
+
+  * (Finish four main player models)
+  * Improve current maps (but only a little if at all)
+  * Fix any issues that are found.
 
 == EBX 0.8 ==
 Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
