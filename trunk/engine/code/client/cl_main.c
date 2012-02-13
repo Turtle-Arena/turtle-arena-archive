@@ -3745,13 +3745,13 @@ void CL_Init( void ) {
 #ifdef TURTLEARENA
 	// DEFAULT_PLAYER
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("spmodel", "raph", CVAR_USERINFO | CVAR_ROM );
+	Cvar_Get ("spmodel", "leo", CVAR_USERINFO | CVAR_ROM );
 	Cvar_Get ("spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
 #endif
-	Cvar_Get ("model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("model", "leo", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("team_model", "raph", CVAR_USERINFO | CVAR_ARCHIVE );
+	Cvar_Get ("team_model", "leo", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
 	// DEFAULT_TEAMS
@@ -3787,11 +3787,11 @@ void CL_Init( void ) {
 	// Second local client userinfo
 	Cvar_Get ("2name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("2spmodel", "mike", CVAR_USERINFO2 | CVAR_ROM );
+	Cvar_Get ("2spmodel", "don", CVAR_USERINFO2 | CVAR_ROM );
 	Cvar_Get ("2spheadmodel", "", CVAR_USERINFO2 | CVAR_ROM );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("2model", "mike", CVAR_USERINFO2 | CVAR_ARCHIVE );
+	Cvar_Get ("2model", "don", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #else
 	Cvar_Get ("2model", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #endif
@@ -3820,11 +3820,11 @@ void CL_Init( void ) {
 	// Third local client userinfo
 	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("3spmodel", "leo", CVAR_USERINFO3 | CVAR_ROM );
+	Cvar_Get ("3spmodel", "raph", CVAR_USERINFO3 | CVAR_ROM );
 	Cvar_Get ("3spheadmodel", "", CVAR_USERINFO3 | CVAR_ROM );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("3model", "leo", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3model", "raph", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #else
 	Cvar_Get ("3model", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
@@ -3853,11 +3853,11 @@ void CL_Init( void ) {
 	// Fourth local client userinfo
 	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
-	Cvar_Get ("4spmodel", "don", CVAR_USERINFO4 | CVAR_ROM );
+	Cvar_Get ("4spmodel", "mike", CVAR_USERINFO4 | CVAR_ROM );
 	Cvar_Get ("4spheadmodel", "", CVAR_USERINFO4 | CVAR_ROM );
 #endif
 #ifdef TURTLEARENA
-	Cvar_Get ("4model", "don", CVAR_USERINFO4 | CVAR_ARCHIVE );
+	Cvar_Get ("4model", "mike", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #else
 	Cvar_Get ("4model", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #endif

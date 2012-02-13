@@ -561,6 +561,16 @@ static void UI_SPLevelMenu_AwardEvent( void* ptr, int notification ) {
 }
 #endif
 
+#ifdef TA_SP
+/*
+=================
+UI_SPLevelMenu_StartGame
+=================
+*/
+static void UI_SPLevelMenu_StartGame(void) {
+	UI_SPArena_Start( levelMenuInfo.selectedArenaInfo );
+}
+#endif
 
 /*
 =================
@@ -581,7 +591,7 @@ static void UI_SPLevelMenu_NextEvent( void* ptr, int notification ) {
 	}
 
 #ifdef TA_SP
-	UI_SPPlayerMenu( levelMenuInfo.selectedArenaInfo );
+	UI_SPPlayerMenu( MAX_SPLITVIEW, UI_SPLevelMenu_StartGame );
 #else
 	UI_SPSkillMenu( levelMenuInfo.selectedArenaInfo );
 #endif

@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2010 by Zack "ZTurtleMan" Middleton
+Copyright (C) 2010-2012 by Zack "ZTurtleMan" Middleton
 
 This file is part of Turtle Arena source code.
 
@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 /*
 =============================================================================
 
-SINGLE PLAYER, PLAYER SELECT MENU
+MAIN GAME PLAYER / CHARACTER SELECT MENU
 
 =============================================================================
 */
@@ -35,19 +35,10 @@ SINGLE PLAYER, PLAYER SELECT MENU
 
 #define ART_BACK					"menu/art/back_0"
 #define ART_BACK_FOCUS				"menu/art/back_1"
-#ifdef TA_MISC // NO_MENU_FIGHT
 #define ART_PLAY					"menu/art/play_0"
 #define ART_PLAY_FOCUS				"menu/art/play_1"
-#else
-#define ART_PLAY					"menu/art/fight_0"
-#define ART_PLAY_FOCUS				"menu/art/fight_1"
-#endif
-#define ART_LEO						"menu/art/char_leo"
-#define ART_DON						"menu/art/char_don"
-#define ART_RAPH					"menu/art/char_raph"
-#define ART_MIKE					"menu/art/char_mike"
 #define ART_FOCUS					"menu/art/char_focus"
-#define ART_DEFER					"gfx/2d/defer"
+#define ART_CONFLICT				"gfx/2d/defer"
 
 #define ID_BACK						10
 #define ID_PLAY						11
@@ -55,7 +46,6 @@ SINGLE PLAYER, PLAYER SELECT MENU
 #define ID_CLIENT0_ENABLED			(ID_CLIENT0+MAX_SPLITVIEW)
 
 const char *spCharacterNames[NUM_SP_CHARACTERS] = { "leo", "don", "raph", "mike" };
-char *spCharacterShaders[NUM_SP_CHARACTERS] = { ART_LEO, ART_DON, ART_RAPH, ART_MIKE };
 
 // Player#
 char *spPnum[MAX_SPLITVIEW] = { "P1", "P2", "P3", "P4" };
@@ -73,10 +63,11 @@ typedef struct {
 	menubitmap_s	back;
 	menubitmap_s	play;
 
-	const char		*arenaInfo;
+	void			(*action)(void);
+
 	sfxHandle_t		silenceSound;
 	sfxHandle_t		characterSound[NUM_SP_CHARACTERS];
-
+	char			clientShaders[MAX_SPLITVIEW][MAX_QPATH];
 	int				selectedCharacter[MAX_SPLITVIEW];
 	int				characterConflict[MAX_SPLITVIEW];
 } playerMenuInfo_t;
@@ -155,7 +146,8 @@ static void UI_SetSPCharacter(int localClientNum, int character) {
 	playerMenuInfo.selectedCharacter[localClientNum] = character;
 
 	// Change shader and force loading it
-	playerMenuInfo.clientCharacter[localClientNum].generic.name = spCharacterShaders[character];
+	Com_sprintf(playerMenuInfo.clientShaders[localClientNum], sizeof (playerMenuInfo.clientShaders[localClientNum]),
+				"menu/art/char_%s", spCharacterNames[character]);
 	playerMenuInfo.clientCharacter[localClientNum].shader = 0;
 }
 
@@ -294,7 +286,9 @@ static void UI_SPPlayerMenu_PlayEvent( void *ptr, int notification ) {
 		trap_Cvar_Set( Com_LocalClientCvarName(i, "spheadmodel"), "" );
 	}
 
-	UI_SPArena_Start( playerMenuInfo.arenaInfo );
+	if (playerMenuInfo.action) {
+		playerMenuInfo.action();
+	}
 }
 
 
@@ -304,8 +298,16 @@ UI_SPPlayerMenu_BackEvent
 =================
 */
 static void UI_SPPlayerMenu_BackEvent( void* ptr, int notification ) {
+	int i;
+
 	if (notification != QM_ACTIVATED) {
 		return;
+	}
+
+	// Set characters in cvars.
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		trap_Cvar_Set( Com_LocalClientCvarName(i, "spmodel"), spCharacterNames[playerMenuInfo.selectedCharacter[i]] );
+		trap_Cvar_Set( Com_LocalClientCvarName(i, "spheadmodel"), "" );
 	}
 
 	trap_S_StartLocalSound( playerMenuInfo.silenceSound, CHAN_ANNOUNCER );
@@ -357,15 +359,14 @@ void UI_SPPlayerMenu_Cache( void ) {
 	int i;
 
 	trap_R_RegisterShaderNoMip( ART_FOCUS );
-	trap_R_RegisterShaderNoMip( ART_DEFER );
+	trap_R_RegisterShaderNoMip( ART_CONFLICT );
 	trap_R_RegisterShaderNoMip( ART_BACK );
 	trap_R_RegisterShaderNoMip( ART_BACK_FOCUS );
 	trap_R_RegisterShaderNoMip( ART_PLAY );
 	trap_R_RegisterShaderNoMip( ART_PLAY_FOCUS );
 
 	for (i = 0; i < NUM_SP_CHARACTERS; i++) {
-		trap_R_RegisterShaderNoMip( spCharacterShaders[i] );
-
+		trap_R_RegisterShaderNoMip( va("menu/art/char_%s", spCharacterNames[i]) );
 		playerMenuInfo.characterSound[i] = trap_S_RegisterSound( va("sound/misc/ui_%s.wav", spCharacterNames[i]), qfalse );
 	}
 
@@ -378,19 +379,21 @@ void UI_SPPlayerMenu_Cache( void ) {
 UI_SPPlayerMenu_Init
 =================
 */
-static void UI_SPPlayerMenu_Init( int maxClients ) {
+static void UI_SPPlayerMenu_Init( int maxLocalClients ) {
 	int		i;
+	int		j;
 	int		spacing;
 	int		leftOffset;
+	char	playerModel[MAX_QPATH];
 
-	if (maxClients > MAX_SPLITVIEW) {
-		maxClients = MAX_SPLITVIEW;
-	} else if (maxClients <= 0) {
-		maxClients = 1;
+	if (maxLocalClients > MAX_SPLITVIEW) {
+		maxLocalClients = MAX_SPLITVIEW;
+	} else if (maxLocalClients <= 0) {
+		maxLocalClients = 1;
 	}
 
 	// Setup equal spacing for the character select columns
-	spacing = SCREEN_WIDTH / maxClients;
+	spacing = SCREEN_WIDTH / maxLocalClients;
 	leftOffset = (spacing - 128) / 2;
 
 	memset( &playerMenuInfo, 0, sizeof(playerMenuInfo) );
@@ -404,7 +407,7 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 	playerMenuInfo.art_banner.generic.flags		= QMF_CENTER_JUSTIFY;
 	playerMenuInfo.art_banner.generic.x			= 320;
 	playerMenuInfo.art_banner.generic.y			= 16;
-	playerMenuInfo.art_banner.string			= "PLAYER SELECT";
+	playerMenuInfo.art_banner.string			= "CHARACTER SELECT";
 	playerMenuInfo.art_banner.color				= text_banner_color;
 	playerMenuInfo.art_banner.style				= UI_CENTER;
 
@@ -430,7 +433,7 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 		}
 
 		playerMenuInfo.clientCharacter[i].generic.type		= MTYPE_BITMAP;
-		//playerMenuInfo.clientCharacter[i].generic.name		= spCharacterShaders[i];
+		playerMenuInfo.clientCharacter[i].generic.name		= playerMenuInfo.clientShaders[i];
 		playerMenuInfo.clientCharacter[i].generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
 		playerMenuInfo.clientCharacter[i].generic.x			= leftOffset+spacing*i;
 		playerMenuInfo.clientCharacter[i].generic.y			= 112;
@@ -446,7 +449,7 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 		}
 
 		playerMenuInfo.clientConflict[i].generic.type		= MTYPE_BITMAP;
-		playerMenuInfo.clientConflict[i].generic.name		= ART_DEFER;
+		playerMenuInfo.clientConflict[i].generic.name		= ART_CONFLICT;
 		playerMenuInfo.clientConflict[i].generic.flags		= QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_HIDDEN;
 		playerMenuInfo.clientConflict[i].generic.x			= leftOffset+spacing*i;
 		playerMenuInfo.clientConflict[i].generic.y			= 112 + 64;
@@ -482,8 +485,9 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 	playerMenuInfo.play.focuspic			= ART_PLAY_FOCUS;
 
 	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.art_banner );
+	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.back );
 
-	for (i = 0; i < maxClients; ++i) {
+	for (i = 0; i < maxLocalClients; ++i) {
 		if (i == 0) {
 			Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.item_p1 );
 		} else {
@@ -493,14 +497,25 @@ static void UI_SPPlayerMenu_Init( int maxClients ) {
 		Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.clientConflict[i] );
 	}
 
-	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.back );
 	Menu_AddItem( &playerMenuInfo.menu, ( void * )&playerMenuInfo.play );
+
+	// Select previously selected characters
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		trap_Cvar_VariableStringBuffer(Com_LocalClientCvarName(i, "spmodel"), playerModel, sizeof(playerModel));
+
+		for (j = 0; j < NUM_SP_CHARACTERS; ++j) {
+			if (Q_stricmp(spCharacterNames[j], playerModel) == 0) {
+				UI_SetSPCharacter(i, j);
+				break;
+			}
+		}
+	}
 }
 
 
-void UI_SPPlayerMenu( int maxLocalClients, const char *arenaInfo ) {
+void UI_SPPlayerMenu( int maxLocalClients, void (*action)(void) ) {
 	UI_SPPlayerMenu_Init(maxLocalClients);
-	playerMenuInfo.arenaInfo = arenaInfo;
+	playerMenuInfo.action = action;
 	UI_PushMenu( &playerMenuInfo.menu );
 	Menu_SetCursorToItem( &playerMenuInfo.menu, &playerMenuInfo.clientCharacter[0] );
 }

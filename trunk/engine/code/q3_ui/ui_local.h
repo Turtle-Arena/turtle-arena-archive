@@ -742,7 +742,7 @@ void UI_SPPostgameMenu_f( void );
 //
 #define NUM_SP_CHARACTERS 4
 extern const char *spCharacterNames[NUM_SP_CHARACTERS];
-void UI_SPPlayerMenu( int maxLocalClients, const char *arenaInfo );
+void UI_SPPlayerMenu( int maxLocalClients, void (*action)(void) );
 void UI_SPPlayerMenu_Cache( void );
 #else
 //
