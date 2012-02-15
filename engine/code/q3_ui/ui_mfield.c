@@ -365,6 +365,12 @@ void MenuField_Init( menufield_s* m ) {
 	}
 #endif
 
+#ifdef IOQ3ZTM
+	if (m->generic.flags & QMF_LEFT_JUSTIFY) {
+		m->generic.left = m->generic.x;
+		m->generic.x += l;
+	} else
+#endif
 	m->generic.left   = m->generic.x - l;
 	m->generic.top    = m->generic.y;
 	m->generic.right  = m->generic.x + w + m->field.widthInChars*w;

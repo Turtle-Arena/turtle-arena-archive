@@ -57,33 +57,6 @@ SINGLE PLAYER POSTGAME MENU
 #endif
 #define ID_MENU			12
 
-#ifdef TA_SP
-// Arcade map gamedata
-#define ARCADE_GAMEDATA_MAGIC "EBXARCADE"
-#define ARCADE_GAMEDATA_VERSION 0
-#define NUM_ARCADE_SCORES 5
-
-typedef struct
-{
-	char name[9];
-	char character[17];
-	int score;
-	int time;
-
-	// Additional CTF data
-	int captures;
-	int redScore;
-	int blueScore;
-} arcadeScore_t;
-
-typedef struct
-{
-	char magic[9];
-	int version;
-	arcadeScore_t scores[NUM_ARCADE_SCORES];
-} arcadeGameData_t;
-#endif
-
 typedef struct {
 	menuframework_s	menu;
 
@@ -342,7 +315,7 @@ static void UI_SPPostgameMenu_DrawAwardsPresentation( int timer ) {
 =================
 UI_SPPostgameMenu_MenuDrawScoreLine
 
-#1  1500  1:25 ZTM
+#1  1500 [pic]  1:25 Name
 =================
 */
 static void UI_SPPostgameMenu_MenuDrawScoreLine( int startx, int y, vec4_t color, int rank, arcadeScore_t *score ) {
@@ -360,17 +333,24 @@ static void UI_SPPostgameMenu_MenuDrawScoreLine( int startx, int y, vec4_t color
 	x += SMALLCHAR_WIDTH * 6;
 	UI_DrawString( x, y, va( "%i", score->score ), UI_RIGHT|UI_SMALLFONT, color );
 
+	// Draw player model icon
+	// ZTM: FIXME: Don't call trap_R_RegisterShaderNoMip each time!
+	x += 13;
+	if (score->character[0])
+		UI_DrawHandlePic( x, y - 4, 26, 26, trap_R_RegisterShaderNoMip(va("models/players/%s/icon_default", score->character)) );
+	else
+		UI_DrawHandlePic( x, y - 4, 26, 26, trap_R_RegisterShaderNoMip("menu/art/randombot_icon") );
+	x += 26;
+
 	// Draw time (right justified)
 	minutes = score->time / 60;
 	seconds = score->time % 60;
 	x += SMALLCHAR_WIDTH * 7;
-	UI_DrawString( x, y, va( "%i:%s%i", minutes, seconds < 10 ? "0" : "", seconds ), UI_RIGHT|UI_SMALLFONT, color );
+	UI_DrawString( x, y, va( "%d:%.2d", minutes, seconds ), UI_RIGHT|UI_SMALLFONT, color );
 
 	// Draw user's name
 	x += SMALLCHAR_WIDTH;
 	UI_DrawString( x, y, va( "%s", score->name ), UI_SMALLFONT, color );
-
-	// ZTM: TODO: Draw player model icon for score->character
 
 	if (postgameMenuInfo.gametype >= GT_CTF) {
 		// ZTM: TODO: Draw captures, redScore, and blueScore
@@ -390,18 +370,10 @@ static void UI_SPPostgameMenu_MenuDrawHighScores( int startx, int y ) {
 	int n;
 
 	if (startx == CENTER_X) {
-		x = centerx = (640 - SMALLCHAR_WIDTH * 27) / 2;
+		x = centerx = (640 - SMALLCHAR_WIDTH * 27 - 39) / 2;
 	} else {
 		x = startx;
 	}
-
-	// Draw header
-	x += SMALLCHAR_WIDTH * 4;
-	UI_DrawString( x, y, "Score", UI_SMALLFONT, color_white );
-	x += SMALLCHAR_WIDTH * 9;
-	UI_DrawString( x, y, "Time", UI_SMALLFONT, color_white );
-	x += SMALLCHAR_WIDTH * 6;
-	UI_DrawString( x, y, "Name", UI_SMALLFONT, color_white );
 
 	// Draw high score list
 	if (startx == CENTER_X) {

@@ -31,7 +31,1059 @@ START SERVER MENU *****
 
 #include "ui_local.h"
 
+#ifdef TA_SP
 
+#include "ui_local.h"
+
+#define GAMESERVER_BACK0		"menu/art/back_0"
+#define GAMESERVER_BACK1		"menu/art/back_1"
+#define GAMESERVER_NEXT0		"menu/art/next_0"
+#define GAMESERVER_NEXT1		"menu/art/next_1"
+#ifdef TA_MISC // NO_MENU_FIGHT
+#define GAMESERVER_PLAY0		"menu/art/play_0"
+#define GAMESERVER_PLAY1		"menu/art/play_1"
+#else
+#define GAMESERVER_PLAY0		"menu/art/fight_0"
+#define GAMESERVER_PLAY1		"menu/art/fight_1"
+#endif
+#define GAMESERVER_UNKNOWNMAP	"menu/art/unknownmap"
+#define GAMESERVER_UNKNOWNCHARACTER "menu/art/randombot_icon"
+
+#define ID_MAXCLIENTS			20
+#define ID_DEDICATED			21
+#define ID_NEXT					22
+#define ID_BACK					23
+#define ID_GAMETYPE				24
+#define ID_MAP					25
+#define ID_RECORDREPLAY			26
+
+#define MAX_MAPNAMELENGTH		16
+
+typedef struct {
+	menuframework_s		menu;
+
+	menutext_s			banner;
+	menulist_s			gametype;
+#if 0
+	menutext_s			gtDescription[4];
+#endif
+
+	menulist_s			map;
+	menubitmap_s		mappic;
+
+	// Arcade
+	menuradiobutton_s	recordreplay;
+	menutext_s			viewreplay;
+	menutext_s			scoreId[NUM_ARCADE_SCORES];
+	menutext_s			scoreNum[NUM_ARCADE_SCORES];
+	menubitmap_s		scoreCharacter[NUM_ARCADE_SCORES];
+	menutext_s			scoreTime[NUM_ARCADE_SCORES];
+	menutext_s			scoreName[NUM_ARCADE_SCORES];
+
+	// Server
+	menufield_s			timelimit;
+	menufield_s			scorelimit;
+	menufield_s			flaglimit;
+	menuradiobutton_s	friendlyfire;
+	//
+	menuradiobutton_s	pure;
+	menuradiobutton_s	publicserver;
+	menuradiobutton_s	dedicated;
+	menufield_s			hostname;
+
+	menubitmap_s		back;
+	menubitmap_s		next;
+
+	qboolean			multiplayer;
+	int					maplist[MAX_ARENAS];
+	char				*mapNames[MAX_ARENAS];
+
+	arcadeGameData_t	gamedata;
+
+} arcademenu_t;
+
+static arcademenu_t s_arcade;
+
+static char scoreIds[NUM_ARCADE_SCORES][5] = { "#1:", "#2:", "#3:", "#4:", "#5:" };
+static char scoreNums[NUM_ARCADE_SCORES][8] = { "0", "0", "0", "0", "0" };
+static char scoreTimes[NUM_ARCADE_SCORES][6] = { "0:00", "0:00", "0:00", "0:00", "0:00" };
+static char scoreNames[NUM_ARCADE_SCORES][9] = { "Nobody", "Nobody", "Nobody", "Nobody", "Nobody" };
+
+// Order of gametypes in "gametype select list", must match gametype_items
+static int gametype_remap[] = {
+	GT_SINGLE_PLAYER,
+	GT_FFA,
+	GT_TOURNAMENT,
+	GT_TEAM,
+	GT_CTF
+#ifdef MISSIONPACK
+	,GT_1FCTF
+	,GT_OBELISK
+#ifdef MISSIONPACK_HARVESTER
+	,GT_HARVESTER
+#endif
+#endif
+};
+
+// Order of gametype_items, convert GT_* to gametype_items index
+/*static int gametype_remap2[] = {
+	0,		// Cooperative
+	1,		// Free For All
+	2,		// Duel
+	3,		// Team Deathmatch
+	4		// Capture the Flag
+#ifdef MISSIONPACK
+	,5		// 1 Flag CTF
+	,6		// Overload
+#ifdef MISSIONPACK_HARVESTER
+	,7		// Harvester
+#endif
+#endif
+};*/
+
+// Names of gametypes in "gametype select list", can be any gametypes in any order
+static const char *gametype_items[] = {
+	"Cooperative",
+	"Free For All",
+	"Duel", // tornament to duel // "Tournament",
+	"Team Deathmatch",
+	"Capture the Flag",
+#ifdef MISSIONPACK
+	"1 Flag CTF",
+	"Overload",
+#ifdef MISSIONPACK_HARVESTER
+	"Harvester",
+#endif
+#endif
+	NULL
+};
+
+// Don't allow sp/coop in arcade mode
+static const char *arcade_gametype_items[] = {
+	"", // No coop in arcade
+	"Free For All",
+	"Duel", // tornament to duel // "Tournament",
+	"Team Deathmatch",
+	"Capture the Flag",
+#ifdef MISSIONPACK
+	"1 Flag CTF",
+	"Overload",
+#ifdef MISSIONPACK_HARVESTER
+	"Harvester",
+#endif
+#endif
+	NULL
+};
+
+
+void UI_LoadBestScores(const char *map, int game)
+{
+	char		fileName[MAX_QPATH];
+	fileHandle_t f;
+	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
+	qboolean	validData;
+	int protocol, protocolLegacy;
+	int i;
+	
+	// compose file name
+	Com_sprintf(fileName, MAX_QPATH, "scores/%s_%s.score", map, gametypeNames[game]);
+	// see if we have one already
+	validData = qfalse;
+	if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0) {
+		trap_FS_Read(&s_arcade.gamedata, sizeof(arcadeGameData_t), f);
+		trap_FS_FCloseFile(f);
+
+		if (!Q_strncmp(s_arcade.gamedata.magic, ARCADE_GAMEDATA_MAGIC, ARRAY_LEN(s_arcade.gamedata.magic)))
+		{
+			if (s_arcade.gamedata.version == ARCADE_GAMEDATA_VERSION) {
+				validData = qtrue;
+			}
+		}
+	}
+
+	if (!validData) {
+		memset(&s_arcade.gamedata, 0, sizeof(arcadeGameData_t));
+	}
+
+	// Set scores
+	for (i = 0; i < NUM_ARCADE_SCORES; ++i) {
+		Com_sprintf(scoreNums[i], sizeof (scoreNums[i]), "%d", s_arcade.gamedata.scores[i].score);
+		Com_sprintf(scoreTimes[i], sizeof (scoreTimes[i]), "%d:%.2d",
+				s_arcade.gamedata.scores[i].time / 60, s_arcade.gamedata.scores[i].time % 60);
+		Q_strncpyz(scoreNames[i], s_arcade.gamedata.scores[i].name, sizeof (scoreNames[i]) );
+
+		if (s_arcade.gamedata.scores[i].character[0] != '\0') {
+			s_arcade.gamedata.scores[i].character[16] = '\0';
+			s_arcade.scoreCharacter[i].shader = trap_R_RegisterShaderNoMip(va("models/players/%s/icon_default", s_arcade.gamedata.scores[i].character));
+		} else {
+			s_arcade.scoreCharacter[i].shader = trap_R_RegisterShaderNoMip(s_arcade.scoreCharacter[i].errorpic);
+		}
+
+		// Set name for empty scores
+		if (scoreNames[i][0] == '\0') {
+			Q_strncpyz(scoreNames[i], "Nobody", sizeof (scoreNames[i]) );
+		}
+	}
+
+	s_arcade.viewreplay.generic.flags |= QMF_GRAYED;
+
+	protocolLegacy = trap_Cvar_VariableValue("com_legacyprotocol");
+	protocol = trap_Cvar_VariableValue("com_protocol");
+
+	if(!protocol)
+		protocol = trap_Cvar_VariableValue("protocol");
+	if(protocolLegacy == protocol)
+		protocolLegacy = 0;
+
+	Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.%s%d", map, game, DEMOEXT, protocol);
+	if(trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0)
+	{
+		s_arcade.viewreplay.generic.flags &= ~QMF_GRAYED;
+		trap_FS_FCloseFile(f);
+	}
+	else if(protocolLegacy > 0)
+	{
+		Com_sprintf(fileName, MAX_QPATH, "demos/%s_%d.%s%d", map, game, DEMOEXT, protocolLegacy);
+		if (trap_FS_FOpenFile(fileName, &f, FS_READ) >= 0)
+		{
+			s_arcade.viewreplay.generic.flags &= ~QMF_GRAYED;
+			trap_FS_FCloseFile(f);
+		}
+	} 
+}
+
+/*
+=================
+StartArcade_Update
+=================
+*/
+static void StartArcade_Update(void) {
+	static 	char levelshotBuffer[MAX_QPATH];
+	const char *info;
+
+	// update levelshot
+	info = UI_GetArenaInfoByNumber( s_arcade.maplist[ s_arcade.map.curvalue ]);
+	Com_sprintf(levelshotBuffer, sizeof (levelshotBuffer), "levelshots/%s_small", Info_ValueForKey( info, "map"));
+	s_arcade.mappic.generic.name = levelshotBuffer;
+	s_arcade.mappic.shader = 0;
+
+	if (!s_arcade.multiplayer) {
+		UI_LoadBestScores(Info_ValueForKey( info, "map"), gametype_remap[s_arcade.gametype.curvalue]);
+	}
+}
+
+/*
+=================
+StartArcade_SaveMenuItems
+=================
+*/
+static void StartArcade_SaveMenuItems( int gametype ) {
+	int		timelimit;
+	int		scorelimit;
+	int		flaglimit;
+	int		friendlyfire;
+
+	timelimit	 = atoi( s_arcade.timelimit.field.buffer );
+	scorelimit	 = atoi( s_arcade.scorelimit.field.buffer );
+	flaglimit	 = atoi( s_arcade.flaglimit.field.buffer );
+	friendlyfire = s_arcade.friendlyfire.curvalue;
+
+	trap_Cvar_SetValue( "ui_publicServer", Com_Clamp( 0, 1, s_arcade.publicserver.curvalue ) );
+	trap_Cvar_SetValue( "sv_pure", s_arcade.pure.curvalue );
+	trap_Cvar_Set("sv_hostname", s_arcade.hostname.field.buffer );
+
+	switch( gametype ) {
+	case GT_FFA:
+	default:
+		trap_Cvar_SetValue( "ui_ffa_scorelimit", scorelimit );
+		trap_Cvar_SetValue( "ui_ffa_timelimit", timelimit );
+		break;
+
+	case GT_TOURNAMENT:
+		trap_Cvar_SetValue( "ui_tourney_scorelimit", scorelimit );
+		trap_Cvar_SetValue( "ui_tourney_timelimit", timelimit );
+		break;
+
+	case GT_SINGLE_PLAYER:
+		// Co-op settings
+		break;
+
+	case GT_TEAM:
+		trap_Cvar_SetValue( "ui_team_scorelimit", scorelimit );
+		trap_Cvar_SetValue( "ui_team_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_team_friendly", friendlyfire );
+		break;
+
+	case GT_CTF:
+		trap_Cvar_SetValue( "ui_ctf_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_ctf_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_ctf_friendly", friendlyfire );
+		break;
+
+#ifdef MISSIONPACK // MP_GAMETYPES
+	case GT_1FCTF:
+		trap_Cvar_SetValue( "ui_1flag_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_1flag_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_1flag_friendly", friendlyfire );
+		break;
+
+	case GT_OBELISK:
+		trap_Cvar_SetValue( "ui_obelisk_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_obelisk_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_obelisk_friendly", friendlyfire );
+		break;
+
+#ifdef MISSIONPACK_HARVESTER
+	case GT_HARVESTER:
+		trap_Cvar_SetValue( "ui_harvester_capturelimit", flaglimit );
+		trap_Cvar_SetValue( "ui_harvester_timelimit", timelimit );
+		trap_Cvar_SetValue( "ui_harvester_friendly", friendlyfire );
+		break;
+#endif
+#endif
+	}
+}
+
+/*
+=================
+StartArcade_SetMenuItems
+=================
+*/
+static void StartArcade_SetMenuItems( void ) {
+
+	s_arcade.publicserver.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_publicServer" ) );
+	Q_strncpyz( s_arcade.hostname.field.buffer, UI_Cvar_VariableString( "sv_hostname" ), sizeof( s_arcade.hostname.field.buffer ) );
+	s_arcade.pure.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_pure" ) );
+
+	switch( gametype_remap[s_arcade.gametype.curvalue] ) {
+	case GT_FFA:
+	default:
+		Com_sprintf( s_arcade.scorelimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ffa_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = 0;
+		break;
+
+	case GT_TOURNAMENT:
+		Com_sprintf( s_arcade.scorelimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_tourney_scorelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_tourney_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = 0;
+		break;
+
+	case GT_SINGLE_PLAYER:
+		Com_sprintf( s_arcade.scorelimit.field.buffer, 4, "%i", 0 );
+		Com_sprintf( s_arcade.flaglimit.field.buffer, 4, "%i", 0 );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", 0 );
+		s_arcade.friendlyfire.curvalue = 0;
+		break;
+
+	case GT_TEAM:
+		Com_sprintf( s_arcade.scorelimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_team_scorelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_team_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_team_friendly" ) );
+		break;
+
+	case GT_CTF:
+		Com_sprintf( s_arcade.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_ctf_capturelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_ctf_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_ctf_friendly" ) );
+		break;
+
+#ifdef MISSIONPACK // MP_GAMETYPES
+	case GT_1FCTF:
+		Com_sprintf( s_arcade.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_1flag_capturelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_1flag_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_1flag_friendly" ) );
+		break;
+
+	case GT_OBELISK:
+		Com_sprintf( s_arcade.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_obelisk_capturelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_obelisk_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_obelisk_friendly" ) );
+		break;
+
+#ifdef MISSIONPACK_HARVESTER
+	case GT_HARVESTER:
+		Com_sprintf( s_arcade.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_harvester_capturelimit" ) ) );
+		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_harvester_timelimit" ) ) );
+		s_arcade.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_harvester_friendly" ) );
+		break;
+#endif
+#endif
+	}
+}
+
+/*
+=================
+StartArcade_Start
+=================
+*/
+static void StartArcade_Start( void ) {
+	int		gametype;
+	int		timelimit;
+	int		scorelimit;
+	int		maxclients;
+	int		localClients;
+	int		publicserver;
+	int		dedicated;
+	int		friendlyfire;
+	int		flaglimit;
+	int		pure;
+	int		skill;
+	int		numLocalClients;
+	int		n;
+	char	buf[64];
+	const char *info;
+
+	gametype	 = gametype_remap[s_arcade.gametype.curvalue];
+	timelimit	 = atoi( s_arcade.timelimit.field.buffer );
+	scorelimit	 = atoi( s_arcade.scorelimit.field.buffer );
+	flaglimit	 = atoi( s_arcade.flaglimit.field.buffer );
+	publicserver = s_arcade.publicserver.curvalue;
+	dedicated	 = s_arcade.dedicated.curvalue;
+	friendlyfire = s_arcade.friendlyfire.curvalue;
+	pure		 = s_arcade.pure.curvalue;
+	skill		 = 3;
+	localClients = trap_Cvar_VariableValue( "cl_localClients" );
+
+	for( n = 0, numLocalClients = 0; n < MAX_SPLITVIEW; ++n ) {
+		if (localClients & (1<<n)) {
+			numLocalClients++;
+		}
+	}
+
+	if (!s_arcade.multiplayer) {
+		if (gametype == GT_TOURNAMENT) {
+			maxclients = 2;
+		} else if (gametype >= GT_TEAM) {
+			maxclients = 8;
+		} else {
+			maxclients = 4;
+		}
+	} else {
+		maxclients = 8;
+	}
+
+	StartArcade_SaveMenuItems(gametype);
+
+	trap_Cvar_SetValue( "sv_maxclients", Com_Clamp( 0, 12, maxclients ) );
+	if (!s_arcade.multiplayer) {
+		trap_Cvar_SetValue( "ui_singlePlayerActive", 1 );
+	} else {
+		trap_Cvar_SetValue( "ui_publicServer", Com_Clamp( 0, 1, publicserver ) );
+		trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
+	}
+	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 1, dedicated ) );
+	trap_Cvar_SetValue ("timelimit", Com_Clamp( 0, timelimit, timelimit ) );
+	trap_Cvar_SetValue ("scorelimit", Com_Clamp( 0, scorelimit, scorelimit ) );
+	trap_Cvar_SetValue ("capturelimit", Com_Clamp( 0, flaglimit, flaglimit ) );
+	trap_Cvar_SetValue( "g_friendlyfire", friendlyfire );
+	trap_Cvar_SetValue( "sv_pure", pure );
+	trap_Cvar_Set("sv_hostname", s_arcade.hostname.field.buffer );
+	
+	// the wait commands will allow the dedicated to take effect
+	info = UI_GetArenaInfoByNumber( s_arcade.maplist[ s_arcade.map.curvalue ]);
+	trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait ; wait ; g_gametype %d; map %s\n", gametype, Info_ValueForKey( info, "map" )));
+
+	trap_Cvar_SetValue( "ui_recordSPDemo", s_arcade.recordreplay.curvalue );
+	if (s_arcade.recordreplay.curvalue) {
+		char buff[MAX_STRING_CHARS];
+
+		Com_sprintf(buff, MAX_STRING_CHARS, "%s_%i", Info_ValueForKey( info, "map" ), gametype);
+		trap_Cvar_Set("ui_recordSPDemoName", buff);
+
+#ifdef MISSIONPACK
+		// If not going to do a warmup and then map_restart, tell client to run demo record command
+		if (!trap_Cvar_VariableValue("g_doWarmup"))
+#endif
+		{
+			trap_Cvar_Set("activeAction", va("set g_synchronousclients 1 ; record %s \n", buff));
+		}
+	}
+
+	// add bots
+	if (!s_arcade.multiplayer) {
+		trap_Cmd_ExecuteText( EXEC_APPEND, "wait 3\n" );
+
+		// ZTM: FIXME: Always have teams equal (currently only true when client is Leo)
+		for( n = 1; n < maxclients; n++ ) {
+			if( gametype >= GT_TEAM ) {
+				Com_sprintf( buf, sizeof(buf), "addbot %s %i %s\n", spCharacterNames[n%NUM_SP_CHARACTERS], skill,
+					n < maxclients/2 ? "blue" : "red" );
+			} else {
+				Com_sprintf( buf, sizeof(buf), "addbot %s %i\n", spCharacterNames[n%NUM_SP_CHARACTERS], skill );
+			}
+			trap_Cmd_ExecuteText( EXEC_APPEND, buf );
+		}
+	}
+
+	// set player's team
+	if( dedicated == 0 && gametype >= GT_TEAM ) {
+		trap_Cmd_ExecuteText( EXEC_APPEND, "wait 3\n" );
+
+		for( n = 0; n < MAX_SPLITVIEW; ++n ) {
+			if (localClients & (1<<n)) {
+				trap_Cmd_ExecuteText( EXEC_APPEND, va( "%s blue\n", Com_LocalClientCvarName(n, "team")));
+			}
+		}
+	}
+}
+
+/*
+=================
+GametypeBits
+=================
+*/
+static int GametypeBits( char *string ) {
+	int		bits;
+	char	*p;
+	char	*token;
+
+	bits = 0;
+	p = string;
+	while( 1 ) {
+		token = COM_ParseExt( &p, qfalse );
+		if( token[0] == 0 ) {
+			break;
+		}
+
+		if( Q_stricmp( token, "ffa" ) == 0 ) {
+			bits |= 1 << GT_FFA;
+			continue;
+		}
+
+		if( Q_stricmp( token, "tourney" ) == 0 ) {
+			bits |= 1 << GT_TOURNAMENT;
+			continue;
+		}
+
+		if( Q_stricmp( token, "single" ) == 0 ) {
+			bits |= 1 << GT_SINGLE_PLAYER;
+			continue;
+		}
+
+		if( Q_stricmp( token, "team" ) == 0 ) {
+			bits |= 1 << GT_TEAM;
+			continue;
+		}
+
+		if( Q_stricmp( token, "ctf" ) == 0 ) {
+			bits |= 1 << GT_CTF;
+			continue;
+		}
+#ifdef MISSIONPACK // ZTM: Support MISSIONPACK gametypes!
+		if( Q_stricmp( token, "oneflag" ) == 0 ) {
+			bits |= 1 << GT_1FCTF;
+			continue;
+		}
+		if( Q_stricmp( token, "overload" ) == 0 ) {
+			bits |= 1 << GT_OBELISK;
+			continue;
+		}
+#ifdef MISSIONPACK_HARVESTER
+		if( Q_stricmp( token, "harvester" ) == 0 ) {
+			bits |= 1 << GT_HARVESTER;
+			continue;
+		}
+#endif
+#endif
+	}
+
+	return bits;
+}
+
+/*
+=================
+StartArcade_GametypeEvent
+=================
+*/
+static void StartArcade_GametypeEvent( void* ptr, int event ) {
+	qboolean	scorelimit;
+	qboolean	flaglimit;
+	int			gametype;
+	int			oldgametype;
+	int			i;
+	int			count;
+	int			gamebits;
+	int			matchbits;
+	const char	*info;
+	static char mapNameBuffer[MAX_ARENAS][MAX_MAPNAMELENGTH];
+
+	if( event != QM_ACTIVATED) {
+		return;
+	}
+
+	gametype = gametype_remap[s_arcade.gametype.curvalue];
+	oldgametype = gametype_remap[s_arcade.gametype.oldvalue];
+
+	s_arcade.map.curvalue = 0;
+
+	count = UI_GetNumArenas();
+	s_arcade.map.numitems = 0;
+	matchbits = 1 << gametype;
+	for( i = 0; i < count; i++ ) {
+		info = UI_GetArenaInfoByNumber( i );
+	
+		gamebits = GametypeBits( Info_ValueForKey( info, "type") );
+		if( !( gamebits & matchbits ) ) {
+			continue;
+		}
+
+		s_arcade.maplist[ s_arcade.map.numitems ] = i;
+		strncpy(mapNameBuffer[s_arcade.map.numitems], Info_ValueForKey( info, "longname"), MAX_MAPNAMELENGTH);
+		mapNameBuffer[s_arcade.map.numitems][MAX_MAPNAMELENGTH-1] = 0;
+		if (!strlen(mapNameBuffer[s_arcade.map.numitems])) {
+			strncpy(mapNameBuffer[s_arcade.map.numitems], Info_ValueForKey( info, "map"), MAX_MAPNAMELENGTH);
+			mapNameBuffer[s_arcade.map.numitems][MAX_MAPNAMELENGTH-1] = 0;
+		}
+		s_arcade.mapNames[s_arcade.map.numitems] = mapNameBuffer[s_arcade.map.numitems];
+		s_arcade.map.numitems++;
+	}
+
+	s_arcade.map.itemnames = (const char **)s_arcade.mapNames;
+
+	if (gametype == GT_SINGLE_PLAYER) {
+		scorelimit = flaglimit = qfalse;
+	} else if (gametype <= GT_TEAM) {
+		scorelimit = qtrue;
+		flaglimit = qfalse;
+	} else {
+		scorelimit = qfalse;
+		flaglimit = qtrue;
+	}
+
+	if (gametype != GT_SINGLE_PLAYER)
+		s_arcade.timelimit.generic.flags	&= ~(QMF_HIDDEN|QMF_INACTIVE);
+	else
+		s_arcade.timelimit.generic.flags |= (QMF_HIDDEN|QMF_INACTIVE);
+
+	if (gametype >= GT_TEAM)
+		s_arcade.friendlyfire.generic.flags	&= ~(QMF_HIDDEN|QMF_INACTIVE);
+	else
+		s_arcade.friendlyfire.generic.flags |= (QMF_HIDDEN|QMF_INACTIVE);
+
+	if (scorelimit)
+		s_arcade.scorelimit.generic.flags	&= ~(QMF_HIDDEN|QMF_INACTIVE);
+	else
+		s_arcade.scorelimit.generic.flags	|= (QMF_HIDDEN|QMF_INACTIVE);
+
+	if (flaglimit)
+		s_arcade.flaglimit.generic.flags	&= ~(QMF_HIDDEN|QMF_INACTIVE);
+	else
+		s_arcade.flaglimit.generic.flags	|= (QMF_HIDDEN|QMF_INACTIVE);
+
+
+	StartArcade_SaveMenuItems(oldgametype);
+	StartArcade_SetMenuItems();
+
+	StartArcade_Update();
+}
+
+/*
+=================
+StartArcade_MapEvent
+=================
+*/
+static void StartArcade_MapEvent( void* ptr, int event ) {
+	if( event != QM_ACTIVATED) {
+		return;
+	}
+	StartArcade_Update();
+}
+
+static void StartArcade_ViewReplayEvent( void* ptr, int event ) {
+	const char *info;
+
+	if( event != QM_ACTIVATED) {
+		return;
+	}
+
+	// Play demo!
+	info = UI_GetArenaInfoByNumber( s_arcade.maplist[ s_arcade.map.curvalue ]);
+	trap_Cmd_ExecuteText( EXEC_APPEND, va("demo %s_%d\n", Info_ValueForKey( info, "map"),
+			gametype_remap[s_arcade.gametype.curvalue]));
+}
+
+/*
+=================
+StartArcade_GametypeEvent
+=================
+*/
+static void StartArcade_Event( void* ptr, int event ) {
+	if( event != QM_ACTIVATED) {
+		return;
+	}
+	
+	switch (((menucommon_s*)ptr)->id) {
+		case ID_DEDICATED:
+			if (((menuradiobutton_s*)ptr)->curvalue) {
+				s_arcade.next.generic.name		= GAMESERVER_PLAY0;
+				s_arcade.next.focuspic			= GAMESERVER_PLAY1;
+			} else {
+				s_arcade.next.generic.name		= GAMESERVER_NEXT0;
+				s_arcade.next.focuspic			= GAMESERVER_NEXT1;
+			}
+			s_arcade.next.shader = 0;
+			s_arcade.next.focusshader = 0;
+			break;
+		case ID_BACK:
+			StartArcade_SaveMenuItems(gametype_remap[s_arcade.gametype.curvalue]);
+			UI_PopMenu();
+			break;
+		case ID_NEXT:
+			if (s_arcade.multiplayer && s_arcade.dedicated.curvalue) {
+				StartArcade_Start();
+			} else {
+				UI_SPPlayerMenu(s_arcade.multiplayer ? MAX_SPLITVIEW : 1, StartArcade_Start);
+			}
+	}
+}
+
+/*
+=================
+StartArcade_StatusBar
+=================
+*/
+static void StartArcade_StatusBar( void* ptr ) {
+	switch( ((menucommon_s*)ptr)->id ) {
+	case ID_RECORDREPLAY:
+		if (!(s_arcade.viewreplay.generic.flags & QMF_GRAYED)) {
+			UI_DrawString( 320, 440, "Warning: This will overwrite the existing replay!",
+					UI_CENTER|UI_SMALLFONT, colorWhite );
+		}
+		break;
+	default:
+		UI_DrawString( 320, 440, "0 = NO LIMIT", UI_CENTER|UI_SMALLFONT, colorWhite );
+		break;
+	}
+}
+
+/*
+=================
+StartArcade_MenuInit
+=================
+*/
+// right side below levelshot
+#define RIGHT_OPTIONS_X	64 //(456+106)
+
+#define LEFT_OPTIONS_X 64
+
+static void StartArcade_MenuInit( qboolean multiplayer ) {
+	int		i;
+	int		y;
+
+	memset( &s_arcade, 0, sizeof(arcademenu_t) );
+	s_arcade.multiplayer = multiplayer;
+
+	StartServer_Cache();
+
+	s_arcade.menu.wrapAround = qtrue;
+	s_arcade.menu.fullscreen = qtrue;
+
+	s_arcade.banner.generic.type		= MTYPE_BTEXT;
+	s_arcade.banner.generic.x			= 320;
+	s_arcade.banner.generic.y			= 16;
+	if (!multiplayer) {
+		s_arcade.banner.string  			= "ARCADE MODE";
+	} else {
+		s_arcade.banner.string  			= "START SERVER";
+	}
+	s_arcade.banner.color  				= text_banner_color;
+	s_arcade.banner.style  				= UI_CENTER;
+
+	s_arcade.gametype.generic.type		= MTYPE_SPINCONTROL;
+	s_arcade.gametype.generic.name		= "Game Type:";
+	s_arcade.gametype.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+	s_arcade.gametype.generic.callback	= StartArcade_GametypeEvent;
+	s_arcade.gametype.generic.id		= ID_GAMETYPE;
+	s_arcade.gametype.generic.x			= 120+44;
+	s_arcade.gametype.generic.y			= 80;
+	if (!multiplayer) {
+		s_arcade.gametype.itemnames		= arcade_gametype_items;
+	} else {
+		s_arcade.gametype.itemnames		= gametype_items;
+	}
+
+#if 0
+	s_arcade.gtDescription[0].generic.type	= MTYPE_TEXT;
+	s_arcade.gtDescription[0].generic.flags	= QMF_SMALLFONT|QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_GRAYED;
+	s_arcade.gtDescription[0].generic.x		= 88;
+	s_arcade.gtDescription[0].generic.y		= 80 + SMALLCHAR_HEIGHT;
+	s_arcade.gtDescription[0].string  		= "(Insert short gametype description here.)";
+	s_arcade.gtDescription[0].color  		= text_banner_color;
+	s_arcade.gtDescription[0].style  		= UI_LEFT;
+
+	s_arcade.gtDescription[1].generic.type	= MTYPE_TEXT;
+	s_arcade.gtDescription[1].generic.flags	= QMF_SMALLFONT|QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_GRAYED;
+	s_arcade.gtDescription[1].generic.x		= 88;
+	s_arcade.gtDescription[1].generic.y		= 80 + SMALLCHAR_HEIGHT*2;
+	s_arcade.gtDescription[1].string  		= "(Insert short gametype description here.)";
+	s_arcade.gtDescription[1].color  		= text_banner_color;
+	s_arcade.gtDescription[1].style  		= UI_LEFT;
+
+	s_arcade.gtDescription[2].generic.type	= MTYPE_TEXT;
+	s_arcade.gtDescription[2].generic.flags	= QMF_SMALLFONT|QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_GRAYED;
+	s_arcade.gtDescription[2].generic.x		= 88;
+	s_arcade.gtDescription[2].generic.y		= 80 + SMALLCHAR_HEIGHT*3;
+	s_arcade.gtDescription[2].string  		= "(Insert short gametype description here.)";
+	s_arcade.gtDescription[2].color  		= text_banner_color;
+	s_arcade.gtDescription[2].style  		= UI_LEFT;
+
+	s_arcade.gtDescription[3].generic.type	= MTYPE_TEXT;
+	s_arcade.gtDescription[3].generic.flags	= QMF_SMALLFONT|QMF_LEFT_JUSTIFY|QMF_INACTIVE|QMF_GRAYED;
+	s_arcade.gtDescription[3].generic.x		= 88;
+	s_arcade.gtDescription[3].generic.y		= 80 + SMALLCHAR_HEIGHT*4;
+	s_arcade.gtDescription[3].string  		= "(Insert short gametype description here.)";
+	s_arcade.gtDescription[3].color  		= text_banner_color;
+	s_arcade.gtDescription[3].style  		= UI_LEFT;
+#endif
+
+	s_arcade.map.generic.type			= MTYPE_SPINCONTROL;
+	s_arcade.map.generic.name			= "Level:";
+	s_arcade.map.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+	s_arcade.map.generic.callback		= StartArcade_MapEvent;
+	s_arcade.map.generic.id				= ID_MAP;
+	s_arcade.map.generic.x				= 120-42+44;
+	s_arcade.map.generic.y				= 224 - SMALLCHAR_HEIGHT;
+	s_arcade.map.itemnames				= gametype_items; // Poor fix for SpinControl_Init // (const char **)s_arcade.mapNames;
+
+	s_arcade.mappic.generic.type		= MTYPE_BITMAP;
+	s_arcade.mappic.generic.flags		= QMF_LEFT_JUSTIFY|QMF_INACTIVE;
+	s_arcade.mappic.generic.x			= 640-64-192;
+	s_arcade.mappic.generic.y			= 80;
+	s_arcade.mappic.width				= 192;
+	s_arcade.mappic.height				= 144;
+	s_arcade.mappic.errorpic			= GAMESERVER_UNKNOWNMAP;
+
+	if( s_arcade.multiplayer ) {
+		y = 224+SMALLCHAR_HEIGHT+2;
+
+		// Scorelimit and capturelimit have the same x/y, only show one at a time!
+		s_arcade.scorelimit.generic.type       = MTYPE_FIELD;
+		s_arcade.scorelimit.generic.name       = "Score Limit:";
+		s_arcade.scorelimit.generic.flags      = QMF_NUMBERSONLY|QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.scorelimit.generic.x	       = RIGHT_OPTIONS_X;
+		s_arcade.scorelimit.generic.y	       = y;
+		s_arcade.scorelimit.generic.statusbar  = StartArcade_StatusBar;
+		s_arcade.scorelimit.field.widthInChars = 4;
+		s_arcade.scorelimit.field.maxchars     = 4;
+
+		s_arcade.flaglimit.generic.type       = MTYPE_FIELD;
+		s_arcade.flaglimit.generic.name       = "Capture Limit:";
+		s_arcade.flaglimit.generic.flags      = QMF_NUMBERSONLY|QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.flaglimit.generic.x	      = RIGHT_OPTIONS_X;
+		s_arcade.flaglimit.generic.y	      = y;
+		s_arcade.flaglimit.generic.statusbar  = StartArcade_StatusBar;
+		s_arcade.flaglimit.field.widthInChars = 3;
+		s_arcade.flaglimit.field.maxchars     = 3;
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.timelimit.generic.type       = MTYPE_FIELD;
+		s_arcade.timelimit.generic.name       = "Time Limit:";
+		s_arcade.timelimit.generic.flags      = QMF_NUMBERSONLY|QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.timelimit.generic.x	      = RIGHT_OPTIONS_X;
+		s_arcade.timelimit.generic.y	      = y;
+		s_arcade.timelimit.generic.statusbar  = StartArcade_StatusBar;
+		s_arcade.timelimit.field.widthInChars = 3;
+		s_arcade.timelimit.field.maxchars     = 3;
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.friendlyfire.generic.type    = MTYPE_RADIOBUTTON;
+		s_arcade.friendlyfire.generic.flags   = QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.friendlyfire.generic.x	      = RIGHT_OPTIONS_X;
+		s_arcade.friendlyfire.generic.y	      = y;
+		s_arcade.friendlyfire.generic.name	  = "Team Damage:";
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.pure.generic.type			= MTYPE_RADIOBUTTON;
+		s_arcade.pure.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.pure.generic.x				= RIGHT_OPTIONS_X;
+		s_arcade.pure.generic.y				= y;
+		s_arcade.pure.generic.name			= "Pure Server:";
+		if (!trap_Cvar_VariableValue( "fs_pure" )) {
+			// Don't let users think they can modify sv_pure, it won't work.
+			s_arcade.pure.generic.flags |= QMF_GRAYED;
+		}
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.publicserver.generic.type	= MTYPE_RADIOBUTTON;
+		s_arcade.publicserver.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.publicserver.generic.x		= RIGHT_OPTIONS_X;
+		s_arcade.publicserver.generic.y		= y;
+		s_arcade.publicserver.generic.name	= "Advertise on Internet:";
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.dedicated.generic.type		= MTYPE_RADIOBUTTON;
+		s_arcade.dedicated.generic.id		= ID_DEDICATED;
+		s_arcade.dedicated.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.dedicated.generic.callback	= StartArcade_Event;
+		s_arcade.dedicated.generic.x		= RIGHT_OPTIONS_X;
+		s_arcade.dedicated.generic.y		= y;
+		s_arcade.dedicated.generic.name		= "Dedicated:";
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.hostname.generic.type			= MTYPE_FIELD;
+		s_arcade.hostname.generic.name			= "Hostname:";
+		s_arcade.hostname.generic.flags			= QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.hostname.generic.x				= RIGHT_OPTIONS_X;
+		s_arcade.hostname.generic.y				= y;
+		s_arcade.hostname.field.widthInChars	= 20;
+		s_arcade.hostname.field.maxchars		= 64;
+	} else {
+		// Record demo option
+		y = 224+SMALLCHAR_HEIGHT+2;
+		s_arcade.recordreplay.generic.type		= MTYPE_RADIOBUTTON;
+		s_arcade.recordreplay.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+		s_arcade.recordreplay.generic.x			= LEFT_OPTIONS_X;
+		s_arcade.recordreplay.generic.y			= y;
+		s_arcade.recordreplay.generic.name		= "Record Replay:";
+		s_arcade.recordreplay.generic.statusbar	= StartArcade_StatusBar;
+		s_arcade.recordreplay.generic.id		= ID_RECORDREPLAY;
+
+		y += SMALLCHAR_HEIGHT+2;
+		s_arcade.viewreplay.generic.type		= MTYPE_PTEXT;
+		s_arcade.viewreplay.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY|QMF_GRAYED;
+		s_arcade.viewreplay.generic.x			= LEFT_OPTIONS_X;
+		s_arcade.viewreplay.generic.y			= y;
+		s_arcade.viewreplay.generic.callback	= StartArcade_ViewReplayEvent;
+		s_arcade.viewreplay.string  			= "View Replay";
+		s_arcade.viewreplay.color  				= color_white;
+		s_arcade.viewreplay.style  				= UI_SMALLFONT|UI_LEFT;
+
+		y = 224+SMALLCHAR_HEIGHT+2;
+		for (i = 0; i < NUM_ARCADE_SCORES; ++i) {
+			s_arcade.scoreId[i].generic.type		= MTYPE_TEXT;
+			s_arcade.scoreId[i].generic.flags		= QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+			s_arcade.scoreId[i].generic.x			= 320 - SMALLCHAR_WIDTH*2;
+			s_arcade.scoreId[i].generic.y			= y;
+			s_arcade.scoreId[i].string  			= scoreIds[i];
+			s_arcade.scoreId[i].color  				= color_white;
+			s_arcade.scoreId[i].style  				= UI_SMALLFONT|UI_LEFT;
+
+			s_arcade.scoreNum[i].generic.type		= MTYPE_TEXT;
+			s_arcade.scoreNum[i].generic.flags		= QMF_SMALLFONT|QMF_RIGHT_JUSTIFY;
+			s_arcade.scoreNum[i].generic.x			= 320+SMALLCHAR_WIDTH*11;
+			s_arcade.scoreNum[i].generic.y			= y;
+			s_arcade.scoreNum[i].string  			= scoreNums[i];
+			s_arcade.scoreNum[i].color  			= color_white;
+			s_arcade.scoreNum[i].style  			= UI_SMALLFONT|UI_RIGHT;
+
+			s_arcade.scoreCharacter[i].generic.type		= MTYPE_BITMAP;
+			s_arcade.scoreCharacter[i].generic.flags	= QMF_LEFT_JUSTIFY|QMF_INACTIVE;
+			s_arcade.scoreCharacter[i].generic.x		= 320+SMALLCHAR_WIDTH*(11+7) - 48;
+			s_arcade.scoreCharacter[i].generic.y		= y - 12;
+			s_arcade.scoreCharacter[i].width			= 32;
+			s_arcade.scoreCharacter[i].height			= 32;
+			s_arcade.scoreCharacter[i].errorpic			= GAMESERVER_UNKNOWNCHARACTER;
+
+			s_arcade.scoreTime[i].generic.type		= MTYPE_TEXT;
+			s_arcade.scoreTime[i].generic.flags		= QMF_SMALLFONT|QMF_RIGHT_JUSTIFY;
+			s_arcade.scoreTime[i].generic.x			= 320+32+SMALLCHAR_WIDTH*(11+7);
+			s_arcade.scoreTime[i].generic.y			= y;
+			s_arcade.scoreTime[i].string  			= scoreTimes[i];
+			s_arcade.scoreTime[i].color  			= color_white;
+			s_arcade.scoreTime[i].style  			= UI_SMALLFONT|UI_RIGHT;
+
+			s_arcade.scoreName[i].generic.type		= MTYPE_TEXT;
+			s_arcade.scoreName[i].generic.flags		= QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
+			s_arcade.scoreName[i].generic.x			= 320+32+SMALLCHAR_WIDTH*(11+7+2);
+			s_arcade.scoreName[i].generic.y			= y;
+			s_arcade.scoreName[i].string  			= scoreNames[i];
+			s_arcade.scoreName[i].color  			= color_white;
+			s_arcade.scoreName[i].style  			= UI_SMALLFONT|UI_LEFT;
+
+			y += 32;
+		}
+	}
+
+	s_arcade.back.generic.type		= MTYPE_BITMAP;
+	s_arcade.back.generic.name		= GAMESERVER_BACK0;
+	s_arcade.back.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_arcade.back.generic.callback	= StartArcade_Event;
+	s_arcade.back.generic.id		= ID_BACK;
+	s_arcade.back.generic.x			= 0;
+	s_arcade.back.generic.y			= 480-64;
+	s_arcade.back.width				= 128;
+	s_arcade.back.height			= 64;
+	s_arcade.back.focuspic			= GAMESERVER_BACK1;
+
+	s_arcade.next.generic.type		= MTYPE_BITMAP;
+	s_arcade.next.generic.name		= GAMESERVER_NEXT0;
+	s_arcade.next.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_arcade.next.generic.callback	= StartArcade_Event;
+	s_arcade.next.generic.id		= ID_NEXT;
+	s_arcade.next.generic.x			= 640;
+	s_arcade.next.generic.y			= 480-64;
+	s_arcade.next.width				= 128;
+	s_arcade.next.height			= 64;
+	s_arcade.next.focuspic			= GAMESERVER_NEXT1;
+
+	Menu_AddItem( &s_arcade.menu, &s_arcade.banner );
+
+	Menu_AddItem( &s_arcade.menu, &s_arcade.gametype );
+#if 0
+	Menu_AddItem( &s_arcade.menu, &s_arcade.gtDescription[0] );
+	Menu_AddItem( &s_arcade.menu, &s_arcade.gtDescription[1] );
+	Menu_AddItem( &s_arcade.menu, &s_arcade.gtDescription[2] );
+	Menu_AddItem( &s_arcade.menu, &s_arcade.gtDescription[3] );
+#endif
+	Menu_AddItem( &s_arcade.menu, &s_arcade.map );
+	Menu_AddItem( &s_arcade.menu, &s_arcade.mappic );
+
+	if( s_arcade.multiplayer ) {
+		Menu_AddItem( &s_arcade.menu, &s_arcade.scorelimit );
+		Menu_AddItem( &s_arcade.menu, &s_arcade.flaglimit );
+		Menu_AddItem( &s_arcade.menu, &s_arcade.timelimit );
+		Menu_AddItem( &s_arcade.menu, &s_arcade.friendlyfire );
+
+		Menu_AddItem( &s_arcade.menu, &s_arcade.pure );
+		Menu_AddItem( &s_arcade.menu, &s_arcade.publicserver );
+		Menu_AddItem( &s_arcade.menu, &s_arcade.dedicated );
+		Menu_AddItem( &s_arcade.menu, &s_arcade.hostname );
+	} else {
+		Menu_AddItem( &s_arcade.menu, &s_arcade.recordreplay);
+		Menu_AddItem( &s_arcade.menu, &s_arcade.viewreplay);
+
+		for (i = 0; i < NUM_ARCADE_SCORES; ++i) {
+			Menu_AddItem( &s_arcade.menu, &s_arcade.scoreId[i]);
+			Menu_AddItem( &s_arcade.menu, &s_arcade.scoreNum[i]);
+			Menu_AddItem( &s_arcade.menu, &s_arcade.scoreCharacter[i]);
+			Menu_AddItem( &s_arcade.menu, &s_arcade.scoreTime[i]);
+			Menu_AddItem( &s_arcade.menu, &s_arcade.scoreName[i]);
+		}
+	}
+
+	Menu_AddItem( &s_arcade.menu, &s_arcade.back );
+	Menu_AddItem( &s_arcade.menu, &s_arcade.next );
+
+	StartArcade_SetMenuItems();
+
+	StartArcade_GametypeEvent(&s_arcade.gametype, QM_ACTIVATED);
+}
+
+/*
+=================
+StartArcade_Cache
+=================
+*/
+void StartServer_Cache( void ) {
+	trap_R_RegisterShaderNoMip( GAMESERVER_BACK0 );
+	trap_R_RegisterShaderNoMip( GAMESERVER_BACK1 );
+	trap_R_RegisterShaderNoMip( GAMESERVER_NEXT0 );
+	trap_R_RegisterShaderNoMip( GAMESERVER_NEXT1 );
+	trap_R_RegisterShaderNoMip( GAMESERVER_UNKNOWNMAP );
+}
+
+
+/*
+=================
+UI_StartArcade
+=================
+*/
+void UI_StartServerMenu( qboolean multiplayer ) {
+	StartArcade_MenuInit( multiplayer );
+	UI_PushMenu( &s_arcade.menu );
+}
+#else
 #define GAMESERVER_BACK0		"menu/art/back_0"
 #define GAMESERVER_BACK1		"menu/art/back_1"
 #define GAMESERVER_NEXT0		"menu/art/next_0"
@@ -1527,7 +2579,7 @@ static void ServerOptions_InitBotNames( void ) {
 	start = count = MAX_SPLITVIEW;	// skip the first few slots, reserved for humans
 
 #ifdef TA_SP
-	if (s_serveroptions.gametype != GT_SINGLE_PLAYER) {
+	if (!s_serveroptions.multiplayer) {
 #endif
 	// get info for this map
 	arenaInfo = UI_GetArenaInfoByMap( s_serveroptions.mapnamebuffer );
@@ -2680,3 +3732,4 @@ void UI_BotSelectMenu( char *bot ) {
 	UI_BotSelectMenu_Init( bot );
 	UI_PushMenu( &botSelectInfo.menu );
 }
+#endif

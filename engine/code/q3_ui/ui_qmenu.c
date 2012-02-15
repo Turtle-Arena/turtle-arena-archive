@@ -493,12 +493,28 @@ static void RadioButton_Init( menuradiobutton_s *rb )
 		len = 0;
 #endif
 
+#ifdef IOQ3ZTM
+	if (rb->generic.flags & QMF_LEFT_JUSTIFY) {
+		rb->generic.left = rb->generic.x;
+		
 #ifdef IOQ3ZTM // FONT_REWRITE
-	rb->generic.left   = rb->generic.x - Com_FontStringWidth(font, rb->generic.name, 0 ) - SMALLCHAR_WIDTH;
+		rb->generic.x += Com_FontStringWidth(font, rb->generic.name, 0 ) + SMALLCHAR_WIDTH;
 #else
-	rb->generic.left   = rb->generic.x - (len+1)*SMALLCHAR_WIDTH;
+		rb->generic.x += (len+1)*SMALLCHAR_WIDTH;
 #endif
+
+	} else
+#endif
+	{
+#ifdef IOQ3ZTM // FONT_REWRITE
+		rb->generic.left   = rb->generic.x - Com_FontStringWidth(font, rb->generic.name, 0 ) - SMALLCHAR_WIDTH;
+#else
+		rb->generic.left   = rb->generic.x - (len+1)*SMALLCHAR_WIDTH;
+#endif
+	}
+
 	rb->generic.right  = rb->generic.x + 6*SMALLCHAR_WIDTH;
+
 	rb->generic.top    = rb->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	rb->generic.bottom = rb->generic.y + Com_FontCharHeight(font);
@@ -951,6 +967,9 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 #endif
 		case K_RIGHTARROW:
 		case K_MOUSE1:
+#ifdef IOQ3ZTM // IOQ3BUGFIX: ?
+			s->oldvalue = s->curvalue;
+#endif
 #ifdef IOQ3ZTM
 			// Skip empty items
 			for (i = 0; i < s->numitems; i++) {
@@ -978,6 +997,9 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
+#endif
+#ifdef IOQ3ZTM // IOQ3BUGFIX: ?
+			s->oldvalue = s->curvalue;
 #endif
 #ifdef IOQ3ZTM
 			// Skip empty items
