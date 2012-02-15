@@ -499,9 +499,11 @@ extern void ArenaServers_Cache( void );
 //
 extern void UI_StartServerMenu( qboolean multiplayer );
 extern void StartServer_Cache( void );
+#ifndef TA_SP
 extern void ServerOptions_Cache( void );
 extern void UI_BotSelectMenu( char *bot );
 extern void UI_BotSelectMenu_Cache( void );
+#endif
 
 //
 // ui_serverinfo.c
@@ -951,5 +953,32 @@ void UI_SignupMenu( void );
 //
 void RankStatus_Cache( void );
 void UI_RankStatusMenu( void );
+
+#ifdef TA_SP
+// Arcade map gamedata
+#define ARCADE_GAMEDATA_MAGIC "EBXARCADE"
+#define ARCADE_GAMEDATA_VERSION 0
+#define NUM_ARCADE_SCORES 5
+
+typedef struct
+{
+	char name[9];
+	char character[17];
+	int score;
+	int time;
+
+	// Additional CTF data
+	int captures;
+	int redScore;
+	int blueScore;
+} arcadeScore_t;
+
+typedef struct
+{
+	char magic[9];
+	int version;
+	arcadeScore_t scores[NUM_ARCADE_SCORES];
+} arcadeGameData_t;
+#endif
 
 #endif
