@@ -323,6 +323,9 @@ typedef struct {
 	int					refreshtime;
 	char				favoriteaddresses[MAX_FAVORITESERVERS][MAX_ADDRESSLENGTH];
 	int					numfavoriteaddresses;
+#ifdef TA_MISC
+	int					numLocalClients;
+#endif
 } arenaservers_t;
 
 static arenaservers_t	g_arenaservers;
@@ -704,9 +707,15 @@ static void ArenaServers_UpdateMenu( void ) {
 			continue;
 		}
 
+#ifdef TA_MISC
+		if( !g_fullservers && ( servernodeptr->numclients+g_arenaservers.numLocalClients > servernodeptr->maxclients ) ) {
+			continue;
+		}
+#else
 		if( !g_fullservers && ( servernodeptr->numclients == servernodeptr->maxclients ) ) {
 			continue;
 		}
+#endif
 
 #ifdef IOQ3ZTM
 		gametype = ArenaServers_GametypeForGames(g_gametype);
@@ -1604,6 +1613,9 @@ ArenaServers_MenuInit
 static void ArenaServers_MenuInit( void ) {
 	int			i;
 	int			y;
+#ifdef TA_MISC
+	int			localClientBits;
+#endif
 	static char	statusbuffer[MAX_STATUSLENGTH];
 
 	// zero set all our globals
@@ -1921,6 +1933,16 @@ static void ArenaServers_MenuInit( void ) {
 
 	// force to initial state and refresh
 	g_arenaservers.master.curvalue = g_servertype = ArenaServers_SetType(g_servertype);
+
+#ifdef TA_MISC 
+	g_arenaservers.numLocalClients = 1;
+	localClientBits = trap_Cvar_VariableValue("cl_localClients");
+	for (i = 1; i < MAX_SPLITVIEW; ++i) {
+		if (localClientBits & (1<<i)) {
+			g_arenaservers.numLocalClients++;
+		}
+	}
+#endif
 
 	trap_Cvar_Register(NULL, "debug_protocol", "", 0 );
 }
