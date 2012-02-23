@@ -653,16 +653,16 @@ static void UI_PlayerSetupMenu_Init( int maxLocalClients, void (*action)(void), 
 			// Main player is always enabled.
 			s_playersetup.item_p1.generic.type	= MTYPE_TEXT;
 			s_playersetup.item_p1.generic.flags	= QMF_LEFT_JUSTIFY;
-			s_playersetup.item_p1.generic.x		= leftOffset+56+spacing*i;
+			s_playersetup.item_p1.generic.x		= leftOffset+spacing*i+28;
 			s_playersetup.item_p1.generic.y		= 112 - 32;
 			s_playersetup.item_p1.string		= pnum[i];
 			s_playersetup.item_p1.color			= text_big_color;
-			s_playersetup.item_p1.style			= UI_CENTER;
+			s_playersetup.item_p1.style			= UI_LEFT;
 		} else {
 			s_playersetup.clientEnabled[i-1].generic.type		= MTYPE_RADIOBUTTON;
 			s_playersetup.clientEnabled[i-1].generic.name		= pnum[i];
 			s_playersetup.clientEnabled[i-1].generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS;
-			s_playersetup.clientEnabled[i-1].generic.x			= leftOffset+56+spacing*i;
+			s_playersetup.clientEnabled[i-1].generic.x			= leftOffset+spacing*i+28;
 			s_playersetup.clientEnabled[i-1].generic.y			= 112 - 32;
 			s_playersetup.clientEnabled[i-1].generic.callback	= UI_PlayerSetupMenu_PlayerToggleEvent;
 			s_playersetup.clientEnabled[i-1].generic.id			= ID_CLIENT0_ENABLED+i;
