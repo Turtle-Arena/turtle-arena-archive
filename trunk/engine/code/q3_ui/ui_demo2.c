@@ -136,7 +136,11 @@ static void Demos_MenuInit( void ) {
 	s_demos.banner.generic.type		= MTYPE_BTEXT;
 	s_demos.banner.generic.x		= 320;
 	s_demos.banner.generic.y		= 16;
+#ifdef TA_MISC
+	s_demos.banner.string			= "REPLAYS";
+#else
 	s_demos.banner.string			= "DEMOS";
+#endif
 	s_demos.banner.color			= text_banner_color;
 	s_demos.banner.style			= UI_CENTER;
 
