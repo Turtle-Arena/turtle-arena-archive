@@ -19,13 +19,13 @@ bots		"FugiTurtle"
 // special		"Training" (First level, in a Tier by its self)
 // special		"Final" (Last level, in a Tier by its self)
 //{
-//map			"sp0a1"
+//map			"sp0"
 //longname	"Introduction"
 //type		"single"
 //}
 
 //{
-//map			"sp13a5"
+//map			"sp6boss"
 //longname	"Final Battle"
 //type		"single tourney"
 //}
@@ -50,32 +50,9 @@ longname	"Narrows"
 type		"ctf oneflag overload"
 }
 
-//Subway level set
-//textures; tan wall, tiled floor, subway tracks
-//models; Subway car?
-//ceiling lights
 {
 map			"subway"
 longname	"Subway"
 type		"ctf oneflag overload"
-}
-
-// Test maps
-{
-map			"test"
-longname	"Item Test map"
-type		"ffa tourney team ctf oneflag overload"
-}
-
-{
-map			"test_city"
-longname	"City theme test map"
-type		"ffa tourney team"
-}
-
-{
-map			"test_smash"
-longname	"2D-mode Smash test map"
-type		"ffa tourney team"
 }
 
