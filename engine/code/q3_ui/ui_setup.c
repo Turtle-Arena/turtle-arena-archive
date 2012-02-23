@@ -222,7 +222,10 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.height  					= 334;
 
 #ifdef TA_SP
-	y = (480 - SETUP_MENU_VERTICAL_SPACING * 8) / 2;
+	if( trap_Cvar_VariableValue( "cl_paused" ) )
+		y = (480 - SETUP_MENU_VERTICAL_SPACING * 3) / 2;
+	else
+		y = (480 - SETUP_MENU_VERTICAL_SPACING * 8) / 2;
 #else
 	y = 134;
 #endif
@@ -283,56 +286,56 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.game.color						= text_big_color;
 	setupMenuInfo.game.style						= UI_CENTER;
 
+	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 #ifdef TA_SP
-	// Moved here from q3 main menu.
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.replays.generic.type				= MTYPE_PTEXT;
-	setupMenuInfo.replays.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.replays.generic.x					= 320;
-	setupMenuInfo.replays.generic.y					= y;
-	setupMenuInfo.replays.generic.id				= ID_REPLAYS;
-	setupMenuInfo.replays.generic.callback			= UI_SetupMenu_Event; 
-	setupMenuInfo.replays.string					= "Replays";
-	setupMenuInfo.replays.color						= text_big_color;
-	setupMenuInfo.replays.style						= UI_CENTER;
+		// Moved here from q3 main menu.
+		y += SETUP_MENU_VERTICAL_SPACING;
+		setupMenuInfo.replays.generic.type				= MTYPE_PTEXT;
+		setupMenuInfo.replays.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		setupMenuInfo.replays.generic.x					= 320;
+		setupMenuInfo.replays.generic.y					= y;
+		setupMenuInfo.replays.generic.id				= ID_REPLAYS;
+		setupMenuInfo.replays.generic.callback			= UI_SetupMenu_Event; 
+		setupMenuInfo.replays.string					= "Replays";
+		setupMenuInfo.replays.color						= text_big_color;
+		setupMenuInfo.replays.style						= UI_CENTER;
 
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.cinematics.generic.type			= MTYPE_PTEXT;
-	setupMenuInfo.cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.cinematics.generic.x				= 320;
-	setupMenuInfo.cinematics.generic.y				= y;
-	setupMenuInfo.cinematics.generic.id				= ID_CINEMATICS;
-	setupMenuInfo.cinematics.generic.callback		= UI_SetupMenu_Event; 
-	setupMenuInfo.cinematics.string					= "Cinematics";
-	setupMenuInfo.cinematics.color					= text_big_color;
-	setupMenuInfo.cinematics.style					= UI_CENTER;
+		y += SETUP_MENU_VERTICAL_SPACING;
+		setupMenuInfo.cinematics.generic.type			= MTYPE_PTEXT;
+		setupMenuInfo.cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		setupMenuInfo.cinematics.generic.x				= 320;
+		setupMenuInfo.cinematics.generic.y				= y;
+		setupMenuInfo.cinematics.generic.id				= ID_CINEMATICS;
+		setupMenuInfo.cinematics.generic.callback		= UI_SetupMenu_Event; 
+		setupMenuInfo.cinematics.string					= "Cinematics";
+		setupMenuInfo.cinematics.color					= text_big_color;
+		setupMenuInfo.cinematics.style					= UI_CENTER;
 
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.mods.generic.type		= MTYPE_PTEXT;
-	setupMenuInfo.mods.generic.flags	= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.mods.generic.x		= 320;
-	setupMenuInfo.mods.generic.y		= y;
-	setupMenuInfo.mods.generic.id		= ID_MODS;
-	setupMenuInfo.mods.generic.callback	= UI_SetupMenu_Event; 
-	setupMenuInfo.mods.string			= "Mods";
-	setupMenuInfo.mods.color			= text_big_color;
-	setupMenuInfo.mods.style			= UI_CENTER;
+		y += SETUP_MENU_VERTICAL_SPACING;
+		setupMenuInfo.mods.generic.type		= MTYPE_PTEXT;
+		setupMenuInfo.mods.generic.flags	= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		setupMenuInfo.mods.generic.x		= 320;
+		setupMenuInfo.mods.generic.y		= y;
+		setupMenuInfo.mods.generic.id		= ID_MODS;
+		setupMenuInfo.mods.generic.callback	= UI_SetupMenu_Event; 
+		setupMenuInfo.mods.string			= "Mods";
+		setupMenuInfo.mods.color			= text_big_color;
+		setupMenuInfo.mods.style			= UI_CENTER;
 #endif
 
 #ifdef TURTLEARENA // LONG_CREDITS
-	y += SETUP_MENU_VERTICAL_SPACING;
-	setupMenuInfo.credits.generic.type				= MTYPE_PTEXT;
-	setupMenuInfo.credits.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	setupMenuInfo.credits.generic.x					= 320;
-	setupMenuInfo.credits.generic.y					= y;
-	setupMenuInfo.credits.generic.id				= ID_CREDITS;
-	setupMenuInfo.credits.generic.callback			= UI_SetupMenu_Event; 
-	setupMenuInfo.credits.string					= "Credits";
-	setupMenuInfo.credits.color						= text_big_color;
-	setupMenuInfo.credits.style						= UI_CENTER;
+		y += SETUP_MENU_VERTICAL_SPACING;
+		setupMenuInfo.credits.generic.type				= MTYPE_PTEXT;
+		setupMenuInfo.credits.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		setupMenuInfo.credits.generic.x					= 320;
+		setupMenuInfo.credits.generic.y					= y;
+		setupMenuInfo.credits.generic.id				= ID_CREDITS;
+		setupMenuInfo.credits.generic.callback			= UI_SetupMenu_Event; 
+		setupMenuInfo.credits.string					= "Credits";
+		setupMenuInfo.credits.color						= text_big_color;
+		setupMenuInfo.credits.style						= UI_CENTER;
 #endif
 
-	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 #if 0
 		y += SETUP_MENU_VERTICAL_SPACING;
 		setupMenuInfo.load.generic.type					= MTYPE_PTEXT;
@@ -393,15 +396,15 @@ static void UI_SetupMenu_Init( void ) {
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupcontrols );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.setupsystem );
 	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.game );
+	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 #ifdef TA_SP
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.replays );
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cinematics );
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.mods );
+		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.replays );
+		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cinematics );
+		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.mods );
 #endif
 #ifdef TURTLEARENA // LONG_CREDITS
-	Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.credits );
+		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.credits );
 #endif
-	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 //		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.load );
 //		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.save );
 		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.defaults );
