@@ -65,8 +65,6 @@ typedef struct {
 
 	void			(*action)(void);
 
-	sfxHandle_t		silenceSound;
-	sfxHandle_t		characterSound[NUM_SP_CHARACTERS];
 	char			clientShaders[MAX_SPLITVIEW][MAX_QPATH];
 	int				selectedCharacter[MAX_SPLITVIEW];
 	int				characterConflict[MAX_SPLITVIEW];
@@ -210,8 +208,6 @@ static sfxHandle_t SPCharacter_Key( menubitmap_s *s, int key )
 		UI_CheckCharacterConflicts(localClientNum, playerMenuInfo.selectedCharacter[localClientNum], curvalue);
 
 		UI_SetSPCharacter(localClientNum, curvalue);
-
-		trap_S_StartLocalSound( playerMenuInfo.characterSound[curvalue], CHAN_ANNOUNCER );
 	}
 
 	return (sound);
@@ -249,8 +245,6 @@ static void UI_SPPlayerMenu_PlayerToggleEvent( void *ptr, int notification ) {
 
 	if (((menuradiobutton_s*)ptr)->curvalue) {
 		playerMenuInfo.clientCharacter[localClientNum].generic.flags &= ~QMF_GRAYED;
-
-		trap_S_StartLocalSound( playerMenuInfo.characterSound[character], CHAN_ANNOUNCER );
 		
 		UI_CheckCharacterConflicts(localClientNum, -1, character);
 	} else {
@@ -312,8 +306,6 @@ static void UI_SPPlayerMenu_BackEvent( void* ptr, int notification ) {
 		return;
 	}
 
-	trap_S_StartLocalSound( playerMenuInfo.silenceSound, CHAN_ANNOUNCER );
-
 	trap_Cvar_SetValue( "cl_localClients", 1 );
 	UI_SPPlayerMenu_SaveChanges();
 	UI_PopMenu();
@@ -349,8 +341,6 @@ static sfxHandle_t UI_SPPlayerMenu_Key( int key ) {
 	key == K_MOUSE2 ||
 #endif
 	key == K_ESCAPE ) {
-		trap_S_StartLocalSound( playerMenuInfo.silenceSound, CHAN_ANNOUNCER );
-
 		trap_Cvar_SetValue( "cl_localClients", 1 );
 		UI_SPPlayerMenu_SaveChanges();
 	}
@@ -375,10 +365,7 @@ void UI_SPPlayerMenu_Cache( void ) {
 
 	for (i = 0; i < NUM_SP_CHARACTERS; i++) {
 		trap_R_RegisterShaderNoMip( va("menu/art/char_%s", spCharacterNames[i]) );
-		playerMenuInfo.characterSound[i] = trap_S_RegisterSound( va("sound/misc/ui_%s.wav", spCharacterNames[i]), qfalse );
 	}
-
-	playerMenuInfo.silenceSound = trap_S_RegisterSound( "sound/misc/silence.wav", qfalse );
 }
 
 
