@@ -524,6 +524,15 @@ static sfxHandle_t UI_PlayerSetupMenu_Key( int key ) {
 		}
 	}
 
+	if(
+#ifndef TA_MISC // MENU: Right Mouse button = left arrow
+	key == K_MOUSE2 ||
+#endif
+	key == K_ESCAPE ) {
+		trap_Cvar_SetValue( "cl_localClients", 1 );
+		UI_PlayerSetupMenu_SaveChanges();
+	}
+
 	return Menu_DefaultKey( &s_playersetup.menu, key );
 }
 
@@ -644,7 +653,7 @@ static void UI_PlayerSetupMenu_Init( int maxLocalClients, void (*action)(void), 
 	s_playersetup.art_banner.generic.flags		= QMF_CENTER_JUSTIFY;
 	s_playersetup.art_banner.generic.x			= 320;
 	s_playersetup.art_banner.generic.y			= 16;
-	s_playersetup.art_banner.string				= "CHARACTER SELECT";
+	s_playersetup.art_banner.string				= "SETUP PLAYERS";
 	s_playersetup.art_banner.color				= text_banner_color;
 	s_playersetup.art_banner.style				= UI_CENTER;
 
