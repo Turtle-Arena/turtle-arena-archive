@@ -11,8 +11,8 @@ Package: turtlearena
 Architecture: any
 Depends: ${shlibs:Depends}, turtlearena-data (>= DATA_VERSION)
 Recommends: turtlearena-server, turtlearena-wiimote
-Description: 3D Third-Person Arena Combat Game
- Turtle Arena is an free and open source third person action game based on
+Description: 3D Third-Person Action Game
+ Turtle Arena is an free and open source 3D third person action game based on
  ioquake3. It is a free stand-alone game.
  .
  This package installs the Turtle Arena client.
@@ -21,7 +21,7 @@ Package: turtlearena-server
 Architecture: any
 Depends: ${shlibs:Depends}, turtlearena-data (>= DATA_VERSION)
 Description: Dedicated server for Turtle Arena
- Turtle Arena is an free and open source third person action game based on
+ Turtle Arena is an free and open source 3D third person action game based on
  ioquake3. It is a free stand-alone game.
  .
  This package installs the Turtle Arena dedicated server.
