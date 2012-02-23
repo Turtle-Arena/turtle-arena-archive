@@ -219,7 +219,7 @@ void InGame_Event( void *ptr, int notification ) {
 
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
-		UI_PlayerSetupMenu(MAX_SPLITVIEW, NULL, qtrue);
+		UI_PlayerSetupMenu(MAX_SPLITVIEW, 0/*NULL*/, qtrue);
 		break;
 #endif
 
