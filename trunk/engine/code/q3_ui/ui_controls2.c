@@ -201,7 +201,9 @@ typedef struct
 	menutext_s			banner;
 	menubitmap_s		framel;
 	menubitmap_s		framer;
+#ifndef TA_MISC
 	menubitmap_s		player;
+#endif
 
 	menutext_s			movement;
 	menutext_s			looking;
@@ -274,7 +276,9 @@ typedef struct
 	menuaction_s		nextitem;
 	menuaction_s		previtem;
 #endif
+#ifndef TA_MISC
 	playerInfo_t		playerinfo;
+#endif
 	qboolean			changesmade;
 	menuaction_s		chat;
 	menuaction_s		chat2;
@@ -307,7 +311,9 @@ typedef struct
 	qboolean			playerChat;
 
 	menubitmap_s		back;
+#ifndef TA_MISC
 	menutext_s			name;
+#endif
 
 	int					localClient;
 	menucommon_s		***controls;
@@ -921,6 +927,7 @@ static float Controls_GetCvarValue( char* name )
 }
 
 
+#ifndef TA_MISC
 /*
 =================
 Controls_UpdateModel
@@ -1071,6 +1078,7 @@ static void Controls_UpdateModel( int anim ) {
 
 	UI_PlayerInfo_SetInfo( &s_controls.playerinfo, s_controls.playerLegs, s_controls.playerTorso, s_controls.playerViewangles, s_controls.playerMoveangles, s_controls.playerWeapon, s_controls.playerChat );
 }
+#endif
 
 
 /*
@@ -1103,10 +1111,19 @@ static void Controls_Update( void ) {
 	// position controls
 	y = ( SCREEN_HEIGHT - j * SMALLCHAR_HEIGHT ) / 2;
 	for( j = 0;	(control = controls[j]) ; j++, y += SMALLCHAR_HEIGHT ) {
+#ifdef TA_MISC
+		control->x      = 384;
+#else
 		control->x      = 320;
+#endif
 		control->y      = y;
+#ifdef TA_MISC
+		control->left   = control->x - 21*SMALLCHAR_WIDTH;
+		control->right  = control->x + 21*SMALLCHAR_WIDTH;
+#else
 		control->left   = 320 - 19*SMALLCHAR_WIDTH;
 		control->right  = 320 + 21*SMALLCHAR_WIDTH;
+#endif
 		control->top    = y;
 		control->bottom = y + SMALLCHAR_HEIGHT;
 	}
@@ -1120,8 +1137,10 @@ static void Controls_Update( void ) {
 		// enable action item
 		((menucommon_s*)(s_controls.menu.items[s_controls.menu.cursor]))->flags &= ~QMF_GRAYED;
 
+#ifndef TA_MISC
 		// don't gray out player's name
 		s_controls.name.generic.flags &= ~QMF_GRAYED;
+#endif
 
 		return;
 	}
@@ -1315,6 +1334,7 @@ static void Controls_StatusBar( void *self )
 }
 
 
+#ifndef TA_MISC
 /*
 =================
 Controls_DrawPlayer
@@ -1334,6 +1354,7 @@ static void Controls_DrawPlayer( void *self ) {
 	b = (menubitmap_s*) self;
 	UI_DrawPlayer( b->generic.x, b->generic.y, b->width, b->height, &s_controls.playerinfo, uis.realtime/2 );
 }
+#endif
 
 
 /*
@@ -1805,6 +1826,7 @@ Controls_ActionEvent
 */
 static void Controls_ActionEvent( void* ptr, int event )
 {
+#ifndef TA_MISC
 	if (event == QM_LOSTFOCUS)
 	{
 		Controls_UpdateModel( ANIM_IDLE );
@@ -1813,13 +1835,16 @@ static void Controls_ActionEvent( void* ptr, int event )
 	{
 		Controls_UpdateModel( g_bindings[((menucommon_s*)ptr)->id].anim );
 	}
-	else if ((event == QM_ACTIVATED) && !s_controls.waitingforkey)
+	else
+#endif
+	if ((event == QM_ACTIVATED) && !s_controls.waitingforkey)
 	{
 		s_controls.waitingforkey = 1;
 		Controls_Update();
 	}
 }
 
+#ifndef TA_MISC
 /*
 =================
 Controls_InitModel
@@ -1878,6 +1903,7 @@ static void Controls_InitWeapons( void ) {
 	}
 #endif
 }
+#endif
 
 /*
 =================
@@ -1886,7 +1912,11 @@ Controls_MenuInit
 */
 static void Controls_MenuInit( int localClient )
 {
+#ifdef TA_MISC
+	static char bannertext[32];
+#else
 	static char playername[32];
+#endif
 	int			y;
 
 	// zero set all our globals
@@ -1911,6 +1941,10 @@ static void Controls_MenuInit( int localClient )
 
 	Controls_Cache();
 
+#ifdef TA_MISC
+	Com_sprintf(bannertext, sizeof (bannertext), "PLAYER %d CONTROLS", s_controls.localClient+1);
+#endif
+
 	s_controls.menu.key        = Controls_MenuKey;
 	s_controls.menu.wrapAround = qtrue;
 	s_controls.menu.fullscreen = qtrue;
@@ -1919,7 +1953,11 @@ static void Controls_MenuInit( int localClient )
 	s_controls.banner.generic.flags	= QMF_CENTER_JUSTIFY;
 	s_controls.banner.generic.x		= 320;
 	s_controls.banner.generic.y		= 16;
+#ifdef TA_MISC
+	s_controls.banner.string		= bannertext;
+#else
 	s_controls.banner.string		= "CONTROLS";
+#endif
 	s_controls.banner.color			= text_banner_color;
 	s_controls.banner.style			= UI_CENTER;
 
@@ -2029,6 +2067,7 @@ static void Controls_MenuInit( int localClient )
 	s_controls.back.height  		 = 64;
 	s_controls.back.focuspic         = ART_BACK1;
 
+#ifndef TA_MISC
 	s_controls.player.generic.type      = MTYPE_BITMAP;
 	s_controls.player.generic.flags     = QMF_INACTIVE;
 	s_controls.player.generic.ownerdraw = Controls_DrawPlayer;
@@ -2036,6 +2075,7 @@ static void Controls_MenuInit( int localClient )
 	s_controls.player.generic.y	        = -40;
 	s_controls.player.width	            = 32*10;
 	s_controls.player.height            = 56*10;
+#endif
 
 	s_controls.walkforward.generic.type	     = MTYPE_ACTION;
 	s_controls.walkforward.generic.flags     = QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_GRAYED|QMF_HIDDEN;
@@ -2423,6 +2463,7 @@ static void Controls_MenuInit( int localClient )
 	s_controls.joythreshold.maxvalue		  = 0.75f;
 	s_controls.joythreshold.generic.statusbar = Controls_StatusBar;
 
+#ifndef TA_MISC
 	s_controls.name.generic.type	= MTYPE_PTEXT;
 	s_controls.name.generic.flags	= QMF_CENTER_JUSTIFY|QMF_INACTIVE;
 	s_controls.name.generic.x		= 320;
@@ -2430,12 +2471,15 @@ static void Controls_MenuInit( int localClient )
 	s_controls.name.string			= playername;
 	s_controls.name.style			= UI_CENTER;
 	s_controls.name.color			= text_color_normal;
+#endif
 
 	Menu_AddItem( &s_controls.menu, &s_controls.banner );
 	Menu_AddItem( &s_controls.menu, &s_controls.framel );
 	Menu_AddItem( &s_controls.menu, &s_controls.framer );
+#ifndef TA_MISC
 	Menu_AddItem( &s_controls.menu, &s_controls.player );
 	Menu_AddItem( &s_controls.menu, &s_controls.name );
+#endif
 
 	Menu_AddItem( &s_controls.menu, &s_controls.looking );
 	Menu_AddItem( &s_controls.menu, &s_controls.movement );
@@ -2530,8 +2574,10 @@ static void Controls_MenuInit( int localClient )
 
 	Menu_AddItem( &s_controls.menu, &s_controls.back );
 
+#ifndef TA_MISC
 	trap_Cvar_VariableStringBuffer( Com_LocalClientCvarName(s_controls.localClient, "name"), s_controls.name.string, 16 );
 	Q_CleanStr( s_controls.name.string );
+#endif
 
 	// initialize the configurable cvars
 	Controls_InitCvars();
@@ -2539,11 +2585,13 @@ static void Controls_MenuInit( int localClient )
 	// initialize the current config
 	Controls_GetConfig();
 
+#ifndef TA_MISC
 	// intialize the model
 	Controls_InitModel();
 
 	// intialize the weapons
 	Controls_InitWeapons ();
+#endif
 
 	// initial default section
 	s_controls.section = C_LOOKING;
