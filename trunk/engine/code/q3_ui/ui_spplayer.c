@@ -262,6 +262,21 @@ static void UI_SPPlayerMenu_PlayerToggleEvent( void *ptr, int notification ) {
 
 /*
 =================
+UI_SPPlayerMenu_SaveChanges
+=================
+*/
+static void UI_SPPlayerMenu_SaveChanges( void ) {
+	int i;
+
+	// Set characters in cvars.
+	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+		trap_Cvar_Set( Com_LocalClientCvarName(i, "spmodel"), spCharacterNames[playerMenuInfo.selectedCharacter[i]] );
+		trap_Cvar_Set( Com_LocalClientCvarName(i, "spheadmodel"), "" );
+	}
+}
+
+/*
+=================
 UI_SPPlayerMenu_PlayEvent
 =================
 */
@@ -279,12 +294,7 @@ static void UI_SPPlayerMenu_PlayEvent( void *ptr, int notification ) {
 	}
 
 	trap_Cvar_SetValue( "cl_localClients", localClients );
-
-	// Set characters in cvars.
-	for (i = 0; i < MAX_SPLITVIEW; ++i) {
-		trap_Cvar_Set( Com_LocalClientCvarName(i, "spmodel"), spCharacterNames[playerMenuInfo.selectedCharacter[i]] );
-		trap_Cvar_Set( Com_LocalClientCvarName(i, "spheadmodel"), "" );
-	}
+	UI_SPPlayerMenu_SaveChanges();
 
 	if (playerMenuInfo.action) {
 		playerMenuInfo.action();
@@ -298,19 +308,14 @@ UI_SPPlayerMenu_BackEvent
 =================
 */
 static void UI_SPPlayerMenu_BackEvent( void* ptr, int notification ) {
-	int i;
-
 	if (notification != QM_ACTIVATED) {
 		return;
 	}
 
-	// Set characters in cvars.
-	for (i = 0; i < MAX_SPLITVIEW; ++i) {
-		trap_Cvar_Set( Com_LocalClientCvarName(i, "spmodel"), spCharacterNames[playerMenuInfo.selectedCharacter[i]] );
-		trap_Cvar_Set( Com_LocalClientCvarName(i, "spheadmodel"), "" );
-	}
-
 	trap_S_StartLocalSound( playerMenuInfo.silenceSound, CHAN_ANNOUNCER );
+
+	trap_Cvar_SetValue( "cl_localClients", 1 );
+	UI_SPPlayerMenu_SaveChanges();
 	UI_PopMenu();
 }
 
@@ -345,6 +350,9 @@ static sfxHandle_t UI_SPPlayerMenu_Key( int key ) {
 #endif
 	key == K_ESCAPE ) {
 		trap_S_StartLocalSound( playerMenuInfo.silenceSound, CHAN_ANNOUNCER );
+
+		trap_Cvar_SetValue( "cl_localClients", 1 );
+		UI_SPPlayerMenu_SaveChanges();
 	}
 	return Menu_DefaultKey( &playerMenuInfo.menu, key );
 }
