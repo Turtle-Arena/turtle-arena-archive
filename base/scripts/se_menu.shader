@@ -41,8 +41,28 @@ menuback
 	}
 }
 
+menubackInGame
+{
+	nomipmaps
+	{
+		map menu/art/menuback.png
+		tcMod scroll 0.02 0.01
+		alphaGen const 0.5
+		blendfunc blend
+	}
+}
+
 // menu background without blending
 menubackRagePro
+{
+	nomipmaps
+	{
+		map menu/art/menuback.png
+		tcMod scroll 0.02 0.01
+	}
+}
+
+menubackInGameRagePro
 {
 	nomipmaps
 	{

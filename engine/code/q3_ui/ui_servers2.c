@@ -1620,7 +1620,11 @@ static void ArenaServers_MenuInit( void ) {
 	g_arenaservers.banner.generic.flags = QMF_CENTER_JUSTIFY;
 	g_arenaservers.banner.generic.x	    = 320;
 	g_arenaservers.banner.generic.y	    = 16;
+#ifdef TA_MISC
+	g_arenaservers.banner.string  		= "SERVER BROWSER";
+#else
 	g_arenaservers.banner.string  		= "ARENA SERVERS";
+#endif
 	g_arenaservers.banner.style  	    = UI_CENTER;
 	g_arenaservers.banner.color  	    = text_banner_color;
 

@@ -126,7 +126,7 @@ UI_InServerMenu_Draw
 =================
 */
 static void UI_InServerMenu_Draw( void ) {
-	UI_DrawBannerString( 320, 16, "SERVER", UI_CENTER, text_banner_color );
+	UI_DrawBannerString( 320, 16, "SERVER OPTIONS", UI_CENTER, text_banner_color );
 
 	// standard menu drawing
 	Menu_Draw( &s_inserver.menu );

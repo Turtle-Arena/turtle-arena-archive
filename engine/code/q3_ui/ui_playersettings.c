@@ -22,6 +22,8 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //
 #include "ui_local.h"
 
+#ifndef TA_MISC
+
 #define ART_FRAMEL			"menu/art/frame2_l"
 #define ART_FRAMER			"menu/art/frame1_r"
 #define ART_MODEL0			"menu/art/model_0"
@@ -311,9 +313,9 @@ static void PlayerSettings_DrawEffects( void *self ) {
 		// bottom
 		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6 + 10, 16, 2, color );
 		// left
-		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
+		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 8, color );
 		// right
-		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f + 14, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 10, color );
+		UI_FillRect( item->generic.x + 64 + item->curvalue * xOffset + xOffset * 0.5f + 14, item->generic.y + PROP_HEIGHT + 6 + 2, 2, 8, color );
 	}
 #endif
 }
@@ -678,3 +680,4 @@ void UI_PlayerSettingsMenu( int localClient ) {
 	PlayerSettings_MenuInit(localClient);
 	UI_PushMenu( &s_playersettings.menu );
 }
+#endif

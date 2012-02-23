@@ -52,7 +52,9 @@ INGAME MENU
 #define ID_QUIT					17
 #define ID_RESUME				18
 #define ID_TEAMORDERS			19
+#ifndef TA_MISC
 #define ID_LOCALPLAYERS			20
+#endif
 #ifdef TA_MISC // SMART_JOIN_MENU
 #define ID_JOINGAME				21
 #define ID_SPECTATE				22
@@ -78,7 +80,7 @@ typedef struct {
 	menutext_s		removebots;
 #endif
 #ifdef TA_MISC
-	menutext_s		setupplayer;
+	menutext_s		setupplayers;
 #endif
 	menutext_s		teamorders;
 	menutext_s		quit;
@@ -217,7 +219,7 @@ void InGame_Event( void *ptr, int notification ) {
 
 #ifdef TA_MISC
 	case ID_CUSTOMIZEPLAYER:
-		InSelectPlayerMenu(UI_PlayerSettingsMenu, "SETUP PLAYER", qtrue);
+		UI_PlayerSetupMenu(MAX_SPLITVIEW, NULL, qtrue);
 		break;
 #endif
 
@@ -229,13 +231,11 @@ void InGame_Event( void *ptr, int notification ) {
 		UI_PopMenu();
 		break;
 
+#ifndef TA_MISC
 	case ID_LOCALPLAYERS:
-#ifdef TA_MISC
-		InSelectPlayerMenu(UI_TogglePlayerIngame, "ADD/DROP", qfalse);
-#else
 		InSelectPlayerMenu(UI_TogglePlayerIngame, "ADD OR DROP", qfalse);
-#endif
 		break;
+#endif
 	}
 }
 
@@ -300,7 +300,7 @@ void InGame_MenuInit( void ) {
 		if (cs.numLocalClients > 1)
 			s_ingame.team.string			= "Change Teams";
 		else
-			s_ingame.team.string				= "Change Team";
+			s_ingame.team.string			= "Change Team";
 		s_ingame.team.color					= text_big_color;
 		s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 	}
@@ -418,6 +418,7 @@ void InGame_MenuInit( void ) {
 		}
 	}
 
+#ifndef TA_MISC
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.localPlayers.generic.type		= MTYPE_PTEXT;
 	s_ingame.localPlayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -442,6 +443,7 @@ void InGame_MenuInit( void ) {
 	{
 		s_ingame.localPlayers.generic.flags |= QMF_GRAYED;
 	}
+#endif
 
 	y += INGAME_MENU_VERTICAL_SPACING;
 	s_ingame.setup.generic.type			= MTYPE_PTEXT;
@@ -460,21 +462,18 @@ void InGame_MenuInit( void ) {
 
 #ifdef TA_MISC
 	y += INGAME_MENU_VERTICAL_SPACING;
-	s_ingame.setupplayer.generic.type		= MTYPE_PTEXT;
-	s_ingame.setupplayer.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	s_ingame.setupplayer.generic.x			= 320;
-	s_ingame.setupplayer.generic.y			= y;
-	s_ingame.setupplayer.generic.id			= ID_CUSTOMIZEPLAYER;
-	s_ingame.setupplayer.generic.callback	= InGame_Event; 
-	if (cs.numLocalClients > 1)
-		s_ingame.setupplayer.string			= "Setup Players";
-	else
-		s_ingame.setupplayer.string				= "Setup Player";
-	s_ingame.setupplayer.color				= text_big_color;
-	s_ingame.setupplayer.style				= UI_CENTER|UI_SMALLFONT;
+	s_ingame.setupplayers.generic.type		= MTYPE_PTEXT;
+	s_ingame.setupplayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+	s_ingame.setupplayers.generic.x			= 320;
+	s_ingame.setupplayers.generic.y			= y;
+	s_ingame.setupplayers.generic.id		= ID_CUSTOMIZEPLAYER;
+	s_ingame.setupplayers.generic.callback	= InGame_Event; 
+	s_ingame.setupplayers.string			= "Setup Players";
+	s_ingame.setupplayers.color				= text_big_color;
+	s_ingame.setupplayers.style				= UI_CENTER|UI_SMALLFONT;
 
 	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
-		s_ingame.setupplayer.generic.flags |= QMF_GRAYED;
+		s_ingame.setupplayers.generic.flags |= QMF_GRAYED;
 	}
 #endif
 
@@ -486,7 +485,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.inserver.generic.y			= y;
 	s_ingame.inserver.generic.id		= ID_SERVER;
 	s_ingame.inserver.generic.callback	= InGame_Event; 
-	s_ingame.inserver.string			= "Server";
+	s_ingame.inserver.string			= "Server Options";
 	s_ingame.inserver.color				= text_big_color;
 	s_ingame.inserver.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" )
@@ -585,10 +584,12 @@ void InGame_MenuInit( void ) {
 	Menu_AddItem( &s_ingame.menu, &s_ingame.removebots );
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
+#ifndef TA_MISC
 	Menu_AddItem( &s_ingame.menu, &s_ingame.localPlayers);
+#endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
 #ifdef TA_MISC
-	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayer );
+	Menu_AddItem( &s_ingame.menu, &s_ingame.setupplayers );
 #endif
 #ifdef TA_MISC // INGAME_SERVER_MENU
 	Menu_AddItem( &s_ingame.menu, &s_ingame.inserver );

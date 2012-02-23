@@ -450,8 +450,13 @@ extern void UI_ModsMenu_Cache( void );
 //
 extern void UI_MultiplayerMenu( void );
 extern void UI_Multiplayer_Cache( void );
-#endif
 
+//
+// ui_playersetup.c
+//
+void UI_PlayerSetupMenu( int maxLocalClients, void (*action)(void), qboolean playButton );
+void UI_PlayerSetupMenu_Cache( void );
+#else
 //
 // ui_playermodel.c
 //
@@ -463,6 +468,7 @@ extern void PlayerModel_Cache( void );
 //
 extern void UI_PlayerSettingsMenu( int localClient );
 extern void PlayerSettings_Cache( void );
+#endif
 
 //
 // ui_preferences.c
@@ -632,7 +638,9 @@ typedef struct {
 	qboolean			debug;
 	qhandle_t			whiteShader;
 	qhandle_t			menuBackShader;
-#ifndef TA_DATA
+#ifdef TA_DATA
+	qhandle_t			menuBackInGameShader;
+#else
 	qhandle_t			menuBackNoLogoShader;
 #endif
 #ifdef IOQ3ZTM // FONT_REWRITE

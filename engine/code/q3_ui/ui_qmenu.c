@@ -902,7 +902,12 @@ static void SpinControl_Init( menulist_s *s ) {
 	else
 		font = &uis.fontBig;
 
-	s->generic.left	= s->generic.x - Com_FontStringWidth(font, s->generic.name, 0 ) - SMALLCHAR_WIDTH;
+	if (s->generic.flags & QMF_LEFT_JUSTIFY) {
+		s->generic.left	= s->generic.x;
+		s->generic.x += Com_FontStringWidth(font, s->generic.name, 0 ) + SMALLCHAR_WIDTH;
+	} else {
+		s->generic.left	= s->generic.x - Com_FontStringWidth(font, s->generic.name, 0 ) - SMALLCHAR_WIDTH;
+	}
 #else
 	if (s->generic.name)
 		len = strlen(s->generic.name) * SMALLCHAR_WIDTH;
@@ -954,6 +959,12 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	sfxHandle_t	sound;
 #ifdef IOQ3ZTM
 	int			i;
+#endif
+
+#ifdef IOQ3ZTM // IOQ3BUGFIX: Don't have mouse control what it isn't touching!
+	if ((key == K_MOUSE1 || key == K_MOUSE2) && !(s->generic.flags & QMF_HASMOUSEFOCUS)) {
+		return 0;
+	}
 #endif
 
 	sound = 0;
@@ -2038,8 +2049,14 @@ void Menu_Cache( void )
 	if ( uis.glconfig.hardwareType == GLHW_RAGEPRO ) {
 		// the blend effect turns to shit with the normal 
 		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menubackRagePro" );
+#ifdef TA_DATA
+		uis.menuBackInGameShader	= trap_R_RegisterShaderNoMip( "menubackInGameRagePro" );
+#endif
 	} else {
 		uis.menuBackShader	= trap_R_RegisterShaderNoMip( "menuback" );
+#ifdef TA_DATA
+		uis.menuBackInGameShader	= trap_R_RegisterShaderNoMip( "menubackInGame" );
+#endif
 	}
 #ifndef TA_DATA
 	uis.menuBackNoLogoShader = trap_R_RegisterShaderNoMip( "menubacknologo" );
