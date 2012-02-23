@@ -732,8 +732,10 @@ static void StartArcade_Event( void* ptr, int event ) {
 		case ID_NEXT:
 			if (s_arcade.multiplayer && s_arcade.dedicated.curvalue) {
 				StartArcade_Start();
+			} else if (s_arcade.multiplayer) {
+				UI_PlayerSetupMenu(MAX_SPLITVIEW, StartArcade_Start, qtrue);
 			} else {
-				UI_SPPlayerMenu(s_arcade.multiplayer ? MAX_SPLITVIEW : 1, StartArcade_Start);
+				UI_SPPlayerMenu(1, StartArcade_Start);
 			}
 	}
 }
@@ -795,7 +797,7 @@ static void StartArcade_MenuInit( qboolean multiplayer ) {
 	s_arcade.gametype.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
 	s_arcade.gametype.generic.callback	= StartArcade_GametypeEvent;
 	s_arcade.gametype.generic.id		= ID_GAMETYPE;
-	s_arcade.gametype.generic.x			= 120+44;
+	s_arcade.gametype.generic.x			= 64;
 	s_arcade.gametype.generic.y			= 80;
 	if (!multiplayer) {
 		s_arcade.gametype.itemnames		= arcade_gametype_items;
@@ -842,7 +844,7 @@ static void StartArcade_MenuInit( qboolean multiplayer ) {
 	s_arcade.map.generic.flags			= QMF_PULSEIFFOCUS|QMF_SMALLFONT|QMF_LEFT_JUSTIFY;
 	s_arcade.map.generic.callback		= StartArcade_MapEvent;
 	s_arcade.map.generic.id				= ID_MAP;
-	s_arcade.map.generic.x				= 120-42+44;
+	s_arcade.map.generic.x				= 64;
 	s_arcade.map.generic.y				= 224 - SMALLCHAR_HEIGHT;
 	s_arcade.map.itemnames				= gametype_items; // Poor fix for SpinControl_Init // (const char **)s_arcade.mapNames;
 

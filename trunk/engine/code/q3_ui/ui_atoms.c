@@ -1301,7 +1301,12 @@ int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 }
 
 qboolean UI_IsFullscreen( void ) {
-	if ( uis.activemenu && ( trap_Key_GetCatcher() & KEYCATCH_UI ) ) {
+	if ( uis.activemenu && ( trap_Key_GetCatcher() & KEYCATCH_UI )
+#ifdef TA_DATA
+		&& (!trap_Cvar_VariableValue("cl_paused") || uis.glconfig.hardwareType == GLHW_RAGEPRO)
+#endif
+		)
+	{
 		return uis.activemenu->fullscreen;
 	}
 
@@ -1465,8 +1470,12 @@ void UI_Cache_f( void ) {
 	InServer_Cache();
 #endif
 	ConfirmMenu_Cache();
+#ifdef TA_MISC
+	UI_PlayerSetupMenu_Cache();
+#else
 	PlayerModel_Cache();
 	PlayerSettings_Cache();
+#endif
 	Controls_Cache();
 	UI_Joystick_Cache();
 	Demos_Cache();
@@ -1479,7 +1488,9 @@ void UI_Cache_f( void ) {
 	SpecifyServer_Cache();
 	ArenaServers_Cache();
 	StartServer_Cache();
+#ifndef TA_SP
 	ServerOptions_Cache();
+#endif
 	DriverInfo_Cache();
 	GraphicsOptions_Cache();
 	UI_DisplayOptionsMenu_Cache();
@@ -1501,7 +1512,9 @@ void UI_Cache_f( void ) {
 	UI_SelectPlayer_Cache();
 //	UI_LoadConfig_Cache();
 //	UI_SaveConfigMenu_Cache();
+#ifndef TA_SP
 	UI_BotSelectMenu_Cache();
+#endif
 	UI_ModsMenu_Cache();
 
 }
@@ -1780,7 +1793,12 @@ void UI_Refresh( int realtime )
 		{
 			// draw the background
 #ifdef TA_DATA
-			UI_DrawPicFullScreen( uis.menuBackShader );
+			if (trap_Cvar_VariableValue( "cl_paused" )) {
+				UI_DrawPicFullScreen( uis.menuBackInGameShader );
+			}
+			else {
+				UI_DrawPicFullScreen( uis.menuBackShader );
+			}
 #else
 			if( uis.activemenu->showlogo ) {
 				UI_DrawHandlePic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, uis.menuBackShader );

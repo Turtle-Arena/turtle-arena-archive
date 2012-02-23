@@ -250,6 +250,9 @@
 		<Unit filename="../../code/q3_ui/ui_playersettings.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../code/q3_ui/ui_playersetup.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/q3_ui/ui_preferences.c">
 			<Option compilerVar="CC" />
 		</Unit>

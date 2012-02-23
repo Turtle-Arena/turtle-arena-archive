@@ -153,10 +153,10 @@ static void UI_SetSPCharacter(int localClientNum, int character) {
 
 /*
 =================
-Character_Key
+SPCharacter_Key
 =================
 */
-static sfxHandle_t Character_Key( menubitmap_s *s, int key )
+static sfxHandle_t SPCharacter_Key( menubitmap_s *s, int key )
 {
 	sfxHandle_t	sound;
 	int			localClientNum;
@@ -226,7 +226,7 @@ static void UI_SPPlayerMenu_CharacterEvent( void *ptr, int notification ) {
 	if (notification != QM_ACTIVATED)
 		return;
 
-	Character_Key((menubitmap_s*)ptr, K_RIGHTARROW);
+	SPCharacter_Key((menubitmap_s*)ptr, K_RIGHTARROW);
 }
 
 /*
@@ -331,7 +331,7 @@ static sfxHandle_t UI_SPPlayerMenu_Key( int key ) {
 		id = ((menucommon_s*)ptr)->id;
 
 		if (id >= ID_CLIENT0 && id < ID_CLIENT0+MAX_SPLITVIEW) {
-			sound = Character_Key((menubitmap_s*)ptr, key);
+			sound = SPCharacter_Key((menubitmap_s*)ptr, key);
 	
 			if (sound) {
 				return sound;
