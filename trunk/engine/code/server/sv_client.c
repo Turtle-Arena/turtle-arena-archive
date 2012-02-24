@@ -186,6 +186,11 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	int			startIndex;
 	intptr_t		denied;
 
+	if ( strlen(userinfo) <= 0 ) {
+		// Ignore dummy userinfo string.
+		return;
+	}
+
 #ifdef TA_SP
 	// Don't allow join in arcade mode
 	if (Cvar_VariableIntegerValue("ui_singlePlayerActive")
@@ -234,11 +239,6 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	}
 
 	if (!newcl) {
-		return;
-	}
-
-	if ( strlen(userinfo) <= 0 ) {
-		// Ignore dummy userinfo string.
 		return;
 	}
 
