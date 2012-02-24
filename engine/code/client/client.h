@@ -424,10 +424,12 @@ extern	cvar_t	*j_pitch[MAX_SPLITVIEW];
 extern	cvar_t	*j_yaw[MAX_SPLITVIEW];
 extern	cvar_t	*j_forward[MAX_SPLITVIEW];
 extern	cvar_t	*j_side[MAX_SPLITVIEW];
+extern	cvar_t	*j_up[MAX_SPLITVIEW];
 extern	cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
 extern	cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
 extern	cvar_t	*j_forward_axis[MAX_SPLITVIEW];
 extern	cvar_t	*j_side_axis[MAX_SPLITVIEW];
+extern	cvar_t	*j_up_axis[MAX_SPLITVIEW];
 
 extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;

@@ -697,7 +697,7 @@ void CL_JoystickMove( calc_t *lc, clientInput_t *ci, usercmd_t *cmd ) {
 		cmd->forwardmove = ClampChar( cmd->forwardmove + (int) (j_forward[lcNum]->value * lc->joystickAxis[j_forward_axis[lcNum]->integer]) );
 	}
 
-	cmd->upmove = ClampChar( cmd->upmove + lc->joystickAxis[AXIS_UP] );
+	cmd->upmove = ClampChar( cmd->upmove + (int) (j_up[lcNum]->value * lc->joystickAxis[j_up_axis[lcNum]->integer]) );
 }
 
 /*

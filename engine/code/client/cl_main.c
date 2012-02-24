@@ -96,10 +96,12 @@ cvar_t	*j_pitch[MAX_SPLITVIEW];
 cvar_t	*j_yaw[MAX_SPLITVIEW];
 cvar_t	*j_forward[MAX_SPLITVIEW];
 cvar_t	*j_side[MAX_SPLITVIEW];
+cvar_t	*j_up[MAX_SPLITVIEW];
 cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
 cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
 cvar_t	*j_forward_axis[MAX_SPLITVIEW];
 cvar_t	*j_side_axis[MAX_SPLITVIEW];
+cvar_t	*j_up_axis[MAX_SPLITVIEW];
 
 cvar_t	*cl_activeAction;
 
@@ -3700,10 +3702,19 @@ void CL_Init( void ) {
 		j_yaw[i] =          Cvar_Get (Com_LocalClientCvarName(i, "j_yaw"),          "-0.022", CVAR_ARCHIVE);
 		j_forward[i] =      Cvar_Get (Com_LocalClientCvarName(i, "j_forward"),      "-0.25", CVAR_ARCHIVE);
 		j_side[i] =         Cvar_Get (Com_LocalClientCvarName(i, "j_side"),         "0.25", CVAR_ARCHIVE);
+		j_up[i] = 	        Cvar_Get (Com_LocalClientCvarName(i, "j_up"),           "1", CVAR_ARCHIVE);
+
 		j_pitch_axis[i] =   Cvar_Get (Com_LocalClientCvarName(i, "j_pitch_axis"),   "3", CVAR_ARCHIVE);
 		j_yaw_axis[i] =     Cvar_Get (Com_LocalClientCvarName(i, "j_yaw_axis"),     "4", CVAR_ARCHIVE);
 		j_forward_axis[i] = Cvar_Get (Com_LocalClientCvarName(i, "j_forward_axis"), "1", CVAR_ARCHIVE);
 		j_side_axis[i] =    Cvar_Get (Com_LocalClientCvarName(i, "j_side_axis"),    "0", CVAR_ARCHIVE);
+		j_up_axis[i] =      Cvar_Get (Com_LocalClientCvarName(i, "j_up_axis"),      "2", CVAR_ARCHIVE);
+
+		Cvar_CheckRange(j_pitch_axis[i], 0, MAX_JOYSTICK_AXIS-1, qtrue);
+		Cvar_CheckRange(j_yaw_axis[i], 0, MAX_JOYSTICK_AXIS-1, qtrue);
+		Cvar_CheckRange(j_forward_axis[i], 0, MAX_JOYSTICK_AXIS-1, qtrue);
+		Cvar_CheckRange(j_side_axis[i], 0, MAX_JOYSTICK_AXIS-1, qtrue);
+		Cvar_CheckRange(j_up_axis[i], 0, MAX_JOYSTICK_AXIS-1, qtrue);
 	}
 
 	cl_motdString = Cvar_Get( "cl_motdString", "", CVAR_ROM );
@@ -3826,12 +3837,12 @@ void CL_Init( void ) {
 #ifdef TURTLEARENA
 	Cvar_Get ("3model", "raph", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("3model", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3model", "major", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
 	Cvar_Get ("3headmodel", "", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #else
-	Cvar_Get ("3headmodel", "crash", CVAR_USERINFO3 | CVAR_ARCHIVE );
+	Cvar_Get ("3headmodel", "major", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #endif
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
 	Cvar_Get ("3team_model", "janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
