@@ -95,6 +95,7 @@ typedef struct {
 	menubitmap_s		next;
 
 	qboolean			multiplayer;
+	qboolean			inGame;
 	int					maplist[MAX_ARENAS];
 	char				*mapNames[MAX_ARENAS];
 
@@ -110,36 +111,36 @@ static char scoreTimes[NUM_ARCADE_SCORES][6] = { "0:00", "0:00", "0:00", "0:00",
 static char scoreNames[NUM_ARCADE_SCORES][9] = { "Nobody", "Nobody", "Nobody", "Nobody", "Nobody" };
 
 // Order of gametypes in "gametype select list", must match gametype_items
-static int gametype_remap[] = {
+static int listToGametype[] = {
 	GT_SINGLE_PLAYER,
 	GT_FFA,
 	GT_TOURNAMENT,
 	GT_TEAM,
-	GT_CTF
+	GT_CTF,
 #ifdef MISSIONPACK
-	,GT_1FCTF
-	,GT_OBELISK
+	GT_1FCTF,
+	GT_OBELISK,
 #ifdef MISSIONPACK_HARVESTER
-	,GT_HARVESTER
+	GT_HARVESTER,
 #endif
 #endif
 };
 
-// Order of gametype_items, convert GT_* to gametype_items index
-/*static int gametype_remap2[] = {
-	0,		// Cooperative
-	1,		// Free For All
-	2,		// Duel
-	3,		// Team Deathmatch
-	4		// Capture the Flag
+// Order of gametype_items, convert GT_* to "gametype select list" index
+static int gametypeToList[] = {
+	1, // GT_FFA
+	2, // GT_TOURNAMENT
+	0, // GT_SINGLE_PLAYER
+	3, // GT_TEAM
+	4, // GT_CTF
 #ifdef MISSIONPACK
-	,5		// 1 Flag CTF
-	,6		// Overload
+	5, // GT_1FCTF
+	6, // GT_OBELISK
 #ifdef MISSIONPACK_HARVESTER
-	,7		// Harvester
+	7, // GT_HARVESTER
 #endif
 #endif
-};*/
+};
 
 // Names of gametypes in "gametype select list", can be any gametypes in any order
 static const char *gametype_items[] = {
@@ -268,7 +269,7 @@ static void StartArcade_Update(void) {
 	s_arcade.mappic.shader = 0;
 
 	if (!s_arcade.multiplayer) {
-		UI_LoadBestScores(Info_ValueForKey( info, "map"), gametype_remap[s_arcade.gametype.curvalue]);
+		UI_LoadBestScores(Info_ValueForKey( info, "map"), listToGametype[s_arcade.gametype.curvalue]);
 	}
 }
 
@@ -355,7 +356,7 @@ static void StartArcade_SetMenuItems( void ) {
 	Q_strncpyz( s_arcade.hostname.field.buffer, UI_Cvar_VariableString( "sv_hostname" ), sizeof( s_arcade.hostname.field.buffer ) );
 	s_arcade.pure.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_pure" ) );
 
-	switch( gametype_remap[s_arcade.gametype.curvalue] ) {
+	switch( listToGametype[s_arcade.gametype.curvalue] ) {
 	case GT_FFA:
 	default:
 		Com_sprintf( s_arcade.scorelimit.field.buffer, 5, "%i", (int)Com_Clamp( 0, 9999, trap_Cvar_VariableValue( "ui_ffa_scorelimit" ) ) );
@@ -434,7 +435,7 @@ static void StartArcade_Start( void ) {
 	char	buf[64];
 	const char *info;
 
-	gametype	 = gametype_remap[s_arcade.gametype.curvalue];
+	gametype	 = listToGametype[s_arcade.gametype.curvalue];
 	timelimit	 = atoi( s_arcade.timelimit.field.buffer );
 	scorelimit	 = atoi( s_arcade.scorelimit.field.buffer );
 	flaglimit	 = atoi( s_arcade.flaglimit.field.buffer );
@@ -532,7 +533,7 @@ static void StartArcade_Start( void ) {
 	}
 
 	// set player's team
-	if( dedicated == 0 && gametype >= GT_TEAM ) {
+	if( !s_arcade.inGame && dedicated == 0 && gametype >= GT_TEAM ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, "wait 3\n" );
 
 		for( n = 0; n < MAX_SPLITVIEW; ++n ) {
@@ -627,8 +628,8 @@ static void StartArcade_GametypeEvent( void* ptr, int event ) {
 		return;
 	}
 
-	gametype = gametype_remap[s_arcade.gametype.curvalue];
-	oldgametype = gametype_remap[s_arcade.gametype.oldvalue];
+	gametype = listToGametype[s_arcade.gametype.curvalue];
+	oldgametype = listToGametype[s_arcade.gametype.oldvalue];
 
 	s_arcade.map.curvalue = 0;
 
@@ -715,7 +716,7 @@ static void StartArcade_ViewReplayEvent( void* ptr, int event ) {
 	// Play demo!
 	info = UI_GetArenaInfoByNumber( s_arcade.maplist[ s_arcade.map.curvalue ]);
 	trap_Cmd_ExecuteText( EXEC_APPEND, va("demo %s_%d\n", Info_ValueForKey( info, "map"),
-			gametype_remap[s_arcade.gametype.curvalue]));
+			listToGametype[s_arcade.gametype.curvalue]));
 }
 
 /*
@@ -741,11 +742,11 @@ static void StartArcade_Event( void* ptr, int event ) {
 			s_arcade.next.focusshader = 0;
 			break;
 		case ID_BACK:
-			StartArcade_SaveMenuItems(gametype_remap[s_arcade.gametype.curvalue]);
+			StartArcade_SaveMenuItems(listToGametype[s_arcade.gametype.curvalue]);
 			UI_PopMenu();
 			break;
 		case ID_NEXT:
-			if (s_arcade.multiplayer && s_arcade.dedicated.curvalue) {
+			if (s_arcade.multiplayer && (s_arcade.dedicated.curvalue || s_arcade.inGame)) {
 				StartArcade_Start();
 			} else if (s_arcade.multiplayer) {
 				UI_PlayerSetupMenu(MAX_SPLITVIEW, StartArcade_Start, qtrue);
@@ -790,6 +791,7 @@ static void StartArcade_MenuInit( qboolean multiplayer ) {
 
 	memset( &s_arcade, 0, sizeof(arcademenu_t) );
 	s_arcade.multiplayer = multiplayer;
+	s_arcade.inGame = trap_Cvar_VariableValue("sv_running");
 
 	StartServer_Cache();
 
@@ -799,7 +801,9 @@ static void StartArcade_MenuInit( qboolean multiplayer ) {
 	s_arcade.banner.generic.type		= MTYPE_BTEXT;
 	s_arcade.banner.generic.x			= 320;
 	s_arcade.banner.generic.y			= 16;
-	if (!multiplayer) {
+	if (s_arcade.inGame) {
+		s_arcade.banner.string  			= "CHANGE MAP";
+	} else if (!s_arcade.multiplayer) {
 		s_arcade.banner.string  			= "ARCADE MODE";
 	} else {
 		s_arcade.banner.string  			= "START SERVER";
@@ -937,6 +941,10 @@ static void StartArcade_MenuInit( qboolean multiplayer ) {
 		s_arcade.dedicated.generic.y		= y;
 		s_arcade.dedicated.generic.name		= "Dedicated:";
 
+		if (s_arcade.inGame) {
+			s_arcade.dedicated.generic.flags |= QMF_GRAYED;
+		}
+
 		y += SMALLCHAR_HEIGHT+2;
 		s_arcade.hostname.generic.type			= MTYPE_FIELD;
 		s_arcade.hostname.generic.name			= "Hostname:";
@@ -1073,6 +1081,14 @@ static void StartArcade_MenuInit( qboolean multiplayer ) {
 	Menu_AddItem( &s_arcade.menu, &s_arcade.next );
 
 	StartArcade_SetMenuItems();
+
+	if (s_arcade.inGame) {
+		s_arcade.gametype.curvalue	= gametypeToList[(int)Com_Clamp(0, ARRAY_LEN(gametypeToList) - 1,
+												trap_Cvar_VariableValue("g_gametype"))];
+
+		s_arcade.next.generic.name		= GAMESERVER_PLAY0;
+		s_arcade.next.focuspic			= GAMESERVER_PLAY1;
+	}
 
 	StartArcade_GametypeEvent(&s_arcade.gametype, QM_ACTIVATED);
 }
@@ -1615,9 +1631,6 @@ static void StartServer_MenuInit( qboolean multiplayer ) {
 	s_startserver.multiplayer = multiplayer;
 
 	s_startserver.menu.wrapAround = qtrue;
-#ifdef TA_MISC
-	if (!inGame)
-#endif
 	s_startserver.menu.fullscreen = qtrue;
 
 	s_startserver.banner.generic.type  = MTYPE_BTEXT;
