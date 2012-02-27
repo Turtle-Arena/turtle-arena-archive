@@ -59,6 +59,11 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define SB_TIME_X			(SB_SCORELINE_X + 17 * BIGCHAR_WIDTH + 8) // width 5
 #define SB_NAME_X			(SB_SCORELINE_X + 22 * BIGCHAR_WIDTH) // width 15
 
+#ifdef TA_SP // SP_SCOREBOARD
+#define SP_SB_SCORE_X			(SB_SCORELINE_X + 5 * BIGCHAR_WIDTH + 8) // width 6
+#define SP_SB_NAME_X			(SB_SCORELINE_X + 17 * BIGCHAR_WIDTH + 8) // width 15
+#endif
+
 // The new and improved score board
 //
 // In cases where the number of clients is high, the score board heads are interleaved
@@ -83,6 +88,9 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	vec3_t	headAngles;
 	clientInfo_t	*ci;
 	int iconx, headx;
+#ifdef TA_SP // SP_SCOREBOARD
+	int scorex, namex;
+#endif
 	playerState_t *ps;
 
 	if ( score->client < 0 || score->client >= cgs.maxclients ) {
@@ -94,6 +102,11 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 
 	iconx = SB_BOTICON_X + (SB_RATING_WIDTH / 2);
 	headx = SB_HEAD_X + (SB_RATING_WIDTH / 2);
+
+#ifdef TA_SP // SP_SCOREBOARD
+	scorex = cg_singlePlayerActive.integer ? SP_SB_SCORE_X : SB_SCORE_X;
+	namex = cg_singlePlayerActive.integer ? SP_SB_NAME_X : SB_NAME_X;
+#endif
 
 	// draw the handicap or bot skill marker (unless player has flag)
 	if ( ci->powerups & ( 1 << PW_NEUTRALFLAG ) ) {
@@ -243,9 +256,18 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 	} else {
 		Com_sprintf(string, sizeof(string), "%5i", score->score);
 	}
+#ifdef TA_SP // SP_SCOREBOARD
+	CG_DrawBigString( scorex + (SB_RATING_WIDTH / 2), y, string, fade );
+#else
 	CG_DrawBigString( SB_SCORE_X + (SB_RATING_WIDTH / 2), y, string, fade );
+#endif
 
-	if ( score->ping != -1 ) {
+	if ( score->ping != -1
+#ifdef TA_SP // SP_SCOREBOARD
+		&& !cg_singlePlayerActive.integer
+#endif
+		)
+	{
 		Com_sprintf(string, sizeof(string), "%4i", score->ping);
 		CG_DrawBigString( SB_PING_X - (SB_RATING_WIDTH / 2), y, string, fade );
 
@@ -253,7 +275,11 @@ static void CG_DrawClientScore( int y, score_t *score, float *color, float fade,
 		CG_DrawBigString( SB_TIME_X - (SB_RATING_WIDTH / 2), y, string, fade );
 	}
 
+#ifdef TA_SP // SP_SCOREBOARD
+	CG_DrawBigString( namex - (SB_RATING_WIDTH / 2), y, ci->name, fade );
+#else
 	CG_DrawBigString( SB_NAME_X - (SB_RATING_WIDTH / 2), y, ci->name, fade );
+#endif
 #else
 	CG_DrawBigString( SB_SCORELINE_X + (SB_RATING_WIDTH / 2), y, string, fade );
 #endif
@@ -399,10 +425,26 @@ qboolean CG_DrawOldScoreboard( void ) {
 	// scoreboard
 	y = SB_HEADER;
 
+#ifdef TA_SP // SP_SCOREBOARD
+	if (cg_singlePlayerActive.integer)
+	{
+		// Only draw score and name, centered.
+		CG_DrawPic( SP_SB_SCORE_X + (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardScore );
+		CG_DrawPic( SP_SB_NAME_X  - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardName );
+	}
+	else
+	{
+		CG_DrawPic( SB_SCORE_X + (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardScore );
+		CG_DrawPic( SB_PING_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardPing );
+		CG_DrawPic( SB_TIME_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardTime );
+		CG_DrawPic( SB_NAME_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardName );
+	}
+#else
 	CG_DrawPic( SB_SCORE_X + (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardScore );
 	CG_DrawPic( SB_PING_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardPing );
 	CG_DrawPic( SB_TIME_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardTime );
 	CG_DrawPic( SB_NAME_X - (SB_RATING_WIDTH / 2), y, 64, 32, cgs.media.scoreboardName );
+#endif
 
 	y = SB_TOP;
 
