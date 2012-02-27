@@ -274,11 +274,34 @@ static void UI_SPPlayerMenu_SaveChanges( void ) {
 UI_SPPlayerMenu_PlayEvent
 =================
 */
+#if NUM_SP_CHARACTERS < MAX_SPLITVIEW
+#error "Start SP can get stuck looping."
+#endif
 static void UI_SPPlayerMenu_PlayEvent( void *ptr, int notification ) {
-	int i, localClients;
+	int i, j, localClients;
 
 	if (notification != QM_ACTIVATED)
 		return;
+
+	// Force disabled clients to have unique characters, otherwise if
+	// they drop in later there could be multiple of the same character.
+	for (i = 1; i < MAX_SPLITVIEW; ++i) {
+		if (playerMenuInfo.clientEnabled[i-1].curvalue) {
+			continue;
+		}
+
+		for (j = 0; j < MAX_SPLITVIEW; ++j) {
+			if (i == j) {
+				continue;
+			}
+
+			if (playerMenuInfo.selectedCharacter[i] == playerMenuInfo.selectedCharacter[j]) {
+				playerMenuInfo.selectedCharacter[i]++;
+				playerMenuInfo.selectedCharacter[i] %= NUM_SP_CHARACTERS;
+				j = 0;
+			}
+		}
+	}
 
 	// Set bits for enabled local clients.
 	for (i = 1, localClients = 1; i < MAX_SPLITVIEW; ++i) {
