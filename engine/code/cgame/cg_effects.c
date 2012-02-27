@@ -743,7 +743,7 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 	ex->refEntity.customShader = cgs.media.bloodExplosionShader;
 
 	// don't show player's own blood in view
-	if ( CG_LocalClient(entityNum) != -1 && (!cg.snap || cg.snap->numPSs <= 1)
+	if ( CG_LocalClientPlayerStateForClientNum(entityNum) && (!cg.snap || cg.snap->numPSs <= 1)
 #ifdef IOQ3ZTM // Show player their own blood in third person
 		&& !cg.renderingThirdPerson
 #endif

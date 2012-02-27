@@ -259,7 +259,7 @@ static void CG_Obituary( entityState_t *ent ) {
 		cgs.gametype != GT_OBELISK &&
 #endif
 #endif
-		CG_LocalClient(attacker) != -1)
+		CG_LocalClientPlayerStateForClientNum(attacker) )
 	{
 		char	*s;
 		playerState_t	*ps;
