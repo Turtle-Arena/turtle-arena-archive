@@ -2076,7 +2076,7 @@ void CG_SetScoreSelection(void *p) {
 		} else if (cg.scores[i].team == TEAM_BLUE) {
 			blue++;
 		}
-		if (ps->clientNum == cg.scores[i].client) {
+		if (ps && ps->clientNum == cg.scores[i].client) {
 			cg.selectedScore = i;
 		}
 	}
@@ -2164,7 +2164,7 @@ static const char *CG_FeederItemText(float feederID, int index, int column, qhan
 				}
 		  break;
 			case 2:
-				if ( cg.cur_ps->stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
+				if ( cg.snap->pss[0].stats[ STAT_CLIENTS_READY ] & ( 1 << sp->client ) ) {
 					return "Ready";
 				}
 				if (team == -1) {

@@ -522,8 +522,14 @@ static void CG_DrawSelectedPlayerWeapon( rectDef_t *rect ) {
 }
 
 static void CG_DrawPlayerScore( rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
-  char num[16];
-  int value = cg.cur_ps->persistant[PERS_SCORE];
+	char num[16];
+	int value;
+
+	if (!cg.cur_ps) {
+		return;
+	}
+
+	value = cg.cur_ps->persistant[PERS_SCORE];
 
 	if (shader) {
 		trap_R_SetColor( color );
@@ -1263,7 +1269,7 @@ static void CG_DrawAreaChat(rectDef_t *rect, float scale, vec4_t color, qhandle_
 
 const char *CG_GetKillerText(void) {
 	const char *s = "";
-	if ( cg.cur_lc->killerName[0] ) {
+	if ( cg.cur_lc && cg.cur_lc->killerName[0] ) {
 #ifdef NOTRATEDM // frag to KO
 		s = va("Knocked out by %s", cg.cur_lc->killerName );
 #else
@@ -1276,7 +1282,7 @@ const char *CG_GetKillerText(void) {
 
 static void CG_DrawKiller(rectDef_t *rect, float scale, vec4_t color, qhandle_t shader, int textStyle ) {
 	// fragged by ... line
-	if ( cg.cur_lc->killerName[0] ) {
+	if ( cg.cur_lc && cg.cur_lc->killerName[0] ) {
 		int x = rect->x + rect->w / 2;
 	  CG_Text_Paint(x - CG_Text_Width(CG_GetKillerText(), scale, 0) / 2, rect->y + rect->h, scale, color, CG_GetKillerText(), 0, 0, textStyle);
 	}
@@ -1304,7 +1310,7 @@ static void CG_Draw2ndPlace(rectDef_t *rect, float scale, vec4_t color, qhandle_
 const char *CG_GetGameStatusText(void) {
 	const char *s = "";
 	if ( cgs.gametype < GT_TEAM) {
-		if (cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
+		if (cg.cur_ps && cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR ) {
 			s = va("%s place with %i",CG_PlaceString( cg.cur_ps->persistant[PERS_RANK] + 1 ),cg.cur_ps->persistant[PERS_SCORE] );
 		}
 	} else {
@@ -2016,11 +2022,11 @@ void CG_RunMenuScript(char **args) {
 
 
 void CG_GetTeamColor(vec4_t *color) {
-  if (cg.cur_ps->persistant[PERS_TEAM] == TEAM_RED) {
+  if (cg.cur_ps && cg.cur_ps->persistant[PERS_TEAM] == TEAM_RED) {
     (*color)[0] = 1.0f;
     (*color)[3] = 0.25f;
     (*color)[1] = (*color)[2] = 0.0f;
-  } else if (cg.cur_ps->persistant[PERS_TEAM] == TEAM_BLUE) {
+  } else if (cg.cur_ps && cg.cur_ps->persistant[PERS_TEAM] == TEAM_BLUE) {
     (*color)[0] = (*color)[1] = 0.0f;
     (*color)[2] = 1.0f;
     (*color)[3] = 0.25f;

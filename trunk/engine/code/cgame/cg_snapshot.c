@@ -429,17 +429,17 @@ void CG_ProcessSnapshots( void ) {
 
 /*
 =============
-CG_LocalClient
+CG_LocalClientPlayerStateForClientNum
 =============
 */
-int CG_LocalClient(int clientNum) {
+playerState_t *CG_LocalClientPlayerStateForClientNum(int clientNum) {
 	int i;
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == clientNum) {
-			return i;
+			return &cg.snap->pss[cg.snap->lcIndex[i]];
 		}
 	}
 
-	return -1;
+	return NULL;
 }

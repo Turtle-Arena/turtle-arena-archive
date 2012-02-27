@@ -3084,7 +3084,7 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 
 	// should never happen in Team Arena
-	if (cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	if (cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc && cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		cg.deferredPlayerLoading = 0;
 		firstTime = qtrue;
 		return qfalse;
@@ -3095,12 +3095,15 @@ static qboolean CG_DrawScoreboard( void ) {
 		return qfalse;
 	}
 
-	if ( cg.showScores || cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD || cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
+	if ( cg.showScores || (cg.cur_lc && (cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD ||
+		 cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION)) ) {
 	} else {
 		if ( !CG_FadeColor( cg.scoreFadeTime, FADE_TIME ) ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
-			cg.cur_lc->killerName[0] = 0;
+			if (cg.cur_lc) {
+				cg.cur_lc->killerName[0] = 0;
+			}
 			firstTime = qtrue;
 			return qfalse;
 		}
@@ -3682,8 +3685,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	}
 
 	// don't draw center string if scoreboard is up
-	cg.scoreBoardShowing = CG_DrawScoreboard();
-	if ( !cg.scoreBoardShowing) {
+	if (!cg.showScores && !cg.scoreBoardShowing && !CG_DrawScoreboard()) {
 #ifdef TA_SP
 		CG_DrawGameOver();
 #endif
@@ -3703,7 +3705,7 @@ static void CG_DrawTourneyScoreboard( void ) {
 =====================
 CG_DrawActive
 
-Perform all drawing needed to completely fill the screen
+Perform all drawing needed to completely fill the viewport
 =====================
 */
 void CG_DrawActive( stereoFrame_t stereoView ) {
@@ -3731,6 +3733,31 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 
 	// draw status bar and other floating elements
  	CG_Draw2D(stereoView);
+}
+
+/*
+=====================
+CG_DrawScreen2D
+
+Perform drawing that fills the screen, drawing over all viewports
+=====================
+*/
+void CG_DrawScreen2D( stereoFrame_t stereoView ) {
+	if ( !cg.snap ) {
+		return;
+	}
+
+	// if we are taking a levelshot for the menu, don't draw anything
+	if ( cg.levelShot ) {
+		return;
+	}
+
+	if ( cg_draw2D.integer == 0 ) {
+		return;
+	}
+
+	// Draw scoreboard over all viewports.
+	cg.scoreBoardShowing = CG_DrawScoreboard();
 }
 
 #ifdef IOQ3ZTM // LETTERBOX
@@ -3817,4 +3844,5 @@ void CG_DrawLetterbox(void)
 	CG_FillRectFit(0, 480-pixels, 640, pixels, color);
 }
 #endif
+
 
