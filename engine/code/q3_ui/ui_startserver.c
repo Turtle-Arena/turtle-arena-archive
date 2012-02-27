@@ -502,10 +502,25 @@ static void StartArcade_Start( void ) {
 
 	// add bots
 	if (!s_arcade.multiplayer) {
+		char	playerCharacter[32];
+
+		// Get user's character
+		trap_Cvar_VariableStringBuffer("spmodel", playerCharacter, sizeof(playerCharacter));
+
 		trap_Cmd_ExecuteText( EXEC_APPEND, "wait 3\n" );
 
-		// ZTM: FIXME: Always have teams equal (currently only true when client is Leo)
-		for( n = 1; n < maxclients; n++ ) {
+		for( n = 0; n < maxclients; n++ ) {
+			// Skip bot for character user is playing as.
+			if (!Q_stricmpn(playerCharacter, spCharacterNames[n%NUM_SP_CHARACTERS], sizeof(playerCharacter))) {
+				if( gametype >= GT_TEAM ) {
+					if (n < maxclients/2) {
+						continue;
+					}
+				} else {
+					continue;
+				}
+			}
+
 			if( gametype >= GT_TEAM ) {
 				Com_sprintf( buf, sizeof(buf), "addbot %s %i %s\n", spCharacterNames[n%NUM_SP_CHARACTERS], skill,
 					n < maxclients/2 ? "blue" : "red" );
