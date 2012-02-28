@@ -4,15 +4,6 @@
 # GNU Make required
 #
 
-# TTimo 5/15/2001
-# some cleanup .. only used on i386 for GtkRadiant setups AFAIK .. removing the i386 tag
-# TODO: the intermediate object files should go into their own directory
-#   specially for ../botlib and ../qcommon, the compilation flags on those might not be what you expect
-#
-# ZTM 2/25/2009
-# Changed Makefile to be like ioquake3 Makefile, currently still only for linux
-#   but should change later.
-
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]')
 
 COMPILE_ARCH=$(shell uname -m | sed -e s/i.86/i386/)
@@ -29,6 +20,9 @@ endif
 ifeq ($(COMPILE_PLATFORM),mingw32)
   ifeq ($(COMPILE_ARCH),i386)
     COMPILE_ARCH=x86
+  endif
+  ifeq ($(COMPILE_ARCH),x86_64)
+    COMPILE_ARCH=x64
   endif
 endif
 
@@ -152,13 +146,13 @@ ifeq ($(PLATFORM),linux)
   endif
   endif
 
-#use these cflags to optimize it
-#ZTM: -m486 :  error: unrecognized command line option "-m486"
-  CFLAGS=$(BASE_CFLAGS) -O6 -ffast-math -funroll-loops \
+  #use these cflags to optimize it
+  RELEASE_CFLAGS=$(BASE_CFLAGS) -O6 -ffast-math -funroll-loops \
 	-fomit-frame-pointer -fexpensive-optimizations -falign-loops=2 \
 	-falign-jumps=2 -falign-functions=2
-#use these when debugging 
-#CFLAGS=$(BASE_CFLAGS) -g
+
+  #use these when debugging
+  DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 
   LIBS=-ldl -lm -lpthread
 
