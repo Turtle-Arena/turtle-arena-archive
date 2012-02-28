@@ -78,27 +78,6 @@ qboolean	forcesidesvisible;	//force all brush sides to be visible when loaded fr
 qboolean	capsule_collision = 0;
 
 
-#if 1 // ZTM(IOQ3): Moved here
-//===========================================================================
-//
-// Parameter:			-
-// Returns:				-
-// Changes Globals:		-
-//===========================================================================
-void Com_Memset (void* dest, const int val, const size_t count) {
-	memset(dest, val, count);
-}
-//===========================================================================
-//
-// Parameter:			-
-// Returns:				-
-// Changes Globals:		-
-//===========================================================================
-void Com_Memcpy (void* dest, const void* src, const size_t count) {
-	memcpy(dest, src, count);
-}
-#endif
-
 /*
 //===========================================================================
 //
@@ -402,7 +381,6 @@ void CreateAASFilesForAllBSPFiles(char *quakepath)
 	struct stat statbuf;
 	int j;
 #endif
-	int done;
 	char filter[_MAX_PATH], bspfilter[_MAX_PATH], aasfilter[_MAX_PATH];
 	char aasfile[_MAX_PATH], buf[_MAX_PATH], foldername[_MAX_PATH];
 	quakefile_t *qf, *qf2, *files, *bspfiles, *aasfiles;

@@ -119,6 +119,8 @@ endif
 
 TARGETS=$(B)/bspc.$(ARCH)$(BINEXT)
 
+BASE_CFLAGS+=-DCom_Memcpy=memcpy -DCom_Memset=memset
+
 #############################################################################
 # SETUP AND BUILD -- Linux
 #############################################################################

@@ -914,7 +914,7 @@ mapbrush_t *GetAreaPortalBrush(entity_t *mapent)
 	//the area portal number
 	portalnum = mapent->areaportalnum;
 	//find the area portal brush in the world brushes
-	for (bn = 0; bn < nummapbrushes && portalnum; bn++)
+	for (bn = 0, brush = NULL; bn < nummapbrushes && portalnum; bn++)
 	{
 		brush = &mapbrushes[bn];
 		//must be in world entity

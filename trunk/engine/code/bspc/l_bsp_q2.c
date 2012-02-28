@@ -688,7 +688,7 @@ void Q2_SwapBSPFile (qboolean todisk)
 //
 	for (i=0 ; i<numtexinfo ; i++)
 	{
-		for (j=0 ; j<8 ; j++)
+		for (j=0 ; j<4 ; j++)
 			texinfo[i].vecs[0][j] = LittleFloat (texinfo[i].vecs[0][j]);
 		texinfo[i].flags = LittleLong (texinfo[i].flags);
 		texinfo[i].value = LittleLong (texinfo[i].value);
