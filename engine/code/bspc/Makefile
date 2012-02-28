@@ -154,7 +154,7 @@ ifeq ($(PLATFORM),linux)
   #use these when debugging
   DEBUG_CFLAGS=$(BASE_CFLAGS) -g
 
-  LIBS=-ldl -lm -lpthread
+  LIBS=-lm -lpthread
 
 else # ifeq Linux
 
