@@ -131,7 +131,7 @@ MKDIR=mkdir
 
 ifeq ($(PLATFORM),linux)
 
-  BASE_CFLAGS+= -Dstricmp=strcasecmp -DLINUX -DBSPC  -Wall
+  BASE_CFLAGS+= -Dstricmp=strcasecmp -DLINUX -DBSPC -Wall
 
   ifeq ($(ARCH),alpha)
     ARCH=axp
@@ -185,7 +185,7 @@ ifeq ($(PLATFORM),mingw32)
 
   BINEXT=.exe
 
-  BASE_CFLAGS+= -DBSPC
+  BASE_CFLAGS+= -DBSPC -Wall
   ifeq ($(ARCH),x86)
     # build 32bit
     BASE_CFLAGS += -m32
