@@ -149,7 +149,7 @@ ifeq ($(PLATFORM),linux)
   #use these cflags to optimize it
   RELEASE_CFLAGS=$(BASE_CFLAGS) -O6 -ffast-math -funroll-loops \
 	-fomit-frame-pointer -fexpensive-optimizations -falign-loops=2 \
-	-falign-jumps=2 -falign-functions=2
+	-falign-jumps=2 -falign-functions=2 -Wall
 
   #use these when debugging
   DEBUG_CFLAGS=$(BASE_CFLAGS) -g
