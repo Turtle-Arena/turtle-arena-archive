@@ -197,7 +197,7 @@ void BotImport_BSPModelMinsMaxsOrigin(int modelnum, vec3_t angles, vec3_t outmin
 // Returns:				-
 // Changes Globals:		-
 //===========================================================================
-void Com_DPrintf(char *fmt, ...)
+void Com_DPrintf(const char *fmt, ...)
 {
 	va_list argptr;
 	char buf[1024];
