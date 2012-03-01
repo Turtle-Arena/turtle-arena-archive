@@ -1165,8 +1165,10 @@ G_InitBots
 ===============
 */
 void G_InitBots( qboolean restart ) {
+#ifndef TA_SP
 	int			fragLimit;
 	int			timeLimit;
+#endif
 	const char	*arenainfo;
 	char		*strValue;
 	int			basedelay;
@@ -1188,6 +1190,7 @@ void G_InitBots( qboolean restart ) {
 			return;
 		}
 
+#ifndef TA_SP
 #ifdef NOTRATEDM // frag to score
 		strValue = Info_ValueForKey( arenainfo, "scorelimit" );
 		fragLimit = atoi( strValue );
@@ -1233,6 +1236,7 @@ void G_InitBots( qboolean restart ) {
 #endif
 			trap_Cvar_Set( "timelimit", "0" );
 		}
+#endif
 
 		basedelay = BOT_BEGIN_DELAY_BASE;
 		strValue = Info_ValueForKey( arenainfo, "special" );
