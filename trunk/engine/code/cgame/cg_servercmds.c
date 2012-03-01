@@ -197,7 +197,11 @@ void CG_ParseServerinfo( void ) {
 	trap_Cvar_Set("g_gametype", va("%i", cgs.gametype));
 	cgs.dmflags = atoi( Info_ValueForKey( info, "dmflags" ) );
 	cgs.teamflags = atoi( Info_ValueForKey( info, "teamflags" ) );
+#ifdef NOTRATEDM // frag to score
+	cgs.fraglimit = atoi( Info_ValueForKey( info, "scorelimit" ) );
+#else
 	cgs.fraglimit = atoi( Info_ValueForKey( info, "fraglimit" ) );
+#endif
 	cgs.capturelimit = atoi( Info_ValueForKey( info, "capturelimit" ) );
 	cgs.timelimit = atoi( Info_ValueForKey( info, "timelimit" ) );
 	cgs.maxclients = atoi( Info_ValueForKey( info, "sv_maxclients" ) );
