@@ -384,6 +384,20 @@ qboolean CG_DrawOldScoreboard( void ) {
 	}
 
 
+#ifdef TA_MISC
+	if (cgs.gametype != GT_SINGLE_PLAYER) {
+		s = va( "Time Limit: %2i", cgs.timelimit );
+		CG_DrawBigString( 320-Com_FontStringWidth(&cgs.media.fontBig, s, 0), 20, s, 1.0f);
+
+		if ( cgs.gametype >= GT_CTF ) {
+			s = va( "Capture Limit: %2i", cgs.capturelimit );
+		} else {
+			s = va( "Score Limit: %2i", cgs.fraglimit );
+		}
+		CG_DrawBigString( 328, 20, s, 1.0f);
+	}
+#endif
+
 	// fragged by ... line
 	if ( cg.cur_lc && cg.cur_lc->killerName[0] ) {
 #ifdef NOTRATEDM // frag to KO
