@@ -73,6 +73,7 @@ ui/assets/statusbar/flag_in_base
 	nomipmaps
 	{
 		map icons/iconf_neutral1.png
+		blendfunc blend
 	}
 }
 
@@ -82,6 +83,7 @@ ui/assets/statusbar/flag_in_base
 	//nomipmaps
 	//{
 	//	map icons/iconf_neutral2.png
+	//	blendfunc blend
 	//}
 //}
 
@@ -90,6 +92,7 @@ ui/assets/statusbar/flag_missing
 	nomipmaps
 	{
 		map icons/iconf_neutral3.png
+		blendfunc blend
 	}
 }
 
