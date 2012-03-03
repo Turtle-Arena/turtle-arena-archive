@@ -462,6 +462,7 @@ depend:
 	$(echo_cmd) "DEPEND $(B)"
 	$(Q)$(CC) -MM $(BSPC_OBJS:.o=.c)
 
+# Copy to main directory
 install:
-	cp $(BR)/bspc.$(ARCH)$(BINEXT) $(BSPCDIR)/../../../extras/bspc/
+	cp $(BR)/bspc.$(ARCH)$(BINEXT) $(BSPCDIR)/../../../
 
