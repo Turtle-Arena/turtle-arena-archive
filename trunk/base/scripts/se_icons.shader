@@ -328,12 +328,12 @@ icons/iconh_mega
 }
 
 // CTF FLAG ICONS
-// Images have no alpha
 icons/iconf_red1
 {
 	nomipmaps
 	{
 		map icons/iconf_red1.png
+		blendfunc blend
 	}
 }
 
@@ -342,6 +342,7 @@ icons/iconf_red2
 	nomipmaps
 	{
 		map icons/iconf_red2.png
+		blendfunc blend
 	}
 }
 
@@ -350,6 +351,7 @@ icons/iconf_red3
 	nomipmaps
 	{
 		map icons/iconf_red3.png
+		blendfunc blend
 	}
 }
 
@@ -358,6 +360,7 @@ icons/iconf_blu1
 	nomipmaps
 	{
 		map icons/iconf_blu1.png
+		blendfunc blend
 	}
 }
 
@@ -366,6 +369,7 @@ icons/iconf_blu2
 	nomipmaps
 	{
 		map icons/iconf_blu2.png
+		blendfunc blend
 	}
 }
 
@@ -374,6 +378,7 @@ icons/iconf_blu3
 	nomipmaps
 	{
 		map icons/iconf_blu3.png
+		blendfunc blend
 	}
 }
 
@@ -382,6 +387,7 @@ icons/iconf_neutral1
 	nomipmaps
 	{
 		map icons/iconf_neutral1.png
+		blendfunc blend
 	}
 }
 
@@ -390,6 +396,7 @@ icons/iconf_neutral3
 	nomipmaps
 	{
 		map icons/iconf_neutral3.png
+		blendfunc blend
 	}
 }
 
