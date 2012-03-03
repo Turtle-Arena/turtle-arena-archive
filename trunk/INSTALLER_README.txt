@@ -1,19 +1,24 @@
 Thank you for installing Turtle Arena.
 
 If you have any questions or comments, feel free to join the forums or the IRC channel.
-	Forums: http://ztm.x10hosting.com/forum/
+	Forums: http://ztm.x10hosting.com/forums/
 	IRC: #turtlearena on irc.freenode.net
 
-1. STARTING THE GAME
-Turtle Arena's main single player mode (PLAY -> NEW GAME menu) is incomplete, you are welcome try it, but current focus is on multiplayer. You can play the multiplayer mode against bots, in splitscreen, over the local network, and/or over the Internet.
+== MAIN GAME ==
+Turtle Arena's main game mode, which can be played by up to four players, will be a 3D platformer mode with boss fights. It's stil in early development, but you are welcome to give it a try.
 
-You can play vs. bots by going to the PLAY -> VS. BOTS menu. You can look for network games using the MULTIPLAYER -> SEARCH menu. You can host a local or Internet game using the MULTIPLAYER -> CREATE menu. You may need to setup port forwarding (for ports 27960 through 27963) in your router to host Internet games.
+== ARCADE MODE ==
+In arcade mode a single player can play against bots in the multiplayer game modes. The top scores for each level/gamemode combo are saved.
 
-2. PLAYER SETTINGS
-You can change your name, player model, effects colors, and handicap in the MULTIPLAYER -> PLAYER 1 menu.
+== MULTIPLAYER ==
+The multiplayer mode can be played in splitscreen, over the local network, and/or over the Internet.
 
-3. CONTROLS
-The default controls for player 1, with descriptions, are listed below. The controls can be changed anytime in the OPTIONS -> CONTROLS -> PLAYER 1 menu.
+You can host a local or Internet servers using the MULTIPLAYER -> START SERVER menu. You may need to setup port forwarding (for ports 27960 through 27963) in your router to host Internet servers.
+
+You can look for network games using the MULTIPLAYER -> JOIN GAME (BROWSE) menu.
+
+== CONTROLS ==
+The default controls for player 1, with descriptions, are listed below. The controls can be changed anytime in the OPTIONS -> CONTROLS -> PLAYER 1 menu. There are no default controls for players 2, 3, or 4.
 
 Control Name	| Mouse and Keyboard	| Keyboard Only		| Description
 ----------------|-----------------------|-------------------|------------
