@@ -36,38 +36,44 @@ SINGLE PLAYER POSTGAME MENU
 #else
 #define MAX_UI_AWARDS		6
 #endif
-#endif
 
 #define MAX_SCOREBOARD_CLIENTS		8
 
 #define AWARD_PRESENTATION_TIME		2000
+#endif
 
+#ifdef TA_SP
+#define ART_FRAME		"menu/art/cut_frame"
+#endif
 #define ART_MENU0		"menu/art/menu_0"
 #define ART_MENU1		"menu/art/menu_1"
 #define ART_REPLAY0		"menu/art/replay_0"
 #define ART_REPLAY1		"menu/art/replay_1"
-#ifndef TA_SP
 #define ART_NEXT0		"menu/art/next_0"
 #define ART_NEXT1		"menu/art/next_1"
-#endif
 
 #define ID_AGAIN		10
-#ifndef TA_SP
 #define ID_NEXT			11
-#endif
 #define ID_MENU			12
 
 typedef struct {
 	menuframework_s	menu;
 
-	menubitmap_s	item_again;
-#ifndef TA_SP
-	menubitmap_s	item_next;
+#ifdef TA_SP
+	// enter name
+	menubitmap_s	art_frame;
+	menufield_s		item_name;
+
+	// after the game
 #endif
+	menubitmap_s	item_again;
+	menubitmap_s	item_next;
 	menubitmap_s	item_menu;
 
 	int				phase;
+#ifndef TA_SP
 	int				ignoreKeysTime;
+#endif
 	int				starttime;
 	int				scoreboardtime;
 	int				serverId;
@@ -92,9 +98,9 @@ typedef struct {
 	int				awardsEarned[MAX_UI_AWARDS];
 	int				awardsLevels[MAX_UI_AWARDS];
 	qboolean		playedSound[MAX_UI_AWARDS];
-#endif
 	int				lastTier;
 	sfxHandle_t		winnerSound;
+#endif
 } postgameMenuInfo_t;
 
 static postgameMenuInfo_t	postgameMenuInfo;
@@ -143,7 +149,33 @@ static void UI_SPPostgameMenu_AgainEvent( void* ptr, int event )
 }
 
 
-#ifndef TA_SP
+#ifdef TA_SP
+void UI_SavePostGameStats(const char *name);
+
+/*
+=================
+UI_SPPostgameMenu_NextEvent
+=================
+*/
+static void UI_SPPostgameMenu_NextEvent( void* ptr, int event ) {
+	if (event != QM_ACTIVATED) {
+		return;
+	}
+
+	trap_Cvar_Set("ui_arcadeName", postgameMenuInfo.item_name.field.buffer);
+	UI_SavePostGameStats(postgameMenuInfo.item_name.field.buffer);
+
+	// Move to the next phase
+	postgameMenuInfo.phase = 2;
+
+	postgameMenuInfo.art_frame.generic.flags |= (QMF_HIDDEN|QMF_INACTIVE);
+	postgameMenuInfo.item_name.generic.flags |= (QMF_HIDDEN|QMF_INACTIVE);
+	postgameMenuInfo.item_next.generic.flags |= (QMF_HIDDEN|QMF_INACTIVE);
+
+	postgameMenuInfo.item_menu.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
+	postgameMenuInfo.item_again.generic.flags &= ~(QMF_HIDDEN|QMF_INACTIVE);
+}
+#else
 /*
 =================
 UI_SPPostgameMenu_NextEvent
@@ -215,21 +247,19 @@ UI_SPPostgameMenu_MenuKey
 =================
 */
 static sfxHandle_t UI_SPPostgameMenu_MenuKey( int key ) {
+#ifndef TA_SP
 	if ( uis.realtime < postgameMenuInfo.ignoreKeysTime ) {
 		return 0;
 	}
 
 	if( postgameMenuInfo.phase == 1 ) {
-#ifndef TA_SP
 		trap_Cmd_ExecuteText( EXEC_APPEND, "abort_podium\n" );
-#endif
 		postgameMenuInfo.phase = 2;
 		postgameMenuInfo.starttime = uis.realtime;
 		postgameMenuInfo.ignoreKeysTime	= uis.realtime + 250;
 		return 0;
 	}
 
-#ifndef TA_SP
 	if( postgameMenuInfo.phase == 2 ) {
 		postgameMenuInfo.phase = 3;
 		postgameMenuInfo.starttime = uis.realtime;
@@ -434,7 +464,9 @@ UI_SPPostgameMenu_MenuDraw
 =================
 */
 static void UI_SPPostgameMenu_MenuDraw( void ) {
+#ifndef TA_SP
 	int		timer;
+#endif
 	int		serverId;
 #ifndef TA_SP
 	int		n;
@@ -448,18 +480,22 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 		return;
 	}
 
+#ifdef TA_SP
+	if (postgameMenuInfo.phase == 2) {
+		UI_SPPostgameMenu_MenuDrawHighScores(CENTER_X, 310);
+	}
+
+	Menu_Draw( &postgameMenuInfo.menu );
+#else
 	// phase 1
-#ifndef TA_SP
 	if ( postgameMenuInfo.numClients > 2 ) {
 		UI_DrawProportionalString( 510, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[2], UI_CENTER, color_white );
 	}
 	UI_DrawProportionalString( 130, 480 - 64 - PROP_HEIGHT, postgameMenuInfo.placeNames[1], UI_CENTER, color_white );
 	UI_DrawProportionalString( 320, 480 - 64 - 2 * PROP_HEIGHT, postgameMenuInfo.placeNames[0], UI_CENTER, color_white );
-#endif
 
 	if( postgameMenuInfo.phase == 1 ) {
 		timer = uis.realtime - postgameMenuInfo.starttime;
-
 		if( timer >= 1000 && postgameMenuInfo.winnerSound ) {
 			trap_S_StartLocalSound( postgameMenuInfo.winnerSound, CHAN_ANNOUNCER );
 			postgameMenuInfo.winnerSound = 0;
@@ -475,12 +511,6 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 	// phase 2
 	if( postgameMenuInfo.phase == 2 ) {
 		timer = uis.realtime - postgameMenuInfo.starttime;
-#ifdef TA_SP
-		if( timer >= 5000 ) {
-			postgameMenuInfo.phase = 3;
-			postgameMenuInfo.starttime = uis.realtime;
-		}
-#else
 		if( timer >= ( postgameMenuInfo.numAwards * AWARD_PRESENTATION_TIME ) ) {
 
 			if( timer < 5000 ) {
@@ -493,12 +523,10 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 		else {
 			UI_SPPostgameMenu_DrawAwardsPresentation( timer );
 		}
-#endif
 	}
 
 	// phase 3
 	if( postgameMenuInfo.phase == 3 ) {
-#ifndef TA_SP
 		if( uis.demoversion ) {
 			if( postgameMenuInfo.won == 1 && UI_ShowTierVideo( 8 )) {
 				trap_Cvar_Set( "nextmap", "" );
@@ -518,24 +546,16 @@ static void UI_SPPostgameMenu_MenuDraw( void ) {
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "disconnect; cinematic tier%i.RoQ\n", postgameMenuInfo.won + 1 ) );
 			return;
 		}
-#endif
 
 		postgameMenuInfo.item_again.generic.flags &= ~QMF_INACTIVE;
-#ifndef TA_SP
 		postgameMenuInfo.item_next.generic.flags &= ~QMF_INACTIVE;
-#endif
 		postgameMenuInfo.item_menu.generic.flags &= ~QMF_INACTIVE;
 
-#ifndef TA_SP
 		UI_SPPostgameMenu_DrawAwardsMedals( postgameMenuInfo.numAwards );
-#endif
 
 		Menu_Draw( &postgameMenuInfo.menu );
 	}
 
-#ifdef TA_SP
-	UI_SPPostgameMenu_MenuDrawHighScores(CENTER_X, 310);
-#else
 	// draw the scoreboard
 	if( !trap_Cvar_VariableValue( "ui_spScoreboard" ) ) {
 		return;
@@ -568,6 +588,9 @@ void UI_SPPostgameMenu_Cache( void ) {
 	buildscript = trap_Cvar_VariableValue("com_buildscript");
 #endif
 
+#ifdef TA_SP
+	trap_R_RegisterShaderNoMip( ART_FRAME );
+#endif
 	trap_R_RegisterShaderNoMip( ART_MENU0 );
 	trap_R_RegisterShaderNoMip( ART_MENU1 );
 	trap_R_RegisterShaderNoMip( ART_REPLAY0 );
@@ -599,13 +622,37 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.menu.wrapAround	= qtrue;
 	postgameMenuInfo.menu.key			= UI_SPPostgameMenu_MenuKey;
 	postgameMenuInfo.menu.draw			= UI_SPPostgameMenu_MenuDraw;
+#ifndef TA_SP
 	postgameMenuInfo.ignoreKeysTime		= uis.realtime + 1500;
+#endif
 
 	UI_SPPostgameMenu_Cache();
 
+#ifdef TA_SP
+	postgameMenuInfo.art_frame.generic.type			= MTYPE_BITMAP;
+	postgameMenuInfo.art_frame.generic.name			= ART_FRAME;
+	postgameMenuInfo.art_frame.generic.flags		= QMF_LEFT_JUSTIFY|QMF_INACTIVE;
+	postgameMenuInfo.art_frame.generic.x			= 142;
+	postgameMenuInfo.art_frame.generic.y			= 118;
+	postgameMenuInfo.art_frame.width				= 359;
+	postgameMenuInfo.art_frame.height				= 256;
+
+	postgameMenuInfo.item_name.generic.type       = MTYPE_FIELD;
+	postgameMenuInfo.item_name.generic.name       = "Name:";
+	postgameMenuInfo.item_name.generic.flags      = QMF_PULSEIFFOCUS;
+	postgameMenuInfo.item_name.generic.x	      = 270;
+	postgameMenuInfo.item_name.generic.y	      = 220;
+	postgameMenuInfo.item_name.field.widthInChars = 8;
+	postgameMenuInfo.item_name.field.maxchars     = 8;
+#endif
+
 	postgameMenuInfo.item_menu.generic.type			= MTYPE_BITMAP;
 	postgameMenuInfo.item_menu.generic.name			= ART_MENU0;
+#ifdef TA_SP
+	postgameMenuInfo.item_menu.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_HIDDEN|QMF_INACTIVE;
+#else
 	postgameMenuInfo.item_menu.generic.flags		= QMF_LEFT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
+#endif
 	postgameMenuInfo.item_menu.generic.x			= 0;
 	postgameMenuInfo.item_menu.generic.y			= 480-64;
 	postgameMenuInfo.item_menu.generic.callback		= UI_SPPostgameMenu_MenuEvent;
@@ -617,7 +664,7 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_again.generic.type		= MTYPE_BITMAP;
 	postgameMenuInfo.item_again.generic.name		= ART_REPLAY0;
 #ifdef TA_SP
-	postgameMenuInfo.item_again.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
+	postgameMenuInfo.item_again.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_HIDDEN|QMF_INACTIVE;
 	postgameMenuInfo.item_again.generic.x			= 640;
 #else
 	postgameMenuInfo.item_again.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
@@ -630,10 +677,13 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_again.height				= 64;
 	postgameMenuInfo.item_again.focuspic			= ART_REPLAY1;
 
-#ifndef TA_SP
 	postgameMenuInfo.item_next.generic.type			= MTYPE_BITMAP;
 	postgameMenuInfo.item_next.generic.name			= ART_NEXT0;
+#ifdef TA_SP
+	postgameMenuInfo.item_next.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS;
+#else
 	postgameMenuInfo.item_next.generic.flags		= QMF_RIGHT_JUSTIFY|QMF_PULSEIFFOCUS|QMF_INACTIVE;
+#endif
 	postgameMenuInfo.item_next.generic.x			= 640;
 	postgameMenuInfo.item_next.generic.y			= 480-64;
 	postgameMenuInfo.item_next.generic.callback		= UI_SPPostgameMenu_NextEvent;
@@ -641,12 +691,17 @@ static void UI_SPPostgameMenu_Init( void ) {
 	postgameMenuInfo.item_next.width				= 128;
 	postgameMenuInfo.item_next.height				= 64;
 	postgameMenuInfo.item_next.focuspic				= ART_NEXT1;
-#endif
 
+#ifdef TA_SP
+	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.art_frame );
+	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_name );
+#endif
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_menu );
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_again );
-#ifndef TA_SP
 	Menu_AddItem( &postgameMenuInfo.menu, ( void * )&postgameMenuInfo.item_next );
+
+#ifdef TA_SP
+	trap_Cvar_VariableStringBuffer("ui_arcadeName", postgameMenuInfo.item_name.field.buffer, postgameMenuInfo.item_name.field.maxchars);
 #endif
 }
 
@@ -682,16 +737,14 @@ int UI_AddArcadeScore(arcadeGameData_t *gamedata, arcadeScore_t *score)
 	return index;
 }
 
-void UI_CalcPostGameStats(void)
+void UI_SavePostGameStats(const char *name)
 {
 	static char *gametypeNames[] = {"ffa", "tourney", "single", "team", "ctf", "oneflag", "overload", "harvester"};
 	char		map[MAX_QPATH];
 	char		fileName[MAX_QPATH];
 	char		info[MAX_INFO_STRING];
-	char		name[9];
 	fileHandle_t f;
 	qboolean	validData;
-	int			time, redScore, blueScore;
 	arcadeGameData_t *gamedata;
 	arcadeScore_t *newScore;
 
@@ -722,28 +775,12 @@ void UI_CalcPostGameStats(void)
 		memset(gamedata, 0, sizeof(arcadeGameData_t));
 	}
 
-	// Get name
-	// TODO: Ask user to enter name
-	trap_Cvar_VariableStringBuffer("name", name, sizeof (name));
+	// Save name in score data.
+	Q_strncpyz(newScore->name, name, STRARRAY_LEN(newScore->name));
 
 	// Setup gamedata
 	memcpy(gamedata->magic, ARCADE_GAMEDATA_MAGIC, ARRAY_LEN(gamedata->magic));
 	gamedata->version = ARCADE_GAMEDATA_VERSION;
-
-	time = (atoi(UI_Argv(1)) - trap_Cvar_VariableValue("ui_matchStartTime")) / 1000;
-	redScore = atoi(UI_Argv(2));
-	blueScore = atoi(UI_Argv(3));
-
-	// Setup newScore
-	Q_strncpyz(newScore->name, name, STRARRAY_LEN(newScore->name));
-	Q_strncpyz(newScore->character, UI_Argv(4), STRARRAY_LEN(newScore->character));
-	newScore->score = atoi(UI_Argv(5));
-	newScore->time = time;
-
-	// CTF
-	newScore->captures = atoi(UI_Argv(6));
-	newScore->redScore = redScore;
-	newScore->blueScore = blueScore;
 
 	// Add the score
 	postgameMenuInfo.scoreIndex = UI_AddArcadeScore(gamedata, newScore);
@@ -754,6 +791,36 @@ void UI_CalcPostGameStats(void)
 		trap_FS_Write(gamedata, sizeof(arcadeGameData_t), f);
 		trap_FS_FCloseFile(f);
 	}
+}
+
+/*
+=================
+UI_CalcPostGameStats
+
+Setup new score data.
+=================
+*/
+static void UI_CalcPostGameStats(void)
+{
+	int time, redScore, blueScore;
+	arcadeScore_t *newScore;
+
+	newScore = &postgameMenuInfo.newScore;
+
+	time = (atoi(UI_Argv(1)) - trap_Cvar_VariableValue("ui_matchStartTime")) / 1000;
+	redScore = atoi(UI_Argv(2));
+	blueScore = atoi(UI_Argv(3));
+
+	// Setup newScore, name is set in UI_SavePostGameStats.
+	Q_strncpyz(newScore->name, "", STRARRAY_LEN(newScore->name));
+	Q_strncpyz(newScore->character, UI_Argv(4), STRARRAY_LEN(newScore->character));
+	newScore->score = atoi(UI_Argv(5));
+	newScore->time = time;
+
+	// CTF
+	newScore->captures = atoi(UI_Argv(6));
+	newScore->redScore = redScore;
+	newScore->blueScore = blueScore;
 }
 #else
 static void Prepname( int index ) {
@@ -910,7 +977,7 @@ void UI_SPPostgameMenu_f( void ) {
 	UI_PushMenu( &postgameMenuInfo.menu );
 
 #ifdef TA_SP
-	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_again );
+	Menu_SetCursorToItem( &postgameMenuInfo.menu, &postgameMenuInfo.item_name );
 
 	trap_Cmd_ExecuteText( EXEC_APPEND, "music music/postgame\n" );
 #else
@@ -937,8 +1004,10 @@ void UI_SPPostgameMenu_f( void ) {
 
 	postgameMenuInfo.phase = 1;
 
+#ifndef TA_SP
 	postgameMenuInfo.lastTier = UI_GetNumSPTiers();
 	if ( UI_GetSpecialArenaInfo( "final" ) ) {
 		postgameMenuInfo.lastTier++;
 	}
+#endif
 }
