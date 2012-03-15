@@ -84,6 +84,10 @@ extern vmCvar_t	ui_saveFilename;
 #endif
 extern vmCvar_t	ui_spSelection;
 
+#ifdef TA_SP
+extern vmCvar_t	ui_arcadeName;
+#endif
+
 extern vmCvar_t	ui_browserMaster;
 extern vmCvar_t	ui_browserGameType;
 extern vmCvar_t	ui_browserSortKey;

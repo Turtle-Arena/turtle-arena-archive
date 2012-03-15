@@ -5707,6 +5707,10 @@ vmCvar_t	ui_saveFilename;
 #endif
 vmCvar_t	ui_spSelection;
 
+#ifdef TA_SP
+vmCvar_t	ui_arcadeName;
+#endif
+
 vmCvar_t	ui_browserMaster;
 vmCvar_t	ui_browserGameType;
 vmCvar_t	ui_browserShowFull;
@@ -5854,6 +5858,10 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO },
 #endif
 	{ &ui_spSelection, "ui_spSelection", "", CVAR_ROM },
+
+#ifdef TA_SP
+	{ &ui_arcadeName, "ui_arcadeName", "Unnamed", CVAR_ARCHIVE },
+#endif
 
 	{ &ui_browserMaster, "ui_browserMaster", "0", CVAR_ARCHIVE },
 	{ &ui_browserGameType, "ui_browserGameType", "0", CVAR_ARCHIVE },
