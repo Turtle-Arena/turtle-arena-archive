@@ -289,13 +289,19 @@ void CG_DrawInformation( void ) {
 	UI_DrawProportionalString( 320, y, s,
 		UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
 	y += PROP_HEIGHT;
-		
-	value = atoi( Info_ValueForKey( info, "timelimit" ) );
-	if ( value ) {
-		UI_DrawProportionalString( 320, y, va( "timelimit %i", value ),
-			UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
-		y += PROP_HEIGHT;
+
+#ifdef TA_SP
+	if (cgs.gametype != GT_SINGLE_PLAYER) {
+#endif
+		value = atoi( Info_ValueForKey( info, "timelimit" ) );
+		if ( value ) {
+			UI_DrawProportionalString( 320, y, va( "timelimit %i", value ),
+				UI_CENTER|UI_SMALLFONT|UI_DROPSHADOW, colorWhite );
+			y += PROP_HEIGHT;
+		}
+#ifdef TA_SP
 	}
+#endif
 
 	if (
 #ifdef TA_SP
