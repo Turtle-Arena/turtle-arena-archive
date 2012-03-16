@@ -2529,11 +2529,13 @@ static void CG_DrawDisconnect( void ) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_RIGHT);
-
 #ifdef TURTLEARENA
+	CG_HudPlacement(HUD_LEFT);
+
 	CG_DrawPic( 0, 0, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
 #else
+	CG_HudPlacement(HUD_RIGHT);
+
 	x = 640 - 48;
 	y = 480 - 48;
 
@@ -2562,7 +2564,11 @@ static void CG_DrawLagometer( void ) {
 		return;
 	}
 
+#ifdef TURTLEARENA
+	CG_HudPlacement(HUD_LEFT);
+#else
 	CG_HudPlacement(HUD_RIGHT);
+#endif
 
 	//
 	// draw the graph
