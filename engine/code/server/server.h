@@ -352,6 +352,7 @@ void SV_UserinfoChanged( client_t *cl );
 void SV_UpdateUserinfos(void);
 #endif
 
+void SV_SetupClientEntity( client_t *client );
 void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
 void SV_FreeClient(client_t *client);
 void SV_DropClient( client_t *drop, const char *reason );

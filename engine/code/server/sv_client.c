@@ -180,7 +180,6 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	int			i;
 	client_t	*cl, *newcl;
 	client_t	temp;
-	sharedEntity_t *ent;
 	int			clientNum;
 	char		*password;
 	int			startIndex;
@@ -248,8 +247,15 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	//*newcl = temp;
 	*newcl = *owner;
 	clientNum = newcl - svs.clients;
-	ent = SV_GentityNum( clientNum );
-	newcl->gentity = ent;
+
+	newcl->mainClient = owner;
+	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
+		newcl->localClients[i] = NULL;
+	}
+
+	// Update owner
+	owner->localClients[lc-1] = newcl;
+	SV_SetupClientEntity(owner);
 
 	// save the challenge
 	newcl->challenge = owner->challenge;
@@ -270,15 +276,8 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	// save the userinfo
 	Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
 
-	newcl->mainClient = owner;
-	owner->localClients[lc-1] = newcl;
-	newcl->gentity->r.mainClientNum = owner - svs.clients;
-	owner->gentity->r.localClientNums[lc-1] = clientNum;
-
-	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-		newcl->localClients[i] = NULL;
-		newcl->gentity->r.localClientNums[i] = -1;
-	}
+	// setup entity before connecting
+	SV_SetupClientEntity(newcl);
 
 	// get the game a chance to reject this connection or modify the userinfo
 	denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
@@ -333,7 +332,6 @@ void SV_DirectConnect( netadr_t from ) {
 	int			i;
 	client_t	*cl, *newcl;
 	client_t	temp;
-	sharedEntity_t *ent;
 	int			clientNum;
 	int			version;
 	int			qport;
@@ -547,17 +545,13 @@ gotnewcl:
 	// this is the only place a client_t is ever initialized
 	*newcl = temp;
 	clientNum = newcl - svs.clients;
-	ent = SV_GentityNum( clientNum );
-	newcl->gentity = ent;
 
 	// Not an extra splitscreen client.
 	newcl->mainClient = NULL;
-	newcl->gentity->r.mainClientNum = -1;
 
 	// No extra splitscreen clients.
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		newcl->localClients[i] = NULL;
-		newcl->gentity->r.localClientNums[i] = -1;
 	}
 
 	// save the challenge
@@ -575,6 +569,9 @@ gotnewcl:
 
 	// save the userinfo
 	Q_strncpyz( newcl->userinfo, userinfo, sizeof(newcl->userinfo) );
+
+	// setup entity before connecting
+	SV_SetupClientEntity(newcl);
 
 	// get the game a chance to reject this connection or modify the userinfo
 	denied = VM_Call( gvm, GAME_CLIENT_CONNECT, clientNum, qtrue, qfalse ); // firstTime = qtrue
@@ -847,20 +844,15 @@ static void SV_SendClientGameState( client_t *client ) {
 
 /*
 ==================
-SV_ClientEnterWorld
+SV_SetupClientEntity
+
+Must call before GAME_CLIENT_CONNECT
 ==================
 */
-void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
+void SV_SetupClientEntity( client_t *client ) {
 	int		clientNum;
 	sharedEntity_t *ent;
 	int		i;
-
-	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
-	client->state = CS_ACTIVE;
-
-	// resend all configstrings using the cs commands since these are
-	// no longer sent when the client is CS_PRIMED
-	SV_UpdateConfigstrings( client );
 
 	// set up the entity for the client
 	clientNum = client - svs.clients;
@@ -873,6 +865,20 @@ void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
 	for (i = 0; i < MAX_SPLITVIEW-1; i++) {
 		client->gentity->r.localClientNums[i] = client->localClients[i] ? client->localClients[i] - svs.clients : -1;
 	}
+}
+
+/*
+==================
+SV_ClientEnterWorld
+==================
+*/
+void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd ) {
+	Com_DPrintf( "Going from CS_PRIMED to CS_ACTIVE for %s\n", client->name );
+	client->state = CS_ACTIVE;
+
+	// resend all configstrings using the cs commands since these are
+	// no longer sent when the client is CS_PRIMED
+	SV_UpdateConfigstrings( client );
 
 	client->deltaMessage = -1;
 	client->lastSnapshotTime = 0;	// generate a snapshot immediately

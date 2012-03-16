@@ -61,8 +61,6 @@ int SV_BotAllocateClient(void) {
 		return -1;
 	}
 
-	cl->gentity = SV_GentityNum( i );
-	cl->gentity->s.number = i;
 	cl->state = CS_ACTIVE;
 	cl->lastPacketTime = svs.time;
 	cl->netchan.remoteAddress.type = NA_BOT;
@@ -70,13 +68,13 @@ int SV_BotAllocateClient(void) {
 
 	// Not an extra splitscreen client.
 	cl->mainClient = NULL;
-	cl->gentity->r.mainClientNum = -1;
 
 	// No extra splitscreen clients.
 	for (j = 0; j < MAX_SPLITVIEW-1; j++) {
 		cl->localClients[j] = NULL;
-		cl->gentity->r.localClientNums[j] = -1;
 	}
+
+	SV_SetupClientEntity(cl);
 
 	return i;
 }

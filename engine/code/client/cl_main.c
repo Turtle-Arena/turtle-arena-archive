@@ -2311,7 +2311,7 @@ void CL_CheckForResend( void ) {
 	int		localClients;
 	int		protocol;
 	char	info[MAX_INFO_STRING];
-	char	data[MAX_INFO_STRING];
+	char	data[MAX_INFO_STRING*MAX_SPLITVIEW];
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying ) {

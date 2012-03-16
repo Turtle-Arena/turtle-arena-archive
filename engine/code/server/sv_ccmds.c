@@ -330,6 +330,9 @@ static void SV_MapRestart_f( void ) {
 		// add the map_restart command
 		SV_AddServerCommand( client, "map_restart\n" );
 
+		// setup entity before connecting
+		SV_SetupClientEntity(&svs.clients[i]);
+
 		// connect the client again, without the firstTime flag
 		denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
 		if ( denied ) {
