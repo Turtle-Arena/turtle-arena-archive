@@ -545,6 +545,9 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 				isBot = qfalse;
 			}
 
+			// setup entity before connecting
+			SV_SetupClientEntity(&svs.clients[i]);
+
 			// connect the client again
 			denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
 			if ( denied ) {
@@ -559,13 +562,9 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 				}
 				else {
 					client_t		*client;
-					sharedEntity_t	*ent;
 
 					client = &svs.clients[i];
 					client->state = CS_ACTIVE;
-					ent = SV_GentityNum( i );
-					ent->s.number = i;
-					client->gentity = ent;
 
 					client->deltaMessage = -1;
 					client->lastSnapshotTime = 0;	// generate a snapshot immediately
