@@ -2503,7 +2503,9 @@ Should we draw something differnet for long lag vs no packets?
 ==============
 */
 static void CG_DrawDisconnect( void ) {
+#ifndef TURTLEARENA
 	float		x, y;
+#endif
 	int			cmdNum;
 	usercmd_t	cmd;
 	const char		*s;
@@ -2529,10 +2531,14 @@ static void CG_DrawDisconnect( void ) {
 
 	CG_HudPlacement(HUD_RIGHT);
 
+#ifdef TURTLEARENA
+	CG_DrawPic( 0, 0, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
+#else
 	x = 640 - 48;
 	y = 480 - 48;
 
 	CG_DrawPic( x, y, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
+#endif
 }
 
 
@@ -2561,11 +2567,14 @@ static void CG_DrawLagometer( void ) {
 	//
 	// draw the graph
 	//
-#ifdef MISSIONPACK_HUD
-	x = 640 - 48;
-	y = 480 - 144;
+#ifdef TURTLEARENA
+	x = 0;
 #else
 	x = 640 - 48;
+#endif
+#ifdef MISSIONPACK_HUD
+	y = 480 - 144;
+#else
 	y = 480 - 48;
 #endif
 
