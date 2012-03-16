@@ -1087,6 +1087,13 @@ void ClientUserinfoChanged( int clientNum ) {
 		client->pers.predictItemPickup = qtrue;
 	}
 
+#ifdef TA_SP
+	// Override names in main game and arcade mode.
+	if (g_singlePlayer.integer && !(ent->r.svFlags & SVF_BOT)) {
+		Info_SetValueForKey(userinfo, "name", va("Player %d", G_LocalClientNumForGentitiyNum(clientNum)+1));
+	}
+#endif
+
 	// set name
 	Q_strncpyz ( oldname, client->pers.netname, sizeof( oldname ) );
 	s = Info_ValueForKey (userinfo, "name");

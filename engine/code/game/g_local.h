@@ -953,6 +953,7 @@ void G_AdvanceMap( void );
 qboolean G_SaveGame(fileHandle_t f);
 void G_LoadGame(fileHandle_t f);
 void G_LoadGameClient(int client);
+int G_LocalClientNumForGentitiyNum(int gentityNum);
 #endif
 
 #ifdef TA_PATHSYS
