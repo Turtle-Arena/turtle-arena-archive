@@ -194,14 +194,14 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	// Don't allow join in arcade mode
 	if (Cvar_VariableIntegerValue("ui_singlePlayerActive")
 		&& sv_gametype->integer != GT_SINGLE_PLAYER) {
-		Com_Printf("Additional local clients not allowed in arcade mode.\n");
+		SV_SendServerCommand( owner, "print \"Additional local clients not allowed in arcade mode.\n\"" );
 		return;
 	}
 #else
 	// Don't allow joining in single player
 	if (sv_gametype->integer == GT_SINGLE_PLAYER
 		|| Cvar_VariableIntegerValue("ui_singlePlayerActive")) {
-		Com_Printf("Additional local clients not allowed in single player mode.\n");
+		SV_SendServerCommand( owner, "print \"Additional local clients not allowed in single player mode.\n\"" );
 		return;
 	}
 #endif
@@ -238,6 +238,7 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	}
 
 	if (!newcl) {
+		SV_SendServerCommand( owner, "print \"Couldn't add local client %d, no free client slots!\n\"", lc+1 );
 		return;
 	}
 
@@ -255,7 +256,7 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 
 	// Update owner
 	owner->localClients[lc-1] = newcl;
-	SV_SetupClientEntity(owner);
+	owner->gentity->r.localClientNums[lc-1] = clientNum;
 
 	// save the challenge
 	newcl->challenge = owner->challenge;
@@ -285,15 +286,29 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 		// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
 		char *str = VM_ExplicitArgPtr( gvm, denied );
 
-		NET_OutOfBandPrint( NS_SERVER, owner->netchan.remoteAddress, "print\n%s\n", str );
-		Com_DPrintf ("Game rejected a connection: %s.\n", str);
+		NET_OutOfBandPrint( NS_SERVER, owner->netchan.remoteAddress, "print\n(For Local Client %d): %s\n", lc+1, str );
+		Com_DPrintf ("Game rejected an extra local client: %s.\n", str);
+
+		// Free all allocated data on the client structure
+		SV_FreeClient(newcl);
+
+		// Nuke user info
+		SV_SetUserinfo( clientNum, "" );
+
+		// Shouldn't need to go to zombie state,
+		// extra local clients piggyback on main client's net connection, instead of using their own.
+		newcl->state = CS_FREE;
+
+		// Update owner
+		owner->localClients[lc-1] = NULL;
+		owner->gentity->r.localClientNums[lc-1] = -1;
 		return;
 	}
 
 	SV_UserinfoChanged( newcl );
 
 	// send the connect packet to the client
-	//NET_OutOfBandPrint(NS_SERVER, from, "connectResponse %d", newcl->challenge);
+	//NET_OutOfBandPrint(NS_SERVER, owner->netchan.remoteAddress, "connectResponse %d", newcl->challenge);
 
 	if (owner->state >= CS_PRIMED) {
 		Com_DPrintf( "Going from CS_FREE to CS_PRIMED for %s\n", newcl->name );
@@ -723,8 +738,9 @@ void SV_DropClient( client_t *drop, const char *reason ) {
 	// nuke user info
 	SV_SetUserinfo( drop - svs.clients, "" );
 	
-	if ( isBot ) {
+	if ( isBot || drop->mainClient ) {
 		// bots shouldn't go zombie, as there's no real net connection.
+		// extra local clients piggyback on main client's net connection, instead of using their own.
 		drop->state = CS_FREE;
 	} else {
 		Com_DPrintf( "Going to CS_ZOMBIE for %s\n", drop->name );
