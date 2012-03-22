@@ -31,10 +31,9 @@ The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with 
   * DONE: Create new CTF flag skins (using new default team icons).
   * DONE: New character select/setup menus (which also allows choosing local clients for splitscreen).
   * DONE: Show scores in arcade menu.
-  * Have user enter name at end of arcade game.
+  * DONE: Have user enter name at end of arcade game.
   * DONE: Fix compiling BSPC (the bot map AAS compiler).
   * Polish game for release.
-  * (May create new load save game menu.)
 
 == 0.6 ==
 On going:
