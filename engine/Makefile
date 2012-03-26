@@ -54,10 +54,6 @@ ifndef BUILD_FINAL
   BUILD_FINAL      =0
 endif
 
-ifndef USE_FREETYPE
-  USE_FREETYPE     =1
-endif
-
 ifneq ($(PLATFORM),darwin)
   BUILD_CLIENT_SMP = 0
 endif
@@ -502,10 +498,8 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
     CLIENT_CFLAGS += -I$(SDLHDIR)/include
   endif
 
-  ifeq ($(USE_FREETYPE),1)
-	ifneq ($(USE_INTERNAL_FREETYPE), 1)
-		BASE_CFLAGS += $(shell freetype-config --cflags)
-	endif
+  ifneq ($(USE_INTERNAL_FREETYPE), 1)
+    BASE_CFLAGS += $(shell freetype-config --cflags)
   endif
 
   ifeq ($(ARCH),i386)
@@ -562,10 +556,8 @@ ifeq ($(PLATFORM),darwin)
     endif
   endif
 
-  ifeq ($(USE_FREETYPE),1)
-	ifneq ($(USE_INTERNAL_FREETYPE), 1)
-		BASE_CFLAGS += $(shell freetype-config --cflags)
-	endif
+  ifneq ($(USE_INTERNAL_FREETYPE), 1)
+    BASE_CFLAGS += $(shell freetype-config --cflags)
   endif
 
   ifeq ($(USE_CODEC_VORBIS),1)
@@ -660,10 +652,8 @@ ifeq ($(PLATFORM),mingw32)
   CLIENT_LIBS = -lgdi32 -lole32
   RENDERER_LIBS = -lgdi32 -lole32 -lopengl32
   
-  ifeq ($(USE_FREETYPE),1)
-	ifneq ($(USE_INTERNAL_FREETYPE),1)
-		BASE_CFLAGS += -Ifreetype2
-	endif
+  ifneq ($(USE_INTERNAL_FREETYPE),1)
+    BASE_CFLAGS += -Ifreetype2
   endif
 
   ifeq ($(ARCH),x64)
@@ -1070,10 +1060,6 @@ endif
 
 TARGETS =
 
-ifeq ($(USE_FREETYPE),1)
-  BASE_CFLAGS += -DBUILD_FREETYPE
-endif
-
 ifndef FULLBINEXT
   FULLBINEXT=.$(ARCH)$(BINEXT)
 endif
@@ -1186,13 +1172,11 @@ else
   RENDERER_LIBS += -ljpeg
 endif
 
-ifeq ($(USE_FREETYPE),1)
 ifeq ($(USE_INTERNAL_FREETYPE),1)
   BASE_CFLAGS += -I$(FTDIR)/include \
 					-DFT2_BUILD_LIBRARY
 else
   RENDERER_LIBS += -lfreetype
-endif
 endif
 
 ifeq ("$(CC)", $(findstring "$(CC)", "clang" "clang++"))
@@ -1814,7 +1798,6 @@ ifneq ($(USE_INTERNAL_JPEG),0)
     $(B)/renderer/jutils.o
 endif
 
-ifeq ($(USE_FREETYPE),1)
 ifneq ($(USE_INTERNAL_FREETYPE),0)
   Q3ROBJ += \
     $(B)/renderer/ftinit.o \
@@ -1824,7 +1807,6 @@ ifneq ($(USE_INTERNAL_FREETYPE),0)
     $(B)/renderer/smooth.o \
     $(B)/renderer/truetype.o \
     $(B)/renderer/sfnt.o
-endif
 endif
 
 ifeq ($(ARCH),i386)

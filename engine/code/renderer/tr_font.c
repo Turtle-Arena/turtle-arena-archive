@@ -23,57 +23,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // 
 //
 // The font system uses FreeType 2.x to render TrueType fonts for use within the game.
-// As of this writing ( Nov, 2000 ) Team Arena uses these fonts for all of the ui and 
-// about 90% of the cgame presentation. A few areas of the CGAME were left uses the old 
-// fonts since the code is shared with standard Q3A.
+// Quake III: Team Arena uses these fonts for all of the ui and about 90% of the cgame
+// presentation. A few areas of the CGAME were left uses the old fonts since the code
+// is shared with standard Q3A. Turtle Arena replaced the last bits so
+// all text uses FreeType.
 //
-// If you include this font rendering code in a commercial product you MUST include the
-// following somewhere with your product, see www.freetype.org for specifics or changes.
-// The Freetype code also uses some hinting techniques that MIGHT infringe on patents 
-// held by apple so be aware of that also.
-//
-// As of Q3A 1.25+ and Team Arena, we are shipping the game with the font rendering code
-// disabled. This removes any potential patent issues and it keeps us from having to 
+// Q3A 1.25+ and Team Arena were shipped with the font rendering code disabled, there was
+// a patent held by Apple at the time which FreeType MIGHT infringe on.
+// This removed any potential patent issues and it kept us (id Software) from having to 
 // distribute an actual TrueTrype font which is 1. expensive to do and 2. seems to require
-// an act of god to accomplish. 
+// an act of god to accomplish.
 //
 // What we did was pre-render the fonts using FreeType ( which is why we leave the FreeType
 // credit in the credits ) and then saved off the glyph data and then hand touched up the 
 // font bitmaps so they scale a bit better in GL.
 //
-// There are limitations in the way fonts are saved and reloaded in that it is based on 
-// point size and not name. So if you pre-render Helvetica in 18 point and Impact in 18 point
-// you will end up with a single 18 point data file and image set. Typically you will want to 
-// choose 3 sizes to best approximate the scaling you will be doing in the ui scripting system
-// 
 // In the UI Scripting code, a scale of 1.0 is equal to a 48 point font. In Team Arena, we
 // use three or four scales, most of them exactly equaling the specific rendered size. We 
-// rendered three sizes in Team Arena, 12, 16, and 20. 
-//
-// To generate new font data you need to go through the following steps.
-// 1. delete the fontImage_x_xx.tga files and fontImage_xx.dat files from the fonts path.
-// 2. in a ui script, specificy a font, smallFont, and bigFont keyword with font name and 
-//    point size. the original TrueType fonts must exist in fonts at this point.
-// 3. run the game, you should see things normally.
-// 4. Exit the game and there will be three dat files and at least three tga files. The 
-//    tga's are in 256x256 pages so if it takes three images to render a 24 point font you 
-//    will end up with fontImage_0_24.tga through fontImage_2_24.tga
-// 5. You will need to flip the tga's in Photoshop as the tga output code writes them upside
-//    down.
-// 6. In future runs of the game, the system looks for these images and data files when a s
-//    specific point sized font is rendered and loads them for use. 
-// 7. Because of the original beta nature of the FreeType code you will probably want to hand
-//    touch the font bitmaps.
-// 
-// Currently a define in the project turns on or off the FreeType code which is currently 
-// defined out. To pre-render new fonts you need enable the define ( BUILD_FREETYPE ) and 
-// uncheck the exclude from build check box in the FreeType2 area of the Renderer project. 
+// rendered three sizes in Team Arena, 12, 16, and 20.
 
 
 #include "tr_local.h"
 #include "../qcommon/qcommon.h"
 
-#ifdef BUILD_FREETYPE
 #include <ft2build.h>
 #include <freetype/fterrors.h>
 #include <freetype/ftsystem.h>
@@ -86,7 +58,6 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #define _TRUNC(x)  ((x) >> 6)
 
 FT_Library ftLibrary = NULL;  
-#endif
 
 #ifdef IOQ3ZTM // USE_FREETYPE
 #define MAX_FONTS 12
@@ -96,7 +67,6 @@ FT_Library ftLibrary = NULL;
 static int registeredFontCount = 0;
 static fontInfo_t registeredFont[MAX_FONTS];
 
-#ifdef BUILD_FREETYPE
 void R_GetGlyphInfo(FT_GlyphSlot glyph, int *left, int *right, int *width, int *top, int *bottom, int *height, int *pitch) {
 
   *left  = _FLOOR( glyph->metrics.horiBearingX );
@@ -320,7 +290,6 @@ static glyphInfo_t *RE_ConstructGlyphInfo(int imageSize, unsigned char *imageOut
 
   return &glyph;
 }
-#endif
 
 static int fdOffset;
 static byte	*fdFile;
@@ -413,7 +382,6 @@ static qboolean R_GetCachedFont(const char *name, fontInfo_t *font) {
 }
 
 void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
-#ifdef BUILD_FREETYPE
 	FT_Face		face;
 	int			j, k, xOut, yOut, lastStart, imageNumber;
 	int			scaledSize, newSize, maxHeight, left;
@@ -433,7 +401,6 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	float		glyphScale = 1.0f;
 	void		*faceData;
 	int			i, len;
-#endif
 	char		fontName[MAX_QPATH];
 	char		strippedName[MAX_QPATH];
 	char		name[MAX_QPATH];
@@ -477,9 +444,6 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 		return;
 	}
 
-#ifndef BUILD_FREETYPE
-	ri.Printf(PRINT_ALL, "RE_RegisterFont: Can't load %s, no freetype support.\n", fontName);
-#else
 	if (ftLibrary == NULL) {
 		ri.Printf(PRINT_ALL, "RE_RegisterFont: FreeType not initialized.\n");
 		return;
@@ -627,28 +591,25 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	Z_Free(out);
 
 	ri.FS_FreeFile(faceData);
-#endif
 }
 
 
 
 void R_InitFreeType(void) {
-#ifdef BUILD_FREETYPE
   if (FT_Init_FreeType( &ftLibrary )) {
     ri.Printf(PRINT_ALL, "R_InitFreeType: Unable to initialize FreeType.\n");
   }
-#endif
+
   registeredFontCount = 0;
 }
 
 
 void R_DoneFreeType(void) {
-#ifdef BUILD_FREETYPE
   if (ftLibrary) {
     FT_Done_FreeType( ftLibrary );
     ftLibrary = NULL;
   }
-#endif
+
 	registeredFontCount = 0;
 }
 
