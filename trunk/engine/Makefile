@@ -55,7 +55,7 @@ ifndef BUILD_FINAL
 endif
 
 ifndef USE_FREETYPE
-  USE_FREETYPE=0
+  USE_FREETYPE     =1
 endif
 
 ifneq ($(PLATFORM),darwin)
@@ -70,8 +70,6 @@ endif
 
 # Some of the defines aren't as independent as they should be, TA_WEAPSYS requires TA_PLAYERSYS, etc
 # Please note: TA_*SYS defines are general system changes, not 'totally' specifiy for Turtle Arena
-
-# USE_FREETYPE Currently doesn't work when using pk3 files instead of using unzipped files?
 
 ##### ioquake3 defines
 # RAVENMD4				Enable support for loading MDR models.
@@ -296,6 +294,10 @@ ifndef USE_INTERNAL_JPEG
 USE_INTERNAL_JPEG=1
 endif
 
+ifndef USE_INTERNAL_FREETYPE
+USE_INTERNAL_FREETYPE=1
+endif
+
 ifndef USE_LOCAL_HEADERS
 USE_LOCAL_HEADERS=1
 endif
@@ -332,6 +334,7 @@ Q3UIDIR=$(MOUNT_DIR)/q3_ui
 JPDIR=$(MOUNT_DIR)/jpeg-8c
 SPEEXDIR=$(MOUNT_DIR)/libspeex
 ZDIR=$(MOUNT_DIR)/zlib
+FTDIR=$(MOUNT_DIR)/freetype-2.4.9
 Q3ASMDIR=$(MOUNT_DIR)/tools/asm
 LBURGDIR=$(MOUNT_DIR)/tools/lcc/lburg
 Q3CPPDIR=$(MOUNT_DIR)/tools/lcc/cpp
@@ -424,10 +427,6 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
     -pipe -DUSE_ICON
   CLIENT_CFLAGS += $(SDL_CFLAGS)
 
-  ifeq ($(USE_FREETYPE),1)
-    CLIENT_CFLAGS += $(shell freetype-config --cflags)
-  endif
-
   OPTIMIZEVM = -O3 -funroll-loops -fomit-frame-pointer
   OPTIMIZE = $(OPTIMIZEVM) -ffast-math
 
@@ -504,8 +503,9 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
   endif
 
   ifeq ($(USE_FREETYPE),1)
-	#BASE_CFLAGS += -I/include/freetype2
-    CLIENT_LIBS += -lfreetype
+	ifneq ($(USE_INTERNAL_FREETYPE), 1)
+		BASE_CFLAGS += $(shell freetype-config --cflags)
+	endif
   endif
 
   ifeq ($(ARCH),i386)
@@ -550,10 +550,6 @@ ifeq ($(PLATFORM),darwin)
 
   BASE_CFLAGS += -fno-strict-aliasing -DMACOS_X -fno-common -pipe
 
-  ifeq ($(USE_FREETYPE),1)
-    BASE_CFLAGS += $(shell freetype-config --cflags)
-  endif
-
   ifeq ($(USE_OPENAL),1)
     ifneq ($(USE_OPENAL_DLOPEN),1)
       CLIENT_LIBS += -framework OpenAL
@@ -567,7 +563,9 @@ ifeq ($(PLATFORM),darwin)
   endif
 
   ifeq ($(USE_FREETYPE),1)
-    CLIENT_LDFLAGS += $(shell freetype-config --libs)
+	ifneq ($(USE_INTERNAL_FREETYPE), 1)
+		BASE_CFLAGS += $(shell freetype-config --cflags)
+	endif
   endif
 
   ifeq ($(USE_CODEC_VORBIS),1)
@@ -663,13 +661,9 @@ ifeq ($(PLATFORM),mingw32)
   RENDERER_LIBS = -lgdi32 -lole32 -lopengl32
   
   ifeq ($(USE_FREETYPE),1)
-	ifeq ($(COMPILE_PLATFORM),mingw32)
-		BASE_CFLAGS += -Ifreetype2/
-	else
-		# cross-make on linux x86_64, ugly...
-		BASE_CFLAGS += -I/usr/i586-mingw32msvc/include/freetype2
+	ifneq ($(USE_INTERNAL_FREETYPE),1)
+		BASE_CFLAGS += -Ifreetype2
 	endif
-    CLIENT_LIBS += -lfreetype
   endif
 
   ifeq ($(ARCH),x64)
@@ -1190,6 +1184,15 @@ ifeq ($(USE_INTERNAL_JPEG),1)
   BASE_CFLAGS += -I$(JPDIR)
 else
   RENDERER_LIBS += -ljpeg
+endif
+
+ifeq ($(USE_FREETYPE),1)
+ifeq ($(USE_INTERNAL_FREETYPE),1)
+  BASE_CFLAGS += -I$(FTDIR)/include \
+					-DFT2_BUILD_LIBRARY
+else
+  RENDERER_LIBS += -lfreetype
+endif
 endif
 
 ifeq ("$(CC)", $(findstring "$(CC)", "clang" "clang++"))
@@ -1809,6 +1812,19 @@ ifneq ($(USE_INTERNAL_JPEG),0)
     $(B)/renderer/jquant1.o \
     $(B)/renderer/jquant2.o \
     $(B)/renderer/jutils.o
+endif
+
+ifeq ($(USE_FREETYPE),1)
+ifneq ($(USE_INTERNAL_FREETYPE),0)
+  Q3ROBJ += \
+    $(B)/renderer/ftinit.o \
+    $(B)/renderer/ftsystem.o \
+    $(B)/renderer/ftbase.o \
+    $(B)/renderer/raster.o \
+    $(B)/renderer/smooth.o \
+    $(B)/renderer/truetype.o \
+    $(B)/renderer/sfnt.o
+endif
 endif
 
 ifeq ($(ARCH),i386)
@@ -2583,6 +2599,21 @@ $(B)/renderer/%.o: $(SDLDIR)/%.c
 	$(DO_REF_CC)
 
 $(B)/renderer/%.o: $(JPDIR)/%.c
+	$(DO_REF_CC)
+
+$(B)/renderer/%.o: $(FTDIR)/src/base/%.c
+	$(DO_REF_CC)
+
+$(B)/renderer/raster.o: $(FTDIR)/src/raster/raster.c
+	$(DO_REF_CC)
+
+$(B)/renderer/smooth.o: $(FTDIR)/src/smooth/smooth.c
+	$(DO_REF_CC)
+
+$(B)/renderer/sfnt.o: $(FTDIR)/src/sfnt/sfnt.c
+	$(DO_REF_CC)
+
+$(B)/renderer/truetype.o: $(FTDIR)/src/truetype/truetype.c
 	$(DO_REF_CC)
 
 $(B)/renderer/%.o: $(RDIR)/%.c
