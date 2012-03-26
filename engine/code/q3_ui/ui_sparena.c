@@ -331,9 +331,6 @@ typedef struct {
 	menubitmap_s	framer;
 	menutext_s		sp_newgame;
 	menutext_s		sp_loadgame;
-	menutext_s		sp_demos;
-	menutext_s		sp_cinematics;
-	menutext_s		sp_mods;
 	menubitmap_s	back;
 } spMenuInfo_t;
 
