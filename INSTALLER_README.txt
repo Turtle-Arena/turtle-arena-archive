@@ -1,8 +1,28 @@
-Thank you for installing Turtle Arena.
+Thank you for downloading Turtle Arena.
 
 If you have any questions or comments, feel free to join the forums or the IRC channel.
 	Forums: http://ztm.x10hosting.com/forums/
 	IRC: #turtlearena on irc.freenode.net
+
+== License ==
+The Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
+	(See GPL-2.txt for full license)
+
+The Turtle Arena data is a mix of GPL2+ and CC-BY-SA-3.0.
+	(See COPYRIGHTS.txt for data copyrights and licenses.)
+
+== Credits ==
+Turtle Arena uses code written by id software, ioquake3 developers, OpenArena developers, Robert "Tr3B" Beckebans, Smokin' Guns developers, Chris "Lakitu7" Schwarz, ZEQ2-lite developers, and Zack "ZTurtleMan" Middleton
+
+See CREDITS.txt for details.
+
+== DATA ==
+Turtle Arena saves it's config, screenshots, etc in per-user data directories.
+
+Windows 2000/XP: C:\Documents and Settings\%USERNAME%\Application Data\TurtleArena\
+Windows Vista/7: C:\Users\%USERNAME%\AppData\Roaming\TurtleArena\
+Mac OS X: /Users/$USERNAME/Library/Application Support/TurtleArena/
+Linux: /home/$USERNAME/.turtlearena/
 
 == MAIN GAME ==
 Turtle Arena's main game mode, which can be played by up to four players, will be a 3D platformer mode with boss fights. It's stil in early development, but you are welcome to give it a try.
