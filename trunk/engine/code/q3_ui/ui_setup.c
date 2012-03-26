@@ -74,7 +74,7 @@ typedef struct {
 #endif
 #ifdef TA_SP
 	menutext_s		replays;
-	menutext_s		cinematics;
+//	menutext_s		cinematics;
 	menutext_s		mods;
 #endif
 //	menutext_s		load;
@@ -152,9 +152,9 @@ static void UI_SetupMenu_Event( void *ptr, int event ) {
 		UI_DemosMenu();
 		break;
 
-	case ID_CINEMATICS:
-		UI_CinematicsMenu();
-		break;
+//	case ID_CINEMATICS:
+//		UI_CinematicsMenu();
+//		break;
 
 	case ID_MODS:
 		UI_ModsMenu();
@@ -225,7 +225,7 @@ static void UI_SetupMenu_Init( void ) {
 	if( trap_Cvar_VariableValue( "cl_paused" ) )
 		y = (480 - SETUP_MENU_VERTICAL_SPACING * 3) / 2;
 	else
-		y = (480 - SETUP_MENU_VERTICAL_SPACING * 8) / 2;
+		y = (480 - SETUP_MENU_VERTICAL_SPACING * 7) / 2;
 #else
 	y = 134;
 #endif
@@ -300,6 +300,7 @@ static void UI_SetupMenu_Init( void ) {
 		setupMenuInfo.replays.color						= text_big_color;
 		setupMenuInfo.replays.style						= UI_CENTER;
 
+/*
 		y += SETUP_MENU_VERTICAL_SPACING;
 		setupMenuInfo.cinematics.generic.type			= MTYPE_PTEXT;
 		setupMenuInfo.cinematics.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -310,6 +311,7 @@ static void UI_SetupMenu_Init( void ) {
 		setupMenuInfo.cinematics.string					= "Cinematics";
 		setupMenuInfo.cinematics.color					= text_big_color;
 		setupMenuInfo.cinematics.style					= UI_CENTER;
+*/
 
 		y += SETUP_MENU_VERTICAL_SPACING;
 		setupMenuInfo.mods.generic.type		= MTYPE_PTEXT;
@@ -399,7 +401,7 @@ static void UI_SetupMenu_Init( void ) {
 	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
 #ifdef TA_SP
 		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.replays );
-		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cinematics );
+//		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.cinematics );
 		Menu_AddItem( &setupMenuInfo.menu, &setupMenuInfo.mods );
 #endif
 #ifdef TURTLEARENA // LONG_CREDITS

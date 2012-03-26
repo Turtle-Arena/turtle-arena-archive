@@ -470,7 +470,7 @@ void UI_MainMenu( void ) {
 	s_main.setup.color						= text_big_color;
 	s_main.setup.style						= style;
 
-#ifndef TA_SP // Moved to PLAY Menu.
+#ifndef TA_SP // Moved to OPTIONS Menu.
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.demos.generic.type				= MTYPE_PTEXT;
 	s_main.demos.generic.flags				= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
