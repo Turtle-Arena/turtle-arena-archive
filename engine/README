@@ -18,8 +18,10 @@ Some of the major ioq3ztm features currently implemented are:
   * Modified pure pk3 system
   * Removed code not needed for standalone games
            (CD Key handling, authentication server code, and punkbuster ui code)
-  * Ogg Vorbis support, enabled by default
-           (with source headers and libraries for easy compiling using MinGW)
+  * Ogg Vorbis support enabled by default, with headers and libraries for
+           easy compiling using MinGW
+  * FreeType support enabled by default, source and headers included in local
+           source tree for easy compiling
   * Joystick select menu
 
 Some of the major ioquake3 features currently implemented are:
@@ -115,6 +117,7 @@ Makefile.local:
   USE_VOIP           - enable built-in VoIP support
   USE_INTERNAL_SPEEX - build internal speex library instead of dynamically
                        linking against system libspeex
+  USE_INTERNAL_FREETYPE - build and link against internal FreeType library
   USE_OLD_VM64       - use Ludwig Nussel's old JIT compiler implementation
                        for x86_64
   USE_INTERNAL_ZLIB  - build and link against internal zlib
