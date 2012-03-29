@@ -5,7 +5,7 @@
 #
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 107
+IOQ3ZTM_REVISION = 109
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
@@ -357,6 +357,7 @@ ifneq ($(BUILD_CLIENT),0)
     OPENAL_LIBS=$(shell pkg-config --silence-errors --libs openal)
     SDL_CFLAGS=$(shell pkg-config --silence-errors --cflags sdl|sed 's/-Dmain=SDL_main//')
     SDL_LIBS=$(shell pkg-config --silence-errors --libs sdl)
+    FREETYPE_CFLAGS=$(shell pkg-config --silence-errors --cflags freetype2)
   endif
   # Use sdl-config if all else fails
   ifeq ($(SDL_CFLAGS),)
@@ -499,7 +500,7 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
   endif
 
   ifneq ($(USE_INTERNAL_FREETYPE), 1)
-    BASE_CFLAGS += $(shell freetype-config --cflags)
+    BASE_CFLAGS += $(FREETYPE_CFLAGS)
   endif
 
   ifeq ($(ARCH),i386)
@@ -557,7 +558,7 @@ ifeq ($(PLATFORM),darwin)
   endif
 
   ifneq ($(USE_INTERNAL_FREETYPE), 1)
-    BASE_CFLAGS += $(shell freetype-config --cflags)
+    BASE_CFLAGS += $(FREETYPE_CFLAGS)
   endif
 
   ifeq ($(USE_CODEC_VORBIS),1)
