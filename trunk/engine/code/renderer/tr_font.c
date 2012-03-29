@@ -164,7 +164,7 @@ static void WriteTGA (char *filename, byte *data, int width, int height) {
 	ri.Free (buffer);
 }
 
-static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, int *yOut, int *maxHeight, FT_Face face, const unsigned char c, qboolean calcHeight) {
+static glyphInfo_t *RE_ConstructGlyphInfo(int imageSize, unsigned char *imageOut, int *xOut, int *yOut, int *maxHeight, FT_Face face, const unsigned char c, qboolean calcHeight) {
 	int i;
 	static glyphInfo_t glyph;
 	unsigned char *src, *dst;
@@ -205,12 +205,12 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 		scaled_height = glyph.height;
 
 		// we need to make sure we fit
-		if (*xOut + scaled_width + 1 >= 255) {
+		if (*xOut + scaled_width + 1 >= imageSize-1) {
 			*xOut = 0;
 			*yOut += *maxHeight + 1;
 		}
 
-		if (*yOut + *maxHeight + 1 >= 255) {
+		if (*yOut + *maxHeight + 1 >= imageSize-1) {
 			*yOut = -1;
 			*xOut = -1;
 			ri.Free(bitmap->buffer);
@@ -220,7 +220,7 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 
 
 		src = bitmap->buffer;
-		dst = imageOut + (*yOut * 256) + *xOut;
+		dst = imageOut + (*yOut * imageSize) + *xOut;
 
 		if (bitmap->pixel_mode == ft_pixel_mode_mono) {
 			for (i = 0; i < glyph.height; i++) {
@@ -245,13 +245,13 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 				}
 
 				src += glyph.pitch;
-				dst += 256;
+				dst += imageSize;
 			}
 		} else {
 			for (i = 0; i < glyph.height; i++) {
 				Com_Memcpy(dst, src, glyph.pitch);
 				src += glyph.pitch;
-				dst += 256;
+				dst += imageSize;
 			}
 		}
 
@@ -260,10 +260,10 @@ static glyphInfo_t *RE_ConstructGlyphInfo(unsigned char *imageOut, int *xOut, in
 
 		glyph.imageHeight = scaled_height;
 		glyph.imageWidth = scaled_width;
-		glyph.s = (float)*xOut / 256;
-		glyph.t = (float)*yOut / 256;
-		glyph.s2 = glyph.s + (float)scaled_width / 256;
-		glyph.t2 = glyph.t + (float)scaled_height / 256;
+		glyph.s = (float)*xOut / imageSize;
+		glyph.t = (float)*yOut / imageSize;
+		glyph.s2 = glyph.s + (float)scaled_width / imageSize;
+		glyph.t2 = glyph.t + (float)scaled_height / imageSize;
 
 		*xOut += scaled_width + 1;
 	}
