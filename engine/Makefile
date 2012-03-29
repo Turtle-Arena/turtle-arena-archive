@@ -5,7 +5,7 @@
 #
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 106
+IOQ3ZTM_REVISION = 107
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
@@ -1803,10 +1803,27 @@ ifneq ($(USE_INTERNAL_FREETYPE),0)
     $(B)/renderer/ftinit.o \
     $(B)/renderer/ftsystem.o \
     $(B)/renderer/ftbase.o \
+	\
+    $(B)/renderer/ftbzip2.o \
+    $(B)/renderer/ftgzip.o \
+    $(B)/renderer/ftlzw.o \
+	\
+    $(B)/renderer/autofit.o \
+    $(B)/renderer/bdf.o \
+    $(B)/renderer/cff.o \
+    $(B)/renderer/pcf.o \
+    $(B)/renderer/pfr.o \
+    $(B)/renderer/psaux.o \
+    $(B)/renderer/pshinter.o \
+    $(B)/renderer/psnames.o \
     $(B)/renderer/raster.o \
+    $(B)/renderer/sfnt.o \
     $(B)/renderer/smooth.o \
     $(B)/renderer/truetype.o \
-    $(B)/renderer/sfnt.o
+    $(B)/renderer/type1.o \
+    $(B)/renderer/type1cid.o \
+    $(B)/renderer/type42.o \
+    $(B)/renderer/winfnt.o
 endif
 
 ifeq ($(ARCH),i386)
@@ -2583,24 +2600,68 @@ $(B)/renderer/%.o: $(SDLDIR)/%.c
 $(B)/renderer/%.o: $(JPDIR)/%.c
 	$(DO_REF_CC)
 
+$(B)/renderer/%.o: $(RDIR)/%.c
+	$(DO_REF_CC)
+
 $(B)/renderer/%.o: $(FTDIR)/src/base/%.c
+	$(DO_REF_CC)
+
+$(B)/renderer/ftbzip2.o: $(FTDIR)/src/bzip2/ftbzip2.c
+	$(DO_REF_CC)
+
+$(B)/renderer/ftgzip.o: $(FTDIR)/src/gzip/ftgzip.c
+	$(DO_REF_CC)
+
+$(B)/renderer/ftlzw.o: $(FTDIR)/src/lzw/ftlzw.c
+	$(DO_REF_CC)
+
+$(B)/renderer/autofit.o: $(FTDIR)/src/autofit/autofit.c
+	$(DO_REF_CC)
+
+$(B)/renderer/bdf.o: $(FTDIR)/src/bdf/bdf.c
+	$(DO_REF_CC)
+
+$(B)/renderer/cff.o: $(FTDIR)/src/cff/cff.c
+	$(DO_REF_CC)
+
+$(B)/renderer/pcf.o: $(FTDIR)/src/pcf/pcf.c
+	$(DO_REF_CC)
+
+$(B)/renderer/pfr.o: $(FTDIR)/src/pfr/pfr.c
+	$(DO_REF_CC)
+
+$(B)/renderer/psaux.o: $(FTDIR)/src/psaux/psaux.c
+	$(DO_REF_CC)
+
+$(B)/renderer/pshinter.o: $(FTDIR)/src/pshinter/pshinter.c
+	$(DO_REF_CC)
+
+$(B)/renderer/psnames.o: $(FTDIR)/src/psnames/psnames.c
 	$(DO_REF_CC)
 
 $(B)/renderer/raster.o: $(FTDIR)/src/raster/raster.c
 	$(DO_REF_CC)
 
-$(B)/renderer/smooth.o: $(FTDIR)/src/smooth/smooth.c
+$(B)/renderer/sfnt.o: $(FTDIR)/src/sfnt/sfnt.c
 	$(DO_REF_CC)
 
-$(B)/renderer/sfnt.o: $(FTDIR)/src/sfnt/sfnt.c
+$(B)/renderer/smooth.o: $(FTDIR)/src/smooth/smooth.c
 	$(DO_REF_CC)
 
 $(B)/renderer/truetype.o: $(FTDIR)/src/truetype/truetype.c
 	$(DO_REF_CC)
 
-$(B)/renderer/%.o: $(RDIR)/%.c
+$(B)/renderer/type1.o: $(FTDIR)/src/type1/type1.c
 	$(DO_REF_CC)
 
+$(B)/renderer/type1cid.o: $(FTDIR)/src/cid/type1cid.c
+	$(DO_REF_CC)
+
+$(B)/renderer/type42.o: $(FTDIR)/src/type42/type42.c
+	$(DO_REF_CC)
+
+$(B)/renderer/winfnt.o: $(FTDIR)/src/winfonts/winfnt.c
+	$(DO_REF_CC)
 
 $(B)/ded/%.o: $(ASMDIR)/%.s
 	$(DO_AS)
