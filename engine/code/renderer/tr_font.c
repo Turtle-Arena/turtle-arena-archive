@@ -423,30 +423,30 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 		return;
 
 	if (registeredFontCount >= MAX_FONTS) {
-		ri.Printf(PRINT_ALL, "RE_RegisterFont: Too many fonts registered already.\n");
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: Too many fonts registered already.\n");
 		return;
 	}
 
 	if (ftLibrary == NULL) {
-		ri.Printf(PRINT_ALL, "RE_RegisterFont: FreeType not initialized.\n");
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType not initialized.\n");
 		return;
 	}
 
 	len = ri.FS_ReadFile(fontName, &faceData);
 	if (len <= 0) {
-		ri.Printf(PRINT_ALL, "RE_RegisterFont: Unable to read font file %s\n", fontName);
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: Unable to read font file '%s'\n", fontName);
 		return;
 	}
 
 	// allocate on the stack first in case we fail
 	if (FT_New_Memory_Face( ftLibrary, faceData, len, 0, &face )) {
-		ri.Printf(PRINT_ALL, "RE_RegisterFont: FreeType2, unable to allocate new face.\n");
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType, unable to allocate new face.\n");
 		return;
 	}
 
 
 	if (FT_Set_Char_Size( face, pointSize << 6, pointSize << 6, dpi, dpi)) {
-		ri.Printf(PRINT_ALL, "RE_RegisterFont: FreeType2, Unable to set face char size.\n");
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType, unable to set face char size.\n");
 		return;
 	}
 
@@ -464,9 +464,9 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	}
 #endif
 
-	out = Z_Malloc(imageSize*imageSize*4);
+	out = ri.Malloc(imageSize*imageSize*4);
 	if (out == NULL) {
-		ri.Printf(PRINT_ALL, "RE_RegisterFont: Z_Malloc failure during output image creation.\n");
+		ri.Printf(PRINT_WARNING, "RE_RegisterFont: ri.Malloc failure during output image creation.\n");
 		return;
 	}
 	Com_Memset(out, 0, imageSize*imageSize*4);
@@ -579,7 +579,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 
 void R_InitFreeType(void) {
 	if (FT_Init_FreeType( &ftLibrary )) {
-		ri.Printf(PRINT_ALL, "R_InitFreeType: Unable to initialize FreeType.\n");
+		ri.Printf(PRINT_WARNING, "R_InitFreeType: Unable to initialize FreeType.\n");
 	}
 
 	registeredFontCount = 0;
