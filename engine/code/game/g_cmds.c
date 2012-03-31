@@ -942,10 +942,9 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		}
 
 #ifdef IOQ3ZTM // PEAKING
-		if (clientnum == ent->client - level.clients )
-		{
-			if (G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR)
-			{
+		if (clientnum == ent - level.gentities ) {
+			if (G_AllowPeaking() && ent->client->sess.sessionTeam != TEAM_SPECTATOR
+				&& ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
 				// Switch to yourself
 				StopFollowing(ent);
 				return;
