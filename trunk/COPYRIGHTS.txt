@@ -92,8 +92,13 @@ The following is copyright (c) 2010 zero-project and is licensed under the
 	Creative Commons Attribution-ShareAlike 3.0 Unported.
 
 music/zero-project_-_Whispering_Wind.ogg
-		zero-project - Whispering Wind - CC-BY-SA-3.0
 		http://www.jamendo.com/en/track/682363
+
+== The Mulletz ==
+The following was released into the public domain in 2011 by Neil Crowe!
+
+music/NeilCrowe_-_EVENT.ogg
+		http://ccmixter.org/files/NeilCrowe/32301
 
 == OpenArena ==
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.

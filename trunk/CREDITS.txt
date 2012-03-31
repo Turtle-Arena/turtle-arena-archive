@@ -11,6 +11,7 @@ Turtle Arena credits.
 * ZEQ2-lite				(For cel shading tcGen code)
 * M+ Outline Fonts		(For M+ 1c, M+ 1mn, and M+ 2p fonts)
 * zero-project			(For music)
+* Neil Crowe			(For music)
 * Zack "ZTurtleMan" Middleton
 
 
