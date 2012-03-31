@@ -53,7 +53,11 @@ creditSection_t credits[] = {
 	{"Art by", { "Zack Middleton", NULL } },
 	{"Fonts by", { "M+ Fonts Project", NULL } },
 	{"Sound Effects by", { "Zack Middleton", NULL } },
-	{"Music by", { "zero-project - zero-project.gr", NULL } },
+	{"Music by", {
+		"Neil Crowe",
+		"zero-project",
+		NULL
+	} },
 	{"Programming by", {
 		"Zack Middleton",
 		"",

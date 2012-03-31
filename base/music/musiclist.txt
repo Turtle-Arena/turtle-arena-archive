@@ -31,13 +31,13 @@ music/postgame
 // Boss battle music
 music/boss
 {
-	intro "music/zero-project_-_Whispering_Wind.ogg"
+	intro "music/NeilCrowe_-_EVENT.ogg"
 }
 
 // Underground city music
 music/subway
 {
-	intro "music/zero-project_-_Whispering_Wind.ogg"
+	intro "music/NeilCrowe_-_EVENT.ogg"
 }
 
 // City (Aboveground) music
@@ -73,6 +73,6 @@ music/snow
 // Space music
 music/space
 {
-	intro "music/zero-project_-_Whispering_Wind.ogg"
+	intro "music/NeilCrowe_-_EVENT.ogg"
 }
 
