@@ -541,16 +541,21 @@ void BroadcastTeamChange( gclient_t *client, int oldTeam )
 #define BCAST_CMD "cp"
 #endif
 
-#ifndef IOQ3ZTM
+#ifdef IOQ3ZTM
+	if ( client->sess.sessionTeam == oldTeam )
+		return;
+
+	if ( client->sess.sessionTeam == TEAM_SPECTATOR )
+#else
 	if ( client->sess.sessionTeam == TEAM_RED ) {
 		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the red team.\n\"",
 			client->pers.netname) );
 	} else if ( client->sess.sessionTeam == TEAM_BLUE ) {
 		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the blue team.\n\"",
 		client->pers.netname));
-	} else
+	} else if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR )
 #endif
-	if ( client->sess.sessionTeam == TEAM_SPECTATOR && oldTeam != TEAM_SPECTATOR ) {
+	{
 		trap_SendServerCommand( -1, va(BCAST_CMD " \"%s" S_COLOR_WHITE " joined the spectators.\n\"",
 		client->pers.netname));
 	} else if ( client->sess.sessionTeam == TEAM_FREE ) {
