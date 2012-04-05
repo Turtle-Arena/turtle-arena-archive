@@ -106,7 +106,7 @@ FT_Bitmap *R_RenderGlyph(FT_GlyphSlot glyph, glyphInfo_t* glyphOut) {
 
 		glyphOut->height = height;
 		glyphOut->pitch = pitch;
-		glyphOut->top = (glyph->metrics.horiBearingY >> 6) + 1;
+		glyphOut->top = _TRUNC(glyph->metrics.horiBearingY) + 1;
 		glyphOut->bottom = bottom;
 
 		return bit2;
@@ -373,15 +373,10 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	image_t		*image;
 	qhandle_t	h;
 	float		max;
-#ifdef TA_DATA // ZTM: This only effects creating font images, not loading pre-rendered image.
-	int			imageSize = 512;
-	float		dpi = 144.0f;
-#else
-	int			imageSize = 256;
-	float		dpi = 72.0f;
-#endif
-	float		dpiScale = 72.0f / dpi; // change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
-	float		glyphScale = 1.0f;
+	int			imageSize;
+	float		dpi;
+	float		dpiScale;
+	float		glyphScale;
 	void		*faceData;
 	int			i, len;
 	char		fontName[MAX_QPATH];
@@ -444,6 +439,8 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 		return;
 	}
 
+	// scale dpi based on screen height
+	dpi = 72.0f * (glConfig.vidHeight / SCREEN_HEIGHT);
 
 	if (FT_Set_Char_Size( face, pointSize << 6, pointSize << 6, dpi, dpi)) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType, unable to set face char size.\n");
@@ -452,18 +449,16 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 
 	//*font = &registeredFonts[registeredFontCount++];
 
+	// scale image size based on screen height, use the next higher power of two
+	for (imageSize = 1; imageSize < 256.0f * (glConfig.vidHeight / SCREEN_HEIGHT); imageSize<<=1);
+
+	// do not exceed maxTextureSize
+	if (imageSize > glConfig.maxTextureSize) {
+		imageSize = glConfig.maxTextureSize;
+	}
+
 	// make a 256x256 image buffer, once it is full, register it, clean it and keep going 
 	// until all glyphs are rendered
-
-#ifdef TA_DATA // ZTM: This only effects creating font images, not loading them.
-	// Use smaller or large size images to more effectively use space/shaders.
-	if (pointSize <= 10) {
-		imageSize = 256;
-	} else if (pointSize > 27) {
-		imageSize = 1024;
-	}
-#endif
-
 	out = ri.Malloc(imageSize*imageSize*4);
 	if (out == NULL) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: ri.Malloc failure during output image creation.\n");
@@ -483,8 +478,11 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	lastStart = i;
 	imageNumber = 0;
 
+	// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
+	dpiScale = 72.0f / dpi;
+
 	// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
-	glyphScale *= 48.0f / pointSize;
+	glyphScale = 48.0f / pointSize;
 
 	while ( i <= GLYPH_END ) {
 
@@ -525,7 +523,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 			}
 
 			Com_sprintf(name, sizeof(name), "%s_%i_%i.tga", strippedName, imageNumber++, pointSize);
-			if(!ri.FS_FileExists(name) && r_saveFontData->integer) {
+			if(r_saveFontData->integer && !ri.FS_FileExists(name)) {
 				WriteTGA(name, imageBuff, imageSize, imageSize);
 			}
 
@@ -566,7 +564,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	Q_strncpyz(font->name, name, sizeof(font->name));
 	Com_Memcpy(&registeredFont[registeredFontCount++], font, sizeof(fontInfo_t));
 
-	if(!ri.FS_FileExists(name) && r_saveFontData->integer) {
+	if(r_saveFontData->integer && !ri.FS_FileExists(name)) {
         ri.FS_WriteFile(name, font, sizeof(fontInfo_t));
  	}
 
