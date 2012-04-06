@@ -387,7 +387,11 @@ static const char *knownRatios[ ][2] =
 #define MAX_RESOLUTIONS	32
 
 static const char* ratios[ MAX_RESOLUTIONS ];
+#ifdef IOQ3ZTM
+static char ratioBuf[ MAX_RESOLUTIONS ][ 14 ];
+#else
 static char ratioBuf[ MAX_RESOLUTIONS ][ 8 ];
+#endif
 static int ratioToRes[ MAX_RESOLUTIONS ];
 static int resToRatio[ MAX_RESOLUTIONS ];
 
@@ -475,15 +479,16 @@ static void GraphicsOptions_GetAspectRatios( void )
 
 		// calculate resolution's aspect ratio
 #ifdef IOQ3ZTM
-		x = strchr( resolutions[r], 'x' );
-		if (x) {
-			x++;
+		if (strchr(resolutions[r], '(')) {
+			w = uis.glconfig.displayWidth;
+			h = uis.glconfig.displayHeight;
+			Com_sprintf( str, sizeof(str), "Auto (%.2f:1)", (float)w / (float)h );
+		} else {
+			x = strchr( resolutions[r], 'x' ) + 1;
 			Q_strncpyz( str, resolutions[r], x-resolutions[r] );
 			w = atoi( str );
 			h = atoi( x );
 			Com_sprintf( str, sizeof(str), "%.2f:1", (float)w / (float)h );
-		} else {
-			Q_strncpyz(str, "Unknown", sizeof(str));
 		}
 #else
 		x = strchr( resolutions[r], 'x' ) + 1;
@@ -554,10 +559,12 @@ static void GraphicsOptions_GetResolutions( void )
 	{
 		char* s = resbuf;
 		unsigned int i = 0;
-
 #ifdef IOQ3ZTM
+		static char displayRes[64];
+
 		// Add display resolution video mode
-		detectedResolutions[i++] = "Display Resolution";
+		Com_sprintf(displayRes, sizeof(displayRes), "Auto (%dx%d)", uis.glconfig.displayWidth, uis.glconfig.displayHeight);
+		detectedResolutions[i++] = displayRes;
 
 		// Use display resolution in "Very High Quality" template
 		s_ivo_templates[0].mode = -2;
@@ -900,10 +907,14 @@ static void GraphicsOptions_SetMenuItems( void )
 		{
 			int i;
 			char buf[MAX_STRING_CHARS];
+#ifdef IOQ3ZTM
+			Com_sprintf(buf, sizeof(buf), "%dx%d", uis.glconfig.vidWidth, uis.glconfig.vidHeight);
+#else
 			trap_Cvar_VariableStringBuffer("r_customwidth", buf, sizeof(buf)-2);
 			buf[strlen(buf)+1] = 0;
 			buf[strlen(buf)] = 'x';
 			trap_Cvar_VariableStringBuffer("r_customheight", buf+strlen(buf), sizeof(buf)-strlen(buf));
+#endif
 
 			for(i = 0; detectedResolutions[i]; ++i)
 			{
