@@ -440,7 +440,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	}
 
 	// scale dpi based on screen height
-	dpi = 72.0f * (glConfig.vidHeight / SCREEN_HEIGHT);
+	dpi = 72.0f * (glConfig.vidHeight / (float)SCREEN_HEIGHT);
 
 	if (FT_Set_Char_Size( face, pointSize << 6, pointSize << 6, dpi, dpi)) {
 		ri.Printf(PRINT_WARNING, "RE_RegisterFont: FreeType, unable to set face char size.\n");
@@ -450,7 +450,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	//*font = &registeredFonts[registeredFontCount++];
 
 	// scale image size based on screen height, use the next higher power of two
-	for (imageSize = 1; imageSize < 256.0f * (glConfig.vidHeight / SCREEN_HEIGHT); imageSize<<=1);
+	for (imageSize = 1; imageSize < 256.0f * (glConfig.vidHeight / (float)SCREEN_HEIGHT); imageSize<<=1);
 
 	// do not exceed maxTextureSize
 	if (imageSize > glConfig.maxTextureSize) {
