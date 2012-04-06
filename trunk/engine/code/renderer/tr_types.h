@@ -245,6 +245,12 @@ typedef struct {
 	qboolean				isFullscreen;
 	qboolean				stereoEnabled;
 	qboolean				smpActive;		// dual processor
+
+#ifdef IOQ3ZTM
+	// display's width and height.
+	int						displayWidth;
+	int						displayHeight;
+#endif
 } glconfig_t;
 
 #endif	// __TR_TYPES_H
