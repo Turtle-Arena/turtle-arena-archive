@@ -3339,7 +3339,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	ci = &cgs.clientinfo[ cent->currentState.clientNum ];
 #endif
 
-	#warning "ZTM: This doesn't support single model or custom skeleton!"
+	// ZTM: FIXME: This doesn't support single model or custom skeleton!
 
 	// map torso animations to weapon animations
 	if ( cg_gun_frame.integer ) {
