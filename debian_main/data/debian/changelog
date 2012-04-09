@@ -1,3 +1,9 @@
+turtlearena-data (0.6-1~lucid1) lucid; urgency=low
+
+  * New upstream release.
+
+ -- Zack "ZTurtleMan" Middleton <ZTurtleMan@gmail.com>  Mon, 9 Apr 2012 15:07:04 +0600
+
 turtlearena-data (0.5.3-1~lucid1) lucid; urgency=low
 
   * New upstream release.

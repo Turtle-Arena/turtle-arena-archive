@@ -254,8 +254,9 @@ PROTOCOL
 ==============================================================
 */
 
-#define	PROTOCOL_VERSION	8
+#define	PROTOCOL_VERSION	9
 #define PROTOCOL_LEGACY_VERSION	0
+// 9 TA 0.6
 // 8 TA 0.5.3
 // 7 TA 0.5.1 / TA 0.5.2
 // 6 TA 0.5.0
