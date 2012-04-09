@@ -188,9 +188,9 @@ typedef struct
 // Only requires paks for gamenames which are used (and aren't flagged as optional).
 const purePak_t com_purePaks[] =
 {
-	{BASEGAME, "assets0", 3676351063u, 0},
-	{BASEGAME, "assets1-qvms", 3914725605u, 0},
-	{BASEGAME, "assets2-music", 3128159308u, PAK_OPTIONAL},
+	{BASEGAME, "assets0", 2952109289u, 0},
+	{BASEGAME, "assets1-qvms", 1324479461u, 0},
+	{BASEGAME, "assets2-music", 1273935545u, PAK_OPTIONAL},
 
 	{NULL, NULL, 0, 0}
 };
