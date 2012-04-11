@@ -372,10 +372,11 @@ void AASOuputFile(quakefile_t *qf, char *outputpath, char *filename)
 //===========================================================================
 void CreateAASFilesForAllBSPFiles(char *quakepath)
 {
-#if defined(WIN32)|defined(_WIN32)
+#if defined(WIN32)||defined(_WIN32)
 	WIN32_FIND_DATA filedata;
 	HWND handle;
 	struct _stat statbuf;
+	int done;
 #else
 	glob_t globbuf;
 	struct stat statbuf;
