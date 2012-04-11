@@ -247,6 +247,10 @@
 			<Add directory="../../code/AL" />
 			<Add directory="../../code/libspeex/include" />
 			<Add directory="../../code/freetype-2.4.9/include" />
+			<Add directory="../../code/libtheora/include" />
+			<Add directory="../../code/libvorbis/include" />
+			<Add directory="../../code/libogg/include" />
+			<Add directory="../../code/jpeg-8c" />
 		</Compiler>
 		<Linker>
 			<Add library="SDLmain" />
@@ -266,10 +270,15 @@
 		</Unit>
 		<Unit filename="../../code/asm/ftola.c">
 			<Option compilerVar="CC" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -c $file -o $object -march=k8" />
 		</Unit>
 		<Unit filename="../../code/asm/matha.s">
 			<Option compilerVar="CC" />
 			<Option compiler="gcc" use="1" buildCommand="$compiler -g $options -x assembler-with-cpp $includes -c $file -o $object" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+			<Option target="Release Linux i386" />
+			<Option target="Debug Linux i386" />
 		</Unit>
 		<Unit filename="../../code/asm/qasm-inline.h" />
 		<Unit filename="../../code/asm/qasm.h" />
@@ -279,10 +288,15 @@
 		</Unit>
 		<Unit filename="../../code/asm/snapvector.c">
 			<Option compilerVar="CC" />
+			<Option compiler="gcc" use="1" buildCommand="$compiler $options $includes -c $file -o $object -march=k8" />
 		</Unit>
 		<Unit filename="../../code/asm/snd_mixa.s">
 			<Option compilerVar="CC" />
 			<Option compiler="gcc" use="1" buildCommand="$compiler -g $options -x assembler-with-cpp $includes -c $file -o $object" />
+			<Option target="Release Win32" />
+			<Option target="Debug Win32" />
+			<Option target="Release Linux i386" />
+			<Option target="Debug Linux i386" />
 		</Unit>
 		<Unit filename="../../code/asm/vm_x86_64.asm">
 			<Option compile="0" />

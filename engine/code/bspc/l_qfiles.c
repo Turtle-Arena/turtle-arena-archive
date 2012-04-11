@@ -406,10 +406,11 @@ quakefile_t *FindQuakeFilesInPak(char *pakfile, char *filter)
 //===========================================================================
 quakefile_t *FindQuakeFilesWithPakFilter(char *pakfilter, char *filter)
 {
-#if defined(WIN32)|defined(_WIN32)
+#if defined(WIN32)||defined(_WIN32)
 	WIN32_FIND_DATA filedata;
 	HWND handle;
 	struct _stat statbuf;
+	int done;
 #else
 	glob_t globbuf;
 	struct stat statbuf;

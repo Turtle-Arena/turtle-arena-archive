@@ -29,7 +29,7 @@ RESET MENU
 
 #include "ui_local.h"
 
-
+#ifndef TA_SP
 #define ART_FRAME					"menu/art/cut_frame"
 
 #define ID_NO		100
@@ -197,3 +197,4 @@ void UI_ResetMenu(void) {
 
 	Menu_SetCursorToItem( &s_reset.menu, &s_reset.no );
 }
+#endif

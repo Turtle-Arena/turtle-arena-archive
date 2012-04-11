@@ -1563,7 +1563,6 @@ float Com_FontStringHeight( font_t *font, const char *s, int limit )
 }
 #endif
 
-#ifndef QAGAME
 /*
 =================
 Com_LocalClientCvarName
@@ -1596,4 +1595,4 @@ char *Com_LocalClientCvarName(int localClient, char *in_cvarName) {
 
 	return localClientCvarName;
 }
-#endif
+
