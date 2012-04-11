@@ -32,6 +32,7 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add option="-DFT2_BUILD_LIBRARY" />
 					<Add directory="../../code/libs/win32/include" />
 				</Compiler>
 				<Linker>
@@ -78,6 +79,7 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add option="-DFT2_BUILD_LIBRARY" />
 					<Add directory="../../code/libs/win32/include" />
 				</Compiler>
 				<Linker>
@@ -119,6 +121,7 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add option="-DFT2_BUILD_LIBRARY" />
 				</Compiler>
 				<Linker>
 					<Add library="GL" />
@@ -147,6 +150,7 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add option="-DFT2_BUILD_LIBRARY" />
 				</Compiler>
 				<Linker>
 					<Add library="GL" />
@@ -174,6 +178,7 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add option="-DFT2_BUILD_LIBRARY" />
 				</Compiler>
 				<Linker>
 					<Add library="GL" />
@@ -202,6 +207,7 @@
 					<Add option="-DUSE_CIN_THEORA" />
 					<Add option="-DFLOATING_POINT" />
 					<Add option="-DUSE_ALLOCA" />
+					<Add option="-DFT2_BUILD_LIBRARY" />
 				</Compiler>
 				<Linker>
 					<Add library="GL" />
@@ -212,19 +218,13 @@
 			<Add option="-static" />
 			<Add option="-DRELATIVE_WIN32_ICON_PATH" />
 			<Add option="-DUSE_INTERNAL_JPEG" />
-			<Add option="-DSTANDALONE" />
-			<Add option="-DRAVENMD4" />
-			<Add option="-DTA_MAIN" />
-			<Add option="-DCELSHADING" />
 			<Add option="-DNOTRATEDM" />
 			<Add option="-DNOBLOOD" />
-			<Add option="-DNET_COMPAT" />
 			<Add option="-DIOQ3ZTM" />
 			<Add option="-DIOQ3ZTM_NO_COMPAT" />
 			<Add option="-DIOQ3ZTM_NO_TEAM_MODEL" />
 			<Add option="-DTA_HOLDSYS" />
 			<Add option="-DTA_ITEMSYS" />
-			<Add option="-DTA_WEAPSYS_NOCOMPAT" />
 			<Add option="-DTA_WEAPSYS" />
 			<Add option="-DTA_PLAYERSYS" />
 			<Add option="-DTA_SUPPORTQ3" />
@@ -232,25 +232,21 @@
 			<Add option="-DTA_NPCSYS" />
 			<Add option="-DTA_PATHSYS" />
 			<Add option="-DTA_WEAPSYS_EX_COMPAT" />
-			<Add option="-DOA_BLOOM" />
-			<Add option="-DTHIRD_PERSON" />
+			<Add option="-DTA_BLOOM" />
+			<Add option="-DTA_SPLITVIEW" />
 			<Add option="-DTURTLEARENA" />
 			<Add option="-DTA_MISC" />
 			<Add option="-DTA_SP" />
 			<Add option="-DTA_HOLDABLE" />
 			<Add option="-DTA_WEAPSYS_EX" />
-			<Add option="-DTA_PLAYERS" />
 			<Add option="-DTA_DATA" />
 			<Add option="-DNIGHTSMODE" />
-			<Add option="-DTA_CAMERA" />
-			<Add option="-DWOLFET" />
-			<Add option="-DMISSIONPACK_HUD2" />
 			<Add option="-DTA_GAME_MODELS" />
-			<Add option="-DTA_SPLITVIEW" />
 			<Add directory="../../code/SDL12/include" />
 			<Add directory="../../code/libcurl" />
 			<Add directory="../../code/AL" />
 			<Add directory="../../code/libspeex/include" />
+			<Add directory="../../code/freetype-2.4.9/include" />
 		</Compiler>
 		<Linker>
 			<Add library="SDLmain" />
@@ -490,6 +486,156 @@
 		</Unit>
 		<Unit filename="../../code/client/snd_public.h" />
 		<Unit filename="../../code/client/snd_wavelet.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/config/ftconfig.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/config/ftheader.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/config/ftmodule.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/config/ftoption.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/config/ftstdlib.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/freetype.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftadvanc.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftbbox.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftbdf.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftbitmap.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftbzip2.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftcache.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftchapters.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftcid.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/fterrdef.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/fterrors.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftgasp.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftglyph.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftgxval.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftgzip.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftimage.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftincrem.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftlcdfil.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftlist.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftlzw.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftmac.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftmm.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftmodapi.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftmoderr.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftotval.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftoutln.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftpfr.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftrender.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftsizes.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftsnames.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftstroke.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftsynth.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftsystem.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/fttrigon.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/fttypes.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftwinfnt.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ftxf86.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/autohint.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftcalc.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftdebug.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftdriver.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftgloadr.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftmemory.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftobjs.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftpic.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftrfork.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftserv.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftstream.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/fttrace.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/ftvalid.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/internal.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/psaux.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/pshints.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svbdf.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svcid.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svgldict.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svgxval.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svkern.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svmm.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svotval.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svpfr.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svpostnm.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svpscmap.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svpsinfo.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svsfnt.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svttcmap.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svtteng.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svttglyf.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svwinfnt.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/services/svxf86nm.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/sfnt.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/t1types.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/internal/tttypes.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/t1tables.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ttnameid.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/tttables.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/tttags.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/freetype/ttunpat.h" />
+		<Unit filename="../../code/freetype-2.4.9/include/ft2build.h" />
+		<Unit filename="../../code/freetype-2.4.9/src/autofit/autofit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/base/ftbase.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/base/ftinit.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/base/ftsystem.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/bdf/bdf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/bzip2/ftbzip2.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/cff/cff.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/cid/type1cid.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/gzip/ftgzip.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/lzw/ftlzw.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/pcf/pcf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/pfr/pfr.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/psaux/psaux.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/pshinter/pshinter.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/psnames/psnames.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/raster/raster.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/sfnt/sfnt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/smooth/smooth.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/truetype/truetype.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/type1/type1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/type42/type42.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/freetype-2.4.9/src/winfonts/winfnt.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/game/bg_public.h" />

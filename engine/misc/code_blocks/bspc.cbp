@@ -85,6 +85,10 @@
 				</Linker>
 			</Target>
 		</Build>
+		<Compiler>
+			<Add option="-DCom_Memcpy=memcpy" />
+			<Add option="-DCom_Memset=memset" />
+		</Compiler>
 		<Unit filename="../../code/botlib/aasfile.h" />
 		<Unit filename="../../code/botlib/be_aas_bsp.h" />
 		<Unit filename="../../code/botlib/be_aas_bspq3.c">
