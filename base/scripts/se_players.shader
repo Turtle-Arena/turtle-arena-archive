@@ -570,58 +570,28 @@ models/players/fugitoid/eyes_mouth_blue
 
 models/players/fugitoid/body
 {
-//	{
-//		map textures/effects/tinfx_lighter.png
-//		tcGen environment
-//		rgbGen lightingDiffuse
-//	}
 	{
-		map $whiteimage
-		rgbGen const ( 0.5 0.5 0.5 )
-	}
-	{
-		map textures/sfx/celshader_2_levels.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
+		map textures/effects/tinfx_lighter.png
+		tcGen environment
+		rgbGen lightingDiffuse
 	}
 }
 
 // Raph fugitoid skin mask/belt shaders
 models/players/fugitoid/red
 {
-//	{
-//		map textures/effects/envmaproc.png
-//		tcGen environment
-//		rgbGen lightingDiffuse
-//	}
 	{
-		map $whiteimage
-		rgbGen const ( 0.6 0.0 0.0 )
-	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
+		map textures/effects/envmaproc.png
+		tcGen environment
+		rgbGen lightingDiffuse
 	}
 }
 
 models/players/fugitoid/blue
 {
-//	{
-//		map textures/effects/envmapblue.png
-//		tcGen environment
-//		rgbGen lightingDiffuse
-//	}
 	{
-		map $whiteimage
-		rgbGen const ( 0.0 0.0 0.6 )
-	}
-	{
-		map textures/sfx/celshader.png
-		blendfunc blend
-		rgbGen identityLighting
-		tcGen cel
+		map textures/effects/envmapblue.png
+		tcGen environment
+		rgbGen lightingDiffuse
 	}
 }
