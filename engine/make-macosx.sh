@@ -1,4 +1,5 @@
 #!/bin/sh
+CC=gcc-4.0
 APPBUNDLE=turtlearena.app
 BINARY=turtlearena.x86_64
 DEDBIN=turtlearena-server.x86_64

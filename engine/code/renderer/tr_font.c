@@ -266,10 +266,10 @@ static glyphInfo_t *RE_ConstructGlyphInfo(int imageSize, unsigned char *imageOut
 		glyph.t2 = glyph.t + (float)scaled_height / imageSize;
 
 		*xOut += scaled_width + 1;
-	}
 
-	ri.Free(bitmap->buffer);
-	ri.Free(bitmap);
+		ri.Free(bitmap->buffer);
+		ri.Free(bitmap);
+	}
 
 	return &glyph;
 }
@@ -375,7 +375,9 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	float		max;
 	int			imageSize;
 	float		dpi;
+#ifdef TURTLEARENA
 	float		dpiScale;
+#endif
 	float		glyphScale;
 	void		*faceData;
 	int			i, len;
@@ -469,7 +471,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	maxHeight = 0;
 
 	for (i = GLYPH_START; i < GLYPH_END; i++) {
-		glyph = RE_ConstructGlyphInfo(imageSize, out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qtrue);
+		RE_ConstructGlyphInfo(imageSize, out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qtrue);
 	}
 
 	xOut = 0;
@@ -478,21 +480,25 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	lastStart = i;
 	imageNumber = 0;
 
+#ifdef TURTLEARENA
 	// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 	dpiScale = 72.0f / dpi;
 
 	// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
 	glyphScale = 48.0f / pointSize;
+#endif
 
 	while ( i <= GLYPH_END ) {
 
 		glyph = RE_ConstructGlyphInfo(imageSize, out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
 
+#ifdef TURTLEARENA // ZTM: FIXME: My font code in client and q3_ui requires this, but should use glyphScale instead.
 		// Scale to compensate for DPI
 		glyph->top *= dpiScale;
 		glyph->xSkip *= dpiScale;
 		glyph->imageHeight *= dpiScale;
 		glyph->imageWidth *= dpiScale;
+#endif
 
 		if (xOut == -1 || yOut == -1 || i == GLYPH_END)  {
 			// ran out of room
@@ -557,6 +563,14 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 			i++;
 		}
 	}
+
+#ifndef TURTLEARENA
+	// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
+	glyphScale = 72.0f / dpi;
+
+	// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
+	glyphScale *= 48.0f / pointSize;
+#endif
 
 	registeredFont[registeredFontCount].glyphScale = glyphScale;
 	font->glyphScale = glyphScale;
