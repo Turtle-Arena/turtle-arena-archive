@@ -7,7 +7,6 @@ PKGINFO=APPLTURTLEARENA
 ICNS=misc/quake3.icns
 DESTDIR=build/release-darwin-x86_64
 BASEDIR=base
-RENDERDIR=build/release-darwin-x86_64
 
 BIN_OBJ="
 	build/release-darwin-x86_64/turtlearena.x86_64
@@ -19,16 +18,25 @@ BASE_OBJ="
 	build/release-darwin-x86_64/$BASEDIR/cgamex86_64.dylib
 	build/release-darwin-x86_64/$BASEDIR/uix86_64.dylib
 	build/release-darwin-x86_64/$BASEDIR/qagamex86_64.dylib
-"
-RENDER_OBJ="
-	build/release-darwin-x86_64/renderer_opengl1_smp_x86_64.dylib
-	build/release-darwin-x86_64/renderer_opengl1_x86_64.dylib
+	../install/$BASEDIR/assets0.pk3
+	../install/$BASEDIR/assets1-qvms.pk3
+	../install/$BASEDIR/assets2-music.pk3
 "
 
 cd `dirname $0`
 if [ ! -f Makefile ]; then
 	echo "This script must be run from the ioquake3 build directory"
 	exit 1
+fi
+
+# Build game assets if needed.
+if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
+        echo "Building assets..."
+        (make -C .. assets) || exit 1;
+        if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
+                echo "Error: Failed to build assets"
+                exit 1
+        fi
 fi
 
 Q3_VERSION=`grep '^VERSION=' Makefile | sed -e 's/.*=\(.*\)/\1/'`
@@ -114,7 +122,6 @@ echo "
 
 lipo -create -o $DESTDIR/$APPBUNDLE/Contents/MacOS/$BINARY $BIN_OBJ
 lipo -create -o $DESTDIR/$APPBUNDLE/Contents/MacOS/$DEDBIN $BIN_DEDOBJ
-cp $RENDER_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/
 cp $BASE_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/$BASEDIR/
 cp code/libs/macosx/*.dylib $DESTDIR/$APPBUNDLE/Contents/MacOS/
 
