@@ -15,7 +15,7 @@ There are  source tarballs on the download page for Turtle Arena 0.4 (and later)
 
 Notes;
   * 0.4.x does not include data files or data source files in the tarball, they are in subversion.
-  * 0.5.x does not include data files in the tarball, they are in subversion.
+  * 0.5.x/0.6 does not include data files in the tarball, they are in subversion.
 
 The data files are zipped and included in the game downloads (see `base/assets*.pk3`).
 
@@ -25,12 +25,12 @@ You will need a subversion client, such as [http://tortoisesvn.tigris.org/ Torto
 Next you will need to do a source checkout, this varies by program.
 
 Latest development code is located at
-	http://turtlearena.googlecode.com/svn/trunk/
+  * http://turtlearena.googlecode.com/svn/trunk/
 
 You can also get the source for released versions
-	http://turtlearena.googlecode.com/svn/tags/0.5.3/
-	http://turtlearena.googlecode.com/svn/tags/0.4.3/
-	http://turtlearena.googlecode.com/svn/tags/0.2/
+  * http://turtlearena.googlecode.com/svn/tags/0.6/
+  * http://turtlearena.googlecode.com/svn/tags/0.4.3/
+  * http://turtlearena.googlecode.com/svn/tags/0.2/
 
 = Windows =
 
