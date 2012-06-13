@@ -1,42 +1,40 @@
 #!/bin/sh
-CC=gcc-4.0
-APPBUNDLE=turtlearena.app
-BINARY=turtlearena.x86_64
-DEDBIN=turtlearena-server.x86_64
-PKGINFO=APPLTURTLEARENA
+APPBUNDLE=ioquake3.app
+BINARY=ioquake3.x86_64
+DEDBIN=ioq3ded.x86_64
+PKGINFO=APPLIOQ3
 ICNS=misc/quake3.icns
 DESTDIR=build/release-darwin-x86_64
-BASEDIR=base
+BASEDIR=baseq3
+MPACKDIR=missionpack
+RENDERDIR=build/release-darwin-x86_64
 
 BIN_OBJ="
-	build/release-darwin-x86_64/turtlearena.x86_64
+	build/release-darwin-x86_64/ioquake3.x86_64
 "
 BIN_DEDOBJ="
-	build/release-darwin-x86_64/turtlearena.x86_64
+	build/release-darwin-x86_64/ioq3ded.x86_64
 "
 BASE_OBJ="
 	build/release-darwin-x86_64/$BASEDIR/cgamex86_64.dylib
 	build/release-darwin-x86_64/$BASEDIR/uix86_64.dylib
 	build/release-darwin-x86_64/$BASEDIR/qagamex86_64.dylib
-	../install/$BASEDIR/assets0.pk3
-	../install/$BASEDIR/assets1-qvms.pk3
-	../install/$BASEDIR/assets2-music.pk3
+"
+MPACK_OBJ="
+	build/release-darwin-x86_64/$MPACKDIR/cgamex86_64.dylib
+	build/release-darwin-x86_64/$MPACKDIR/uix86_64.dylib
+	build/release-darwin-x86_64/$MPACKDIR/qagamex86_64.dylib
+"
+
+RENDER_OBJ="
+	build/release-darwin-x86_64/renderer_opengl1_smp_x86_64.dylib
+	build/release-darwin-x86_64/renderer_opengl1_x86_64.dylib
 "
 
 cd `dirname $0`
 if [ ! -f Makefile ]; then
 	echo "This script must be run from the ioquake3 build directory"
 	exit 1
-fi
-
-# Build game assets if needed.
-if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
-        echo "Building assets..."
-        (make -C .. assets) || exit 1;
-        if [ ! -f ../install/$BASEDIR/assets0.pk3 ]; then
-                echo "Error: Failed to build assets"
-                exit 1
-        fi
 fi
 
 Q3_VERSION=`grep '^VERSION=' Makefile | sed -e 's/.*=\(.*\)/\1/'`
@@ -78,10 +76,13 @@ echo "Creating .app bundle $DESTDIR/$APPBUNDLE"
 if [ ! -d $DESTDIR/$APPBUNDLE/Contents/MacOS/$BASEDIR ]; then
 	mkdir -p $DESTDIR/$APPBUNDLE/Contents/MacOS/$BASEDIR || exit 1;
 fi
+if [ ! -d $DESTDIR/$APPBUNDLE/Contents/MacOS/$MPACKDIR ]; then
+	mkdir -p $DESTDIR/$APPBUNDLE/Contents/MacOS/$MPACKDIR || exit 1;
+fi
 if [ ! -d $DESTDIR/$APPBUNDLE/Contents/Resources ]; then
 	mkdir -p $DESTDIR/$APPBUNDLE/Contents/Resources
 fi
-cp $ICNS $DESTDIR/$APPBUNDLE/Contents/Resources/turtlearena.icns || exit 1;
+cp $ICNS $DESTDIR/$APPBUNDLE/Contents/Resources/ioquake3.icns || exit 1;
 echo $PKGINFO > $DESTDIR/$APPBUNDLE/Contents/PkgInfo
 echo "
 	<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -95,15 +96,15 @@ echo "
 		<key>CFBundleExecutable</key>
 		<string>$BINARY</string>
 		<key>CFBundleGetInfoString</key>
-		<string>Turtle Arena $Q3_VERSION</string>
+		<string>ioquake3 $Q3_VERSION</string>
 		<key>CFBundleIconFile</key>
-		<string>turtlearena.icns</string>
+		<string>ioquake3.icns</string>
 		<key>CFBundleIdentifier</key>
 		<string>org.ioquake.ioquake3</string>
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>Turtle Arena</string>
+		<string>ioquake3</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -122,6 +123,8 @@ echo "
 
 lipo -create -o $DESTDIR/$APPBUNDLE/Contents/MacOS/$BINARY $BIN_OBJ
 lipo -create -o $DESTDIR/$APPBUNDLE/Contents/MacOS/$DEDBIN $BIN_DEDOBJ
+cp $RENDER_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/
 cp $BASE_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/$BASEDIR/
+cp $MPACK_OBJ $DESTDIR/$APPBUNDLE/Contents/MacOS/$MPACKDIR/
 cp code/libs/macosx/*.dylib $DESTDIR/$APPBUNDLE/Contents/MacOS/
 
