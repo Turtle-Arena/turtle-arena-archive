@@ -721,11 +721,9 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 		return;
 	}
 	trap_R_SetColor( hcolor );
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	CG_DrawPicFit( x, y, w, h, cgs.media.teamStatusBar );
-#else
+	CG_SetScreenPlacement(PLACE_STRETCH);
 	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
-#endif
+	CG_PopScreenPlacement();
 	trap_R_SetColor( NULL );
 }
 
@@ -1023,7 +1021,7 @@ static void CG_DrawStatusBar( void ) {
 #endif
 
 #ifdef TURTLEARENA
-	CG_HudPlacement(HUD_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT);
 
 	ps = cg.cur_ps;
 	cent = &cg_entities[ps->clientNum];
@@ -1175,7 +1173,7 @@ static void CG_DrawStatusBar( void ) {
 #endif
 	}
 #else
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	ps = cg.cur_ps;
 	cent = &cg_entities[ps->clientNum];
@@ -1309,7 +1307,7 @@ void CG_DrawMiddleLeft(void)
 {
 	int y;
 
-	CG_HudPlacement(HUD_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT);
 
 	y = SCREEN_HEIGHT/2;
 
@@ -1346,7 +1344,7 @@ void CG_DrawScoreChain(void)
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	fadeColor = CG_FadeColor( cg.cur_lc->scorePickupTime, 2000 );
 	if (!fadeColor) {
@@ -1770,7 +1768,7 @@ static void CG_DrawUpperRight(stereoFrame_t stereoFrame)
 
 	y = 0;
 
-	CG_HudPlacement(HUD_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT);
 
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qtrue );
@@ -2144,7 +2142,7 @@ static void CG_DrawLowerRight( void ) {
 	y = 480 - ICON_SIZE;
 #endif
 
-	CG_HudPlacement(HUD_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT);
 
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 2 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qfalse );
@@ -2215,9 +2213,9 @@ CG_DrawLowerLeft
 static void CG_DrawLowerLeft( void ) {
 	float	y;
 
-	CG_HudPlacement(HUD_LEFT);
-
 	y = 480 - ICON_SIZE;
+
+	CG_SetScreenPlacement(PLACE_LEFT);
 
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 3 ) {
 		y = CG_DrawTeamOverlay( y, qfalse, qfalse );
@@ -2333,7 +2331,11 @@ CG_DrawPersistantPowerup
 static void CG_DrawPersistantPowerup( void ) { 
 	int		value;
 
-	CG_HudPlacement(HUD_LEFT);
+#ifdef TURTLEARENA
+	CG_SetScreenPlacement(PLACE_LEFT);
+#else
+	CG_SetScreenPlacement(PLACE_RIGHT);
+#endif
 
 	value = cg.cur_ps->stats[STAT_PERSISTANT_POWERUP];
 	if ( value ) {
@@ -2360,11 +2362,11 @@ static void CG_DrawReward( void ) {
 	float	x, y;
 	char	buf[32];
 
-	CG_HudPlacement(HUD_CENTER);
-
 	if ( !cg_drawRewards.integer ) {
 		return;
 	}
+
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	color = CG_FadeColor( cg.cur_lc->rewardTime, REWARD_TIME );
 	if ( !color ) {
@@ -2510,8 +2512,6 @@ static void CG_DrawDisconnect( void ) {
 	usercmd_t	cmd;
 	const char		*s;
 
-	CG_HudPlacement(HUD_CENTER);
-
 	// draw the phone jack if we are completely past our buffers
 	cmdNum = trap_GetCurrentCmdNumber() - CMD_BACKUP + 1;
 	trap_GetUserCmd( cmdNum, &cmd, cg.cur_localClientNum );
@@ -2519,6 +2519,8 @@ static void CG_DrawDisconnect( void ) {
 		|| cmd.serverTime > cg.time ) {	// special check for map_restart
 		return;
 	}
+
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	// also add text in center of screen
 	s = "Connection Interrupted";
@@ -2530,11 +2532,11 @@ static void CG_DrawDisconnect( void ) {
 	}
 
 #ifdef TURTLEARENA
-	CG_HudPlacement(HUD_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT);
 
 	CG_DrawPic( 0, 0, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
 #else
-	CG_HudPlacement(HUD_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT);
 
 	x = 640 - 48;
 	y = 480 - 48;
@@ -2565,9 +2567,9 @@ static void CG_DrawLagometer( void ) {
 	}
 
 #ifdef TURTLEARENA
-	CG_HudPlacement(HUD_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT);
 #else
-	CG_HudPlacement(HUD_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT);
 #endif
 
 	//
@@ -2732,7 +2734,7 @@ static void CG_DrawCenterString( void ) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	trap_R_SetColor( color );
 
@@ -2809,7 +2811,7 @@ static void CG_DrawCrosshair(void)
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	// set color based on health
 	if ( cg_crosshairHealth.integer ) {
@@ -2878,7 +2880,7 @@ static void CG_DrawCrosshair3D(void)
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	w = cg_crosshairSize.value;
 
@@ -2982,7 +2984,7 @@ static void CG_DrawCrosshairNames( void ) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	// scan the known entities to see if the crosshair is sighted on one
 	CG_ScanForCrosshairEntity();
@@ -3013,7 +3015,7 @@ CG_DrawSpectator
 =================
 */
 static void CG_DrawSpectator(void) {
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 	CG_DrawBigString(CENTER_X, 440, "SPECTATOR", 1.0F);
 	if ( cgs.gametype == GT_TOURNAMENT ) {
 		CG_DrawBigString(CENTER_X, 460, "waiting to play", 1.0F);
@@ -3043,7 +3045,7 @@ static void CG_DrawVote(void) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT);
 
 	// play a talk beep whenever it is modified
 	if ( cgs.voteModified ) {
@@ -3092,7 +3094,7 @@ static void CG_DrawTeamVote(void) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT);
 
 	// play a talk beep whenever it is modified
 	if ( cgs.teamVoteModified[cs_offset] ) {
@@ -3119,7 +3121,7 @@ static qboolean CG_DrawScoreboard( void ) {
 #ifdef MISSIONPACK_HUD
 	static qboolean firstTime = qtrue;
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	if (menuScoreboard) {
 		menuScoreboard->window.flags &= ~WINDOW_FORCED;
@@ -3203,7 +3205,7 @@ static void CG_DrawSPIntermission( void ) {
 	color[2] = 1;
 	color[3] = 1;
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	if (cg_singlePlayerActive.integer) {
 		if (cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName[0] == '*') {
@@ -3265,7 +3267,7 @@ static qboolean CG_DrawFollow( void ) {
 		return qfalse;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	CG_DrawBigString( CENTER_X, 24, "following", 1.0F );
 
@@ -3293,7 +3295,7 @@ static qboolean CG_DrawUseEntity(void)
 	if (!(cg.cur_ps->eFlags & EF_USE_ENT))
 		return qfalse;
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	s = "Use Entity!";
 
@@ -3332,7 +3334,7 @@ static void CG_DrawAmmoWarning( void ) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	if ( cg.cur_lc->lowAmmoWarning == 2 ) {
 		s = "OUT OF AMMO";
@@ -3360,7 +3362,7 @@ static void CG_DrawProxWarning( void ) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
   if (proxTime == 0) {
     proxTime = cg.time + 5000;
@@ -3406,7 +3408,7 @@ static void CG_DrawWarmup( void ) {
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	if ( sec < 0 ) {
 		s = "Waiting for players";
@@ -3575,7 +3577,7 @@ void CG_DrawGameOver(void)
 		return;
 	}
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	ps = cg.cur_ps;
 
@@ -3887,8 +3889,9 @@ void CG_DrawLetterbox(void)
 		return;
 	}
 
-	CG_FillRectFit(0, 0, 640, pixels, color);
-	CG_FillRectFit(0, 480-pixels, 640, pixels, color);
+	CG_SetScreenPlacement(PLACE_STRETCH);
+	CG_FillRect(0, 0, 640, pixels, color);
+	CG_FillRect(0, 480-pixels, 640, pixels, color);
 }
 #endif
 

@@ -2481,10 +2481,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	// ZTM: Don't strech HUD, make it a cvar?
-	cgs.screenXScaleFit = cgs.glconfig.vidWidth * (1.0/640.0);
-	cgs.screenYScaleFit = cgs.glconfig.vidHeight * (1.0/480.0);
+
+	// Viewport scale and offset
+	cgs.screenXScaleStretch = cgs.glconfig.vidWidth * (1.0/640.0);
+	cgs.screenYScaleStretch = cgs.glconfig.vidHeight * (1.0/480.0);
 	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
 		cgs.screenXScale = cgs.glconfig.vidWidth * (1.0/640.0);
 		cgs.screenYScale = cgs.glconfig.vidHeight * (1.0/480.0);
@@ -2493,15 +2493,11 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		cgs.screenXScale = cgs.screenYScale;
 	}
 	else {
-		cgs.screenXScale = cgs.screenXScaleFit;
-		cgs.screenYScale = cgs.screenYScaleFit;
+		cgs.screenXScale = cgs.screenXScaleStretch;
+		cgs.screenYScale = cgs.screenYScaleStretch;
 		// no wide screen
 		cgs.screenXBias = 0;
 	}
-#else
-	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
-	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
-#endif
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );

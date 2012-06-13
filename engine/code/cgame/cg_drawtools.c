@@ -23,74 +23,29 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"
 
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-/*
-================
-CG_AdjustFrom640Fit
-
-Adjusted for resolution, doesn't keep screen aspect ratio
-================
-*/
-void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h ) {
-	if (cg.numViewports != 1 && cg.snap) {
-		qboolean right = qfalse;
-		qboolean down = qfalse;
-
-		if (cg.numViewports == 2) {
-			if (cg.viewport == 1) {
-				down = qtrue;
-			}
-		}
-		else if (cg.numViewports == 3 && cg.viewport == 2) {
-			down = qtrue;
-		}
-		else if (cg.numViewports <= 4) {
-			if (cg.viewport == 1 || cg.viewport == 3) {
-				right = qtrue;
-			}
-			if (cg.viewport == 2 || cg.viewport == 3) {
-				down = qtrue;
-			}
-		}
-
-		if (cg.viewport != 0 && (cg.numViewports == 2 || cg.numViewports == 3) && cg_splitviewVertical.integer) {
-			right = !right;
-			down = !down;
-		}
-
-		if (right) {
-			*x += SCREEN_WIDTH;
-		}
-		if (down) {
-			*y += SCREEN_HEIGHT;
-		}
-	}
-
-	// scale for screen sizes
-	*x *= cgs.screenXScaleFit;
-	*y *= cgs.screenYScaleFit;
-	*w *= cgs.screenXScaleFit;
-	*h *= cgs.screenYScaleFit;
-}
-#endif
+static screenPlacement_e cg_screenPlacement = PLACE_CENTER;
+static screenPlacement_e cg_lastScreenPlacement = PLACE_CENTER;
 
 /*
 ================
-CG_HudPlacement
+CG_SetScreenPlacement
 ================
 */
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-int cg_hudPlacement = HUD_CENTER;
-void CG_HudPlacement(int pos)
+void CG_SetScreenPlacement(screenPlacement_e pos)
 {
-	cg_hudPlacement = pos;
+	cg_lastScreenPlacement = cg_screenPlacement;
+	cg_screenPlacement = pos;
 }
-#else
-void CG_HudPlacement(int pos)
+
+/*
+================
+CG_PopScreenPlacement
+================
+*/
+void CG_PopScreenPlacement(void)
 {
-	(void)pos;
+	cg_screenPlacement = cg_lastScreenPlacement;
 }
-#endif
 
 /*
 ================
@@ -137,29 +92,29 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 		}
 	}
 
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	if (cg_hudPlacement == HUD_LEFT)
-		*x = *x * cgs.screenXScale;
-	else if (cg_hudPlacement == HUD_RIGHT)
-		*x = *x * cgs.screenXScale + cgs.screenXBias*2;
-	else // HUD_CENTER
-		*x = *x * cgs.screenXScale + cgs.screenXBias;
-#else
-#if 0
-	// adjust for wide screens
-	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
-		*x += 0.5 * ( cgs.glconfig.vidWidth - ( cgs.glconfig.vidHeight * 640 / 480 ) );
-	}
-#endif
-	// scale for screen sizes
-	*x *= cgs.screenXScale;
-#endif
-	*y *= cgs.screenYScale;
-	*w *= cgs.screenXScale;
-	*h *= cgs.screenYScale;
+	if (cg_screenPlacement == PLACE_STRETCH) {
+		// scale for screen sizes (not aspect correct in wide screen)
+		*x *= cgs.screenXScaleStretch;
+		*y *= cgs.screenYScaleStretch;
+		*w *= cgs.screenXScaleStretch;
+		*h *= cgs.screenYScaleStretch;
+	} else {
+		// scale for screen sizes
+		*x *= cgs.screenXScale;
+		*y *= cgs.screenYScale;
+		*w *= cgs.screenXScale;
+		*h *= cgs.screenYScale;
 
-	// Offset for widescreen
-	*x += cgs.screenXBias*(viewXBias);
+		// Screen Placement
+		if (cg_screenPlacement == PLACE_CENTER) {
+			*x += cgs.screenXBias;
+		} else if (cg_screenPlacement == PLACE_RIGHT) {
+			*x += cgs.screenXBias*2;
+		}
+
+		// Offset for widescreen
+		*x += cgs.screenXBias*(viewXBias);
+	}
 }
 
 /*
@@ -178,24 +133,6 @@ void CG_FillRect( float x, float y, float width, float height, const float *colo
 	trap_R_SetColor( NULL );
 }
 
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-/*
-================
-CG_FillRect
-
-Coordinates are 640*480 virtual values
-=================
-*/
-void CG_FillRectFit( float x, float y, float width, float height, const float *color ) {
-	trap_R_SetColor( color );
-
-	CG_AdjustFrom640Fit( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 0, 0, cgs.media.whiteShader );
-
-	trap_R_SetColor( NULL );
-}
-#endif
-
 /*
 ================
 CG_DrawSides
@@ -204,23 +141,23 @@ Coords are virtual 640x480
 ================
 */
 void CG_DrawSides(float x, float y, float w, float h, float size) {
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	CG_AdjustFrom640Fit( &x, &y, &w, &h );
-#else
 	CG_AdjustFrom640( &x, &y, &w, &h );
-#endif
-	size *= cgs.screenXScale;
+	if (cg_screenPlacement == PLACE_STRETCH) {
+		size *= cgs.screenXScaleStretch;
+	} else {
+		size *= cgs.screenXScale;
+	}
 	trap_R_DrawStretchPic( x, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 	trap_R_DrawStretchPic( x + w - size, y, size, h, 0, 0, 0, 0, cgs.media.whiteShader );
 }
 
 void CG_DrawTopBottom(float x, float y, float w, float h, float size) {
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	CG_AdjustFrom640Fit( &x, &y, &w, &h );
-#else
 	CG_AdjustFrom640( &x, &y, &w, &h );
-#endif
-	size *= cgs.screenYScale;
+	if (cg_screenPlacement == PLACE_STRETCH) {
+		size *= cgs.screenYScaleStretch;
+	} else {
+		size *= cgs.screenYScale;
+	}
 	trap_R_DrawStretchPic( x, y, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 	trap_R_DrawStretchPic( x, y + h - size, w, size, 0, 0, 0, 0, cgs.media.whiteShader );
 }
@@ -253,18 +190,6 @@ void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader 
 	CG_AdjustFrom640( &x, &y, &width, &height );
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
-
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-/*
-================
-CG_DrawPicFit
-=================
-*/
-void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShader ) {
-	CG_AdjustFrom640Fit( &x, &y, &width, &height );
-	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
-}
-#endif
 
 
 

@@ -1487,10 +1487,8 @@ typedef struct {
 	float			screenXScale;		// derived from glconfig
 	float			screenYScale;
 	float			screenXBias;
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	float			screenXScaleFit;
-	float			screenYScaleFit;
-#endif
+	float			screenXScaleStretch;
+	float			screenYScaleStretch;
 
 	int				serverCommandSequence;	// reliable command stream counter
 	int				processedSnapshotNum;// the number of snapshots cgame has requested
@@ -1847,15 +1845,15 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 //
 // cg_drawtools.c
 //
-#ifdef IOQ3ZTM
-void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h );
-void CG_FillRectFit( float x, float y, float width, float height, const float *color );
-void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShader );
-#endif
-#define HUD_CENTER 0
-#define HUD_LEFT 1
-#define HUD_RIGHT 2
-void CG_HudPlacement(int pos);
+typedef enum {
+	PLACE_CENTER,
+	PLACE_LEFT,
+	PLACE_RIGHT,
+	PLACE_STRETCH
+} screenPlacement_e;
+
+void CG_SetScreenPlacement(screenPlacement_e pos);
+void CG_PopScreenPlacement(void);
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
