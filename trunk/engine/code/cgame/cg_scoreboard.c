@@ -338,7 +338,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	int lineHeight;
 	int topBorderSize, bottomBorderSize;
 
-	CG_HudPlacement(HUD_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER);
 
 	// don't draw amuthing if the menu or console is up
 	if ( cg_paused.integer ) {
@@ -566,6 +566,8 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	int				y;
 	int				i;
 
+	CG_SetScreenPlacement(PLACE_CENTER);
+
 	// request more scores regularly
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		cg.scoresRequestTime = cg.time;
@@ -575,11 +577,9 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
 	color[3] = 1;
-#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
-	CG_FillRectFit( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
-#else
+	CG_SetScreenPlacement(PLACE_STRETCH);
 	CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
-#endif
+	CG_PopScreenPlacement();
 
 	color[0] = 1;
 	color[1] = 1;
