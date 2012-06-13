@@ -18,7 +18,6 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-DWIN32" />
-					<Add option="-DWIN32_MISC_ICON_PATH" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -65,7 +64,6 @@
 					<Add option="-W" />
 					<Add option="-O0" />
 					<Add option="-DWIN32" />
-					<Add option="-DWIN32_MISC_ICON_PATH" />
 					<Add option="-D_DEBUG" />
 					<Add option="-D_WINDOWS" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -216,7 +214,6 @@
 		</Build>
 		<Compiler>
 			<Add option="-static" />
-			<Add option="-DRELATIVE_WIN32_ICON_PATH" />
 			<Add option="-DUSE_INTERNAL_JPEG" />
 			<Add option="-DNOTRATEDM" />
 			<Add option="-DNOBLOOD" />
