@@ -1,0 +1,12 @@
+# turtlearena_nun - Wiimote + Nunchuck
+
+include turtlearena
+
+# buttons
+Wiimote.Up		= KEY_SEMICOLON # Drop weapon
+Wiimote.Down	= KEY_ENTER # Use Item
+Wiimote.Left	= KEY_A # Move left
+Wiimote.Right	= KEY_D # Move right
+Wiimote.1		= KEY_F # Drop flag
+Wiimote.2		= KEY_KP7 # Toggle third person
+

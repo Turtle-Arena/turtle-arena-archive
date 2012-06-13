@@ -1,0 +1,159 @@
+Turtle Arena data copyrights for base and base-src directories ("the data files"), excludes any files compiled from the engine source code (including but not limited to QVM, DLL, SO, and DYLIB files).
+
+== ZTM ==
+All of the data files, unless otherwise noted, are copyright (c) 2009-2012 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version and licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported.
+	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
+
+The data files in the base directory that have source files are included in the base-src directory.
+
+The following use M+ Outline Fonts, for font license see the last section of this file.
+
+Images that use M+ 1c Bold:
+base/gfx/2d/numbers/eight_32b.png
+base/gfx/2d/numbers/five_32b.png
+base/gfx/2d/numbers/four_32b.png
+base/gfx/2d/numbers/minus_32b.png
+base/gfx/2d/numbers/nine_32b.png
+base/gfx/2d/numbers/one_32b.png
+base/gfx/2d/numbers/seven_32b.png
+base/gfx/2d/numbers/six_32b.png
+base/gfx/2d/numbers/three_32b.png
+base/gfx/2d/numbers/two_32b.png
+base/gfx/2d/numbers/zero_32b.png
+base/icons/ammo_regen.png
+base/icons/doubler.png
+base/icons/guard.png
+base/icons/scout.png
+base/menu/art/accept_0.png
+base/menu/art/accept_1.png
+base/menu/art/back_0.png
+base/menu/art/back_1.png
+base/menu/art/cancel_0.png
+base/menu/art/cancel_1.png
+base/menu/art/delete_0.png
+base/menu/art/delete_1.png
+base/menu/art/join_0.png
+base/menu/art/join_1.png
+base/menu/art/load_0.png
+base/menu/art/load_1.png
+base/menu/art/menu_0.png
+base/menu/art/menu_1.png
+base/menu/art/model_0.png
+base/menu/art/model_1.png
+base/menu/art/new_0.png
+base/menu/art/new_1.png
+base/menu/art/next_0.png
+base/menu/art/next_1.png
+base/menu/art/play_0.png
+base/menu/art/play_1.png
+base/menu/art/refresh_0.png
+base/menu/art/refresh_1.png
+base/menu/art/replay_0.png
+base/menu/art/replay_1.png
+base/menu/art/reset_0.png
+base/menu/art/reset_1.png
+base/menu/art/save_0.png
+base/menu/art/save_1.png
+base/menu/art/skill1.png
+base/menu/art/skill2.png
+base/menu/art/skill3.png
+base/menu/art/skill4.png
+base/menu/art/skill5.png
+base/menu/art/specify_0.png
+base/menu/art/specify_1.png
+base/menu/tab/name.png
+base/menu/tab/ping.png
+base/menu/tab/score.png
+base/menu/tab/time.png
+base/models/powerups/ammo2.png
+base/models/powerups/doubler2.png
+base/models/powerups/guard2.png
+base/models/powerups/scout2.png
+base/textures/city/manhole_top.png
+base/textures/common/alpha000.png
+base/textures/common/alpha025.png
+base/textures/common/alpha050.png
+base/textures/common/alpha075.png
+base/textures/common/alpha085.png
+base/textures/common/alpha100.png
+base/textures/ctf2/blueteam01.png
+base/textures/ctf2/redteam01.png
+base/textures/fog/fogblack.png
+base/textures/fog/fogwhite.png
+
+Images that use M+ 1mn Regular:
+base/gfx/clientLoading.png
+base/gfx/clientLoading_low.png
+base/textures/tech/terminal.png
+base/textures/tech/terminal_editor.png
+
+== zero-project.gr ==
+The following is copyright (c) 2010 zero-project and is licensed under the
+	Creative Commons Attribution-ShareAlike 3.0 Unported.
+
+music/zero-project_-_Whispering_Wind.ogg
+		http://www.jamendo.com/en/track/682363
+
+== The Mulletz ==
+The following was released into the public domain in 2011 by Neil Crowe!
+
+music/NeilCrowe_-_EVENT.ogg
+		http://ccmixter.org/files/NeilCrowe/32301
+
+== OpenArena ==
+Some of the shaders in the base/scripts/*.shader files are from OpenArena.
+base/scripts/male1.voice is based on file from OpenArena.
+
+The following are based on files from OpenArena and are copyright (c) 2006 Dmn_clown and 2009-2012 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
+
+base/botfiles/bots/default_c.c
+base/botfiles/bots/default_t.c
+base/botfiles/bots/raph_c.c
+base/botfiles/bots/raph_t.c
+base/botfiles/fuzi.c
+base/botfiles/match.c
+base/botfiles/rchat.c
+base/botfiles/rnd.c
+base/botfiles/syn.c
+base/botfiles/teamplay.h
+
+== M+ Outline Fonts ==
+The following files are Copyright (C) 2002-2011 M+ FONTS PROJECT and licensed as follows:
+	"These fonts are free softwares. Unlimited permission is granted to use, copy, and distribute it, with or without modification, either commercially and noncommercially. THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY."
+
+TrueType Fonts from M+ Outline Fonts (v044)
+base/fonts/mplus-1c-regular.ttf
+base/fonts/mplus-1c-bold.ttf
+base/fonts/mplus-1mn-regular.ttf
+base/fonts/mplus-2p-black.ttf
+
+The dat and png files listed below were created by the engine, using freetype2.
+
+Files created from base/fonts/mplus-1c-regular.ttf:
+base/fonts/mplus-1c-regular_0_8.png
+base/fonts/mplus-1c-regular_0_12.png
+base/fonts/mplus-1c-regular_0_16.png
+base/fonts/mplus-1c-regular_0_20.png
+base/fonts/mplus-1c-regular_0_48.png
+base/fonts/mplus-1c-regular_1_48.png
+base/fonts/mplus-1c-regular_8.dat
+base/fonts/mplus-1c-regular_12.dat
+base/fonts/mplus-1c-regular_16.dat
+base/fonts/mplus-1c-regular_20.dat
+base/fonts/mplus-1c-regular_48.dat
+
+Files created from base/fonts/mplus-1c-bold.ttf:
+base/fonts/mplus-1c-bold_0_20.png
+base/fonts/mplus-1c-bold_0_27.png
+base/fonts/mplus-1c-bold_1_27.png
+base/fonts/mplus-1c-bold_20.dat
+base/fonts/mplus-1c-bold_27.dat
+
+Files created from base/fonts/mplus-1mn-regular.ttf:
+base/fonts/mplus-1mn-regular_0_16.png
+base/fonts/mplus-1mn-regular_16.dat
+
+Files created from base/fonts/mplus-1mn-regular.ttf:
+base/fonts/mplus-1mn-regular_0_16.png
+base/fonts/mplus-1mn-regular_16.dat
+
