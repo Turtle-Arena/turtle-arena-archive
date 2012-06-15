@@ -245,6 +245,9 @@ typedef enum {
 #endif
 #endif
 
+	G_ADDCOMMAND,
+	G_REMOVECOMMAND,
+
 	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=100, etc
 
 	BOTLIB_SETUP = 200,				// ( void );
@@ -286,6 +289,8 @@ typedef enum {
 
 	BOTLIB_AAS_SWIMMING,
 	BOTLIB_AAS_PREDICT_CLIENT_MOVEMENT,
+
+	BOTLIB_AAS_BEST_REACHABLE_AREA,
 
 	BOTLIB_EA_SAY = 400,
 	BOTLIB_EA_SAY_TEAM,

@@ -55,6 +55,9 @@ equ trap_R_SetupSkeleton		-50
 equ trap_R_SetupPlayerSkeleton	-51
 equ trap_R_MakeSkeletonAbsolute	-52
 
+equ trap_AddCommand			-47
+equ trap_RemoveCommand		-48
+
 equ	memset					-101
 equ	memcpy					-102
 equ	strncpy					-103
@@ -109,6 +112,8 @@ equ trap_AAS_AreaTravelTimeToGoalArea	-317
 
 equ trap_AAS_Swimming					-318
 equ trap_AAS_PredictClientMovement		-319
+
+equ trap_AAS_BestReachableArea			-320
 
 
 

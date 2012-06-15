@@ -58,11 +58,7 @@ SOUND OPTIONS MENU
 #define ID_BACK				19
 #define ID_APPLY			20
 
-#ifdef IOQ3ZTM
 #define DEFAULT_SDL_SND_SPEED 44100
-#else
-#define DEFAULT_SDL_SND_SPEED 22050
-#endif
 
 static const char *quality_items[] = {
 	"Low", "Medium", "High", NULL

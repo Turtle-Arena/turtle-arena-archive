@@ -5178,6 +5178,10 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 #endif
 }
 
+int cmdcmp( const void *a, const void *b ) {
+  return Q_stricmp( (const char *)a, ((dummyCmd_t *)b)->name );
+}
+
 #ifdef IOQ3ZTM // LERP_FRAME_CLIENT_LESS
 /*
 ===============
