@@ -1934,6 +1934,12 @@ qboolean	BG_PlayerTouchesItem( playerState_t *ps, entityState_t *item, int atTim
 #define KAMI_BOOMSPHERE_MAXRADIUS		720
 #define KAMI_SHOCKWAVE2_MAXRADIUS		704
 
+typedef struct
+{
+  const char *name;
+} dummyCmd_t;
+int cmdcmp( const void *a, const void *b );
+
 #ifdef TA_SP
 // Set as defaults for g_saveVersions so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game

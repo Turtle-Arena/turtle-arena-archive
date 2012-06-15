@@ -276,6 +276,14 @@ void trap_R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
 #endif
 #endif
 
+void trap_AddCommand( const char *cmdName ) {
+	syscall( G_ADDCOMMAND, cmdName );
+}
+
+void trap_RemoveCommand( const char *cmdName ) {
+	syscall( G_REMOVECOMMAND, cmdName );
+}
+
 // BotLib traps start here
 int trap_BotLibSetup( void ) {
 	return syscall( BOTLIB_SETUP );
@@ -395,6 +403,10 @@ int trap_AAS_IntForBSPEpairKey(int ent, char *key, int *value) {
 
 int trap_AAS_AreaReachability(int areanum) {
 	return syscall( BOTLIB_AAS_AREA_REACHABILITY, areanum );
+}
+
+int trap_AAS_BestReachableArea(vec3_t origin, vec3_t mins, vec3_t maxs, vec3_t goalorigin) {
+	return syscall( BOTLIB_AAS_BEST_REACHABLE_AREA, origin, mins, maxs, goalorigin );
 }
 
 int trap_AAS_AreaTravelTimeToGoalArea(int areanum, vec3_t origin, int goalareanum, int travelflags) {

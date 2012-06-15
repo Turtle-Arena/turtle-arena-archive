@@ -819,6 +819,8 @@ void G_DeNiGHTSizePlayer( gentity_t *ent );
 // g_svcmds.c
 //
 qboolean	ConsoleCommand( void );
+void G_RegisterCommands( void );
+void G_UnregisterCommands( void );
 void G_ProcessIPBans(void);
 qboolean G_FilterPacket (char *from);
 
@@ -855,6 +857,7 @@ void G_SetMiscAnim(gentity_t *ent, int anim);
 //
 // g_cmds.c
 //
+char *ConcatArgs( int start );
 
 //
 // g_pweapon.c
@@ -1197,6 +1200,7 @@ int		trap_AAS_FloatForBSPEpairKey(int ent, char *key, float *value);
 int		trap_AAS_IntForBSPEpairKey(int ent, char *key, int *value);
 
 int		trap_AAS_AreaReachability(int areanum);
+int		trap_AAS_BestReachableArea(vec3_t origin, vec3_t mins, vec3_t maxs, vec3_t goalorigin);
 
 int		trap_AAS_AreaTravelTimeToGoalArea(int areanum, vec3_t origin, int goalareanum, int travelflags);
 int		trap_AAS_EnableRoutingArea( int areanum, int enable );
@@ -1333,3 +1337,5 @@ int		trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *paren
 
 void	trap_SnapVector( float *v );
 
+void	trap_AddCommand( const char *cmdName );
+void	trap_RemoveCommand( const char *cmdName );
