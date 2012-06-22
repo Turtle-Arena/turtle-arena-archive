@@ -442,7 +442,7 @@ void	Svcmd_ForceTeam_f( void ) {
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 3 ) {
-		G_Printf("Usage:  forceTeam <player> <team>\n");
+		G_Printf("Usage: forceTeam <player> <team>\n");
 		return;
 	}
 

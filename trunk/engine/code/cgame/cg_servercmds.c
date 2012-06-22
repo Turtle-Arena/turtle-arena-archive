@@ -33,6 +33,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 // be a valid snapshot this frame
 
 #include "cg_local.h"
+#ifdef MISSIONPACK
 #include "../../ui/menudef.h"
 
 typedef struct {
@@ -54,7 +55,6 @@ static const orderTask_t validOrders[] = {
 
 static const int numValidOrders = ARRAY_LEN(validOrders);
 
-#ifdef MISSIONPACK
 static int CG_ValidOrder(const char *p) {
 	int i;
 	for (i = 0; i < numValidOrders; i++) {
@@ -601,6 +601,8 @@ static void CG_MapRestart( void ) {
 	}
 }
 
+#ifdef MISSIONPACK
+
 #define MAX_VOICEFILESIZE	16384
 #ifdef IOQ3ZTM // LOAD_VOICE_FILES
 #define MAX_VOICEFILES		64
@@ -1097,7 +1099,6 @@ CG_VoiceChat
 =================
 */
 void CG_VoiceChat( int mode ) {
-#ifdef MISSIONPACK
 	const char *cmd;
 	int clientNum, color;
 	qboolean voiceOnly;
@@ -1119,8 +1120,8 @@ void CG_VoiceChat( int mode ) {
 	}
 
 	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd );
-#endif
 }
+#endif
 
 /*
 =================
@@ -1251,6 +1252,8 @@ static void CG_ServerCommand( void ) {
 #endif
 		return;
 	}
+
+#ifdef MISSIONPACK
 	if ( !strcmp( cmd, "vchat" ) ) {
 		if (lc != 0) {
 			return;
@@ -1277,6 +1280,7 @@ static void CG_ServerCommand( void ) {
 		CG_VoiceChat( SAY_TELL );
 		return;
 	}
+#endif
 
 	if ( !strcmp( cmd, "scores" ) ) {
 		CG_ParseScores(start);

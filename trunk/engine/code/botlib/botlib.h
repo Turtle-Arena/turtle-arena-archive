@@ -144,7 +144,7 @@ struct weaponinfo_s;
 #define ACTION_DROP_WEAPON		0x20000000
 #endif
 
-//the bot input, will be converted to an usercmd_t
+//the bot input, will be converted to a usercmd_t
 typedef struct bot_input_s
 {
 	float thinktime;		//time since last output (in seconds)

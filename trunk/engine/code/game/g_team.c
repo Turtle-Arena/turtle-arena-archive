@@ -906,20 +906,18 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		// also make sure we don't award assist bonuses to the flag carrier himself.
 		if (!player->inuse || player == other)
   			continue;
-#ifdef IOQ3ZTM // Don't give bonus points to player who captured the flag.
-		if (player == other)
-			continue;
-#endif
 
 		if (player->client->sess.sessionTeam !=
 			cl->sess.sessionTeam) {
 			player->client->pers.teamState.lasthurtcarrier = -5;
 		} else if (player->client->sess.sessionTeam ==
 			cl->sess.sessionTeam) {
-#ifndef IOQ3ZTM
+#ifdef MISSIONPACK
+#ifndef IOQ3ZTM // IOQ3BUGFIX: Not needed after ioq3 r1644
 			if (player != other)
 #endif
 				AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
+#endif
 			// award extra points for capture assists
 			if (player->client->pers.teamState.lastreturnedflag + 
 				CTF_RETURN_FLAG_ASSIST_TIMEOUT > level.time) {
@@ -1011,9 +1009,7 @@ int Team_TouchEnemyFlag( gentity_t *ent, gentity_t *other, int team ) {
 		Team_SetFlagStatus( team, FLAG_TAKEN );
 #ifdef MISSIONPACK
 	}
-#endif
 
-#if !defined IOQ3ZTM || (CTF_FLAG_BONUS != 0) // ZTM: Does a "0" spawn in Q3?
 	AddScore(other, ent->r.currentOrigin, CTF_FLAG_BONUS);
 #endif
 	cl->pers.teamState.flagsince = level.time;

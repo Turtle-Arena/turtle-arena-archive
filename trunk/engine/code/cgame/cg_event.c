@@ -1671,13 +1671,13 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					if (localHasBlue || localHasNeutral) {
 					}
 					else {
-					if (cgs.clientinfo[lc->clientNum].team == TEAM_BLUE) {
+						if (cgs.clientinfo[lc->clientNum].team == TEAM_BLUE) {
 #ifdef MISSIONPACK
 							if (cgs.gametype == GT_1FCTF) 
 								CG_AddBufferedSound( cgs.media.yourTeamTookTheFlagSound );
 							else
 #endif
-						 	CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
+							CG_AddBufferedSound( cgs.media.enemyTookYourFlagSound );
 						}
 						else if (cgs.clientinfo[lc->clientNum].team == TEAM_RED) {
 #ifdef MISSIONPACK

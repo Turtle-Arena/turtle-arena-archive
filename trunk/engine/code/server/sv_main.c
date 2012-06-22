@@ -512,7 +512,7 @@ void SV_MasterShutdown( void ) {
 		return;
 	}
 
-	// send a hearbeat right now
+	// send a heartbeat right now
 	svs.nextHeartbeatTime = -9999;
 	SV_MasterHeartbeat(FLATLINE_FOR_MASTER);
 
@@ -520,7 +520,7 @@ void SV_MasterShutdown( void ) {
 	svs.nextHeartbeatTime = -9999;
 	SV_MasterHeartbeat(FLATLINE_FOR_MASTER);
 #else
-	// send a hearbeat right now
+	// send a heartbeat right now
 	svs.nextHeartbeatTime = -9999;
 	SV_MasterHeartbeat(HEARTBEAT_FOR_MASTER);
 
