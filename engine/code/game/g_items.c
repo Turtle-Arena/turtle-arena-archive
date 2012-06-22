@@ -1286,7 +1286,7 @@ void G_SpawnItem (gentity_t *ent, gitem_t *item) {
 	if (mirrorType == 1)
 		ent->s.eFlags |= EF_ONLY_MIRROR;
 	else if (mirrorType == 2)
-		ent->s.eFlags |= EF_NOT_MIRROR;
+		ent->s.eFlags |= EF_NO_MIRROR;
 #endif
 
 	RegisterItem( item );
@@ -1397,7 +1397,7 @@ void SP_weapon_random( gentity_t *ent ) {
 	if (mirrorType == 1)
 		ent->s.eFlags |= EF_ONLY_MIRROR;
 	else if (mirrorType == 2)
-		ent->s.eFlags |= EF_NOT_MIRROR;
+		ent->s.eFlags |= EF_NO_MIRROR;
 #endif
 
 	item = G_RandomWeaponItem(ent, ent->spawnflags>>1);

@@ -757,11 +757,7 @@ void CG_Bleed( vec3_t origin, int entityNum ) {
 #endif
 		)
 	{
-#ifdef IOQ3ZTM // RENDERFLAGS
 		ex->refEntity.renderfx |= RF_ONLY_MIRROR;
-#else
-		ex->refEntity.renderfx |= RF_THIRD_PERSON;
-#endif
 	}
 }
 #endif

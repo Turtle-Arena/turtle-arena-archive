@@ -3378,11 +3378,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		hand.hModel = ci->torsoModel;
 	}
 #endif
-#ifdef IOQ3ZTM // RENDERFLAGS
-	hand.renderfx = RF_DEPTHHACK | RF_NOT_MIRROR | RF_MINLIGHT;
-#else
-	hand.renderfx = RF_DEPTHHACK | RF_FIRST_PERSON | RF_MINLIGHT;
-#endif
+	hand.renderfx = RF_DEPTHHACK | RF_NO_MIRROR | RF_MINLIGHT;
 
 	// add everything onto the hand
 	CG_AddPlayerWeapon( &hand, NULL, ps, &cg.cur_lc->predictedPlayerEntity, ps->persistant[PERS_TEAM] );
@@ -3989,11 +3985,7 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 #endif
 		)
 	{
-#ifdef IOQ3ZTM // RENDERFLAGS
 		ex->refEntity.renderfx |= RF_ONLY_MIRROR;
-#else
-		ex->refEntity.renderfx |= RF_THIRD_PERSON;
-#endif
 	}
 }
 #endif

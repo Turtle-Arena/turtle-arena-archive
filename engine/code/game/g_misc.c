@@ -940,7 +940,7 @@ void SP_misc_object( gentity_t *ent ) {
 	if (mirrorType == 1)
 		ent->s.eFlags |= EF_ONLY_MIRROR;
 	else if (mirrorType == 2)
-		ent->s.eFlags |= EF_NOT_MIRROR;
+		ent->s.eFlags |= EF_NO_MIRROR;
 #endif
 
 	G_SetOrigin( ent, ent->s.origin );

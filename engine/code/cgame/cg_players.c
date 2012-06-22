@@ -3142,11 +3142,7 @@ void CG_Player( centity_t *cent ) {
 	renderfx = 0;
 	if ( cent->currentState.number == cg.cur_ps->clientNum) {
 		if (!cg.renderingThirdPerson) {
-#ifdef IOQ3ZTM // RENDERFLAGS
 			renderfx = RF_ONLY_MIRROR;
-#else
-			renderfx = RF_THIRD_PERSON;			// only draw in mirrors
-#endif
 		} else {
 			if (cg_cameraMode.integer) {
 				return;
@@ -3474,11 +3470,7 @@ void CG_Player( centity_t *cent ) {
 		powerup.hModel = cgs.media.invulnerabilityPowerupModel;
 		powerup.customSkin = 0;
 		// always draw
-#ifdef IOQ3ZTM // RENDERFLAGS
 		powerup.renderfx &= ~RF_ONLY_MIRROR;
-#else
-		powerup.renderfx &= ~RF_THIRD_PERSON;
-#endif
 		VectorCopy(cent->lerpOrigin, powerup.origin);
 
 		if ( cg.time - ci->invulnerabilityStartTime < 250 ) {
@@ -3503,11 +3495,7 @@ void CG_Player( centity_t *cent ) {
 		powerup.hModel = cgs.media.medkitUsageModel;
 		powerup.customSkin = 0;
 		// always draw
-#ifdef IOQ3ZTM // RENDERFLAGS
 		powerup.renderfx &= ~RF_ONLY_MIRROR;
-#else
-		powerup.renderfx &= ~RF_THIRD_PERSON;
-#endif
 		VectorClear(angles);
 		AnglesToAxis(angles, powerup.axis);
 		VectorCopy(cent->lerpOrigin, powerup.origin);

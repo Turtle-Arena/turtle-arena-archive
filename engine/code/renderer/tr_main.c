@@ -1259,6 +1259,7 @@ R_AddEntitySurfaces
 void R_AddEntitySurfaces (void) {
 	trRefEntity_t	*ent;
 	shader_t		*shader;
+	qboolean		onlyRenderShadows;
 
 	if ( !r_drawentities->integer ) {
 		return;
@@ -1274,37 +1275,29 @@ void R_AddEntitySurfaces (void) {
 		// preshift the value we are going to OR into the drawsurf sort
 		tr.shiftedEntityNum = tr.currentEntityNum << QSORT_ENTITYNUM_SHIFT;
 
-#ifdef IOQ3ZTM // RENDERFLAGS
-		//
-		// Check the flags to see if we should draw the model.
-		//
-
-		// Skip entities that are only draw in mirrors when not rendering mirror/portal
-		// Don't skip player model when "cg_shadows" is 3 as the shadow can be 
-
-		// If only mirror and not rendering mirror
-		//   and not (player model and shadows 3)
-		if (((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
-			&& !(ent->e.reType == RT_MODEL && (ent->e.renderfx & RF_SHADOW_PLANE)))
-		{
-			continue;
-		}
-#endif
-
 		//
 		// the weapon model must be handled special --
 		// we don't want the hacked weapon position showing in 
 		// mirrors, because the true body position will already be drawn
 		//
-#ifdef IOQ3ZTM // RENDERFLAGS
-		if ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal) {
+		if ((ent->e.renderfx & RF_NO_MIRROR) && tr.viewParms.isPortal) {
 			continue;
 		}
-#else
-		if ( (ent->e.renderfx & RF_FIRST_PERSON) && tr.viewParms.isPortal) {
-			continue;
+
+		onlyRenderShadows = qfalse;
+
+		//
+		// the player model must be handled special --
+		// we only want the player model shown in mirrors in first person mode,
+		// but may need to render shadow.
+		//
+		if ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+			if (ent->e.reType == RT_MODEL && (ent->e.renderfx & RF_SHADOW_PLANE)) {
+				onlyRenderShadows = qtrue;
+			} else {
+				continue;
+			}
 		}
-#endif
 
 		// simple generated models, like sprites and beams, are not culled
 		switch ( ent->e.reType ) {
@@ -1315,14 +1308,6 @@ void R_AddEntitySurfaces (void) {
 		case RT_LIGHTNING:
 		case RT_RAIL_CORE:
 		case RT_RAIL_RINGS:
-#ifndef IOQ3ZTM // RENDERFLAGS
-			// self blood sprites, talk balloons, etc should not be drawn in the primary
-			// view.  We can't just do this check for all entities, because md3
-			// entities may still want to cast shadows from them
-			if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
-				continue;
-			}
-#endif
 			shader = R_GetShaderByHandle( ent->e.customShader );
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 			R_AddDrawSurf( &entitySurface, shader, R_SpriteFogNum( ent ), 0, R_SortOrder(ent) );
@@ -1343,16 +1328,18 @@ void R_AddEntitySurfaces (void) {
 				R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0 );
 #endif
 			} else {
+				// Check if model format doesn't support only rendering shadows
+				if (onlyRenderShadows && (tr.currentModel->type == MOD_BAD
+					|| tr.currentModel->type == MOD_BRUSH
+					|| tr.currentModel->type == MOD_MD4)) {
+					break;
+				}
+
 				switch ( tr.currentModel->type ) {
 				case MOD_MESH:
 					R_AddMD3Surfaces( ent );
 					break;
 				case MOD_MD4:
-#ifdef IOQ3ZTM // RENDERFLAGS
-					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
-						break;
-					}
-#endif
 					R_AddAnimSurfaces( ent );
 					break;
 #ifdef RAVENMD4
@@ -1364,23 +1351,9 @@ void R_AddEntitySurfaces (void) {
 					R_AddIQMSurfaces( ent );
 					break;
 				case MOD_BRUSH:
-#ifdef IOQ3ZTM // RENDERFLAGS
-					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
-						break;
-					}
-#endif
 					R_AddBrushModelSurfaces( ent );
 					break;
 				case MOD_BAD:		// null model axis
-#ifdef IOQ3ZTM // RENDERFLAGS
-					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
-						break;
-					}
-#else
-					if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
-						break;
-					}
-#endif
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 					R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0, R_SortOrder(ent) );
 #else
