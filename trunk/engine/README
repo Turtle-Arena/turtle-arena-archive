@@ -233,6 +233,12 @@ New cvars
                                       holds custom pk3 files for your server
   sv_banFile                        - Name of the file that is used for storing
                                       the server bans
+  sv_public							- controls infomation sent to master server
+                                      and game server browsers
+                                       1: send info to masters and game browsers
+                                       0: send info to game browsers
+                                      -1: don't send any info
+                                      -2: don't send any info or allow joining
 
   net_ip6                           - IPv6 address to bind to
   net_port6                         - port to bind to using the ipv6 address
@@ -314,7 +320,6 @@ New commands
   kickbots                - kick all bots off the server
 
   tell <client num> <msg> - send message to a single client (new to server)
-
 
 Removed commands
   clientkick <clientkick> - replaced with kicknum command

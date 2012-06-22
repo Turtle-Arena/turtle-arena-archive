@@ -135,9 +135,7 @@ vmCvar_t	ui_harvester_friendly;
 #endif
 #endif
 
-#ifdef IOQ3ZTM // SV_PUBLIC
 vmCvar_t	ui_publicServer;
-#endif
 
 vmCvar_t	ui_arenasFile;
 vmCvar_t	ui_botsFile;
@@ -241,9 +239,7 @@ static cvarTable_t		cvarTable[] = {
 #endif
 #endif
 
-#ifdef IOQ3ZTM // SV_PUBLIC
 	{ &ui_publicServer, "ui_publicServer", "1", CVAR_ARCHIVE },
-#endif
 
 	{ &ui_arenasFile, "g_arenasFile", "", CVAR_INIT|CVAR_ROM },
 	{ &ui_botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM },

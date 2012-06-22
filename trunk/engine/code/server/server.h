@@ -302,9 +302,7 @@ extern	cvar_t	*sv_floodProtect;
 extern	cvar_t	*sv_lanForceRate;
 extern	cvar_t	*sv_banFile;
 
-#ifdef IOQ3ZTM // SV_PUBLIC
 extern	cvar_t	*sv_public;
-#endif
 
 extern	serverBan_t serverBans[SERVER_MAXBANS];
 extern	int serverBansCount;
