@@ -70,9 +70,7 @@ extern vmCvar_t	ui_harvester_friendly;
 #endif
 #endif
 
-#ifdef IOQ3ZTM // SV_PUBLIC
 extern vmCvar_t	ui_publicServer;
-#endif
 
 extern vmCvar_t	ui_arenasFile;
 extern vmCvar_t	ui_botsFile;

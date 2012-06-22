@@ -1947,12 +1947,8 @@ typedef struct {
 	menubitmap_s		mappic;
 	menubitmap_s		picframe;
 
-#ifdef IOQ3ZTM // SV_PUBLIC
 	menuradiobutton_s	publicserver;
 	menuradiobutton_s	dedicated;
-#else
-	menulist_s			dedicated;
-#endif
 #ifdef IOQ3ZTM // RECORD_SP_DEMO
 	menuradiobutton_s	recorddemo;
 #endif
@@ -1984,15 +1980,6 @@ typedef struct {
 } serveroptions_t;
 
 static serveroptions_t s_serveroptions;
-
-#ifndef IOQ3ZTM // SV_PUBLIC
-static const char *dedicated_list[] = {
-	"No",
-	"LAN",
-	"Internet",
-	NULL
-};
-#endif
 
 #define PT_OPEN 0
 #define PT_BOT 1
@@ -2074,9 +2061,7 @@ static void ServerOptions_Start( void ) {
 	int		fraglimit;
 	int		maxclients;
 	int		localClients;
-#ifdef IOQ3ZTM // SV_PUBLIC
 	int		publicserver;
-#endif
 	int		dedicated;
 	int		friendlyfire;
 	int		flaglimit;
@@ -2089,9 +2074,7 @@ static void ServerOptions_Start( void ) {
 	timelimit	 = atoi( s_serveroptions.timelimit.field.buffer );
 	fraglimit	 = atoi( s_serveroptions.fraglimit.field.buffer );
 	flaglimit	 = atoi( s_serveroptions.flaglimit.field.buffer );
-#ifdef IOQ3ZTM // SV_PUBLIC
 	publicserver = s_serveroptions.publicserver.curvalue;
-#endif
 	dedicated	 = s_serveroptions.dedicated.curvalue;
 	friendlyfire = s_serveroptions.friendlyfire.curvalue;
 	pure		 = s_serveroptions.pure.curvalue;
@@ -2188,9 +2171,6 @@ static void ServerOptions_Start( void ) {
 		// Aracde mode
 		trap_Cvar_SetValue( "ui_singlePlayerActive", 1 );
 	}
-#endif
-#ifdef IOQ3ZTM // SV_PUBLIC
-#ifdef TA_SP
 	else
 #endif
 	{
@@ -2198,9 +2178,6 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "sv_public", Com_Clamp( 0, 1, publicserver ) );
 	}
 	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 1, dedicated ) );
-#else
-	trap_Cvar_SetValue( "dedicated", Com_Clamp( 0, 2, dedicated ) );
-#endif
 	trap_Cvar_SetValue ("timelimit", Com_Clamp( 0, timelimit, timelimit ) );
 #ifdef NOTRATEDM // frag to score
 	trap_Cvar_SetValue ("scorelimit", Com_Clamp( 0, fraglimit, fraglimit ) );
@@ -2766,9 +2743,7 @@ static void ServerOptions_SetMenuItems( void ) {
 #endif
 	}
 
-#ifdef IOQ3ZTM // SV_PUBLIC
 	s_serveroptions.publicserver.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_publicServer" ) );
-#endif
 	Q_strncpyz( s_serveroptions.hostname.field.buffer, UI_Cvar_VariableString( "sv_hostname" ), sizeof( s_serveroptions.hostname.field.buffer ) );
 	s_serveroptions.pure.curvalue = Com_Clamp( 0, 1, trap_Cvar_VariableValue( "sv_pure" ) );
 
@@ -2969,7 +2944,6 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	}
 
 	if( s_serveroptions.multiplayer ) {
-#ifdef IOQ3ZTM // SV_PUBLIC
 		y += BIGCHAR_HEIGHT+2;
 		s_serveroptions.publicserver.generic.type	= MTYPE_RADIOBUTTON;
 		s_serveroptions.publicserver.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
@@ -2985,32 +2959,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.dedicated.generic.x		= OPTIONS_X;
 		s_serveroptions.dedicated.generic.y		= y;
 		s_serveroptions.dedicated.generic.name	= "Dedicated:";
-#else
-		y += BIGCHAR_HEIGHT+2;
-		s_serveroptions.dedicated.generic.type		= MTYPE_SPINCONTROL;
-		s_serveroptions.dedicated.generic.id		= ID_DEDICATED;
-		s_serveroptions.dedicated.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-		s_serveroptions.dedicated.generic.callback	= ServerOptions_Event;
-		s_serveroptions.dedicated.generic.x			= OPTIONS_X;
-		s_serveroptions.dedicated.generic.y			= y;
-		s_serveroptions.dedicated.generic.name		= "Dedicated:";
-		s_serveroptions.dedicated.itemnames			= dedicated_list;
-#endif
-	}
-#ifdef IOQ3ZTM // RECORD_SP_DEMO
-	else
-	{
-		// Record demo option
-		y += BIGCHAR_HEIGHT+2;
-		s_serveroptions.recorddemo.generic.type		= MTYPE_RADIOBUTTON;
-		s_serveroptions.recorddemo.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
-		s_serveroptions.recorddemo.generic.x		= OPTIONS_X;
-		s_serveroptions.recorddemo.generic.y		= y;
-		s_serveroptions.recorddemo.generic.name		= "Record Game:";
-	}
-#endif
 
-	if( s_serveroptions.multiplayer ) {
 		y += BIGCHAR_HEIGHT+2;
 		s_serveroptions.hostname.generic.type       = MTYPE_FIELD;
 		s_serveroptions.hostname.generic.name       = "Hostname:";
@@ -3024,6 +2973,18 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 #endif
 		s_serveroptions.hostname.field.maxchars     = 64;
 	}
+#ifdef IOQ3ZTM // RECORD_SP_DEMO
+	else
+	{
+		// Record demo option
+		y += BIGCHAR_HEIGHT+2;
+		s_serveroptions.recorddemo.generic.type		= MTYPE_RADIOBUTTON;
+		s_serveroptions.recorddemo.generic.flags	= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
+		s_serveroptions.recorddemo.generic.x		= OPTIONS_X;
+		s_serveroptions.recorddemo.generic.y		= y;
+		s_serveroptions.recorddemo.generic.name		= "Record Game:";
+	}
+#endif
 
 	y = 80;
 	s_serveroptions.botSkill.generic.type			= MTYPE_SPINCONTROL;
@@ -3153,19 +3114,15 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	}
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.pure );
 	if( s_serveroptions.multiplayer ) {
-#ifdef IOQ3ZTM // SV_PUBLIC
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.publicserver );
-#endif
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.dedicated );
+		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.hostname );
 	}
 #ifdef IOQ3ZTM // RECORD_SP_DEMO
 	else {
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.recorddemo);
 	}
 #endif
-	if( s_serveroptions.multiplayer ) {
-		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.hostname );
-	}
 
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.back );
 	Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.next );
