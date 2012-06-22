@@ -1794,7 +1794,7 @@ void NET_Event(fd_set *fdr)
 				// com_dropsim->value percent of incoming packets get dropped.
 				if(rand() < (int) (((double) RAND_MAX) / 100.0 * (double) net_dropsim->value))
 					continue;          // drop this packet
-                        }
+			}
 
 			if(com_sv_running->integer)
 				Com_RunAndTimeServerPacket(&from, &netmsg);
@@ -1817,7 +1817,8 @@ void NET_Sleep(int msec)
 {
 	struct timeval timeout;
 	fd_set fdr;
-	int highestfd = -1, retval;
+	int retval;
+	SOCKET highestfd = INVALID_SOCKET;
 
 	if(msec < 0)
 		msec = 0;
@@ -1834,17 +1835,14 @@ void NET_Sleep(int msec)
 	if(ip6_socket != INVALID_SOCKET)
 	{
 		FD_SET(ip6_socket, &fdr);
-		
-		if((int)ip6_socket > highestfd)
+
+		if(highestfd == INVALID_SOCKET || ip6_socket > highestfd)
 			highestfd = ip6_socket;
 	}
 #endif
 
-	timeout.tv_sec = msec/1000;
-	timeout.tv_usec = (msec%1000)*1000;
-	
 #ifdef _WIN32
-	if(highestfd < 0)
+	if(highestfd == INVALID_SOCKET)
 	{
 		// windows ain't happy when select is called without valid FDs
 		SleepEx(msec, 0);
@@ -1852,9 +1850,12 @@ void NET_Sleep(int msec)
 	}
 #endif
 
+	timeout.tv_sec = msec/1000;
+	timeout.tv_usec = (msec%1000)*1000;
+
 	retval = select(highestfd + 1, &fdr, NULL, NULL, &timeout);
-	
-	if(retval < 0)
+
+	if(retval == SOCKET_ERROR)
 #ifdef __wii__ // ZTM: FIXME: ?
 		;
 #else

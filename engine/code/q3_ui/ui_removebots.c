@@ -115,7 +115,7 @@ static void UI_RemoveBotsMenu_DeleteEvent( void* ptr, int event ) {
 		return;
 	}
 
-	trap_Cmd_ExecuteText( EXEC_APPEND, va("clientkick %i\n", removeBotsMenuInfo.botClientNums[removeBotsMenuInfo.baseBotNum + removeBotsMenuInfo.selectedBotNum]) );
+	trap_Cmd_ExecuteText( EXEC_APPEND, va("kicknum %i\n", removeBotsMenuInfo.botClientNums[removeBotsMenuInfo.baseBotNum + removeBotsMenuInfo.selectedBotNum]) );
 }
 
 

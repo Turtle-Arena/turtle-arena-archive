@@ -125,11 +125,11 @@ CheatsOk
 */
 qboolean	CheatsOk( gentity_t *ent ) {
 	if ( !g_cheats.integer ) {
-		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
+		trap_SendServerCommand( ent-g_entities, "print \"Cheats are not enabled on this server.\n\"");
 		return qfalse;
 	}
 	if ( ent->health <= 0 ) {
-		trap_SendServerCommand( ent-g_entities, va("print \"You must be alive to use this command.\n\""));
+		trap_SendServerCommand( ent-g_entities, "print \"You must be alive to use this command.\n\"");
 		return qfalse;
 	}
 	return qtrue;
@@ -1522,7 +1522,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		arg2IsInteger = qtrue;
 #endif
 	} else if ( !Q_stricmp( arg1, "kick" ) ) {
-	} else if ( !Q_stricmp( arg1, "clientkick" ) ) {
+	} else if ( !Q_stricmp( arg1, "kicknum" ) ) {
 #ifdef IOQ3ZTM // CALLVOTE_TEST_INT
 		arg2IsInteger = qtrue;
 #endif
@@ -1545,9 +1545,9 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 	} else {
 		trap_SendServerCommand( ent-g_entities, "print \"Invalid vote string.\n\"" );
 #ifdef NOTRATEDM // frag to score
-		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, scorelimit <score>.\n\"" );
+		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, kicknum <clientnum>, g_doWarmup, timelimit <time>, scorelimit <score>.\n\"" );
 #else
-		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, clientkick <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"" );
+		trap_SendServerCommand( ent-g_entities, "print \"Vote commands are: map_restart, nextmap, map <mapname>, g_gametype <n>, kick <player>, kicknum <clientnum>, g_doWarmup, timelimit <time>, fraglimit <frags>.\n\"" );
 #endif
 		return;
 	}
@@ -1861,11 +1861,11 @@ void Cmd_SetViewpos_f( gentity_t *ent ) {
 	int			i;
 
 	if ( !g_cheats.integer ) {
-		trap_SendServerCommand( ent-g_entities, va("print \"Cheats are not enabled on this server.\n\""));
+		trap_SendServerCommand( ent-g_entities, "print \"Cheats are not enabled on this server.\n\"");
 		return;
 	}
 	if ( trap_Argc() != 5 ) {
-		trap_SendServerCommand( ent-g_entities, va("print \"usage: setviewpos x y z yaw\n\""));
+		trap_SendServerCommand( ent-g_entities, "print \"usage: setviewpos x y z yaw\n\"");
 		return;
 	}
 
