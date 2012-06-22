@@ -804,13 +804,8 @@ void R_AddIQMSurfaces( trRefEntity_t *ent ) {
 	data = tr.currentModel->modelData;
 	surface = data->surfaces;
 
-#ifdef IOQ3ZTM // RENDERFLAGS
 	// don't add mirror only objects if not in a mirror/portal
 	personalModel = (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal;
-#else
-	// don't add third_person objects if not in a portal
-	personalModel = (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal;
-#endif
 
 	if ( ent->e.renderfx & RF_WRAP_FRAMES ) {
 		ent->e.frame %= data->num_frames;

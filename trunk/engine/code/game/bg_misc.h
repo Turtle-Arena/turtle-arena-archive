@@ -289,7 +289,7 @@ typedef enum {
 #endif
 #ifdef IOQ3ZTM // RENDERFLAGS
 #define EF_ONLY_MIRROR		0x00400000 // Only render in mirrors
-#define EF_NOT_MIRROR		0x00800000 // Do not render in mirrors
+#define EF_NO_MIRROR		0x00800000 // Do not render in mirrors
 #endif
 #ifdef TA_ENTSYS // FUNC_USE
 #define EF_USE_ENT			0x01000000 // Use entity not holdable item
