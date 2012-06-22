@@ -75,18 +75,18 @@ int ReadValue(source_t *source, float *value)
 	if (!PC_ExpectAnyToken(source, &token)) return qfalse;
 	if (!strcmp(token.string, "-"))
 	{
-		SourceWarning(source, "negative value set to zero\n");
+		SourceWarning(source, "negative value set to zero");
 
 		if(!PC_ExpectAnyToken(source, &token))
 		{
-			SourceError(source, "Missing return value\n");
+			SourceError(source, "Missing return value");
 			return qfalse;
 		}
 	}
 
 	if (token.type != TT_NUMBER)
 	{
-		SourceError(source, "invalid return value %s\n", token.string);
+		SourceError(source, "invalid return value %s", token.string);
 		return qfalse;
 	}
 	
@@ -198,7 +198,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 			{
 				if (founddefault)
 				{
-					SourceError(source, "switch already has a default\n");
+					SourceError(source, "switch already has a default");
 					FreeFuzzySeperators_r(firstfs);
 					return NULL;
 				} //end if
@@ -248,7 +248,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 			} //end else if
 			else
 			{
-				SourceError(source, "invalid name %s\n", token.string);
+				SourceError(source, "invalid name %s", token.string);
 				return NULL;
 			} //end else
 			if (newindent)
@@ -263,7 +263,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 		else
 		{
 			FreeFuzzySeperators_r(firstfs);
-			SourceError(source, "invalid name %s\n", token.string);
+			SourceError(source, "invalid name %s", token.string);
 			return NULL;
 		} //end else
 		if (!PC_ExpectAnyToken(source, &token))
@@ -275,7 +275,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 	//
 	if (!founddefault)
 	{
-		SourceWarning(source, "switch without default\n");
+		SourceWarning(source, "switch without default");
 		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
 		fs->index = index;
 		fs->value = MAX_INVENTORYVALUE;
@@ -354,7 +354,7 @@ weightconfig_t *ReadWeightConfig(char *filename)
 		{
 			if (config->numweights >= MAX_WEIGHTS)
 			{
-				SourceWarning(source, "too many fuzzy weights\n");
+				SourceWarning(source, "too many fuzzy weights");
 				break;
 			} //end if
 			if (!PC_ExpectTokenType(source, TT_STRING, 0, &token))
@@ -412,7 +412,7 @@ weightconfig_t *ReadWeightConfig(char *filename)
 			} //end else if
 			else
 			{
-				SourceError(source, "invalid name %s\n", token.string);
+				SourceError(source, "invalid name %s", token.string);
 				FreeWeightConfig(config);
 				FreeSource(source);
 				return NULL;
@@ -430,7 +430,7 @@ weightconfig_t *ReadWeightConfig(char *filename)
 		} //end if
 		else
 		{
-			SourceError(source, "invalid name %s\n", token.string);
+			SourceError(source, "invalid name %s", token.string);
 			FreeWeightConfig(config);
 			FreeSource(source);
 			return NULL;

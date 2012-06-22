@@ -1077,8 +1077,8 @@ extern	vmCvar_t	g_laserTag;
 extern	vmCvar_t	g_2dmode;
 #endif
 
-void	trap_Printf( const char *fmt );
-void trap_Error(const char *fmt) __attribute__((noreturn));
+void	trap_Print( const char *text );
+void	trap_Error( const char *text ) __attribute__((noreturn));
 int		trap_Milliseconds( void );
 int	trap_RealTime( qtime_t *qtime );
 int		trap_Argc( void );

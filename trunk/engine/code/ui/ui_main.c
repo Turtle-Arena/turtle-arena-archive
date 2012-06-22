@@ -978,7 +978,7 @@ void UI_LoadMenus(const char *menuFile, qboolean reset) {
 		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		handle = trap_PC_LoadSource( "ui/menus.txt" );
 		if (!handle) {
-			trap_Error( va( S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!" ) );
+			trap_Error( S_COLOR_RED "default menu file not found: ui/menus.txt, unable to continue!" );
 		}
 	}
 
@@ -4527,10 +4527,10 @@ static void UI_FeederSelection(float feederID, int index) {
 	index = actual;
     if (index >= 0 && index < uiInfo.characterCount) {
 #ifdef IOQ3ZTM_NO_TEAM_MODEL
-		trap_Cvar_Set( "model", va("%s", uiInfo.characterList[index].base));
+		trap_Cvar_Set( "model", uiInfo.characterList[index].base);
 		trap_Cvar_Set( "headmodel", va("*%s", uiInfo.characterList[index].name));
 #else
-		trap_Cvar_Set( "team_model", va("%s", uiInfo.characterList[index].base));
+		trap_Cvar_Set( "team_model", uiInfo.characterList[index].base);
 		trap_Cvar_Set( "team_headmodel", va("*%s", uiInfo.characterList[index].name)); 
 #endif
 		updateModel = qtrue;
@@ -4707,11 +4707,11 @@ static qboolean Character_Parse(char **p) {
 	               I plan to just list the name (Casey/April/Raph/...), but it is left for compatiblity.
 	  */
 	  if (tempStr && (!Q_stricmp(tempStr, "female"))) {
-        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("Janet"));
+        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc("Janet");
       } else if (tempStr && (!Q_stricmp(tempStr, "male"))) {
-        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("James"));
+        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc("James");
 	  } else {
-        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(va("%s",tempStr));
+        uiInfo.characterList[uiInfo.characterCount].base = String_Alloc(tempStr);
 	  }
 
       Com_DPrintf("Loaded %s character %s.\n", uiInfo.characterList[uiInfo.characterCount].base, uiInfo.characterList[uiInfo.characterCount].name);
@@ -5617,7 +5617,7 @@ void UI_DrawConnectScreen( qboolean overlay ) {
 	}
 
 	if (!Q_stricmp(cstate.servername,"localhost")) {
-		Text_PaintCenter(centerPoint, yStart + 48, scale, colorWhite, va("Starting up..."), ITEM_TEXTSTYLE_SHADOWEDMORE);
+		Text_PaintCenter(centerPoint, yStart + 48, scale, colorWhite, "Starting up...", ITEM_TEXTSTYLE_SHADOWEDMORE);
 	} else {
 		strcpy(text, va("Connecting to %s", cstate.servername));
 		Text_PaintCenter(centerPoint, yStart + 48, scale, colorWhite,text , ITEM_TEXTSTYLE_SHADOWEDMORE);

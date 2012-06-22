@@ -307,9 +307,19 @@ New commands
 
   which <filename/path>   - print out the path on disk to a loaded item
 
-  execq <filename>        - quite exec command, doesn't print "execing file.cfg"
+  execq <filename>        - quiet exec command, doesn't print "execing file.cfg"
+
+  kicknum <client number> - kick a client off the server using client number
+  kickall                 - kick all clients off the server
+  kickbots                - kick all bots off the server
 
   tell <client num> <msg> - send message to a single client (new to server)
+
+
+Removed commands
+  clientkick <clientkick> - replaced with kicknum command
+  kick all                - replaced with kickall command
+  kick allbots            - replaced with kickbots command
 
 
 --------------------------------------------------------- README for Users -----
