@@ -864,7 +864,7 @@ int BG_ItemNumForHoldableNum(holdable_t holdablenum);
 #endif
 
 // entityState_t->event values
-// entity events are for effects that take place reletive
+// entity events are for effects that take place relative
 // to an existing entities origin.  Very network efficient.
 
 // two bits at the top of the entityState->event field
