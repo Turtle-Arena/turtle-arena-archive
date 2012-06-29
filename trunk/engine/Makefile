@@ -139,9 +139,6 @@ BUILD_DEFINES += -DTURTLEARENA -DTA_MISC -DTA_SP \
 DED_USE_MODELS=1
 BUILD_DEFINES += -DTA_GAME_MODELS
 
-# Turtle Arena's intro video will be ogg theora
-USE_CODEC_THEORA=1
-
 # Turtle Arena currently just keeps renderer internal
 ifneq ($(USE_RENDERER_DLOPEN), 1)
 	USE_RENDERER_DLOPEN=0
@@ -1002,8 +999,7 @@ LIBPATHS = -L$(LIBOGC_LIB)
   USE_OPENAL_DLOPEN=0
   USE_CURL_DLOPEN=0
 
-  # Need to build static libs for libogc
-  USE_CODEC_VORBIS=0
+  # Need to add internal libtheora
   USE_CODEC_THEORA=0
 
   ARCH=ppc
