@@ -31,7 +31,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 #ifndef __UI_PUBLIC_H__
 #define __UI_PUBLIC_H__
 
-#define UI_API_VERSION	100
+#define UI_API_VERSION	101
 
 typedef struct {
 	connstate_t		connState;
@@ -130,6 +130,8 @@ typedef enum {
 	UI_LAN_COMPARESERVERS,
 	// 1.32
 	UI_FS_SEEK,
+
+	UI_S_SOUNDDURATION,
 
 //#ifdef IOQ3ZTM // BONES
 	UI_R_ADDREFENTITYTOSCENE_CUSTOMSKELETON,

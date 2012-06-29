@@ -91,13 +91,12 @@ equ	trap_R_AddPolysToScene				-88
 equ trap_R_inPVS						-89
 equ trap_FS_Seek						-90
 equ trap_FS_GetFileList					-91
-
-;;IOQ3ZTM // BONES
-equ trap_R_AddRefEntityToScene_CustomSkeleton -92
-equ trap_R_JointIndexForName			-93
-equ trap_R_SetupSkeleton				-94
-equ trap_R_SetupPlayerSkeleton			-95
-equ trap_R_MakeSkeletonAbsolute			-96
+equ trap_S_SoundDuration				-92
+equ trap_Key_KeynumToStringBuf			-93
+equ trap_Key_GetBindingBuf				-94
+equ trap_Key_SetBinding					-95
+equ trap_Key_SetOverstrikeMode			-96
+equ trap_Key_GetOverstrikeMode			-97
 
 equ	memset						-101
 equ	memcpy						-102
@@ -109,4 +108,12 @@ equ	sqrt						-107
 equ floor						-108
 equ	ceil						-109
 equ acos						-110
+
+;;IOQ3ZTM // BONES
+equ trap_R_AddRefEntityToScene_CustomSkeleton -201
+equ trap_R_JointIndexForName			-202
+equ trap_R_SetupSkeleton				-203
+equ trap_R_SetupPlayerSkeleton			-204
+equ trap_R_MakeSkeletonAbsolute			-205
+
 
