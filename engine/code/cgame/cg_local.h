@@ -2342,6 +2342,7 @@ void		trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 // given entityNum and position
 void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson );
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );		// returns buzz if not found
+int			trap_S_SoundDuration( sfxHandle_t handle );
 void		trap_S_StartBackgroundTrack( const char *intro, const char *loop );	// empty name stops music
 void	trap_S_StopBackgroundTrack( void );
 
@@ -2425,6 +2426,11 @@ qboolean	trap_Key_IsDown( int keynum );
 int			trap_Key_GetCatcher( void );
 void		trap_Key_SetCatcher( int catcher );
 int			trap_Key_GetKey( const char *binding );
+void		trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
+void		trap_Key_GetBindingBuf( int keynum, char *buf, int buflen );
+void		trap_Key_SetBinding( int keynum, const char *binding );
+void		trap_Key_SetOverstrikeMode( qboolean state );
+qboolean	trap_Key_GetOverstrikeMode( void );
 
 
 typedef enum {

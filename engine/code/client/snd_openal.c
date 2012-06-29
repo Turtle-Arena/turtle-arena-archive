@@ -148,6 +148,8 @@ typedef struct alSfx_s
 	qboolean	isLocked;				// Sound is locked (can not be unloaded)
 	int				lastUsedTime;		// Time last used
 
+	int				duration;				// Milliseconds
+
 	int				loopCnt;		// number of loops using this sfx
 	int				loopActiveCnt;		// number of playing loops using this sfx
 	int				masterLoopSrc;		// All other sources looping this buffer are synced to this master src
@@ -497,6 +499,22 @@ sfxHandle_t S_AL_RegisterSound( const char *sample, qboolean compressed )
 	}
 
 	return sfx;
+}
+
+/*
+=================
+S_AL_SoundDuration
+=================
+*/
+static
+int S_AL_SoundDuration( sfxHandle_t sfx )
+{
+	if (sfx < 0 || sfx >= numSfx)
+	{
+		Com_Printf(S_COLOR_RED "ERROR: S_AL_SoundDuration: handle %i out of range\n", sfx);
+		return 0;
+	}
+	return knownSfx[sfx].duration;
 }
 
 /*
@@ -2642,6 +2660,7 @@ qboolean S_AL_Init( soundInterface_t *si )
 	si->DisableSounds = S_AL_DisableSounds;
 	si->BeginRegistration = S_AL_BeginRegistration;
 	si->RegisterSound = S_AL_RegisterSound;
+	si->SoundDuration = S_AL_SoundDuration;
 	si->ClearSoundBuffer = S_AL_ClearSoundBuffer;
 	si->SoundInfo = S_AL_SoundInfo;
 	si->SoundList = S_AL_SoundList;

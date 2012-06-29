@@ -31,7 +31,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	100
+#define	GAME_API_VERSION	101
 
 // entity->svFlags
 // the server does not know how to interpret most of the values
@@ -233,6 +233,9 @@ typedef enum {
 	// 1.32
 	G_FS_SEEK,
 
+	G_ADDCOMMAND,
+	G_REMOVECOMMAND,
+
 #ifdef TA_GAME_MODELS
 	G_REGISTERMODEL, // CG_R_REGISTERMODEL
 	G_LERPTAG,		// CG_R_LERPTAG
@@ -244,9 +247,6 @@ typedef enum {
 	G_MAKESKELETONABSOLUTE,
 #endif
 #endif
-
-	G_ADDCOMMAND,
-	G_REMOVECOMMAND,
 
 	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=100, etc
 

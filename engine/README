@@ -115,13 +115,15 @@ Makefile.local:
   USE_CODEC_VORBIS   - enable Ogg Vorbis support
   USE_MUMBLE         - enable Mumble support
   USE_VOIP           - enable built-in VoIP support
+  USE_OLD_VM64       - use Ludwig Nussel's old JIT compiler implementation
+                       for x86_64
   USE_INTERNAL_SPEEX - build internal speex library instead of dynamically
                        linking against system libspeex
   USE_INTERNAL_FREETYPE - build and link against internal FreeType library
-  USE_OLD_VM64       - use Ludwig Nussel's old JIT compiler implementation
-                       for x86_64
   USE_INTERNAL_ZLIB  - build and link against internal zlib
   USE_INTERNAL_JPEG  - build and link against internal JPEG library
+  USE_INTERNAL_OGG   - build and link against internal Ogg library
+  USE_INTERNAL_VORBIS - build and link against internal Vorbis library
   USE_LOCAL_HEADERS  - use headers local to ioq3 instead of system ones
   DEBUG_CFLAGS       - C compiler flags to use for building debug version
   COPYDIR            - the target installation directory

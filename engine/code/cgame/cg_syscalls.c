@@ -234,6 +234,10 @@ sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
 	return syscall( CG_S_REGISTERSOUND, sample, compressed );
 }
 
+int trap_S_SoundDuration( sfxHandle_t handle ) {
+	return syscall( CG_S_SOUNDDURATION, handle );
+}
+
 void	trap_S_StartBackgroundTrack( const char *intro, const char *loop ) {
 	syscall( CG_S_STARTBACKGROUNDTRACK, intro, loop );
 }
@@ -455,6 +459,26 @@ qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
 
 qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( CG_R_INPVS, p1, p2 );
+}
+
+void trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
+  syscall( CG_KEY_KEYNUMTOSTRINGBUF, keynum, buf, buflen );
+}
+
+void trap_Key_GetBindingBuf( int keynum, char *buf, int buflen ) {
+  syscall( CG_KEY_GETBINDINGBUF, keynum, buf, buflen );
+}
+
+void trap_Key_SetBinding( int keynum, const char *binding ) {
+  syscall( CG_KEY_SETBINDING, keynum, binding );
+}
+
+void trap_Key_SetOverstrikeMode( qboolean state ) {
+  syscall( CG_KEY_SETOVERSTRIKEMODE, state );
+}
+
+qboolean trap_Key_GetOverstrikeMode( void ) {
+  return syscall( CG_KEY_GETOVERSTRIKEMODE );
 }
 
 #ifdef IOQ3ZTM // BONES

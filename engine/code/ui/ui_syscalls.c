@@ -201,6 +201,10 @@ sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
 	return syscall( UI_S_REGISTERSOUND, sample, compressed );
 }
 
+int trap_S_SoundDuration( sfxHandle_t handle ) {
+	return syscall( UI_S_SOUNDDURATION, handle );
+}
+
 void trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
 	syscall( UI_KEY_KEYNUMTOSTRINGBUF, keynum, buf, buflen );
 }

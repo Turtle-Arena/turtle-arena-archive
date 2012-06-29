@@ -648,32 +648,6 @@ static void CL_GetClipboardData( char *buf, int buflen ) {
 
 /*
 ====================
-Key_KeynumToStringBuf
-====================
-*/
-static void Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
-	Q_strncpyz( buf, Key_KeynumToString( keynum ), buflen );
-}
-
-/*
-====================
-Key_GetBindingBuf
-====================
-*/
-static void Key_GetBindingBuf( int keynum, char *buf, int buflen ) {
-	char	*value;
-
-	value = Key_GetBinding( keynum );
-	if ( value ) {
-		Q_strncpyz( buf, value, buflen );
-	}
-	else {
-		*buf = 0;
-	}
-}
-
-/*
-====================
 GetConfigString
 ====================
 */
@@ -863,6 +837,9 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 	case UI_S_REGISTERSOUND:
 		return S_RegisterSound( VMA(1), args[2] );
+
+	case UI_S_SOUNDDURATION:
+		return S_SoundDuration( args[1] );
 
 	case UI_S_STARTLOCALSOUND:
 		S_StartLocalSound( args[1], args[2] );
