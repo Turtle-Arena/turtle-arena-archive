@@ -1735,12 +1735,6 @@ void CheckExitRules( void ) {
 		}
 	}
 
-#ifndef IOQ3ZTM // ZTM: This annoys me.
-	if ( level.numPlayingClients < 2 ) {
-		return;
-	}
-#endif
-
 	if ( g_gametype.integer < GT_CTF && g_fraglimit.integer ) {
 		if ( level.teamScores[TEAM_RED] >= g_fraglimit.integer ) {
 #ifdef NOTRATEDM // frag to score
