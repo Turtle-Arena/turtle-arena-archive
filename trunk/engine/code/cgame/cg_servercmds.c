@@ -543,7 +543,6 @@ static void CG_MapRestart( void ) {
 	cg.fraglimitWarnings = 0;
 
 	cg.timelimitWarnings = 0;
-
 	cg.intermissionStarted = qfalse;
 	cg.levelShot = qfalse;
 
@@ -585,6 +584,9 @@ static void CG_MapRestart( void ) {
 #endif
 
 	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+		cg.localClients[lc].rewardTime = 0;
+		cg.localClients[lc].rewardStack = 0;
+
 #ifdef TURTLEARENA // THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
 		if (cg_laserTag.integer)
