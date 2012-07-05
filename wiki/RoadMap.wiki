@@ -4,43 +4,18 @@
 = Roadmap =
 Work-in-progress plans for future releases.
 
-== 0.5 series ==
-The 0.5 series focuses on completing tasks for 0.6, creating smaller goals with more often releases.
+== 0.6 series ==
+See svn/branches/0.6/
 
-=== 0.5.0 (Completed) ===
-  * DONE: Four player splitscreen.
-  * DONE: Allow server public (internet) status to be changed anytime.
-  * DONE: Allow non-dedicated internet servers.
-
-=== 0.5.1 (Completed) ===
-  * DONE: Remove remaining OpenArena images and sounds.
-
-=== 0.5.2 (Completed) ===
-  * DONE: Redesign HUD (with health bar)
-  * Fixed various usability issues.
-
-=== 0.5.3 (Completed) ===
-  * Added initial "Arcade Mode".
-  * DONE: Create new icon and loading screen.
-  * DONE: Replace usage of GNU Freefont fonts with M+ Outline Fonts.
-
-=== 0.5.4 ===
-0.5.4 may be kind of a Release Candidate for 0.6.
-
-  * DONE: Replace teams (names and icons).
-  * DONE: Create new CTF flag skins (using new default team icons).
-  * DONE: New character select/setup menus (which also allows choosing local clients for splitscreen).
-  * DONE: Show scores in arcade menu.
-  * DONE: Have user enter name at end of arcade game.
-  * DONE: Fix compiling BSPC (the bot map AAS compiler).
-  * Polish game for release.
-
-== 0.6 ==
-On going:
-  * Remake graphics at 4x (or 2x in the case of fonts?) quake3 resolution.
+=== 0.6.1 ===
+  * DONE: Fix symlink issue on Linux.
+  * Fix bot jump underwater issue. (Fixed in trunk.)
+  * Fix bot drowned issue?
 
 == 0.7 series ==
 Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
+
+  * Make all 2D graphics be 4 times quake3 resolution.
 
 === 0.7.0 ===
   * Make changes to player model system for future models.
