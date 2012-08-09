@@ -63,11 +63,9 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_SPLITVERTICAL		138
-#define ID_BACK					139
+#define ID_ATMEFFECTS			139
+#define ID_BACK					140
 
-#ifdef TA_ATMEFFECTSYS
-#define ID_ATMEFFECTS			140
-#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 #define ID_SHOWBLOOD			141
@@ -109,9 +107,7 @@ typedef struct {
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
 	menulist_s			splitvertical;
-#ifdef TA_ATMEFFECTSYS
 	menulist_s			atmeffects;
-#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	menuradiobutton_s	showblood;
@@ -145,7 +141,6 @@ static const char *splitvertical_names[] =
 	NULL
 };
 
-#ifdef TA_ATMEFFECTSYS
 static const char *atmeffects_names[] =
 {
 	"off",
@@ -153,7 +148,6 @@ static const char *atmeffects_names[] =
 	"high",
 	NULL
 };
-#endif
 
 static void Preferences_SetMenuItems( void ) {
 #ifndef TURTLEARENA
@@ -176,13 +170,13 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
 	s_preferences.splitvertical.curvalue	= trap_Cvar_VariableValue( "cg_splitviewVertical" ) != 0;
-#ifdef TA_ATMEFFECTSYS
+
 	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
 	if (s_preferences.atmeffects.curvalue < 0)
 		s_preferences.atmeffects.curvalue = 0;
 	else if (s_preferences.atmeffects.curvalue > 2)
 		s_preferences.atmeffects.curvalue = 2;
-#endif
+
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	s_preferences.showblood.curvalue	= trap_Cvar_VariableValue( "com_blood" ) != 0;
@@ -260,11 +254,9 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cg_splitviewVertical", s_preferences.splitvertical.curvalue );
 		break;
 
-#ifdef TA_ATMEFFECTSYS
 	case ID_ATMEFFECTS:
 		trap_Cvar_SetValue( "cg_atmosphericEffects", (float)s_preferences.atmeffects.curvalue/2.0f );
 		break;
-#endif
 
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
@@ -494,7 +486,6 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.splitvertical.generic.y			= y;
 	s_preferences.splitvertical.itemnames			= splitvertical_names;
 
-#ifdef TA_ATMEFFECTSYS
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
 	s_preferences.atmeffects.generic.name		= "Snow/Rain:";
@@ -504,7 +495,6 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.atmeffects.generic.x			= PREFERENCES_X_POS;
 	s_preferences.atmeffects.generic.y			= y;
 	s_preferences.atmeffects.itemnames			= atmeffects_names;
-#endif
 
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
@@ -561,9 +551,7 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.splitvertical );
-#ifdef TA_ATMEFFECTSYS
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
-#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	Menu_AddItem( &s_preferences.menu, &s_preferences.showblood );

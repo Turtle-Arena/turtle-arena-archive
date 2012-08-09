@@ -1712,6 +1712,7 @@ extern	vmCvar_t		cg_oldRail;
 extern	vmCvar_t		cg_oldRocket;
 extern	vmCvar_t		cg_oldPlasma;
 extern	vmCvar_t		cg_trueLightning;
+extern	vmCvar_t		cg_atmosphericEffects;
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
@@ -1739,9 +1740,6 @@ extern	vmCvar_t		cg_impactDebris;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t		cg_laserTag;
-#endif
-#ifdef TA_ATMEFFECTSYS
-extern vmCvar_t			cg_atmosphericEffects;
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 extern vmCvar_t			cg_2dmode;
