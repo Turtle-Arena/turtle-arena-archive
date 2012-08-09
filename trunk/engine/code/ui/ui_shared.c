@@ -1989,8 +1989,7 @@ qboolean Item_YesNo_HandleKey(itemDef_t *item, int key) {
 #ifdef IOQ3ZTM // ARROWS // This changes the behavor... now it is the same as all of the ownerdraw
 	if (item->cvar)
 	{
-		int select = UI_SelectForKey(key);
-		if (select != 0)
+		if (UI_SelectForKey(key) != 0)
 		{
 			DC->setCVar(item->cvar, va("%i", !DC->getCVarValue(item->cvar)));
 			return qtrue;
