@@ -223,6 +223,7 @@ vmCvar_t	cg_oldRail;
 vmCvar_t	cg_oldRocket;
 vmCvar_t	cg_oldPlasma;
 vmCvar_t	cg_trueLightning;
+vmCvar_t	cg_atmosphericEffects;
 
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 vmCvar_t 	cg_redTeamName;
@@ -251,9 +252,6 @@ vmCvar_t	cg_impactDebris;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	cg_laserTag;
-#endif
-#ifdef TA_ATMEFFECTSYS
-vmCvar_t	cg_atmosphericEffects;
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 vmCvar_t	cg_2dmode;
@@ -483,7 +481,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
 	{ &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE},
 #endif
-	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE}
+	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
+	{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}
@@ -493,9 +492,6 @@ static cvarTable_t cvarTable[] = {
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }
-#endif
-#ifdef TA_ATMEFFECTSYS
-	,{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 	,{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO}
