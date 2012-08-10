@@ -1063,8 +1063,19 @@ int BotGetLongTermGoal(bot_state_t *bs, int tfl, int retreat, bot_goal_t *goal) 
 	}
 #endif // #ifdef MISSIONPACK_HARVESTER
 #endif
+
+#ifdef IOQ3ZTM
+	//normal goal stuff
+	if (BotGetItemLongTermGoal(bs, tfl, goal)) {
+		return qtrue;
+	}
+
+	//must have a long term goal to do normal go for air, so do it here
+	return BotGoForAir(bs, bs->tfl, goal, 400);
+#else
 	//normal goal stuff
 	return BotGetItemLongTermGoal(bs, tfl, goal);
+#endif
 }
 
 /*
