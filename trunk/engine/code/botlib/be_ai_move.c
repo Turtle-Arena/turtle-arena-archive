@@ -3111,8 +3111,17 @@ bot_moveresult_t BotMoveInGoalArea(bot_movestate_t *ms, bot_goal_t *goal)
 	if (speed < 10) speed = 0;
 	//
 	BotCheckBlocked(ms, dir, qtrue, &result);
-	//elemantary action move in direction
-	EA_Move(ms->client, dir, speed);
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	if (ms->moveflags & MFL_SWIMMING)
+	{
+		BotSwimInDirection(ms, dir, speed, 0);
+	}
+	else
+#endif
+	{
+		//elemantary action move in direction
+		EA_Move(ms->client, dir, speed);
+	}
 	VectorCopy(dir, result.movedir);
 	//
 	if (ms->moveflags & MFL_SWIMMING)
