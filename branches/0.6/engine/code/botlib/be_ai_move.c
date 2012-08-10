@@ -1133,6 +1133,25 @@ int BotCheckBarrierJump(bot_movestate_t *ms, vec3_t dir, float speed)
 	//there is a barrier
 	return qtrue;
 } //end of the function BotCheckBarrierJump
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+//===========================================================================
+//
+// Parameter:			-
+// Returns:				-
+// Changes Globals:		-
+//===========================================================================
+void BotJumpIfOnGround(bot_movestate_t *ms) {
+
+	if (AAS_OnGround(ms->origin, ms->presencetype, ms->entitynum)) ms->moveflags |= MFL_ONGROUND;
+
+	//if the bot is on the ground
+	if (ms->moveflags & MFL_ONGROUND)
+	{
+		//jump off the ground
+		EA_Jump(ms->client);
+	}
+} //end of the function BotJumpIfOnGround
+#endif
 //===========================================================================
 //
 // Parameter:			-
@@ -1145,6 +1164,11 @@ int BotSwimInDirection(bot_movestate_t *ms, vec3_t dir, float speed, int type)
 
 	VectorCopy(dir, normdir);
 	VectorNormalize(normdir);
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	if (normdir[2] > 0) {
+		BotJumpIfOnGround(ms);
+	}
+#endif
 	EA_Move(ms->client, normdir, speed);
 	return qtrue;
 } //end of the function BotSwimInDirection
@@ -1284,25 +1308,17 @@ int BotMoveInDirection(int movestate, vec3_t dir, float speed, int type)
 	//check if swimming
 	swimming = AAS_Swimming(ms->origin);
 	//player walks on ground underwater
-	if (swimming)
+	if (swimming && !(dir[2] > 0))
 	{
 		if (AAS_OnGround(ms->origin, ms->presencetype, ms->entitynum)) ms->moveflags |= MFL_ONGROUND;
 		//if the bot is on the ground
 		if (ms->moveflags & MFL_ONGROUND)
 		{
-			if (dir[2] > 0)
-			{
-				//need to jump off ground to swim
-				EA_Jump(ms->client);
-			}
-			else
-			{
-				//walk underwater instead
-				swimming = qfalse;
-			}
+			//walk underwater instead
+			swimming = qfalse;
 		}
 	}
-	//if swimming
+	//if in water and not on ground or want to swim up
 	if (swimming)
 #else
 	//if swimming
@@ -1592,8 +1608,13 @@ bot_moveresult_t BotTravel_Swim(bot_movestate_t *ms, aas_reachability_t *reach)
 	VectorNormalize(dir);
 	//
 	BotCheckBlocked(ms, dir, qtrue, &result);
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	//
+	BotSwimInDirection(ms, dir, 400, 0);
+#else
 	//elemantary actions
 	EA_Move(ms->client, dir, 400);
+#endif
 	//
 	VectorCopy(dir, result.movedir);
 	Vector2Angles(dir, result.ideal_viewangles);
@@ -3083,8 +3104,17 @@ bot_moveresult_t BotMoveInGoalArea(bot_movestate_t *ms, bot_goal_t *goal)
 	if (speed < 10) speed = 0;
 	//
 	BotCheckBlocked(ms, dir, qtrue, &result);
-	//elemantary action move in direction
-	EA_Move(ms->client, dir, speed);
+#ifdef IOQ3ZTM // WALK_UNDERWATER
+	if (ms->moveflags & MFL_SWIMMING)
+	{
+		BotSwimInDirection(ms, dir, speed, 0);
+	}
+	else
+#endif
+	{
+		//elemantary action move in direction
+		EA_Move(ms->client, dir, speed);
+	}
 	VectorCopy(dir, result.movedir);
 	//
 	if (ms->moveflags & MFL_SWIMMING)
