@@ -8,9 +8,10 @@ Work-in-progress plans for future releases.
 See svn/branches/0.6/
 
 === 0.6.1 ===
-  * DONE: Fix symlink issue on Linux.
-  * Fix bot jump underwater issue. (Fixed in trunk.)
-  * Fix bot drowned issue?
+  * DONE: Fix symlink issue on Linux. (CVE-2012-3345)
+  * DONE: Fix bot jump underwater issue. (Issue 37)
+  * DONE: Fix bots to wait at surface for air meter to fill. (Issue 38)
+  * DONE: Fix bots not going for air when they have no long term goal.
 
 == 0.7 series ==
 Focus on finalizing the game's branding (name, logo, etc), making it completely standalone from the Ninja Turtles, and solve all licensing concerns.
