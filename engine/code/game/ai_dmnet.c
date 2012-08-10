@@ -126,9 +126,6 @@ int BotGetAirGoal(bot_state_t *bs, bot_goal_t *goal) {
 	vec3_t end, mins = {-15, -15, -2}, maxs = {15, 15, 2};
 	int areanum;
 
-#ifdef TURTLEARENA // DROWNING // ZTM: TODO: If bubble spawning entity is added check for near by bubbles as well as surface.
-#endif
-
 	//trace up until we hit solid
 	VectorCopy(bs->origin, end);
 	end[2] += 1000;
@@ -169,7 +166,7 @@ int BotGoForAir(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 
 	//if the bot needs air
 #ifdef TURTLEARENA // DROWNING
-	if (bs->lastair_time < FloatTime() - 20)
+	if (bs->cur_ps.powerups[PW_AIR] < level.time + 9000)
 #else
 	if (bs->lastair_time < FloatTime() - 6)
 #endif
@@ -184,6 +181,8 @@ int BotGoForAir(bot_state_t *bs, int tfl, bot_goal_t *ltg, float range) {
 			return qtrue;
 		}
 		else {
+#ifdef TURTLEARENA // DROWNING // ZTM: TODO: If bubble spawning entity is added check for near by bubbles spawn points underwater.
+#endif
 			//get a nearby goal outside the water
 			while(trap_BotChooseNBGItem(bs->gs, bs->origin, bs->inventory, tfl, ltg, range)) {
 				trap_BotGetTopGoal(bs->gs, &goal);
@@ -281,10 +280,21 @@ int BotReachedGoal(bot_state_t *bs, bot_goal_t *goal) {
 		}
 	}
 	else if (goal->flags & GFL_AIR) {
+#ifdef TURTLEARENA // DROWNING
+		//if the bot got air
+		if (bs->cur_ps.powerups[PW_AIR] > level.time + 30000) return qtrue;
+
+		//check if goal is underwater
+		if (trap_AAS_PointContents(goal->origin) & (CONTENTS_WATER|CONTENTS_SLIME|CONTENTS_LAVA)) {
+			//go get a new air goal!
+			return qtrue;
+		}
+#else
 		//if touching the goal
 		if (trap_BotTouchingGoal(bs->origin, goal)) return qtrue;
 		//if the bot got air
 		if (bs->lastair_time > FloatTime() - 1) return qtrue;
+#endif
 	}
 	else {
 		//if touching the goal
