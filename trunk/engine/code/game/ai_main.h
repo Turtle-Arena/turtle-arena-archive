@@ -210,7 +210,9 @@ typedef struct bot_state_s
 	float ctfroam_time;								//time the bot is roaming in ctf
 	float killedenemy_time;							//time the bot killed the enemy
 	float arrive_time;								//time arrived (at companion)
+#ifndef TURTLEARENA // DROWNING
 	float lastair_time;								//last time the bot had air
+#endif
 	float teleport_time;							//last time the bot teleported
 	float camp_time;								//last time camped
 	float weaponchange_time;						//time the bot started changing weapons

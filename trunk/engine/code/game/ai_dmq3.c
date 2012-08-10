@@ -5803,6 +5803,7 @@ void BotCheckSnapshot(bot_state_t *bs) {
 	BotCheckEvents(bs, &state);
 }
 
+#ifndef TURTLEARENA // DROWNING
 /*
 ==================
 BotCheckAir
@@ -5816,6 +5817,7 @@ void BotCheckAir(bot_state_t *bs) {
 	}
 	bs->lastair_time = FloatTime();
 }
+#endif
 
 /*
 ==================
@@ -6024,8 +6026,10 @@ void BotDeathmatchAI(bot_state_t *bs, float thinktime) {
 		BotUpdateInventory(bs);
 		//check out the snapshot
 		BotCheckSnapshot(bs);
+#ifndef TURTLEARENA // DROWNING
 		//check for air
 		BotCheckAir(bs);
+#endif
 	}
 	//check the console messages
 	BotCheckConsoleMessages(bs);
