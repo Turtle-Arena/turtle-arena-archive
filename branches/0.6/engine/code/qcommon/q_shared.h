@@ -38,7 +38,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 //  #define LEGACY_PROTOCOL	// You probably don't need this for your standalone game
 
   #ifndef PRODUCT_VERSION
-    #define PRODUCT_VERSION "0.6"
+    #define PRODUCT_VERSION "0.6.1"
   #endif
 #else // ioquake3 defaults
   #define PRODUCT_NAME			"ioq3"
