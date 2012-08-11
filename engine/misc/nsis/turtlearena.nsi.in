@@ -127,6 +127,7 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   SetOutPath "$INSTDIR\${MODDIR}"
   File "XXXASSETPATHXXX/assets0.pk3"
   File "XXXASSETPATHXXX/assets1-qvms.pk3"
+  File "XXXASSETPATHXXX/assets3-game-patch.pk3"
 
   ; Write the installation path into the registry
   WriteRegStr SHCTX "Software\${GAME_FSNAME}" ${MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME} "$INSTDIR"

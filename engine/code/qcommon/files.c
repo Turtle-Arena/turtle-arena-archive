@@ -191,6 +191,7 @@ const purePak_t com_purePaks[] =
 	{BASEGAME, "assets0", 2030282223u, 0},
 	{BASEGAME, "assets1-qvms", 32394176u, 0},
 	{BASEGAME, "assets2-music", 1273935545u, PAK_OPTIONAL},
+	{BASEGAME, "assets3-game-patch", 3244104299u, 0},
 
 	{NULL, NULL, 0, 0}
 };

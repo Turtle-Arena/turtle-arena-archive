@@ -57,7 +57,7 @@ ifndef GAMENAME
 GAMENAME=turtlearena
 endif
 ifndef VERSION
-VERSION=0.6
+VERSION=0.6.1
 endif
 ifndef RELEASE
 RELEASE=0
@@ -172,7 +172,7 @@ qvms-clean:
 #
 # Asset packages (pk3 files)
 #
-assets: $(DATADIR)/base/assets0.pk3 $(DATADIR)/base/assets1-qvms.pk3 $(DATADIR)/base/assets2-music.pk3
+assets: $(DATADIR)/base/assets0.pk3 $(DATADIR)/base/assets1-qvms.pk3 $(DATADIR)/base/assets2-music.pk3 $(DATADIR)/base/assets3-game-patch.pk3
 
 assets-clean: qvms-clean
 	rm -fr $(DATADIR)/base/
@@ -203,11 +203,8 @@ $(DATADIR)/base/assets0.pk3:
 #    to play on pure servers.
 #
 
-$(DATADIR)/base/assets1-qvms.pk3: qvms
-	$(Q)mkdir -p $(DATADIR)/base/assets1/vm
-	$(Q)cp engine/build/release-$(COMPILE_PLATFORM)-$(COMPILE_ARCH)/base/vm/*.qvm $(DATADIR)/base/assets1/vm
-	$(Q)cd $(DATADIR)/base/assets1/ && zip -qmr ../assets1-qvms.pk3 .
-	$(Q)rm -r $(DATADIR)/base/assets1/
+$(DATADIR)/base/assets1-qvms.pk3:
+	$(Q)echo "Get assets1-qvms.pk3 from Turtle Arena 0.6!"
 
 $(DATADIR)/base/assets2-music.pk3:
 	$(Q)echo "  Coping music files (temporary files)..."
@@ -223,6 +220,12 @@ $(DATADIR)/base/assets2-music.pk3:
 	$(Q)echo "  Zipping assets..."
 	$(Q)cd $(DATADIR)/base/assets2/ && zip -qmr ../assets2-music.pk3 .
 	$(Q)rm -r $(DATADIR)/base/assets2/
+
+$(DATADIR)/base/assets3-game-patch.pk3: qvms
+	$(Q)mkdir -p $(DATADIR)/base/assets3/vm
+	$(Q)cp engine/build/release-$(COMPILE_PLATFORM)-$(COMPILE_ARCH)/base/vm/qagame.qvm $(DATADIR)/base/assets3/vm
+	$(Q)cd $(DATADIR)/base/assets3/ && zip -qmr ../assets3-game-patch.pk3 .
+	$(Q)rm -r $(DATADIR)/base/assets3/
 
 
 #
