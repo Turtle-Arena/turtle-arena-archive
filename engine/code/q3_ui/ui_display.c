@@ -196,8 +196,6 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 		NULL
 	};
 
-	const int numAnaglyphModes = ARRAY_LEN(anaglyph_names) - 2;
-
 	static const char *offOn_names[] =
 	{
 		"Off",
@@ -380,8 +378,8 @@ static void UI_DisplayOptionsMenu_Init( void ) {
 	displayOptionsInfo.anaglyph.curvalue    = trap_Cvar_VariableValue("r_anaglyphMode");
 	if (displayOptionsInfo.anaglyph.curvalue < 0)
 		displayOptionsInfo.anaglyph.curvalue = 0;
-	else if (displayOptionsInfo.anaglyph.curvalue > numAnaglyphModes)
-		displayOptionsInfo.anaglyph.curvalue = numAnaglyphModes;
+	else if (displayOptionsInfo.anaglyph.curvalue > 6)
+		displayOptionsInfo.anaglyph.curvalue = 6;
 
 	displayOptionsInfo.greyscale.curvalue = displayOptionsInfo.greyscale_default
 			= (trap_Cvar_VariableValue( "r_greyscale") != 0);
