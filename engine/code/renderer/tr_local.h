@@ -509,6 +509,9 @@ typedef struct {
 	int			numPolys;
 	struct srfPoly_s	*polys;
 
+	int			numPolyBuffers;
+	struct srfPolyBuffer_s	*polybuffers;
+
 	int			numDrawSurfs;
 	struct drawSurf_s	*drawSurfs;
 
@@ -587,6 +590,7 @@ typedef enum {
 	SF_GRID,
 	SF_TRIANGLES,
 	SF_POLY,
+	SF_POLYBUFFER,
 	SF_MD3,
 	SF_MD4,
 #ifdef RAVENMD4
@@ -620,6 +624,12 @@ typedef struct srfPoly_s {
 	int				numVerts;
 	polyVert_t		*verts;
 } srfPoly_t;
+
+typedef struct srfPolyBuffer_s {
+	surfaceType_t surfaceType;
+	int fogIndex;
+	polyBuffer_t *pPolyBuffer;
+} srfPolyBuffer_t;
 
 typedef struct srfDisplayList_s {
 	surfaceType_t	surfaceType;
@@ -1099,13 +1109,6 @@ extern trGlobals_t	tr;
 extern glconfig_t	glConfig;		// outside of TR since it shouldn't be cleared during ref re-init
 extern glstate_t	glState;		// outside of TR since it shouldn't be cleared during ref re-init
 
-// These two variables should live inside glConfig but can't because of compatibility issues to the original ID vms.
-// If you release a stand-alone game and your mod uses tr_types.h from this build you can safely move them to
-// the glconfig_t struct.
-extern qboolean  textureFilterAnisotropic;
-extern int       maxAnisotropy;
-extern float     displayAspect;
-
 
 //
 // cvars
@@ -1262,6 +1265,7 @@ void R_AddRailSurfaces( trRefEntity_t *e, qboolean isUnderwater );
 void R_AddLightningBoltSurfaces( trRefEntity_t *e );
 
 void R_AddPolygonSurfaces( void );
+void R_AddPolygonBufferSurfaces( void );
 
 void R_ComposeSort( drawSurf_t *drawSurf, int sortedShaderIndex, int sortOrder,
  					 int shiftedEntityNum, int fogIndex, int dlightMap );
@@ -1595,6 +1599,7 @@ void RE_AddRefEntityToScene( const refEntity_t *ent, const refSkeleton_t *custom
 void RE_AddRefEntityToScene( const refEntity_t *ent );
 #endif
 void RE_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num );
+void RE_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer );
 void RE_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b );
 void RE_RenderScene( const refdef_t *fd );
@@ -1842,11 +1847,13 @@ typedef struct {
 #endif
 	srfPoly_t	*polys;//[MAX_POLYS];
 	polyVert_t	*polyVerts;//[MAX_POLYVERTS];
+	srfPolyBuffer_t *polybuffers;//[MAX_POLYS];
 	renderCommandList_t	commands;
 } backEndData_t;
 
 extern	int		max_polys;
 extern	int		max_polyverts;
+extern	int		max_polybuffers;
 
 extern	backEndData_t	*backEndData[SMP_FRAMES];	// the second one may not be allocated
 

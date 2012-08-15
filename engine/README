@@ -323,6 +323,11 @@ New commands
 
   tell <client num> <msg> - send message to a single client (new to server)
 
+
+Removed cvars
+  r_customPixelAspect     - it had no effect
+
+
 Removed commands
   clientkick <clientkick> - replaced with kicknum command
   kick all                - replaced with kickall command
