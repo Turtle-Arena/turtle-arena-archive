@@ -1,5 +1,43 @@
 // Based on OpenArena's /scripts/decals.shader
 
+// Snow!
+gfx/misc/snow
+{
+	cull disable
+	{
+		map gfx/misc/snow
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+gfx/misc/snow1
+{
+	cull disable
+	{
+		map gfx/misc/snow1
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+gfx/misc/snow2
+{
+	cull disable
+	{
+		map gfx/misc/snow2
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
+// raindrop
+gfx/misc/raindrop
+{
+	cull disable
+	{
+		map gfx/misc/raindrop
+		blendFunc GL_SRC_ALPHA GL_ONE_MINUS_SRC_ALPHA
+	}
+}
+
 // Melee Weapon Trail
 weaponTrail
 {
