@@ -2741,17 +2741,8 @@ Returns the Z component of the surface being shadowed
 ===============
 */
 #define	SHADOW_DISTANCE		128
-#ifdef IOQ3ZTM // SHADOW
-static qboolean CG_PlayerShadow( centity_t *cent, vec3_t start, float *shadowPlane )
-#else
-static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane )
-#endif
-{
-#ifdef IOQ3ZTM // LADDER // SHADOW // When using torso origin on a ladder, trace starts in ladder. For raph_v9 it was like one unit too big.
+static qboolean CG_PlayerShadow( centity_t *cent, vec3_t start, float *shadowPlane ) {
 	vec3_t		end, mins = {-8, -8, 0}, maxs = {8, 8, 2};
-#else
-	vec3_t		end, mins = {-15, -15, 0}, maxs = {15, 15, 2};
-#endif
 	trace_t		trace;
 	float		alpha;
 
@@ -2767,17 +2758,10 @@ static qboolean CG_PlayerShadow( centity_t *cent, float *shadowPlane )
 	}
 
 	// send a trace down from the player to the ground
-#ifdef IOQ3ZTM // SHADOW
 	VectorCopy( start, end );
 	end[2] -= SHADOW_DISTANCE;
 
 	trap_CM_BoxTrace( &trace, start, end, mins, maxs, 0, MASK_PLAYERSOLID );
-#else
-	VectorCopy( cent->lerpOrigin, end );
-	end[2] -= SHADOW_DISTANCE;
-
-	trap_CM_BoxTrace( &trace, cent->lerpOrigin, end, mins, maxs, 0, MASK_PLAYERSOLID );
-#endif
 
 	// no shadow if too high
 	if ( trace.fraction == 1.0 || trace.startsolid || trace.allsolid ) {
@@ -3101,10 +3085,8 @@ void CG_Player( centity_t *cent ) {
 	int				renderfx;
 	qboolean		shadow;
 	float			shadowPlane;
-#ifdef IOQ3ZTM // SHADOW
 	refEntity_t		shadowRef;
 	vec3_t			shadowOrigin;
-#endif
 #ifdef TURTLEARENA // POWERS
 	refEntity_t		powerup;
 #endif
@@ -3190,15 +3172,18 @@ void CG_Player( centity_t *cent ) {
 	CG_PlayerSprites( cent );
 #endif
 
-	// add the shadow
-#ifdef IOQ3ZTM // SHADOW
+	// cast shadow from torso origin
 	memcpy(&shadowRef, &torso, sizeof(shadowRef));
 	VectorCopy(cent->lerpOrigin, legs.origin);
 
 	// Shadow from the torso origin
 #ifdef IOQ3ZTM // BONES
-	if (ci->playerModel && CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->playerModel, &skeleton, "tag_torso")) {
-		VectorCopy(shadowRef.origin, shadowOrigin);
+	if (ci->playerModel) {
+		if (CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->playerModel, &skeleton, "tag_torso")) {
+			VectorCopy(shadowRef.origin, shadowOrigin);
+		} else {
+			VectorCopy(cent->lerpOrigin, shadowOrigin);
+		}
 	} else
 #endif
 	if (CG_PositionRotatedEntityOnTag(&shadowRef, &legs, ci->legsModel, NULL, "tag_torso")) {
@@ -3206,10 +3191,9 @@ void CG_Player( centity_t *cent ) {
 	} else {
 		VectorCopy(cent->lerpOrigin, shadowOrigin);
 	}
+
+	// add the shadow
 	shadow = CG_PlayerShadow( cent, shadowOrigin, &shadowPlane );
-#else
-	shadow = CG_PlayerShadow( cent, &shadowPlane );
-#endif
 
 	// add a water splash if partially in and out of water
 	CG_PlayerSplash( cent );

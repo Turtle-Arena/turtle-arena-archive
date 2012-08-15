@@ -1940,6 +1940,29 @@ typedef struct
 } dummyCmd_t;
 int cmdcmp( const void *a, const void *b );
 
+#define MAX_MAP_SIZE 65536
+
+//
+// bg_tracemap.c
+//
+typedef struct
+{
+	// callbacks to test the world
+	// these will be different functions during game and cgame
+	void		(*trace)( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentMask );
+	int			(*pointcontents)( const vec3_t point, int passEntityNum );
+} bgGenTracemap_t;
+
+void BG_GenerateTracemap(const char *mapname, vec3_t mapcoordsMins, vec3_t mapcoordsMaxs, bgGenTracemap_t *gen);
+
+qboolean BG_LoadTraceMap( char *rawmapname, vec2_t world_mins, vec2_t world_maxs );
+float BG_GetSkyHeightAtPoint( vec3_t pos );
+float BG_GetSkyGroundHeightAtPoint( vec3_t pos );
+float BG_GetGroundHeightAtPoint( vec3_t pos );
+int BG_GetTracemapGroundFloor( void );
+int BG_GetTracemapGroundCeil( void );
+void etpro_FinalizeTracemapClamp( int *x, int *y );
+
 #ifdef TA_SP
 // Set as defaults for g_saveVersions so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game

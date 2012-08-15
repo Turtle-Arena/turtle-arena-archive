@@ -97,6 +97,7 @@ equ trap_Key_GetBindingBuf				-94
 equ trap_Key_SetBinding					-95
 equ trap_Key_SetOverstrikeMode			-96
 equ trap_Key_GetOverstrikeMode			-97
+equ	trap_R_AddPolyBufferToScene			-98
 
 equ	memset						-101
 equ	memcpy						-102

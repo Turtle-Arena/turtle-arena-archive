@@ -685,6 +685,21 @@ void CG_4CamReset_f(void) {
 }
 #endif
 
+void CG_GenerateTracemap(void)
+{
+	bgGenTracemap_t gen;
+
+	if ( !cg.mapcoordsValid ) {
+		CG_Printf( "Need valid mapcoords in the worldspawn to be able to generate a tracemap.\n" );
+		return;
+	}
+
+	gen.trace = CG_Trace;
+	gen.pointcontents = CG_PointContents;
+
+	BG_GenerateTracemap(cgs.mapname, cg.mapcoordsMins, cg.mapcoordsMaxs, &gen);
+}
+
 typedef struct {
 	char	*cmd;
 	void	(*function)(void);
@@ -819,7 +834,8 @@ static consoleCommand_t	commands[] = {
 #endif
 	{ "startOrbit", CG_StartOrbit_f },
 	//{ "camera", CG_Camera_f },
-	{ "loaddeferred", CG_LoadDeferredPlayers }	
+	{ "loaddeferred", CG_LoadDeferredPlayers },
+	{ "generateTracemap", CG_GenerateTracemap }
 };
 
 
