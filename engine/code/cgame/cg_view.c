@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -117,7 +109,11 @@ Replaces the current view weapon with the given model
 void CG_TestGun_f (void) {
 	CG_TestModel_f();
 	cg.testGun = qtrue;
-	cg.testModelEntity.renderfx = RF_DEPTHHACK | RF_NO_MIRROR | RF_MINLIGHT;
+#ifdef IOQ3ZTM // RENDERFLAGS
+	cg.testModelEntity.renderfx = RF_DEPTHHACK | RF_NOT_MIRROR | RF_MINLIGHT;
+#else
+	cg.testModelEntity.renderfx = RF_MINLIGHT | RF_DEPTHHACK | RF_FIRST_PERSON;
+#endif
 }
 
 
@@ -157,7 +153,7 @@ static void CG_AddTestModel (void) {
 		return;
 	}
 
-	// if testing a gun, set the origin relative to the view origin
+	// if testing a gun, set the origin reletive to the view origin
 	if ( cg.testGun ) {
 		VectorCopy( cg.refdef.vieworg, cg.testModelEntity.origin );
 		VectorCopy( cg.refdef.viewaxis[0], cg.testModelEntity.axis[0] );
@@ -252,8 +248,10 @@ static void CG_CalcVrect (void) {
 	}
 
 	// Viewport scale and offset
-	cgs.screenXScaleStretch = viewWidth * (1.0/640.0);
-	cgs.screenYScaleStretch = viewHeight * (1.0/480.0);
+#ifdef IOQ3ZTM
+	cgs.screenXScaleFit = viewWidth * (1.0/640.0);
+	cgs.screenYScaleFit = viewHeight * (1.0/480.0);
+#endif
 	if ( viewWidth * 480 > viewHeight * 640 ) {
 		cgs.screenXScale = viewWidth * (1.0/640.0);
 		cgs.screenYScale = viewHeight * (1.0/480.0);
@@ -261,8 +259,13 @@ static void CG_CalcVrect (void) {
 		cgs.screenXBias = 0.5 * ( viewWidth - ( viewHeight * (640.0/480.0) ) );
 		cgs.screenXScale = cgs.screenYScale;
 	} else {
-		cgs.screenXScale = cgs.screenXScaleStretch;
-		cgs.screenYScale = cgs.screenYScaleStretch;
+#ifdef IOQ3ZTM
+		cgs.screenXScale = cgs.screenXScaleFit;
+		cgs.screenYScale = cgs.screenYScaleFit;
+#else
+		cgs.screenXScale = viewWidth * (1.0/640.0);
+		cgs.screenYScale = viewHeight * (1.0/480.0);
+#endif
 		// no wide screen
 		cgs.screenXBias = 0;
 	}
@@ -1198,6 +1201,12 @@ static void CG_DamageBlendBlob( void ) {
 	int			maxTime;
 	refEntity_t		ent;
 
+#ifdef IOQ3ZTM // Only if blood is enabled
+	if (!cg_blood.integer) {
+		return;
+	}
+#endif
+
 	if (!cg_blood.integer) {
 		return;
 	}
@@ -1224,7 +1233,11 @@ static void CG_DamageBlendBlob( void ) {
 
 	memset( &ent, 0, sizeof( ent ) );
 	ent.reType = RT_SPRITE;
-	ent.renderfx = RF_NO_MIRROR;
+#ifdef IOQ3ZTM // RENDERFLAGS
+	ent.renderfx = RF_NOT_MIRROR;
+#else
+	ent.renderfx = RF_FIRST_PERSON;
+#endif
 
 	VectorMA( cg.refdef.vieworg, 8, cg.refdef.viewaxis[0], ent.origin );
 	VectorMA( ent.origin, cg.cur_lc->damageX * -8, cg.refdef.viewaxis[1], ent.origin );
@@ -1340,7 +1353,7 @@ static int CG_CalcViewValues( void ) {
 		CG_OffsetFirstPersonView();
 	}
 
-	// position eye relative to origin
+	// position eye reletive to origin
 	AnglesToAxis( cg.refdefViewAngles, cg.refdef.viewaxis );
 
 	if ( cg.cur_lc->hyperspace ) {
@@ -1785,10 +1798,8 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		// add buffered sounds
 		CG_PlayBufferedSounds();
 
-#ifdef MISSIONPACK
 		// play buffered voice chats
 		CG_PlayBufferedVoiceChats();
-#endif
 
 		// finish up the rest of the refdef
 		if ( cg.testModelEntity.hModel ) {

@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 #include "q_shared.h"
@@ -36,7 +28,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define	OPSTACK_MASK	(OPSTACK_SIZE-1)
 
 // don't change
-// Hardcoded in q3asm a reserved at end of bss
+// Hardcoded in q3asm an reserved at end of bss
 #define	PROGRAM_STACK_SIZE	0x10000
 #define	PROGRAM_STACK_MASK	(PROGRAM_STACK_SIZE-1)
 

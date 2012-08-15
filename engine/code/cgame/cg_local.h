@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -973,12 +965,10 @@ typedef struct {
 	int			soundTime;
 	qhandle_t	soundBuffer[MAX_SOUNDBUFFER];
 
-#ifdef MISSIONPACK
 	// for voice chat buffer
 	int			voiceChatTime;
 	int			voiceChatBufferIn;
 	int			voiceChatBufferOut;
-#endif
 
 	// warmup countdown
 	int			warmup;
@@ -1497,8 +1487,10 @@ typedef struct {
 	float			screenXScale;		// derived from glconfig
 	float			screenYScale;
 	float			screenXBias;
-	float			screenXScaleStretch;
-	float			screenYScaleStretch;
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	float			screenXScaleFit;
+	float			screenYScaleFit;
+#endif
 
 	int				serverCommandSequence;	// reliable command stream counter
 	int				processedSnapshotNum;// the number of snapshots cgame has requested
@@ -1687,10 +1679,8 @@ extern	vmCvar_t		cg_predictItems;
 extern	vmCvar_t		cg_deferPlayers;
 extern	vmCvar_t		cg_drawFriend;
 extern	vmCvar_t		cg_teamChatsOnly;
-#ifdef MISSIONPACK
 extern	vmCvar_t		cg_noVoiceChats;
 extern	vmCvar_t		cg_noVoiceText;
-#endif
 extern  vmCvar_t		cg_scorePlum;
 extern	vmCvar_t		cg_smoothClients;
 extern	vmCvar_t		pmove_fixed;
@@ -1712,7 +1702,6 @@ extern	vmCvar_t		cg_oldRail;
 extern	vmCvar_t		cg_oldRocket;
 extern	vmCvar_t		cg_oldPlasma;
 extern	vmCvar_t		cg_trueLightning;
-extern	vmCvar_t		cg_atmosphericEffects;
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
@@ -1740,6 +1729,9 @@ extern	vmCvar_t		cg_impactDebris;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 extern	vmCvar_t		cg_laserTag;
+#endif
+#ifdef TA_ATMEFFECTSYS
+extern vmCvar_t			cg_atmosphericEffects;
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 extern vmCvar_t			cg_2dmode;
@@ -1855,15 +1847,15 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 //
 // cg_drawtools.c
 //
-typedef enum {
-	PLACE_CENTER,
-	PLACE_LEFT,
-	PLACE_RIGHT,
-	PLACE_STRETCH
-} screenPlacement_e;
-
-void CG_SetScreenPlacement(screenPlacement_e pos);
-void CG_PopScreenPlacement(void);
+#ifdef IOQ3ZTM
+void CG_AdjustFrom640Fit( float *x, float *y, float *w, float *h );
+void CG_FillRectFit( float x, float y, float width, float height, const float *color );
+void CG_DrawPicFit( float x, float y, float width, float height, qhandle_t hShader );
+#endif
+#define HUD_CENTER 0
+#define HUD_LEFT 1
+#define HUD_RIGHT 2
+void CG_HudPlacement(int pos);
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
@@ -1999,7 +1991,7 @@ void CG_PainEvent( centity_t *cent, int health );
 void CG_SetEntitySoundPosition( centity_t *cent );
 void CG_AddPacketEntities( void );
 void CG_Beam( centity_t *cent );
-void CG_AdjustPositionForMover(const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out, vec3_t angles_in, vec3_t angles_out);
+void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out );
 
 #ifdef IOQ3ZTM // BONES
 qboolean CG_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *parent,
@@ -2225,12 +2217,10 @@ void CG_InitConsoleCommands( void );
 void CG_ExecuteNewServerCommands( int latestSequence );
 void CG_ParseServerinfo( void );
 void CG_SetConfigValues( void );
-void CG_ShaderStateChanged(void);
-#ifdef MISSIONPACK
 void CG_LoadVoiceChats( void );
+void CG_ShaderStateChanged(void);
 void CG_VoiceChatLocal( int mode, qboolean voiceOnly, int clientNum, int color, const char *cmd );
 void CG_PlayBufferedVoiceChats( void );
-#endif
 
 //
 // cg_playerstate.c
@@ -2340,7 +2330,6 @@ void		trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin );
 // given entityNum and position
 void		trap_S_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson );
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );		// returns buzz if not found
-int			trap_S_SoundDuration( sfxHandle_t handle );
 void		trap_S_StartBackgroundTrack( const char *intro, const char *loop );	// empty name stops music
 void	trap_S_StopBackgroundTrack( void );
 
@@ -2424,11 +2413,6 @@ qboolean	trap_Key_IsDown( int keynum );
 int			trap_Key_GetCatcher( void );
 void		trap_Key_SetCatcher( int catcher );
 int			trap_Key_GetKey( const char *binding );
-void		trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen );
-void		trap_Key_GetBindingBuf( int keynum, char *buf, int buflen );
-void		trap_Key_SetBinding( int keynum, const char *binding );
-void		trap_Key_SetOverstrikeMode( qboolean state );
-qboolean	trap_Key_GetOverstrikeMode( void );
 
 
 typedef enum {

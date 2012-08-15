@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -32,9 +24,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 // executed by a key binding
 
 #include "cg_local.h"
-#ifdef MISSIONPACK
 #include "../ui/ui_shared.h"
-#endif
 #ifdef MISSIONPACK_HUD
 extern menuDef_t *menuScoreboard;
 #endif
@@ -246,7 +236,6 @@ static void CG_TellAttacker_f( void ) {
 	trap_SendClientCommand( command );
 }
 
-#ifdef MISSIONPACK
 static void CG_VoiceTellTarget_f( void ) {
 	int		clientNum;
 	char	command[128];
@@ -277,6 +266,7 @@ static void CG_VoiceTellAttacker_f( void ) {
 	trap_SendClientCommand( command );
 }
 
+#ifdef MISSIONPACK
 static void CG_NextTeamMember_f( void ) {
   CG_SelectNextPlayer();
 }
@@ -778,12 +768,12 @@ static consoleCommand_t	commands[] = {
 	{ "4holdprev", CG_4PrevHoldable_f },
 	{ "4holdable", CG_4Holdable_f },
 #endif
-	{ "tcmd", CG_TargetCommand_f },
 	{ "tell_target", CG_TellTarget_f },
 	{ "tell_attacker", CG_TellAttacker_f },
-#ifdef MISSIONPACK
 	{ "vtell_target", CG_VoiceTellTarget_f },
 	{ "vtell_attacker", CG_VoiceTellAttacker_f },
+	{ "tcmd", CG_TargetCommand_f },
+#ifdef MISSIONPACK
 #ifdef MISSIONPACK_HUD
 	{ "loadhud", CG_LoadHud_f },
 #endif
@@ -871,7 +861,6 @@ void CG_InitConsoleCommands( void ) {
 		trap_AddCommand(Com_LocalClientCvarName(i, "say"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "say_team"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "tell"));
-#ifdef MISSIONPACK
 		trap_AddCommand(Com_LocalClientCvarName(i, "vsay"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "vsay_team"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "vtell"));
@@ -879,12 +868,10 @@ void CG_InitConsoleCommands( void ) {
 		trap_AddCommand(Com_LocalClientCvarName(i, "vosay_team"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "votell"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "vtaunt"));
-#endif
 		trap_AddCommand(Com_LocalClientCvarName(i, "give"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "god"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "notarget"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "noclip"));
-		trap_AddCommand(Com_LocalClientCvarName(i, "where"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "kill"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "teamtask"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "levelshot"));

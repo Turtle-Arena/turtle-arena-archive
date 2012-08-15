@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -747,7 +739,7 @@ bot_synonymlist_t *BotLoadSynonyms(char *filename)
 					} //end while
 					if (numsynonyms < 2)
 					{
-						SourceError(source, "synonym must have at least two entries");
+						SourceError(source, "synonym must have at least two entries\n");
 						FreeSource(source);
 						return NULL;
 					} //end if
@@ -899,7 +891,7 @@ int BotLoadChatMessage(source_t *source, char *chatmessagestring)
 			StripDoubleQuotes(token.string);
 			if (strlen(ptr) + strlen(token.string) + 1 > MAX_MESSAGE_SIZE)
 			{
-				SourceError(source, "chat message too long");
+				SourceError(source, "chat message too long\n");
 				return qfalse;
 			} //end if
 			strcat(ptr, token.string);
@@ -909,7 +901,7 @@ int BotLoadChatMessage(source_t *source, char *chatmessagestring)
 		{
 			if (strlen(ptr) + 7 > MAX_MESSAGE_SIZE)
 			{
-				SourceError(source, "chat message too long");
+				SourceError(source, "chat message too long\n");
 				return qfalse;
 			} //end if
 			sprintf(&ptr[strlen(ptr)], "%cv%ld%c", ESCAPE_CHAR, token.intvalue, ESCAPE_CHAR);
@@ -919,14 +911,14 @@ int BotLoadChatMessage(source_t *source, char *chatmessagestring)
 		{
 			if (strlen(ptr) + 7 > MAX_MESSAGE_SIZE)
 			{
-				SourceError(source, "chat message too long");
+				SourceError(source, "chat message too long\n");
 				return qfalse;
 			} //end if
 			sprintf(&ptr[strlen(ptr)], "%cr%s%c", ESCAPE_CHAR, token.string, ESCAPE_CHAR);
 		} //end else if
 		else
 		{
-			SourceError(source, "unknown message component %s", token.string);
+			SourceError(source, "unknown message component %s\n", token.string);
 			return qfalse;
 		} //end else
 		if (PC_CheckTokenString(source, ";")) break;
@@ -1183,14 +1175,14 @@ bot_matchpiece_t *BotLoadMatchPieces(source_t *source, char *endtoken)
 		{
 			if (token.intvalue >= MAX_MATCHVARIABLES)
 			{
-				SourceError(source, "can't have more than %d match variables", MAX_MATCHVARIABLES);
+				SourceError(source, "can't have more than %d match variables\n", MAX_MATCHVARIABLES);
 				FreeSource(source);
 				BotFreeMatchPieces(firstpiece);
 				return NULL;
 			} //end if
 			if (lastwasvariable)
 			{
-				SourceError(source, "not allowed to have adjacent variables");
+				SourceError(source, "not allowed to have adjacent variables\n");
 				FreeSource(source);
 				BotFreeMatchPieces(firstpiece);
 				return NULL;
@@ -1246,7 +1238,7 @@ bot_matchpiece_t *BotLoadMatchPieces(source_t *source, char *endtoken)
 		} //end if
 		else
 		{
-			SourceError(source, "invalid token %s", token.string);
+			SourceError(source, "invalid token %s\n", token.string);
 			FreeSource(source);
 			BotFreeMatchPieces(firstpiece);
 			return NULL;
@@ -1306,7 +1298,7 @@ bot_matchtemplate_t *BotLoadMatchTemplates(char *matchfile)
 	{
 		if (token.type != TT_NUMBER || !(token.subtype & TT_INTEGER))
 		{
-			SourceError(source, "expected integer, found %s", token.string);
+			SourceError(source, "expected integer, found %s\n", token.string);
 			BotFreeMatchTemplates(matches);
 			FreeSource(source);
 			return NULL;
@@ -2088,7 +2080,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 					return NULL;
 				} //end if
 				StripDoubleQuotes(token.string);
-				//after the chat name we expect an opening brace
+				//after the chat name we expect a opening brace
 				if (!PC_ExpectTokenString(source, "{"))
 				{
 					FreeSource(source);
@@ -2109,7 +2101,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 						if (!strcmp(token.string, "}")) break;
 						if (strcmp(token.string, "type"))
 						{
-							SourceError(source, "expected type found %s", token.string);
+							SourceError(source, "expected type found %s\n", token.string);
 							FreeSource(source);
 							return NULL;
 						} //end if
@@ -2180,7 +2172,7 @@ bot_chat_t *BotLoadInitialChat(char *chatfile, char *chatname)
 			} //end if
 			else
 			{
-				SourceError(source, "unknown definition %s", token.string);
+				SourceError(source, "unknown definition %s\n", token.string);
 				FreeSource(source);
 				return NULL;
 			} //end else

@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -63,9 +55,11 @@ GAME OPTIONS MENU
 #define ID_DRAWTEAMOVERLAY		136
 #define ID_ALLOWDOWNLOAD			137
 #define ID_SPLITVERTICAL		138
-#define ID_ATMEFFECTS			139
-#define ID_BACK					140
+#define ID_BACK					139
 
+#ifdef TA_ATMEFFECTSYS
+#define ID_ATMEFFECTS			140
+#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 #define ID_SHOWBLOOD			141
@@ -107,7 +101,9 @@ typedef struct {
 	menulist_s			drawteamoverlay;
 	menuradiobutton_s	allowdownload;
 	menulist_s			splitvertical;
+#ifdef TA_ATMEFFECTSYS
 	menulist_s			atmeffects;
+#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	menuradiobutton_s	showblood;
@@ -141,6 +137,7 @@ static const char *splitvertical_names[] =
 	NULL
 };
 
+#ifdef TA_ATMEFFECTSYS
 static const char *atmeffects_names[] =
 {
 	"off",
@@ -148,6 +145,7 @@ static const char *atmeffects_names[] =
 	"high",
 	NULL
 };
+#endif
 
 static void Preferences_SetMenuItems( void ) {
 #ifndef TURTLEARENA
@@ -170,13 +168,13 @@ static void Preferences_SetMenuItems( void ) {
 	s_preferences.drawteamoverlay.curvalue	= Com_Clamp( 0, 3, trap_Cvar_VariableValue( "cg_drawTeamOverlay" ) );
 	s_preferences.allowdownload.curvalue	= trap_Cvar_VariableValue( "cl_allowDownload" ) != 0;
 	s_preferences.splitvertical.curvalue	= trap_Cvar_VariableValue( "cg_splitviewVertical" ) != 0;
-
+#ifdef TA_ATMEFFECTSYS
 	s_preferences.atmeffects.curvalue		= 2*trap_Cvar_VariableValue( "cg_atmosphericEffects" );
 	if (s_preferences.atmeffects.curvalue < 0)
 		s_preferences.atmeffects.curvalue = 0;
 	else if (s_preferences.atmeffects.curvalue > 2)
 		s_preferences.atmeffects.curvalue = 2;
-
+#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	s_preferences.showblood.curvalue	= trap_Cvar_VariableValue( "com_blood" ) != 0;
@@ -254,9 +252,11 @@ static void Preferences_Event( void* ptr, int notification ) {
 		trap_Cvar_SetValue( "cg_splitviewVertical", s_preferences.splitvertical.curvalue );
 		break;
 
+#ifdef TA_ATMEFFECTSYS
 	case ID_ATMEFFECTS:
 		trap_Cvar_SetValue( "cg_atmosphericEffects", (float)s_preferences.atmeffects.curvalue/2.0f );
 		break;
+#endif
 
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
@@ -486,6 +486,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.splitvertical.generic.y			= y;
 	s_preferences.splitvertical.itemnames			= splitvertical_names;
 
+#ifdef TA_ATMEFFECTSYS
 	y += BIGCHAR_HEIGHT+2;
 	s_preferences.atmeffects.generic.type		= MTYPE_SPINCONTROL;
 	s_preferences.atmeffects.generic.name		= "Snow/Rain:";
@@ -495,6 +496,7 @@ static void Preferences_MenuInit( void ) {
 	s_preferences.atmeffects.generic.x			= PREFERENCES_X_POS;
 	s_preferences.atmeffects.generic.y			= y;
 	s_preferences.atmeffects.itemnames			= atmeffects_names;
+#endif
 
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
@@ -551,7 +553,9 @@ static void Preferences_MenuInit( void ) {
 	Menu_AddItem( &s_preferences.menu, &s_preferences.drawteamoverlay );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.allowdownload );
 	Menu_AddItem( &s_preferences.menu, &s_preferences.splitvertical );
+#ifdef TA_ATMEFFECTSYS
 	Menu_AddItem( &s_preferences.menu, &s_preferences.atmeffects );
+#endif
 #ifdef IOQ3ZTM // CONTENT_FILTERING
 #ifndef NOBLOOD
 	Menu_AddItem( &s_preferences.menu, &s_preferences.showblood );

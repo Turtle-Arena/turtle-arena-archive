@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -49,14 +41,13 @@ int PASSFLOAT( float x ) {
 	return fi.i;
 }
 
-void	trap_Print( const char *text ) {
-	syscall( G_PRINT, text );
+void	trap_Printf( const char *fmt ) {
+	syscall( G_PRINT, fmt );
 }
 
-void trap_Error( const char *text )
+void trap_Error(const char *fmt)
 {
-	syscall( G_ERROR, text );
-	// shut up GCC warning about returning functions, because we know better
+	syscall(G_ERROR, fmt);
 	exit(1);
 }
 
@@ -236,6 +227,7 @@ int trap_RealTime( qtime_t *qtime ) {
 
 void trap_SnapVector( float *v ) {
 	syscall( G_SNAPVECTOR, v );
+	return;
 }
 
 #ifdef TA_GAME_MODELS
@@ -275,14 +267,6 @@ void trap_R_MakeSkeletonAbsolute(const refSkeleton_t *in, refSkeleton_t *out)
 }
 #endif
 #endif
-
-void trap_AddCommand( const char *cmdName ) {
-	syscall( G_ADDCOMMAND, cmdName );
-}
-
-void trap_RemoveCommand( const char *cmdName ) {
-	syscall( G_REMOVECOMMAND, cmdName );
-}
 
 // BotLib traps start here
 int trap_BotLibSetup( void ) {
@@ -403,10 +387,6 @@ int trap_AAS_IntForBSPEpairKey(int ent, char *key, int *value) {
 
 int trap_AAS_AreaReachability(int areanum) {
 	return syscall( BOTLIB_AAS_AREA_REACHABILITY, areanum );
-}
-
-int trap_AAS_BestReachableArea(vec3_t origin, vec3_t mins, vec3_t maxs, vec3_t goalorigin) {
-	return syscall( BOTLIB_AAS_BEST_REACHABLE_AREA, origin, mins, maxs, goalorigin );
 }
 
 int trap_AAS_AreaTravelTimeToGoalArea(int areanum, vec3_t origin, int goalareanum, int travelflags) {

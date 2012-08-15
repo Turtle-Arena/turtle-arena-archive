@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -248,7 +240,11 @@ static void CG_General( centity_t *cent ) {
 
 	// player model
 	if (s1->number == cg.cur_ps->clientNum) {
+#ifdef IOQ3ZTM // RENDERFLAGS
 		ent.renderfx |= RF_ONLY_MIRROR;
+#else
+		ent.renderfx |= RF_THIRD_PERSON;	// only draw from mirrors
+#endif
 	}
 
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Rotate Team Arena protals.
@@ -492,8 +488,8 @@ static void CG_MiscObject( centity_t *cent ) {
 	// Flags for only drawing or not drawing a object in mirrors
 	if (s1->eFlags & EF_ONLY_MIRROR) {
 		ent.renderfx |= RF_ONLY_MIRROR;
-	} else if (s1->eFlags & EF_NO_MIRROR) {
-		ent.renderfx |= RF_NO_MIRROR;
+	} else if (s1->eFlags & EF_NOT_MIRROR) {
+		ent.renderfx |= RF_NOT_MIRROR;
 	}
 
 	// add to refresh list
@@ -671,8 +667,8 @@ static void CG_Item( centity_t *cent ) {
 		// Flags for only drawing or not drawing a object in mirrors
 		if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
 			ent.renderfx |= RF_ONLY_MIRROR;
-		} else if (cent->currentState.eFlags & EF_NO_MIRROR) {
-			ent.renderfx |= RF_NO_MIRROR;
+		} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
+			ent.renderfx |= RF_NOT_MIRROR;
 		}
 #endif
 
@@ -842,8 +838,8 @@ static void CG_Item( centity_t *cent ) {
 	// Flags for only drawing or not drawing a object in mirrors
 	if (cent->currentState.eFlags & EF_ONLY_MIRROR) {
 		ent.renderfx |= RF_ONLY_MIRROR;
-	} else if (cent->currentState.eFlags & EF_NO_MIRROR) {
-		ent.renderfx |= RF_NO_MIRROR;
+	} else if (cent->currentState.eFlags & EF_NOT_MIRROR) {
+		ent.renderfx |= RF_NOT_MIRROR;
 	}
 #endif
 
@@ -1450,21 +1446,20 @@ CG_AdjustPositionForMover
 Also called by client movement prediction code
 =========================
 */
-void CG_AdjustPositionForMover(const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out, vec3_t angles_in, vec3_t angles_out) {
+void CG_AdjustPositionForMover( const vec3_t in, int moverNum, int fromTime, int toTime, vec3_t out ) {
 	centity_t	*cent;
 	vec3_t	oldOrigin, origin, deltaOrigin;
-	vec3_t	oldAngles, angles, deltaAngles;
+	vec3_t	oldAngles, angles;
+	//vec3_t	deltaAngles;
 
 	if ( moverNum <= 0 || moverNum >= ENTITYNUM_MAX_NORMAL ) {
 		VectorCopy( in, out );
-		VectorCopy(angles_in, angles_out);
 		return;
 	}
 
 	cent = &cg_entities[ moverNum ];
 	if ( cent->currentState.eType != ET_MOVER ) {
 		VectorCopy( in, out );
-		VectorCopy(angles_in, angles_out);
 		return;
 	}
 
@@ -1475,10 +1470,10 @@ void CG_AdjustPositionForMover(const vec3_t in, int moverNum, int fromTime, int 
 	BG_EvaluateTrajectory( &cent->currentState.apos, toTime, angles );
 
 	VectorSubtract( origin, oldOrigin, deltaOrigin );
-	VectorSubtract( angles, oldAngles, deltaAngles );
+	//VectorSubtract( angles, oldAngles, deltaAngles );
 
 	VectorAdd( in, deltaOrigin, out );
-	VectorAdd( angles_in, deltaAngles, angles_out );
+
 	// FIXME: origin change when on a rotating object
 }
 
@@ -1563,7 +1558,7 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	if ( i == MAX_SPLITVIEW ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
-		cg.snap->serverTime, cg.time, cent->lerpOrigin, cent->lerpAngles, cent->lerpAngles);
+		cg.snap->serverTime, cg.time, cent->lerpOrigin );
 	}
 }
 
@@ -1788,7 +1783,7 @@ static void CG_AddCEntity( centity_t *cent ) {
 
 	switch ( cent->currentState.eType ) {
 	default:
-		CG_Error( "Bad entity type: %i", cent->currentState.eType );
+		CG_Error( "Bad entity type: %i\n", cent->currentState.eType );
 		break;
 	case ET_INVISIBLE:
 	case ET_PUSH_TRIGGER:

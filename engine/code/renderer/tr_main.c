@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 // tr_main.c -- main control flow for each frame
@@ -1259,7 +1251,6 @@ R_AddEntitySurfaces
 void R_AddEntitySurfaces (void) {
 	trRefEntity_t	*ent;
 	shader_t		*shader;
-	qboolean		onlyRenderShadows;
 
 	if ( !r_drawentities->integer ) {
 		return;
@@ -1275,29 +1266,37 @@ void R_AddEntitySurfaces (void) {
 		// preshift the value we are going to OR into the drawsurf sort
 		tr.shiftedEntityNum = tr.currentEntityNum << QSORT_ENTITYNUM_SHIFT;
 
+#ifdef IOQ3ZTM // RENDERFLAGS
+		//
+		// Check the flags to see if we should draw the model.
+		//
+
+		// Skip entities that are only draw in mirrors when not rendering mirror/portal
+		// Don't skip player model when "cg_shadows" is 3 as the shadow can be 
+
+		// If only mirror and not rendering mirror
+		//   and not (player model and shadows 3)
+		if (((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal)
+			&& !(ent->e.reType == RT_MODEL && (ent->e.renderfx & RF_SHADOW_PLANE)))
+		{
+			continue;
+		}
+#endif
+
 		//
 		// the weapon model must be handled special --
 		// we don't want the hacked weapon position showing in 
 		// mirrors, because the true body position will already be drawn
 		//
-		if ((ent->e.renderfx & RF_NO_MIRROR) && tr.viewParms.isPortal) {
+#ifdef IOQ3ZTM // RENDERFLAGS
+		if ((ent->e.renderfx & RF_NOT_MIRROR) && tr.viewParms.isPortal) {
 			continue;
 		}
-
-		onlyRenderShadows = qfalse;
-
-		//
-		// the player model must be handled special --
-		// we only want the player model shown in mirrors in first person mode,
-		// but may need to render shadow.
-		//
-		if ((ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
-			if (ent->e.reType == RT_MODEL && (ent->e.renderfx & RF_SHADOW_PLANE)) {
-				onlyRenderShadows = qtrue;
-			} else {
-				continue;
-			}
+#else
+		if ( (ent->e.renderfx & RF_FIRST_PERSON) && tr.viewParms.isPortal) {
+			continue;
 		}
+#endif
 
 		// simple generated models, like sprites and beams, are not culled
 		switch ( ent->e.reType ) {
@@ -1308,6 +1307,14 @@ void R_AddEntitySurfaces (void) {
 		case RT_LIGHTNING:
 		case RT_RAIL_CORE:
 		case RT_RAIL_RINGS:
+#ifndef IOQ3ZTM // RENDERFLAGS
+			// self blood sprites, talk balloons, etc should not be drawn in the primary
+			// view.  We can't just do this check for all entities, because md3
+			// entities may still want to cast shadows from them
+			if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
+				continue;
+			}
+#endif
 			shader = R_GetShaderByHandle( ent->e.customShader );
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 			R_AddDrawSurf( &entitySurface, shader, R_SpriteFogNum( ent ), 0, R_SortOrder(ent) );
@@ -1328,18 +1335,16 @@ void R_AddEntitySurfaces (void) {
 				R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0 );
 #endif
 			} else {
-				// Check if model format doesn't support only rendering shadows
-				if (onlyRenderShadows && (tr.currentModel->type == MOD_BAD
-					|| tr.currentModel->type == MOD_BRUSH
-					|| tr.currentModel->type == MOD_MD4)) {
-					break;
-				}
-
 				switch ( tr.currentModel->type ) {
 				case MOD_MESH:
 					R_AddMD3Surfaces( ent );
 					break;
 				case MOD_MD4:
+#ifdef IOQ3ZTM // RENDERFLAGS
+					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+						break;
+					}
+#endif
 					R_AddAnimSurfaces( ent );
 					break;
 #ifdef RAVENMD4
@@ -1351,9 +1356,23 @@ void R_AddEntitySurfaces (void) {
 					R_AddIQMSurfaces( ent );
 					break;
 				case MOD_BRUSH:
+#ifdef IOQ3ZTM // RENDERFLAGS
+					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+						break;
+					}
+#endif
 					R_AddBrushModelSurfaces( ent );
 					break;
 				case MOD_BAD:		// null model axis
+#ifdef IOQ3ZTM // RENDERFLAGS
+					if ( (ent->e.renderfx & RF_ONLY_MIRROR) && !tr.viewParms.isPortal) {
+						break;
+					}
+#else
+					if ( (ent->e.renderfx & RF_THIRD_PERSON) && !tr.viewParms.isPortal) {
+						break;
+					}
+#endif
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
 					R_AddDrawSurf( &entitySurface, tr.defaultShader, 0, 0, R_SortOrder(ent) );
 #else

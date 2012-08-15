@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -158,6 +150,7 @@ struct gentity_s {
 
 	int			timestamp;		// body queue sinking, etc
 
+	float		angle;			// set in editor, -1 = up, -2 = down
 	char		*target;
 #ifdef TA_ENTSYS
 	char		*paintarget;
@@ -271,6 +264,11 @@ typedef struct {
 	float		flagsince;
 	float		lastfraggedcarrier;
 } playerTeamState_t;
+
+// the auto following clients don't follow a specific client
+// number, but instead follow the first two active players
+#define	FOLLOW_ACTIVE1	-1
+#define	FOLLOW_ACTIVE2	-2
 
 // client data that stays across multiple levels or tournament restarts
 // this is achieved by writing all the data to cvar strings at game shutdown
@@ -630,6 +628,7 @@ void	G_FreeEntity( gentity_t *e );
 qboolean	G_EntitiesFree( void );
 
 void	G_TouchTriggers (gentity_t *ent);
+void	G_TouchSolids (gentity_t *ent);
 
 float	*tv (float x, float y, float z);
 char	*vtos( const vec3_t v );
@@ -786,6 +785,8 @@ gentity_t *SelectSpawnPoint (vec3_t avoidPoint, vec3_t origin, vec3_t angles, qb
 void CopyToBodyQue( gentity_t *ent );
 void ClientRespawn(gentity_t *ent);
 void BeginIntermission (void);
+void InitClientPersistant (gclient_t *client);
+void InitClientResp (gclient_t *client);
 void InitBodyQue (void);
 void ClientSpawn( gentity_t *ent, qboolean firstTime );
 void player_die (gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
@@ -810,8 +811,6 @@ void G_DeNiGHTSizePlayer( gentity_t *ent );
 // g_svcmds.c
 //
 qboolean	ConsoleCommand( void );
-void G_RegisterCommands( void );
-void G_UnregisterCommands( void );
 void G_ProcessIPBans(void);
 qboolean G_FilterPacket (char *from);
 
@@ -822,6 +821,13 @@ void FireWeapon( gentity_t *ent );
 #if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 void G_StartKamikaze( gentity_t *ent );
 #endif
+
+//
+// p_hud.c
+//
+void MoveClientToIntermission (gentity_t *client);
+void G_SetStats (gentity_t *ent);
+void DeathmatchScoreboardMessage (gentity_t *client);
 
 #ifdef TA_NPCSYS
 //
@@ -841,13 +847,15 @@ void G_SetMiscAnim(gentity_t *ent, int anim);
 //
 // g_cmds.c
 //
-void DeathmatchScoreboardMessage( gentity_t *ent );
-char *ConcatArgs( int start );
+
+//
+// g_pweapon.c
+//
+
 
 //
 // g_main.c
 //
-void MoveClientToIntermission( gentity_t *ent );
 void FindIntermissionPoint( void );
 void SetLeader(int team, int client);
 void CheckTeamLeader( int team );
@@ -1077,8 +1085,8 @@ extern	vmCvar_t	g_laserTag;
 extern	vmCvar_t	g_2dmode;
 #endif
 
-void	trap_Print( const char *text );
-void	trap_Error( const char *text ) __attribute__((noreturn));
+void	trap_Printf( const char *fmt );
+void trap_Error(const char *fmt) __attribute__((noreturn));
 int		trap_Milliseconds( void );
 int	trap_RealTime( qtime_t *qtime );
 int		trap_Argc( void );
@@ -1181,7 +1189,6 @@ int		trap_AAS_FloatForBSPEpairKey(int ent, char *key, float *value);
 int		trap_AAS_IntForBSPEpairKey(int ent, char *key, int *value);
 
 int		trap_AAS_AreaReachability(int areanum);
-int		trap_AAS_BestReachableArea(vec3_t origin, vec3_t mins, vec3_t maxs, vec3_t goalorigin);
 
 int		trap_AAS_AreaTravelTimeToGoalArea(int areanum, vec3_t origin, int goalareanum, int travelflags);
 int		trap_AAS_EnableRoutingArea( int areanum, int enable );
@@ -1318,5 +1325,3 @@ int		trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *paren
 
 void	trap_SnapVector( float *v );
 
-void	trap_AddCommand( const char *cmdName );
-void	trap_RemoveCommand( const char *cmdName );

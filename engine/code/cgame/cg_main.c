@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -196,10 +188,8 @@ vmCvar_t	cg_drawTeamOverlay;
 vmCvar_t	cg_teamOverlayUserinfo;
 vmCvar_t	cg_drawFriend;
 vmCvar_t	cg_teamChatsOnly;
-#ifdef MISSIONPACK
 vmCvar_t	cg_noVoiceChats;
 vmCvar_t	cg_noVoiceText;
-#endif
 vmCvar_t	cg_hudFiles;
 vmCvar_t 	cg_scorePlum;
 vmCvar_t 	cg_smoothClients;
@@ -223,7 +213,6 @@ vmCvar_t	cg_oldRail;
 vmCvar_t	cg_oldRocket;
 vmCvar_t	cg_oldPlasma;
 vmCvar_t	cg_trueLightning;
-vmCvar_t	cg_atmosphericEffects;
 
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 vmCvar_t 	cg_redTeamName;
@@ -252,6 +241,9 @@ vmCvar_t	cg_impactDebris;
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 vmCvar_t	cg_laserTag;
+#endif
+#ifdef TA_ATMEFFECTSYS
+vmCvar_t	cg_atmosphericEffects;
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 vmCvar_t	cg_2dmode;
@@ -413,10 +405,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_stats, "cg_stats", "0", 0 },
 	{ &cg_drawFriend, "cg_drawFriend", "1", CVAR_ARCHIVE },
 	{ &cg_teamChatsOnly, "cg_teamChatsOnly", "0", CVAR_ARCHIVE },
-#ifdef MISSIONPACK
 	{ &cg_noVoiceChats, "cg_noVoiceChats", "0", CVAR_ARCHIVE },
 	{ &cg_noVoiceText, "cg_noVoiceText", "0", CVAR_ARCHIVE },
-#endif
 	// the following variables are created in other parts of the system,
 	// but we also reference them here
 	{ &cg_buildScript, "com_buildScript", "0", 0 },	// force loading of all possible data amd error on failures
@@ -481,8 +471,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_oldRocket, "cg_oldRocket", "1", CVAR_ARCHIVE},
 	{ &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE},
 #endif
-	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
-	{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
+	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE}
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}
@@ -492,6 +481,9 @@ static cvarTable_t cvarTable[] = {
 #endif
 #ifdef IOQ3ZTM // LASERTAG
 	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }
+#endif
+#ifdef TA_ATMEFFECTSYS
+	,{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
 #endif
 #ifdef TA_PATHSYS // 2DMODE
 	,{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO}
@@ -661,7 +653,7 @@ void QDECL Com_Error( int level, const char *error, ... ) {
 	Q_vsnprintf (text, sizeof(text), error, argptr);
 	va_end (argptr);
 
-	trap_Error( text );
+	CG_Error( "%s", text);
 }
 
 void QDECL Com_Printf( const char *msg, ... ) {
@@ -672,7 +664,7 @@ void QDECL Com_Printf( const char *msg, ... ) {
 	Q_vsnprintf (text, sizeof(text), msg, argptr);
 	va_end (argptr);
 
-	trap_Print( text );
+	CG_Printf ("%s", text);
 }
 
 void QDECL Com_DPrintf( const char *msg, ... ) {
@@ -1992,13 +1984,13 @@ void CG_LoadMenus(const char *menuFile) {
 		Com_Printf( S_COLOR_YELLOW "menu file not found: %s, using default\n", menuFile );
 		len = trap_FS_FOpenFile( "ui/hud.txt", &f, FS_READ );
 		if (!f) {
-			CG_Error( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!" );
+			trap_Error( va( S_COLOR_RED "default menu file not found: ui/hud.txt, unable to continue!\n") );
 		}
 	}
 
 	if ( len >= MAX_MENUDEFFILE ) {
+		trap_Error( va( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i\n", menuFile, len, MAX_MENUDEFFILE ) );
 		trap_FS_FCloseFile( f );
-		CG_Error( S_COLOR_RED "menu file too large: %s is %i, max allowed is %i", menuFile, len, MAX_MENUDEFFILE );
 		return;
 	}
 
@@ -2489,10 +2481,10 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	// get the rendering configuration from the client system
 	trap_GetGlconfig( &cgs.glconfig );
-
-	// Viewport scale and offset
-	cgs.screenXScaleStretch = cgs.glconfig.vidWidth * (1.0/640.0);
-	cgs.screenYScaleStretch = cgs.glconfig.vidHeight * (1.0/480.0);
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	// ZTM: Don't strech HUD, make it a cvar?
+	cgs.screenXScaleFit = cgs.glconfig.vidWidth * (1.0/640.0);
+	cgs.screenYScaleFit = cgs.glconfig.vidHeight * (1.0/480.0);
 	if ( cgs.glconfig.vidWidth * 480 > cgs.glconfig.vidHeight * 640 ) {
 		cgs.screenXScale = cgs.glconfig.vidWidth * (1.0/640.0);
 		cgs.screenYScale = cgs.glconfig.vidHeight * (1.0/480.0);
@@ -2501,11 +2493,15 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 		cgs.screenXScale = cgs.screenYScale;
 	}
 	else {
-		cgs.screenXScale = cgs.screenXScaleStretch;
-		cgs.screenYScale = cgs.screenYScaleStretch;
+		cgs.screenXScale = cgs.screenXScaleFit;
+		cgs.screenYScale = cgs.screenYScaleFit;
 		// no wide screen
 		cgs.screenXBias = 0;
 	}
+#else
+	cgs.screenXScale = cgs.glconfig.vidWidth / 640.0;
+	cgs.screenYScale = cgs.glconfig.vidHeight / 480.0;
+#endif
 
 	// get the gamestate from the client system
 	trap_GetGameState( &cgs.gameState );

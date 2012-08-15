@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -374,11 +366,12 @@ static void SV_MapRestart_f( void ) {
 ==================
 SV_Kick_f
 
-Kick a user off of the server
+Kick a user off of the server  FIXME: move to game
 ==================
 */
 static void SV_Kick_f( void ) {
 	client_t	*cl;
+	int			i;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -387,111 +380,40 @@ static void SV_Kick_f( void ) {
 	}
 
 	if ( Cmd_Argc() != 2 ) {
-		Com_Printf ("Usage: kick <player name>\n");
+		Com_Printf ("Usage: kick <player name>\nkick all = kick everyone\nkick allbots = kick all bots\n");
 		return;
 	}
 
 	cl = SV_GetPlayerByHandle();
 	if ( !cl ) {
+		if ( !Q_stricmp(Cmd_Argv(1), "all") ) {
+			for ( i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
+				if ( !cl->state ) {
+					continue;
+				}
+				if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+					continue;
+				}
+				SV_DropClient( cl, "was kicked" );
+				cl->lastPacketTime = svs.time;	// in case there is a funny zombie
+			}
+		}
+		else if ( !Q_stricmp(Cmd_Argv(1), "allbots") ) {
+			for ( i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
+				if ( !cl->state ) {
+					continue;
+				}
+				if( cl->netchan.remoteAddress.type != NA_BOT ) {
+					continue;
+				}
+				SV_DropClient( cl, "was kicked" );
+				cl->lastPacketTime = svs.time;	// in case there is a funny zombie
+			}
+		}
 		return;
 	}
 	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
-		Com_Printf("Cannot kick host player\n");
-		return;
-	}
-
-	SV_DropClient( cl, "was kicked" );
-	cl->lastPacketTime = svs.time;	// in case there is a funny zombie
-}
-
-/*
-==================
-SV_KickBots_f
-
-Kick all bots off of the server
-==================
-*/
-static void SV_KickBots_f( void ) {
-	client_t	*cl;
-	int			i;
-
-	// make sure server is running
-	if( !com_sv_running->integer ) {
-		Com_Printf("Server is not running.\n");
-		return;
-	}
-
-	for( i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++ ) {
-		if( !cl->state ) {
-			continue;
-		}
-
-		if( cl->netchan.remoteAddress.type != NA_BOT ) {
-			continue;
-		}
-
-		SV_DropClient( cl, "was kicked" );
-		cl->lastPacketTime = svs.time; // in case there is a funny zombie
-	}
-}
-/*
-==================
-SV_KickAll_f
-
-Kick all users off of the server
-==================
-*/
-static void SV_KickAll_f( void ) {
-	client_t *cl;
-	int i;
-
-	// make sure server is running
-	if( !com_sv_running->integer ) {
-		Com_Printf( "Server is not running.\n" );
-		return;
-	}
-
-	for( i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++ ) {
-		if( !cl->state ) {
-			continue;
-		}
-
-		if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
-			continue;
-		}
-
-		SV_DropClient( cl, "was kicked" );
-		cl->lastPacketTime = svs.time; // in case there is a funny zombie
-	}
-}
-
-/*
-==================
-SV_KickNum_f
-
-Kick a user off of the server
-==================
-*/
-static void SV_KickNum_f( void ) {
-	client_t	*cl;
-
-	// make sure server is running
-	if ( !com_sv_running->integer ) {
-		Com_Printf( "Server is not running.\n" );
-		return;
-	}
-
-	if ( Cmd_Argc() != 2 ) {
-		Com_Printf ("Usage: %s <client number>\n", Cmd_Argv(0));
-		return;
-	}
-
-	cl = SV_GetPlayerByNum();
-	if ( !cl ) {
-		return;
-	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
-		Com_Printf("Cannot kick host player\n");
+		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
 		return;
 	}
 
@@ -992,6 +914,40 @@ static void SV_ExceptDel_f(void)
 }
 
 /*
+==================
+SV_KickNum_f
+
+Kick a user off of the server  FIXME: move to game
+==================
+*/
+static void SV_KickNum_f( void ) {
+	client_t	*cl;
+
+	// make sure server is running
+	if ( !com_sv_running->integer ) {
+		Com_Printf( "Server is not running.\n" );
+		return;
+	}
+
+	if ( Cmd_Argc() != 2 ) {
+		Com_Printf ("Usage: kicknum <client number>\n");
+		return;
+	}
+
+	cl = SV_GetPlayerByNum();
+	if ( !cl ) {
+		return;
+	}
+	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+		SV_SendServerCommand(NULL, "print \"%s\"", "Cannot kick host player\n");
+		return;
+	}
+
+	SV_DropClient( cl, "was kicked" );
+	cl->lastPacketTime = svs.time;	// in case there is a funny zombie
+}
+
+/*
 ================
 SV_Status_f
 ================
@@ -1181,7 +1137,7 @@ static void SV_Systeminfo_f( void ) {
 ===========
 SV_DumpUser_f
 
-Examine all a users info strings
+Examine all a users info strings FIXME: move to game
 ===========
 */
 static void SV_DumpUser_f( void ) {
@@ -1436,9 +1392,7 @@ void SV_AddOperatorCommands( void ) {
 
 	Cmd_AddCommand ("heartbeat", SV_Heartbeat_f);
 	Cmd_AddCommand ("kick", SV_Kick_f);
-	Cmd_AddCommand ("kickbots", SV_KickBots_f);
-	Cmd_AddCommand ("kickall", SV_KickAll_f);
-	Cmd_AddCommand ("kicknum", SV_KickNum_f);
+	Cmd_AddCommand ("clientkick", SV_KickNum_f);
 	Cmd_AddCommand ("status", SV_Status_f);
 	Cmd_AddCommand ("serverinfo", SV_Serverinfo_f);
 	Cmd_AddCommand ("systeminfo", SV_Systeminfo_f);
@@ -1484,9 +1438,6 @@ void SV_RemoveOperatorCommands( void ) {
 	// removing these won't let the server start again
 	Cmd_RemoveCommand ("heartbeat");
 	Cmd_RemoveCommand ("kick");
-	Cmd_RemoveCommand ("kicknum");
-	Cmd_RemoveCommand ("kickall");
-	Cmd_RemoveCommand ("kickbots");
 	Cmd_RemoveCommand ("banUser");
 	Cmd_RemoveCommand ("banClient");
 	Cmd_RemoveCommand ("status");

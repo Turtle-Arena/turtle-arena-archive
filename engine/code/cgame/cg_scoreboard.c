@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -346,7 +338,7 @@ qboolean CG_DrawOldScoreboard( void ) {
 	int lineHeight;
 	int topBorderSize, bottomBorderSize;
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_HudPlacement(HUD_CENTER);
 
 	// don't draw amuthing if the menu or console is up
 	if ( cg_paused.integer ) {
@@ -574,8 +566,6 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	int				y;
 	int				i;
 
-	CG_SetScreenPlacement(PLACE_CENTER);
-
 	// request more scores regularly
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		cg.scoresRequestTime = cg.time;
@@ -585,9 +575,11 @@ void CG_DrawOldTourneyScoreboard( void ) {
 	// draw the dialog background
 	color[0] = color[1] = color[2] = 0;
 	color[3] = 1;
-	CG_SetScreenPlacement(PLACE_STRETCH);
+#ifdef IOQ3ZTM // HUD_ASPECT_CORRECT
+	CG_FillRectFit( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
+#else
 	CG_FillRect( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color );
-	CG_PopScreenPlacement();
+#endif
 
 	color[0] = 1;
 	color[1] = 1;

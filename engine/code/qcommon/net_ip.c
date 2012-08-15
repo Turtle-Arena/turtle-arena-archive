@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -742,7 +734,6 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 		return;
 #else
 	if( (ip_socket == INVALID_SOCKET && to.type == NA_IP) ||
-		(ip_socket == INVALID_SOCKET && to.type == NA_BROADCAST) ||
 		(ip6_socket == INVALID_SOCKET && to.type == NA_IP6) ||
 		(ip6_socket == INVALID_SOCKET && to.type == NA_MULTICAST6) )
 		return;
@@ -787,7 +778,7 @@ void Sys_SendPacket( int length, const void *data, netadr_t to ) {
 			return;
 		}
 
-		Com_Printf( "Sys_SendPacket: %s\n", NET_ErrorString() );
+		Com_Printf( "NET_SendPacket: %s\n", NET_ErrorString() );
 	}
 }
 
@@ -1675,7 +1666,7 @@ void NET_Config( qboolean enableNetworking ) {
 		}
 
 #ifndef __wii__
-		if(multicast6_socket != INVALID_SOCKET)
+		if(multicast6_socket)
 		{
 			if(multicast6_socket != ip6_socket)
 				closesocket(multicast6_socket);
@@ -1795,7 +1786,7 @@ void NET_Event(fd_set *fdr)
 				// com_dropsim->value percent of incoming packets get dropped.
 				if(rand() < (int) (((double) RAND_MAX) / 100.0 * (double) net_dropsim->value))
 					continue;          // drop this packet
-			}
+                        }
 
 			if(com_sv_running->integer)
 				Com_RunAndTimeServerPacket(&from, &netmsg);
@@ -1818,8 +1809,7 @@ void NET_Sleep(int msec)
 {
 	struct timeval timeout;
 	fd_set fdr;
-	int retval;
-	SOCKET highestfd = INVALID_SOCKET;
+	int highestfd = -1, retval;
 
 	if(msec < 0)
 		msec = 0;
@@ -1836,14 +1826,17 @@ void NET_Sleep(int msec)
 	if(ip6_socket != INVALID_SOCKET)
 	{
 		FD_SET(ip6_socket, &fdr);
-
-		if(highestfd == INVALID_SOCKET || ip6_socket > highestfd)
+		
+		if(ip6_socket > highestfd)
 			highestfd = ip6_socket;
 	}
 #endif
 
+	timeout.tv_sec = msec/1000;
+	timeout.tv_usec = (msec%1000)*1000;
+	
 #ifdef _WIN32
-	if(highestfd == INVALID_SOCKET)
+	if(highestfd < 0)
 	{
 		// windows ain't happy when select is called without valid FDs
 		SleepEx(msec, 0);
@@ -1851,12 +1844,9 @@ void NET_Sleep(int msec)
 	}
 #endif
 
-	timeout.tv_sec = msec/1000;
-	timeout.tv_usec = (msec%1000)*1000;
-
 	retval = select(highestfd + 1, &fdr, NULL, NULL, &timeout);
-
-	if(retval == SOCKET_ERROR)
+	
+	if(retval < 0)
 #ifdef __wii__ // ZTM: FIXME: ?
 		;
 #else

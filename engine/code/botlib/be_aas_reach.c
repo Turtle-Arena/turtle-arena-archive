@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -420,7 +412,7 @@ int AAS_BestReachableArea(vec3_t origin, vec3_t mins, vec3_t maxs, vec3_t goalor
 		else
 		{
 			//it can very well happen that the AAS_PointAreaNum function tells that
-			//a point is in an area and that starting an AAS_TraceClientBBox from that
+			//a point is in an area and that starting a AAS_TraceClientBBox from that
 			//point will return trace.startsolid qtrue
 #if 0
 			if (AAS_PointAreaNum(start))
@@ -498,7 +490,7 @@ aas_lreachability_t *AAS_AllocReachability(void)
 
 	if (!nextreachability) return NULL;
 	//make sure the error message only shows up once
-	if (!nextreachability->next) AAS_Error("AAS_MAX_REACHABILITYSIZE\n");
+	if (!nextreachability->next) AAS_Error("AAS_MAX_REACHABILITYSIZE");
 	//
 	r = nextreachability;
 	nextreachability = nextreachability->next;
@@ -531,7 +523,7 @@ int AAS_AreaReachability(int areanum)
 {
 	if (areanum < 0 || areanum >= aasworld.numareas)
 	{
-		AAS_Error("AAS_AreaReachability: areanum %d out of range\n", areanum);
+		AAS_Error("AAS_AreaReachability: areanum %d out of range", areanum);
 		return 0;
 	} //end if
 	return aasworld.areasettings[areanum].numreachableareas;
@@ -856,7 +848,7 @@ int AAS_Reachability_Swim(int area1num, int area2num)
 	area1 = &aasworld.areas[area1num];
 	area2 = &aasworld.areas[area2num];
 
-	//if the areas are not near enough
+	//if the areas are not near anough
 	for (i = 0; i < 3; i++)
 	{
 		if (area1->mins[i] > area2->maxs[i] + 10) return qfalse;
@@ -931,7 +923,7 @@ int AAS_Reachability_EqualFloorHeight(int area1num, int area2num)
 
 	area1 = &aasworld.areas[area1num];
 	area2 = &aasworld.areas[area2num];
-	//if the areas are not near enough in the x-y direction
+	//if the areas are not near anough in the x-y direction
 	for (i = 0; i < 2; i++)
 	{
 		if (area1->mins[i] > area2->maxs[i] + 10) return qfalse;
@@ -1093,7 +1085,7 @@ int AAS_Reachability_Step_Barrier_WaterJump_WalkOffLedge(int area1num, int area2
 	area2 = &aasworld.areas[area2num];
 	//if the first area contains a liquid
 	area1swim = AAS_AreaSwim(area1num);
-	//if the areas are not near enough in the x-y direction
+	//if the areas are not near anough in the x-y direction
 	for (i = 0; i < 2; i++)
 	{
 		if (area1->mins[i] > area2->maxs[i] + 10) return qfalse;
@@ -2139,7 +2131,7 @@ int AAS_Reachability_Jump(int area1num, int area2num)
 	//maximum height a player can jump with the given initial z velocity
 	maxjumpheight = AAS_MaxJumpHeight(phys_jumpvel);
 
-	//if the areas are not near enough in the x-y direction
+	//if the areas are not near anough in the x-y direction
 	for (i = 0; i < 2; i++)
 	{
 		if (area1->mins[i] > area2->maxs[i] + maxjumpdistance) return qfalse;

@@ -5,7 +5,7 @@
 #
 
 # ioq3ztm svn version that this is based on
-IOQ3ZTM_REVISION = 145
+IOQ3ZTM_REVISION = 113
 
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
@@ -139,6 +139,9 @@ BUILD_DEFINES += -DTURTLEARENA -DTA_MISC -DTA_SP \
 DED_USE_MODELS=1
 BUILD_DEFINES += -DTA_GAME_MODELS
 
+# Turtle Arena's intro video will be ogg theora
+USE_CODEC_THEORA=1
+
 # Turtle Arena currently just keeps renderer internal
 ifneq ($(USE_RENDERER_DLOPEN), 1)
 	USE_RENDERER_DLOPEN=0
@@ -183,7 +186,7 @@ endif
 export CROSS_COMPILING
 
 ifndef VERSION
-VERSION=0.6
+VERSION=0.6.1
 endif
 
 ifndef CLIENTBIN
@@ -289,14 +292,6 @@ endif
 
 ifndef USE_INTERNAL_FREETYPE
 USE_INTERNAL_FREETYPE=1
-endif
-
-ifndef USE_INTERNAL_OGG
-USE_INTERNAL_OGG=1
-endif
-
-ifndef USE_INTERNAL_VORBIS
-USE_INTERNAL_VORBIS=1
 endif
 
 ifndef USE_LOCAL_HEADERS
@@ -489,6 +484,9 @@ ifneq (,$(findstring "$(PLATFORM)", "linux" "gnu_kfreebsd" "kfreebsd-gnu"))
     endif
   endif
 
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
   ifeq ($(USE_CODEC_THEORA),1)
     CLIENT_LIBS += -ltheora
   endif
@@ -563,6 +561,9 @@ ifeq ($(PLATFORM),darwin)
     BASE_CFLAGS += $(FREETYPE_CFLAGS)
   endif
 
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
   ifeq ($(USE_CODEC_THEORA),1)
     CLIENT_LIBS += -ltheora
   endif
@@ -704,6 +705,13 @@ ifeq ($(PLATFORM),mingw32)
     endif
 
     # Extra libs, easier to just include in source tree
+    ifeq ($(USE_CODEC_VORBIS),1)
+      CLIENT_CFLAGS += -I$(OGGDIR)/include \
+                      -I$(VORBISDIR)/include
+      CLIENT_LIBS += $(WINLIBDIR)/libvorbisfile.a \
+                      $(WINLIBDIR)/libvorbis.a \
+                      $(WINLIBDIR)/libogg.a
+    endif
     ifeq ($(USE_CODEC_THEORA),1)
       CLIENT_CFLAGS += -I$(THEORADIR)/include
       CLIENT_LIBS += $(WINLIBDIR)/libtheora.a
@@ -715,6 +723,9 @@ ifeq ($(PLATFORM),mingw32)
     RENDERER_LIBS += $(SDL_LIBS)
     SDLDLL=SDL.dll
 
+    ifeq ($(USE_CODEC_VORBIS),1)
+      CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+    endif
     ifeq ($(USE_CODEC_THEORA),1)
       CLIENT_LIBS += -ltheora
     endif
@@ -764,6 +775,10 @@ ifeq ($(PLATFORM),freebsd)
     ifeq ($(USE_CURL_DLOPEN),1)
       CLIENT_LIBS += -lcurl
     endif
+  endif
+
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_LIBS += -lvorbisfile -lvorbis -logg
   endif
 
   # cross-compiling tweaks
@@ -816,6 +831,9 @@ ifeq ($(PLATFORM),openbsd)
     endif
   endif
 
+  ifeq ($(USE_CODEC_VORBIS),1)
+    CLIENT_LIBS += -lvorbisfile -lvorbis -logg
+  endif
   ifeq ($(USE_CODEC_THEORA),1)
     CLIENT_LIBS += -ltheora
   endif
@@ -999,7 +1017,8 @@ LIBPATHS = -L$(LIBOGC_LIB)
   USE_OPENAL_DLOPEN=0
   USE_CURL_DLOPEN=0
 
-  # Need to add internal libtheora
+  # Need to build static libs for libogc
+  USE_CODEC_VORBIS=0
   USE_CODEC_THEORA=0
 
   ARCH=ppc
@@ -1159,20 +1178,6 @@ ifeq ($(USE_INTERNAL_FREETYPE),1)
 					-DFT2_BUILD_LIBRARY
 else
   RENDERER_LIBS += -lfreetype
-endif
-
-ifeq ($(USE_CODEC_VORBIS),1)
-ifeq ($(USE_INTERNAL_VORBIS),1)
-  CLIENT_CFLAGS += -I$(VORBISDIR)/include
-  
-else
-  CLIENT_LIBS += -lvorbisfile -lvorbis
-endif
-ifeq ($(USE_INTERNAL_OGG),1)
-  CLIENT_CFLAGS += -I$(OGGDIR)/include
-else
-  CLIENT_LIBS += -logg
-endif
 endif
 
 ifeq ("$(CC)", $(findstring "$(CC)", "clang" "clang++"))
@@ -1387,7 +1392,6 @@ makedirs:
 	@if [ ! -d $(BUILD_DIR) ];then $(MKDIR) $(BUILD_DIR);fi
 	@if [ ! -d $(B) ];then $(MKDIR) $(B);fi
 	@if [ ! -d $(B)/client ];then $(MKDIR) $(B)/client;fi
-	@if [ ! -d $(B)/client/vorbis ];then $(MKDIR) $(B)/client/vorbis;fi
 	@if [ ! -d $(B)/renderer ];then $(MKDIR) $(B)/renderer;fi
 	@if [ ! -d $(B)/renderersmp ];then $(MKDIR) $(B)/renderersmp;fi
 	@if [ ! -d $(B)/ded ];then $(MKDIR) $(B)/ded;fi
@@ -1693,38 +1697,6 @@ ifeq ($(PLATFORM),mingw32)
 else
   Q3OBJ += \
 	$(B)/client/con_tty.o
-endif
-
-ifeq ($(USE_CODEC_VORBIS),1)
-ifneq ($(USE_INTERNAL_VORBIS),0)
-  Q3OBJ += \
-		$(B)/client/vorbis/mdct.o \
-		$(B)/client/vorbis/smallft.o \
-		$(B)/client/vorbis/block.o \
-		$(B)/client/vorbis/envelope.o \
-		$(B)/client/vorbis/window.o \
-		$(B)/client/vorbis/lsp.o \
-		$(B)/client/vorbis/lpc.o \
-		$(B)/client/vorbis/analysis.o \
-		$(B)/client/vorbis/synthesis.o \
-		$(B)/client/vorbis/psy.o \
-		$(B)/client/vorbis/info.o \
-		$(B)/client/vorbis/floor1.o \
-		$(B)/client/vorbis/floor0.o \
-		$(B)/client/vorbis/res0.o \
-		$(B)/client/vorbis/mapping0.o \
-		$(B)/client/vorbis/registry.o \
-		$(B)/client/vorbis/codebook.o \
-		$(B)/client/vorbis/sharedbook.o \
-		$(B)/client/vorbis/lookup.o \
-		$(B)/client/vorbis/bitrate.o \
-		$(B)/client/vorbis/vorbisfile.o
-endif
-ifneq ($(USE_INTERNAL_OGG),0)
-  Q3OBJ += \
-		$(B)/client/bitwise.o \
-		$(B)/client/framing.o
-endif
 endif
 
 Q3ROBJ = \
@@ -2602,12 +2574,6 @@ $(B)/client/%.o: $(SPEEXDIR)/%.c
 	$(DO_CC)
 
 $(B)/client/%.o: $(ZDIR)/%.c
-	$(DO_CC)
-
-$(B)/client/%.o: $(OGGDIR)/src/%.c
-	$(DO_CC)
-
-$(B)/client/vorbis/%.o: $(VORBISDIR)/lib/%.c
 	$(DO_CC)
 
 $(B)/client/%.o: $(SDLDIR)/%.c

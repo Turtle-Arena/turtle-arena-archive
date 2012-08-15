@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -274,7 +266,7 @@ void Svcmd_AddIP_f (void)
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 2 ) {
-		G_Printf("Usage: addip <ip-mask>\n");
+		G_Printf("Usage:  addip <ip-mask>\n");
 		return;
 	}
 
@@ -296,7 +288,7 @@ void Svcmd_RemoveIP_f (void)
 	char		str[MAX_TOKEN_CHARS];
 
 	if ( trap_Argc() < 2 ) {
-		G_Printf("Usage: removeip <ip-mask>\n");
+		G_Printf("Usage:  sv removeip <ip-mask>\n");
 		return;
 	}
 
@@ -434,17 +426,12 @@ gclient_t	*ClientForString( const char *s ) {
 ===================
 Svcmd_ForceTeam_f
 
-forceTeam <player> <team>
+forceteam <player> <team>
 ===================
 */
 void	Svcmd_ForceTeam_f( void ) {
 	gclient_t	*cl;
 	char		str[MAX_TOKEN_CHARS];
-
-	if ( trap_Argc() < 3 ) {
-		G_Printf("Usage: forceTeam <player> <team>\n");
-		return;
-	}
 
 	// find the player
 	trap_Argv( 1, str, sizeof( str ) );
@@ -458,46 +445,7 @@ void	Svcmd_ForceTeam_f( void ) {
 	SetTeam( &g_entities[cl - level.clients], str );
 }
 
-/*
-===================
-Svcmd_ListIPs_f
-===================
-*/
-void	Svcmd_ListIPs_f( void ) {
-	trap_SendConsoleCommand( EXEC_NOW, "g_banIPs\n" );
-}
-
-#if 0
-/*
-===================
-Svcmd_Say_f
-===================
-*/
-void	Svcmd_Say_f( void ) {
-	trap_SendServerCommand( -1, va("print \"server: %s\n\"", ConcatArgs(1) ) );
-}
-#endif
-
-struct svcmd
-{
-  char     *cmd;
-  qboolean dedicated;
-  void     ( *function )( void );
-} svcmds[ ] = {
-#ifndef TA_SP
-  { "abort_podium", qfalse, Svcmd_AbortPodium_f },
-#endif
-  { "addbot", qfalse, Svcmd_AddBot_f },
-  { "addip", qfalse, Svcmd_AddIP_f },
-  { "entityList", qfalse, Svcmd_EntityList_f },
-  { "forceTeam", qfalse, Svcmd_ForceTeam_f },
-  { "game_memory", qfalse, Svcmd_GameMem_f },
-  { "listip", qfalse, Svcmd_ListIPs_f },
-  { "removeip", qfalse, Svcmd_RemoveIP_f },
-  //{ "say", qtrue, Svcmd_Say_f },
-};
-
-const size_t numSvCmds = ARRAY_LEN(svcmds);
+char	*ConcatArgs( int start );
 
 /*
 =================
@@ -507,48 +455,66 @@ ConsoleCommand
 */
 qboolean	ConsoleCommand( void ) {
 	char	cmd[MAX_TOKEN_CHARS];
-	struct	svcmd *command;
 
 	trap_Argv( 0, cmd, sizeof( cmd ) );
 
-	command = bsearch( cmd, svcmds, numSvCmds, sizeof( struct svcmd ), cmdcmp );
-
-	if( !command )
-	{
-		if( g_dedicated.integer )
-			G_Printf( "unknown command: %s\n", cmd );
-
-		return qfalse;
+	if ( Q_stricmp (cmd, "entitylist") == 0 ) {
+		Svcmd_EntityList_f();
+		return qtrue;
 	}
 
-	if( command->dedicated && !g_dedicated.integer )
-		return qfalse;
-
-	command->function( );
-	return qtrue;
-}
-
-void G_RegisterCommands( void )
-{
-	int i;
-
-	for( i = 0; i < numSvCmds; i++ )
-	{
-		if( svcmds[ i ].dedicated && !g_dedicated.integer )
-			continue;
-		trap_AddCommand( svcmds[ i ].cmd );
+	if ( Q_stricmp (cmd, "forceteam") == 0 ) {
+		Svcmd_ForceTeam_f();
+		return qtrue;
 	}
-}
 
-void G_UnregisterCommands( void )
-{
-	int i;
-
-	for( i = 0; i < numSvCmds; i++ )
-	{
-		if( svcmds[ i ].dedicated && !g_dedicated.integer )
-			continue;
-		trap_RemoveCommand( svcmds[ i ].cmd );
+	if (Q_stricmp (cmd, "game_memory") == 0) {
+		Svcmd_GameMem_f();
+		return qtrue;
 	}
+
+	if (Q_stricmp (cmd, "addbot") == 0) {
+		Svcmd_AddBot_f();
+		return qtrue;
+	}
+
+	if (Q_stricmp (cmd, "botlist") == 0) {
+		Svcmd_BotList_f();
+		return qtrue;
+	}
+
+#ifndef TA_SP
+	if (Q_stricmp (cmd, "abort_podium") == 0) {
+		Svcmd_AbortPodium_f();
+		return qtrue;
+	}
+#endif
+
+	if (Q_stricmp (cmd, "addip") == 0) {
+		Svcmd_AddIP_f();
+		return qtrue;
+	}
+
+	if (Q_stricmp (cmd, "removeip") == 0) {
+		Svcmd_RemoveIP_f();
+		return qtrue;
+	}
+
+	if (Q_stricmp (cmd, "listip") == 0) {
+		trap_SendConsoleCommand( EXEC_NOW, "g_banIPs\n" );
+		return qtrue;
+	}
+
+	if (g_dedicated.integer) {
+		if (Q_stricmp (cmd, "say") == 0) {
+			trap_SendServerCommand( -1, va("print \"server: %s\n\"", ConcatArgs(1) ) );
+			return qtrue;
+		}
+		// everything else will also be printed as a say command
+		trap_SendServerCommand( -1, va("print \"server: %s\n\"", ConcatArgs(0) ) );
+		return qtrue;
+	}
+
+	return qfalse;
 }
 

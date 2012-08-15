@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -75,18 +67,18 @@ int ReadValue(source_t *source, float *value)
 	if (!PC_ExpectAnyToken(source, &token)) return qfalse;
 	if (!strcmp(token.string, "-"))
 	{
-		SourceWarning(source, "negative value set to zero");
+		SourceWarning(source, "negative value set to zero\n");
 
 		if(!PC_ExpectAnyToken(source, &token))
 		{
-			SourceError(source, "Missing return value");
+			SourceError(source, "Missing return value\n");
 			return qfalse;
 		}
 	}
 
 	if (token.type != TT_NUMBER)
 	{
-		SourceError(source, "invalid return value %s", token.string);
+		SourceError(source, "invalid return value %s\n", token.string);
 		return qfalse;
 	}
 	
@@ -198,7 +190,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 			{
 				if (founddefault)
 				{
-					SourceError(source, "switch already has a default");
+					SourceError(source, "switch already has a default\n");
 					FreeFuzzySeperators_r(firstfs);
 					return NULL;
 				} //end if
@@ -248,7 +240,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 			} //end else if
 			else
 			{
-				SourceError(source, "invalid name %s", token.string);
+				SourceError(source, "invalid name %s\n", token.string);
 				return NULL;
 			} //end else
 			if (newindent)
@@ -263,7 +255,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 		else
 		{
 			FreeFuzzySeperators_r(firstfs);
-			SourceError(source, "invalid name %s", token.string);
+			SourceError(source, "invalid name %s\n", token.string);
 			return NULL;
 		} //end else
 		if (!PC_ExpectAnyToken(source, &token))
@@ -275,7 +267,7 @@ fuzzyseperator_t *ReadFuzzySeperators_r(source_t *source)
 	//
 	if (!founddefault)
 	{
-		SourceWarning(source, "switch without default");
+		SourceWarning(source, "switch without default\n");
 		fs = (fuzzyseperator_t *) GetClearedMemory(sizeof(fuzzyseperator_t));
 		fs->index = index;
 		fs->value = MAX_INVENTORYVALUE;
@@ -354,7 +346,7 @@ weightconfig_t *ReadWeightConfig(char *filename)
 		{
 			if (config->numweights >= MAX_WEIGHTS)
 			{
-				SourceWarning(source, "too many fuzzy weights");
+				SourceWarning(source, "too many fuzzy weights\n");
 				break;
 			} //end if
 			if (!PC_ExpectTokenType(source, TT_STRING, 0, &token))
@@ -412,7 +404,7 @@ weightconfig_t *ReadWeightConfig(char *filename)
 			} //end else if
 			else
 			{
-				SourceError(source, "invalid name %s", token.string);
+				SourceError(source, "invalid name %s\n", token.string);
 				FreeWeightConfig(config);
 				FreeSource(source);
 				return NULL;
@@ -430,7 +422,7 @@ weightconfig_t *ReadWeightConfig(char *filename)
 		} //end if
 		else
 		{
-			SourceError(source, "invalid name %s", token.string);
+			SourceError(source, "invalid name %s\n", token.string);
 			FreeWeightConfig(config);
 			FreeSource(source);
 			return NULL;

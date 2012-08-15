@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 //
@@ -33,7 +25,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 // be a valid snapshot this frame
 
 #include "cg_local.h"
-#ifdef MISSIONPACK
 #include "../../ui/menudef.h"
 
 typedef struct {
@@ -55,6 +46,7 @@ static const orderTask_t validOrders[] = {
 
 static const int numValidOrders = ARRAY_LEN(validOrders);
 
+#ifdef MISSIONPACK
 static int CG_ValidOrder(const char *p) {
 	int i;
 	for (i = 0; i < numValidOrders; i++) {
@@ -543,6 +535,7 @@ static void CG_MapRestart( void ) {
 	cg.fraglimitWarnings = 0;
 
 	cg.timelimitWarnings = 0;
+
 	cg.intermissionStarted = qfalse;
 	cg.levelShot = qfalse;
 
@@ -584,9 +577,6 @@ static void CG_MapRestart( void ) {
 #endif
 
 	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
-		cg.localClients[lc].rewardTime = 0;
-		cg.localClients[lc].rewardStack = 0;
-
 #ifdef TURTLEARENA // THIRD_PERSON
 #ifdef IOQ3ZTM // LASERTAG
 		if (cg_laserTag.integer)
@@ -602,8 +592,6 @@ static void CG_MapRestart( void ) {
 #endif
 	}
 }
-
-#ifdef MISSIONPACK
 
 #define MAX_VOICEFILESIZE	16384
 #ifdef IOQ3ZTM // LOAD_VOICE_FILES
@@ -1101,6 +1089,7 @@ CG_VoiceChat
 =================
 */
 void CG_VoiceChat( int mode ) {
+#ifdef MISSIONPACK
 	const char *cmd;
 	int clientNum, color;
 	qboolean voiceOnly;
@@ -1122,8 +1111,8 @@ void CG_VoiceChat( int mode ) {
 	}
 
 	CG_VoiceChatLocal( mode, voiceOnly, clientNum, color, cmd );
-}
 #endif
+}
 
 /*
 =================
@@ -1254,8 +1243,6 @@ static void CG_ServerCommand( void ) {
 #endif
 		return;
 	}
-
-#ifdef MISSIONPACK
 	if ( !strcmp( cmd, "vchat" ) ) {
 		if (lc != 0) {
 			return;
@@ -1282,7 +1269,6 @@ static void CG_ServerCommand( void ) {
 		CG_VoiceChat( SAY_TELL );
 		return;
 	}
-#endif
 
 	if ( !strcmp( cmd, "scores" ) ) {
 		CG_ParseScores(start);

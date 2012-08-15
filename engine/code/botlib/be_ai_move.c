@@ -1,30 +1,22 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -796,7 +788,7 @@ void BotAddAvoidSpot(int movestate, vec3_t origin, float radius, int type)
 int BotGetReachabilityToGoal(vec3_t origin, int areanum,
 									  int lastgoalareanum, int lastareanum,
 									  int *avoidreach, float *avoidreachtimes, int *avoidreachtries,
-									  bot_goal_t *goal, int travelflags,
+									  bot_goal_t *goal, int travelflags, int movetravelflags,
 									  struct bot_avoidspot_s *avoidspots, int numavoidspots, int *flags)
 {
 	int i, t, besttime, bestreachnum, reachnum;
@@ -808,6 +800,7 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum,
 	if (AAS_AreaDoNotEnter(areanum) || AAS_AreaDoNotEnter(goal->areanum))
 	{
 		travelflags |= TFL_DONOTENTER;
+		movetravelflags |= TFL_DONOTENTER;
 	} //end if
 	//use the routing to find the next area to go to
 	besttime = 0;
@@ -817,7 +810,7 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum,
 		reachnum = AAS_NextAreaReachability(areanum, reachnum))
 	{
 #ifdef AVOIDREACH
-		//check if it isn't a reachability to avoid
+		//check if it isn't an reachability to avoid
 		for (i = 0; i < MAX_AVOIDREACH; i++)
 		{
 			if (avoidreach[i] == reachnum && avoidreachtimes[i] >= AAS_Time()) break;
@@ -837,7 +830,7 @@ int BotGetReachabilityToGoal(vec3_t origin, int areanum,
 		if (lastgoalareanum == goal->areanum && reach.areanum == lastareanum) continue;
 		//if (AAS_AreaContentsTravelFlags(reach.areanum) & ~travelflags) continue;
 		//if the travel isn't valid
-		if (!BotValidTravel(origin, &reach, travelflags)) continue;
+		if (!BotValidTravel(origin, &reach, movetravelflags)) continue;
 		//get the travel time
 		t = AAS_AreaTravelTimeToGoalArea(reach.areanum, reach.end, goal->areanum, travelflags);
 		//if the goal area isn't reachable from the reachable area
@@ -926,7 +919,7 @@ int BotMovementViewTarget(int movestate, bot_goal_t *goal, int travelflags, floa
 		reachnum = BotGetReachabilityToGoal(reach.end, reach.areanum,
 						ms->lastgoalareanum, lastareanum,
 							ms->avoidreach, ms->avoidreachtimes, ms->avoidreachtries,
-									goal, travelflags, NULL, 0, NULL);
+									goal, travelflags, travelflags, NULL, 0, NULL);
 		VectorCopy(reach.end, end);
 		lastareanum = reach.areanum;
 		if (lastareanum == goal->areanum)
@@ -985,7 +978,7 @@ int BotPredictVisiblePosition(vec3_t origin, int areanum, bot_goal_t *goal, int 
 		reachnum = BotGetReachabilityToGoal(end, areanum,
 						lastgoalareanum, lastareanum,
 							avoidreach, avoidreachtimes, avoidreachtries,
-									goal, travelflags, NULL, 0, NULL);
+									goal, travelflags, travelflags, NULL, 0, NULL);
 		if (!reachnum) return qfalse;
 		AAS_ReachabilityFromNum(reachnum, &reach);
 		//
@@ -2094,7 +2087,7 @@ bot_moveresult_t BotTravel_Ladder(bot_movestate_t *ms, aas_reachability_t *reach
 	{
 		//botimport.Print(PRT_MESSAGE, "moving towards ladder\n");
 		VectorSubtract(reach->end, ms->origin, dir);
-		//make sure the horizontal movement is large enough
+		//make sure the horizontal movement is large anough
 		VectorCopy(dir, hordir);
 		hordir[2] = 0;
 		dist = VectorNormalize(hordir);
@@ -3385,7 +3378,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 			reachnum = BotGetReachabilityToGoal(ms->origin, ms->areanum,
 								ms->lastgoalareanum, ms->lastareanum,
 											ms->avoidreach, ms->avoidreachtimes, ms->avoidreachtries,
-														goal, travelflags,
+														goal, travelflags, travelflags,
 																ms->avoidspots, ms->numavoidspots, &resultflags);
 			//the area number the reachability starts in
 			ms->reachareanum = ms->areanum;
@@ -3510,7 +3503,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 				lastreachnum = BotGetReachabilityToGoal(end, areas[i],
 							ms->lastgoalareanum, ms->lastareanum,
 							ms->avoidreach, ms->avoidreachtimes, ms->avoidreachtries,
-							goal, TFL_JUMPPAD, ms->avoidspots, ms->numavoidspots, NULL);
+							goal, travelflags, TFL_JUMPPAD, ms->avoidspots, ms->numavoidspots, NULL);
 				if (lastreachnum)
 				{
 					ms->lastreachnum = lastreachnum;
@@ -3530,6 +3523,7 @@ void BotMoveToGoal(bot_moveresult_t *result, int movestate, bot_goal_t *goal, in
 							ms->lastreachnum = lastreachnum;
 							ms->lastareanum = areas[i];
 							//botimport.Print(PRT_MESSAGE, "found jumppad reachability hard!!\n");
+							break;
 						} //end if
 					} //end for
 					if (lastreachnum) break;

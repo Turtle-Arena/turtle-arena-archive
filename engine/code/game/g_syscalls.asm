@@ -1,6 +1,6 @@
 code
 
-equ	trap_Print				-1
+equ	trap_Printf				-1
 equ	trap_Error				-2
 equ	trap_Milliseconds		-3
 equ	trap_Cvar_Register		-4
@@ -46,17 +46,14 @@ equ trap_SnapVector			-43
 equ trap_TraceCapsule		-44
 equ trap_EntityContactCapsule	-45
 equ trap_FS_Seek -46
-equ trap_AddCommand			-47
-equ trap_RemoveCommand		-48
-
 ;; ZTM: For TA_GAME_MODELS
-equ trap_R_RegisterModel		-49
-equ trap_R_LerpTag				-50
+equ trap_R_RegisterModel		-47
+equ trap_R_LerpTag				-48
 ;; IOQ3ZTM // BONES
-equ trap_R_JointIndexForName	-51
-equ trap_R_SetupSkeleton		-52
-equ trap_R_SetupPlayerSkeleton	-53
-equ trap_R_MakeSkeletonAbsolute	-54
+equ trap_R_JointIndexForName	-49
+equ trap_R_SetupSkeleton		-50
+equ trap_R_SetupPlayerSkeleton	-51
+equ trap_R_MakeSkeletonAbsolute	-52
 
 equ	memset					-101
 equ	memcpy					-102
@@ -112,8 +109,6 @@ equ trap_AAS_AreaTravelTimeToGoalArea	-317
 
 equ trap_AAS_Swimming					-318
 equ trap_AAS_PredictClientMovement		-319
-
-equ trap_AAS_BestReachableArea			-320
 
 
 

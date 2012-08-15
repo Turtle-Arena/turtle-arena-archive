@@ -1,31 +1,23 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
+Copyright (C) 1999-2005 Id Software, Inc.
 Copyright (C) 2005 Stuart Dalton (badcdev@gmail.com)
 
-This file is part of Spearmint Source Code.
+This file is part of Quake III Arena source code.
 
-Spearmint Source Code is free software; you can redistribute it
+Quake III Arena source code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 3 of the License,
+published by the Free Software Foundation; either version 2 of the License,
 or (at your option) any later version.
 
-Spearmint Source Code is distributed in the hope that it will be
+Quake III Arena source code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
-
-In addition, Spearmint Source Code is also subject to certain additional terms.
-You should have received a copy of these additional terms immediately following
-the terms and conditions of the GNU General Public License.  If not, please
-request a copy in writing from id Software at the address below.
-
-If you have questions concerning this license or the applicable additional
-terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
-Suite 120, Rockville, Maryland 20850 USA.
+along with Quake III Arena source code; if not, write to the Free Software
+Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 ===========================================================================
 */
 
@@ -147,8 +139,6 @@ typedef struct alSfx_s
 	qboolean	inMemory;				// Sound is stored in memory
 	qboolean	isLocked;				// Sound is locked (can not be unloaded)
 	int				lastUsedTime;		// Time last used
-
-	int				duration;				// Milliseconds
 
 	int				loopCnt;		// number of loops using this sfx
 	int				loopActiveCnt;		// number of playing loops using this sfx
@@ -366,7 +356,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, qboolean cache)
 		// We have no data to buffer, so buffer silence
 		byte dummyData[ 2 ] = { 0 };
 
-		qalBufferData(curSfx->buffer, AL_FORMAT_MONO16, (void *)dummyData, 2, 44100);
+		qalBufferData(curSfx->buffer, AL_FORMAT_MONO16, (void *)dummyData, 2, 22050);
 	}
 	else
 		qalBufferData(curSfx->buffer, format, data, info.size, info.rate);
@@ -503,25 +493,9 @@ sfxHandle_t S_AL_RegisterSound( const char *sample, qboolean compressed )
 
 /*
 =================
-S_AL_SoundDuration
-=================
-*/
-static
-int S_AL_SoundDuration( sfxHandle_t sfx )
-{
-	if (sfx < 0 || sfx >= numSfx)
-	{
-		Com_Printf(S_COLOR_RED "ERROR: S_AL_SoundDuration: handle %i out of range\n", sfx);
-		return 0;
-	}
-	return knownSfx[sfx].duration;
-}
-
-/*
-=================
 S_AL_BufferGet
 
-Return's a sfx's buffer
+Return's an sfx's buffer
 =================
 */
 static
@@ -1971,7 +1945,7 @@ void S_AL_MusicProcess(ALuint b)
 		// We have no data to buffer, so buffer silence
 		byte dummyData[ 2 ] = { 0 };
 
-		qalBufferData( b, AL_FORMAT_MONO16, (void *)dummyData, 2, 44100 );
+		qalBufferData( b, AL_FORMAT_MONO16, (void *)dummyData, 2, 22050 );
 	}
 	else
 		qalBufferData(b, format, decode_buffer, l, curstream->info.rate);
@@ -2660,7 +2634,6 @@ qboolean S_AL_Init( soundInterface_t *si )
 	si->DisableSounds = S_AL_DisableSounds;
 	si->BeginRegistration = S_AL_BeginRegistration;
 	si->RegisterSound = S_AL_RegisterSound;
-	si->SoundDuration = S_AL_SoundDuration;
 	si->ClearSoundBuffer = S_AL_ClearSoundBuffer;
 	si->SoundInfo = S_AL_SoundInfo;
 	si->SoundList = S_AL_SoundList;
