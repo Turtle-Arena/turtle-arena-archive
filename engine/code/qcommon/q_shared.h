@@ -46,7 +46,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 //  #define LEGACY_PROTOCOL	// You probably don't need this for your standalone game
 
   #ifndef PRODUCT_VERSION
-    #define PRODUCT_VERSION "0.6"
+    #define PRODUCT_VERSION "0.7"
   #endif
 #else // ioquake3 defaults
   #define PRODUCT_NAME			"ioq3"
