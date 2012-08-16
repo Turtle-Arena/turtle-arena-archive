@@ -150,7 +150,6 @@ cvar_t  *r_noborder;
 
 cvar_t	*r_customwidth;
 cvar_t	*r_customheight;
-cvar_t	*r_customPixelAspect;
 
 cvar_t	*r_overBrightBits;
 cvar_t	*r_mapOverBrightBits;
@@ -1385,9 +1384,7 @@ void R_Init( void ) {
 	}
 	Com_Memset( tess.constantColor255, 255, sizeof( tess.constantColor255 ) );
 
-#ifdef IOQ3ZTM // IOSTVEF_NOISE
 	R_NoiseInit();
-#endif
 
 	//
 	// init function tables
@@ -1398,9 +1395,7 @@ void R_Init( void ) {
 		tr.squareTable[i]	= ( i < FUNCTABLE_SIZE/2 ) ? 1.0f : -1.0f;
 		tr.sawToothTable[i] = (float)i / FUNCTABLE_SIZE;
 		tr.inverseSawToothTable[i] = 1.0f - tr.sawToothTable[i];
-#ifdef IOQ3ZTM // IOSTVEF_NOISE
-		tr.noiseTable[i] = R_NoiseGet4f(0, 0, 0, i);
-#endif
+		tr.noiseTable[i]	= R_NoiseGet4f(0, 0, 0, i);
 
 		if ( i < FUNCTABLE_SIZE / 2 )
 		{
@@ -1420,10 +1415,6 @@ void R_Init( void ) {
 	}
 
 	R_InitFogTable();
-
-#ifndef IOQ3ZTM // IOSTVEF_NOISE
-	R_NoiseInit();
-#endif
 
 	R_Register();
 
