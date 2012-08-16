@@ -40,17 +40,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #	include <SDL_opengl.h>
 #endif
 
-// ZTM:
-#if !defined(APIENTRYP)
-#  define APIENTRYP APIENTRY*
-#endif
-// ZTM:
-// http://svn.icculus.org/quake3/branches/unified-sdl/code/renderer/qgl.h?revision=775&view=markup&pathrev=1156
-// S3TC compression constants
-#define GL_RGB_S3TC                         0x83A0
-#define GL_RGB4_S3TC                        0x83A1
-
-
 extern void (APIENTRYP qglActiveTextureARB) (GLenum texture);
 extern void (APIENTRYP qglClientActiveTextureARB) (GLenum texture);
 extern void (APIENTRYP qglMultiTexCoord2fARB) (GLenum target, GLfloat s, GLfloat t);
