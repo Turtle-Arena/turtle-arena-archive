@@ -48,7 +48,6 @@ ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
 * Xreal (XREAL): http://www.xreal-project.net/
 ** Homing rockets (Xreal svn r2785)
 ** Fired rockets and homing-rockets can be destroyed (Xreal svn r > 2785)
-** Jeff "Jeffro11" Attwood (EXTERNAL_LIGHTMAPS): http://ioquake.org/forums/viewtopic.php?f=2&t=100
 
 * Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
 ** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
