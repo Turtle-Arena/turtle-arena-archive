@@ -2761,6 +2761,61 @@ shader_t *R_FindShaderByName( const char *name ) {
 	return tr.defaultShader;
 }
 
+/*
+===============
+R_FindLightmap - ydnar
+given a (potentially erroneous) lightmap index, attempts to load
+an external lightmap image and/or sets the index to a valid number
+===============
+*/
+
+#define EXTERNAL_LIGHTMAP   "lm_%04d.tga"    // THIS MUST BE IN SYNC WITH Q3MAP2
+
+void R_FindLightmap( int *lightmapIndex ) {
+	image_t     *image;
+	char fileName[ MAX_QPATH ];
+
+	// don't fool with bogus lightmap indexes
+	if ( *lightmapIndex < 0 ) {
+		return;
+	}
+
+	// does this lightmap already exist?
+	if ( *lightmapIndex < tr.numLightmaps && tr.lightmaps[ *lightmapIndex ] != NULL ) {
+		return;
+	}
+
+	// bail if no world dir
+	if ( tr.worldDir == NULL ) {
+		*lightmapIndex = LIGHTMAP_BY_VERTEX;
+		return;
+	}
+
+	// bail if no free slot
+	if ( *lightmapIndex >= tr.maxLightmaps ) {
+		*lightmapIndex = LIGHTMAP_BY_VERTEX;
+		return;
+	}
+
+	// sync up render thread, because we're going to have to load an image
+	R_SyncRenderThread();
+
+	// attempt to load an external lightmap
+	Com_sprintf( fileName, sizeof (fileName), "%s/" EXTERNAL_LIGHTMAP, tr.worldDir, *lightmapIndex );
+	image = R_FindImageFile( fileName, qfalse, qfalse, GL_CLAMP_TO_EDGE );
+	if ( image == NULL ) {
+		*lightmapIndex = LIGHTMAP_BY_VERTEX;
+		return;
+	}
+
+	// add it to the lightmap list
+	if ( *lightmapIndex >= tr.numLightmaps ) {
+		tr.numLightmaps = *lightmapIndex + 1;
+	}
+	tr.lightmaps[ *lightmapIndex ] = image;
+}
+
+
 
 /*
 ===============
@@ -2801,15 +2856,8 @@ shader_t *R_FindShader( const char *name, int lightmapIndex, qboolean mipRawImag
 		return tr.defaultShader;
 	}
 
-	// use (fullbright) vertex lighting if the bsp file doesn't have
-	// lightmaps
-	if ( lightmapIndex >= 0 && lightmapIndex >= tr.numLightmaps ) {
-		lightmapIndex = LIGHTMAP_BY_VERTEX;
-	} else if ( lightmapIndex < LIGHTMAP_2D ) {
-		// negative lightmap indexes cause stray pointers (think tr.lightmaps[lightmapIndex])
-		ri.Printf( PRINT_WARNING, "WARNING: shader '%s' has invalid lightmap index of %d\n", name, lightmapIndex  );
-		lightmapIndex = LIGHTMAP_BY_VERTEX;
-	}
+	// ydnar: validate lightmap index
+	R_FindLightmap( &lightmapIndex );
 
 	COM_StripExtension(name, strippedName, sizeof(strippedName));
 

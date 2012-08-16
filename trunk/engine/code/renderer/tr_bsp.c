@@ -133,69 +133,6 @@ static	void R_ColorShiftLightingBytes( byte in[4], byte out[4] ) {
 	out[3] = in[3];
 }
 
-#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS // ZTM: Load external lightmaps, as well as internal ones.
-/*
-===============
-R_LoadLightmaps & LightmapNameCompare
-Checks for External Lightmaps first and loads them if some are found.
-If it doesnt find any external lightmaps then it will fall back to q3
-style of lightmapping. Thanks to Tr3B for coding in external lightmapping
-for Xreal and making this easy. :) ENC
-
-ZTM: Patch for ioquake3 made by "Jeffro11" (website says "Jeff Attwood")
-	Using code from XReal ( http://ioquake.org/forums/viewtopic.php?f=2&t=100 )
-	http://theone.lithfaq.com/Engine/ioex/External%20lightmaps.patch
-	Fri Feb 13, 2009
-
-===============
-*/
-static int QDECL LightmapNameCompare(const void *a, const void *b)
-{
-	char           *s1, *s2;
-	int             c1, c2;
-
-	s1 = *(char **)a;
-	s2 = *(char **)b;
-
-	do
-	{
-		c1 = *s1++;
-		c2 = *s2++;
-
-		if (c1 >= 'a' && c1 <= 'z')
-		{
-			c1 -= ('a' - 'A');
-		}
-		if (c2 >= 'a' && c2 <= 'z')
-		{
-			c2 -= ('a' - 'A');
-		}
-
-		if (c1 == '\\' || c1 == ':')
-		{
-			c1 = '/';
-		}
-		if (c2 == '\\' || c2 == ':')
-		{
-			c2 = '/';
-		}
-
-		if (c1 < c2)
-		{
-			// strings not equal
-			return -1;
-		}
-		if (c1 > c2)
-		{
-			return 1;
-		}
-	} while(c1);
-
-	// strings are equal
-	return 0;
-}
-#endif
-
 /*
 ===============
 R_LoadLightmaps
@@ -203,52 +140,34 @@ R_LoadLightmaps
 ===============
 */
 #define	LIGHTMAP_SIZE	128
-static void R_LoadLightmaps(lump_t * l)
-{
+static	void R_LoadLightmaps( lump_t *l ) {
 	byte		*buf, *buf_p;
 	int			len;
 	byte		image[LIGHTMAP_SIZE*LIGHTMAP_SIZE*4];
 	int			i, j;
-	float maxIntensity = 0;
-	double sumIntensity = 0;
-#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS
-	qboolean vextexOnly;
+	float		maxIntensity = 0;
+	double		sumIntensity = 0;
+	int			numExternalLightmaps = 0;
+
+	// ydnar: clear lightmaps first
+	tr.numLightmaps = tr.maxLightmaps = 0;
+	tr.lightmaps = NULL;
 
 	// if we are in r_vertexLight mode, we don't need the lightmaps at all
-	vextexOnly = ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 );
-
-	if (!vextexOnly) {
-		char	mapName[MAX_QPATH];
-		char	**lightmapFiles;
-
-		COM_StripExtension(s_worldData.name, mapName, sizeof(mapName)); // ZTM: Get map .bsp filename
-		//strcat(mapName, "/lightmaps"); //HACK: Loads external lightmaps inside mapName/lightmaps/lm_0000.tga etc
-		lightmapFiles = ri.FS_ListFiles(mapName, ".tga", &tr.numLightmaps);
-
-		if (lightmapFiles && tr.numLightmaps)
-		{
-			qsort(lightmapFiles, tr.numLightmaps, sizeof(char *), LightmapNameCompare);
-
-			ri.Printf(PRINT_DEVELOPER, "...loading %i external lightmaps\n", tr.numLightmaps);
-
-			// we are about to upload textures
-			R_SyncRenderThread();
-
-			tr.lightmaps = ri.Hunk_Alloc( tr.numLightmaps * sizeof(image_t *), h_low );
-			for(i = 0; i < tr.numLightmaps; i++)
-			{
-				ri.Printf(PRINT_DEVELOPER, "...loading external lightmap '%s/%s'\n", mapName, lightmapFiles[i]);
-
-				tr.lightmaps[i] = R_FindImageFile(va("%s/%s", mapName, lightmapFiles[i]), qfalse, qfalse, GL_CLAMP_TO_EDGE);
-			}
-
-			return;
-		}
+	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
+		return;
 	}
-#endif
+
+	// get number of external lightmaps
+	if (tr.worldDir) {
+		ri.FS_ListFiles(tr.worldDir, ".tga", &numExternalLightmaps);
+	}
 
 	len = l->filelen;
 	if ( !len ) {
+		// Allocate data for external lightmaps.
+		tr.maxLightmaps = numExternalLightmaps;
+		tr.lightmaps = ri.Hunk_Alloc( tr.maxLightmaps * sizeof(image_t *), h_low );
 		return;
 	}
 	buf = fileBase + l->fileofs;
@@ -264,18 +183,8 @@ static void R_LoadLightmaps(lump_t * l)
 		tr.numLightmaps++;
 	}
 
-	// if we are in r_vertexLight mode, we don't need the lightmaps at all
-#ifdef IOQ3ZTM // EXTERNAL_LIGHTMAPS
-	if ( vextexOnly ) {
-		return;
-	}
-#else
-	if ( r_vertexLight->integer || glConfig.hardwareType == GLHW_PERMEDIA2 ) {
-		return;
-	}
-#endif
-
-	tr.lightmaps = ri.Hunk_Alloc( tr.numLightmaps * sizeof(image_t *), h_low );
+	tr.maxLightmaps = tr.numLightmaps + numExternalLightmaps;
+	tr.lightmaps = ri.Hunk_Alloc( tr.maxLightmaps * sizeof(image_t *), h_low );
 	for ( i = 0 ; i < tr.numLightmaps ; i++ ) {
 		// expand the 24 bit on-disk to 32 bit
 		buf_p = buf + i * LIGHTMAP_SIZE*LIGHTMAP_SIZE * 3;
@@ -1926,12 +1835,16 @@ void RE_LoadWorldMap( const char *name ) {
 	VectorNormalize( tr.sunDirection );
 
 	tr.worldMapLoaded = qtrue;
+	tr.worldDir = NULL;
 
 	// load it
     ri.FS_ReadFile( name, &buffer.v );
 	if ( !buffer.b ) {
 		ri.Error (ERR_DROP, "RE_LoadWorldMap: %s not found", name);
 	}
+
+	tr.worldDir = S_Malloc(strlen(name)+1);
+	COM_StripExtension(name, tr.worldDir, strlen(name)+1);
 
 	// clear tr.world so if the level fails to load, the next
 	// try will not look at the partially loaded version
