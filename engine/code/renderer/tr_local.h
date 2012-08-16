@@ -164,10 +164,8 @@ typedef enum {
 	GF_SAWTOOTH, 
 	GF_INVERSE_SAWTOOTH, 
 
-	GF_NOISE
-#ifdef IOQ3ZTM // IOSTVEF_NOISE
-	,GF_RANDOM
-#endif
+	GF_NOISE,
+	GF_RANDOM
 
 } genFunc_t;
 
@@ -1097,9 +1095,7 @@ typedef struct {
 	float					triangleTable[FUNCTABLE_SIZE];
 	float					sawToothTable[FUNCTABLE_SIZE];
 	float					inverseSawToothTable[FUNCTABLE_SIZE];
-#ifdef IOQ3ZTM // IOSTVEF_NOISE
 	float					noiseTable[FUNCTABLE_SIZE];
-#endif
 	float					fogTable[FOG_TABLE_SIZE];
 #endif
 } trGlobals_t;
@@ -1249,9 +1245,7 @@ extern cvar_t	*r_marksOnTriangleMeshes;
 //====================================================================
 
 float R_NoiseGet4f( float x, float y, float z, float t );
-#ifdef IOQ3ZTM // IOSTVEF_NOISE
 int R_RandomOn( float t );
-#endif
 void  R_NoiseInit( void );
 
 void R_SwapBuffers( int );

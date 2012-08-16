@@ -556,35 +556,6 @@ Creating standalone games
   maps) created by yourself are your property and can be sold like every other
   game you find in stores.
 
-Network protocols
-  There are now two cvars that give you some degree of freedom over the reported
-  protocol versions between clients and servers: "com_protocol" and
-  "com_legacyprotocol".
-  The reason for this is that some standalone games increased the protocol
-  number even though nothing really changed in their protocol and the ioquake3
-  engine is still fully compatible.
-
-  In order to harden the network protocol against UDP spoofing attacks a new
-  network protocol was introduced that defends against such attacks.
-  Unfortunately, this protocol will be incompatible to the original quake3 1.32c
-  which is the latest official release from id.
-  Luckily, ioquake3 has backwards compatibility, on the client as well as on the
-  server. This means ioquake3 players can play on old servers just as ioquake3
-  servers are able to service old clients.
-
-  The cvar "com_protocol" denotes the protocol version for the new hardened
-  protocol, whereas the "com_legacyprotocol" cvar denotes the protocol version
-  for the legacy protocol.
-  If the value for "com_protocol" and "com_legacyprotocol" is identical, then
-  the legacy protocol is always used. If "com_legacyprotocol" is set to 0, then
-  support for the legacy protocol is disabled.
-  
-  Mods that use a standalone engine obviously do not require dual protocol
-  support, and it is turned off if the engine is compiled with STANDALONE per
-  default. If you desire backwards compatibility to older versions of your
-  game you can still enable it in q_shared.h by defining
-  LEGACY_PROTOCOL.
-
 cl_guid Support
   cl_guid is a cvar which is part of the client's USERINFO string.  Its value
   is a 32 character string made up of [a-f] and [0-9] characters.  This
