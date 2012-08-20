@@ -1712,6 +1712,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 						}
 					}
 					break;
+#ifdef MISSIONPACK
 				case GTS_REDOBELISK_ATTACKED: // Overload: red obelisk is being attacked
 					if (cgs.clientinfo[lc->clientNum].team == TEAM_RED) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
@@ -1722,6 +1723,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
 					}
 					break;
+#endif
 
 				case GTS_REDTEAM_SCORED:
 					CG_AddBufferedSound(cgs.media.redScoredSound);

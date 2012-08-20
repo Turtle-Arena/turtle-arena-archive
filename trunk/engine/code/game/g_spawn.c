@@ -533,7 +533,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 	int			i;
 	gentity_t	*ent;
 	char		*s, *value, *gametypeName;
-	static char *gametypeNames[] = {
+	static char *gametypeNames[GT_MAX_GAME_TYPE] = {
 		"ffa",
 #ifdef TA_MISC // tornament to duel
 		"duel",
@@ -547,13 +547,17 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #endif
 		"team",
 		"ctf",
+#ifdef MISSIONPACK
 		"oneflag",
 #ifdef TA_MISC // tornament to duel, obelisk to overload
 		"overload",
 #else
 		"obelisk",
 #endif
+#ifdef MISSIONPACK_HARVESTER
 		"harvester"
+#endif
+#endif
 	};
 
 	// get the next free entity
@@ -622,7 +626,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #ifdef TA_SP // ZTM: Support single player and coop separately.
 	if ( g_singlePlayer.integer && g_gametype.integer == GT_SINGLE_PLAYER )
 		gametypeName = "single";
-	else if ( g_gametype.integer >= 0 && g_gametype.integer < ARRAY_LEN(gametypeNames) ) {
+	else if ( g_gametype.integer >= 0 && g_gametype.integer < GT_MAX_GAME_TYPE ) {
 		gametypeName = gametypeNames[g_gametype.integer];
 	} else {
 		gametypeName = NULL;
@@ -632,7 +636,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 #ifdef IOQ3ZTM // ZTM: Allow not spawning in only some gametypes. Copied from OpenArena (oax)
 	if( G_SpawnString( "!gametype", NULL, &value ) ) {
 #ifndef TA_SP
-		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
+		if( g_gametype.integer >= 0 && g_gametype.integer < GT_MAX_GAME_TYPE ) {
 			gametypeName = gametypeNames[g_gametype.integer];
 #endif
 
@@ -650,7 +654,7 @@ void G_SpawnGEntityFromSpawnVars( void ) {
 
 	if( G_SpawnString( "gametype", NULL, &value ) ) {
 #ifndef TA_SP
-		if( g_gametype.integer >= GT_FFA && g_gametype.integer < GT_MAX_GAME_TYPE ) {
+		if( g_gametype.integer >= 0 && g_gametype.integer < GT_MAX_GAME_TYPE ) {
 			gametypeName = gametypeNames[g_gametype.integer];
 #endif
 

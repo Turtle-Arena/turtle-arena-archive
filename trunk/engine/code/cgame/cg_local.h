@@ -1216,9 +1216,11 @@ typedef struct {
 	qhandle_t	battleWeaponShader;
 #endif
 	qhandle_t	hastePuffShader;
+#ifdef MISSIONPACK
 #ifndef TURTLEARENA // NO_KAMIKAZE_ITEM
 	qhandle_t	redKamikazeShader;
 	qhandle_t	blueKamikazeShader;
+#endif
 #endif
 #ifdef TURTLEARENA // POWERS // PW_FLASHING
 	qhandle_t	playerTeleportShader;
@@ -1413,7 +1415,9 @@ typedef struct {
 	sfxHandle_t shurikenSound;
 #endif
 
+#ifdef MISSIONPACK
 	sfxHandle_t weaponHoverSound;
+#endif
 
 	// teamplay sounds
 	sfxHandle_t captureAwardSound;
@@ -1432,13 +1436,17 @@ typedef struct {
 
 	sfxHandle_t redFlagReturnedSound;
 	sfxHandle_t blueFlagReturnedSound;
+#ifdef MISSIONPACK
 	sfxHandle_t neutralFlagReturnedSound;
+#endif
 	sfxHandle_t	enemyTookYourFlagSound;
-	sfxHandle_t	enemyTookTheFlagSound;
 	sfxHandle_t yourTeamTookEnemyFlagSound;
-	sfxHandle_t yourTeamTookTheFlagSound;
 	sfxHandle_t	youHaveFlagSound;
+#ifdef MISSIONPACK
+	sfxHandle_t	enemyTookTheFlagSound;
+	sfxHandle_t yourTeamTookTheFlagSound;
 	sfxHandle_t yourBaseIsUnderAttackSound;
+#endif
 #ifndef NOTRATEDM // Disable strong lang.
 	sfxHandle_t holyShitSound;
 #endif
@@ -1469,10 +1477,11 @@ typedef struct {
 	sfxHandle_t guardSound;
 	sfxHandle_t scoutSound;
 #endif
-#endif
+
 	qhandle_t cursor;
 	qhandle_t selectCursor;
 	qhandle_t sizeCursor;
+#endif
 
 	sfxHandle_t	regenSound;
 	sfxHandle_t	protectSound;

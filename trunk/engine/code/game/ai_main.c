@@ -1761,10 +1761,18 @@ int BotInitLibrary(void) {
 	//maximum number of items in a level
 	trap_Cvar_VariableStringBuffer("max_levelitems", buf, sizeof(buf));
 	if (strlen(buf)) trap_BotLibVarSet("max_levelitems", buf);
-	//game type
-	trap_Cvar_VariableStringBuffer("g_gametype", buf, sizeof(buf));
-	if (!strlen(buf)) strcpy(buf, "0");
-	trap_BotLibVarSet("g_gametype", buf);
+	//single player entities
+	if (g_gametype.integer == GT_SINGLE_PLAYER) {
+		trap_BotLibVarSet("singleplayerentities", "1");
+	} else {
+		trap_BotLibVarSet("singleplayerentities", "0");
+	}
+	//team play entities
+	if (g_gametype.integer > GT_TEAM) {
+		trap_BotLibVarSet("teamplayentities", "1");
+	} else {
+		trap_BotLibVarSet("teamplayentities", "0");
+	}
 	//bot developer mode and log file
 	trap_BotLibVarSet("bot_developer", bot_developer.string);
 	trap_Cvar_VariableStringBuffer("logfile", buf, sizeof(buf));

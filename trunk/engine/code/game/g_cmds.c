@@ -1583,7 +1583,7 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 #ifndef TA_SP
 		i == GT_SINGLE_PLAYER ||
 #endif
-		i < GT_FFA || i >= GT_MAX_GAME_TYPE) {
+		i < 0 || i >= GT_MAX_GAME_TYPE) {
 			trap_SendServerCommand( ent-g_entities, "print \"Invalid gametype.\n\"" );
 			return;
 		}

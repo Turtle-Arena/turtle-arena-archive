@@ -67,11 +67,7 @@ void SV_GetChallenge(netadr_t from)
 	}
 
 	// ignore if we are in single player
-	if (
-#ifndef TA_SP
-	Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
-#endif
-	Cvar_VariableValue("ui_singlePlayerActive")) {
+	if ( Com_GameIsSinglePlayer() ) {
 		return;
 	}
 
@@ -197,16 +193,16 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	}
 
 #ifdef TA_SP
+#if 0 // ZTM: FIXME: Move to GAME_CLIENT_CONNECT in game.
 	// Don't allow join in arcade mode
-	if (Cvar_VariableIntegerValue("ui_singlePlayerActive")
-		&& sv_gametype->integer != GT_SINGLE_PLAYER) {
+	if (Com_GameIsSinglePlayer() && sv_gametype->integer != GT_SINGLE_PLAYER) {
 		SV_SendServerCommand( owner, "print \"Additional local clients not allowed in arcade mode.\n\"" );
 		return;
 	}
+#endif
 #else
 	// Don't allow joining in single player
-	if (sv_gametype->integer == GT_SINGLE_PLAYER
-		|| Cvar_VariableIntegerValue("ui_singlePlayerActive")) {
+	if ( Com_GameIsSinglePlayer() ) {
 		SV_SendServerCommand( owner, "print \"Additional local clients not allowed in single player mode.\n\"" );
 		return;
 	}

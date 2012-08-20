@@ -91,6 +91,7 @@ vmCvar_t	pmove_fixed;
 vmCvar_t	pmove_msec;
 vmCvar_t	g_rankings;
 vmCvar_t	g_listEntity;
+vmCvar_t	g_singlePlayer;
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 vmCvar_t	g_redteam;
 vmCvar_t	g_blueteam;
@@ -105,9 +106,6 @@ vmCvar_t	g_cubeTimeout;
 #endif
 vmCvar_t	g_redteam;
 vmCvar_t	g_blueteam;
-#ifndef TA_SP
-vmCvar_t	g_singlePlayer;
-#endif
 vmCvar_t	g_enableDust;
 vmCvar_t	g_enableBreath;
 #endif
@@ -115,7 +113,6 @@ vmCvar_t	g_enableBreath;
 vmCvar_t	g_proxMineTimeout;
 #endif
 #ifdef TA_SP
-vmCvar_t	g_singlePlayer;
 vmCvar_t	g_spSaveData; // Used to save data between levels.
 //vmCvar_t	g_spSaveDataNet[MAX_CLIENTS]; // Save data for all clients
 vmCvar_t	g_saveVersions;
@@ -211,6 +208,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_allowVote, "g_allowVote", "1", CVAR_ARCHIVE, 0, qfalse },
 	{ &g_listEntity, "g_listEntity", "0", 0, 0, qfalse },
 
+	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_SYSTEMINFO | CVAR_ROM, 0, qfalse, qfalse  },
+
 #ifdef MISSIONPACK
 #ifdef TURTLEARENA
 	{ &g_obeliskHealth, "g_obeliskHealth", "1000", 0, 0, qfalse },
@@ -230,9 +229,6 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_redteam, "g_redteam", "Stroggs", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue },
 	{ &g_blueteam, "g_blueteam", "Pagans", CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO , 0, qtrue, qtrue  },
 #endif
-#ifndef TA_SP
-	{ &g_singlePlayer, "ui_singlePlayerActive", "", 0, 0, qfalse, qfalse  },
-#endif
 
 	{ &g_enableDust, "g_enableDust", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
 	{ &g_enableBreath, "g_enableBreath", "0", CVAR_SERVERINFO, 0, qtrue, qfalse },
@@ -241,7 +237,6 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
 #endif
 #ifdef TA_SP
-	{ &g_singlePlayer, "ui_singlePlayerActive", "0", CVAR_ROM, 0, qfalse, qfalse  },
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO, 0, 0, qfalse },
@@ -478,7 +473,14 @@ void G_RegisterCvars( void ) {
 	// check some things
 	if ( g_gametype.integer < 0 || g_gametype.integer >= GT_MAX_GAME_TYPE ) {
 		G_Printf( "g_gametype %i is out of range, defaulting to 0\n", g_gametype.integer );
+		g_gametype.integer = 0;
 		trap_Cvar_Set( "g_gametype", "0" );
+	}
+
+	// Don't allow single player gametype to be used in multiplayer.
+	if ( g_gametype.integer == GT_SINGLE_PLAYER && !g_singlePlayer.integer) {
+		g_gametype.integer = GT_FFA;
+		trap_Cvar_Set( "g_gametype", va("%d", g_gametype.integer) );
 	}
 
 	level.warmupModificationCount = g_warmup.modificationCount;
