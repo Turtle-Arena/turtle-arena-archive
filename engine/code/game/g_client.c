@@ -2106,7 +2106,7 @@ qboolean G_ClientCompletedLevel(gentity_t *activator, char *nextMap)
 	trap_Cvar_Set("g_saveMapname", nextMap);
 
 	// Set cvar for level change.
-	Com_sprintf(buf, MAX_QPATH, "spmap %s", nextMap);
+	Com_sprintf(buf, MAX_QPATH, "map %s", nextMap);
 	trap_Cvar_Set("nextmap", buf);
 	return qtrue;
 }
