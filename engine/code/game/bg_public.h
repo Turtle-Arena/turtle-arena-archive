@@ -57,21 +57,3 @@ enum {
 	ET_MOVER
 };
 
-// server and botlib
-
-// ZTM: Server and botlib need GT_SINGLE_PLAYER and [just] botlib needs GT_TEAM
-//             If TA_SP is not defined Client also needs GT_SINGLE_PLAYER and
-//               Server also needs GT_FFA
-
-//FIXME: these are game specific
-
-#ifdef TA_SP
-//GT_FFA 0						// free for all
-#else
-#define GT_FFA 0				// free for all
-#endif
-//GT_TOURNAMENT 1				// one on one tournament
-#define GT_SINGLE_PLAYER 2		// single player tournament
-#define GT_TEAM 3				// team deathmatch
-//GT_CTF 4						// capture the flag
-

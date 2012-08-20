@@ -3475,3 +3475,12 @@ qboolean Com_IsVoipTarget(uint8_t *voipTargets, int voipTargetsSize, int clientN
 
 	return qfalse;
 }
+
+/*
+====================
+Com_GameIsSinglePlayer
+====================
+*/
+qboolean Com_GameIsSinglePlayer( void ) {
+	return ( Cvar_VariableValue( "ui_singlePlayerActive" ) );
+}

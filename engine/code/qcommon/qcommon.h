@@ -840,6 +840,8 @@ void		Com_RunAndTimeServerPacket(netadr_t *evFrom, msg_t *buf);
 
 qboolean	Com_IsVoipTarget(uint8_t *voipTargets, int voipTargetsSize, int clientNum);
 
+qboolean	Com_GameIsSinglePlayer(void);
+
 void		Com_StartupVariable( const char *match );
 // checks for and removes command line "+set var arg" constructs
 // if match is NULL, all set commands will be executed, otherwise

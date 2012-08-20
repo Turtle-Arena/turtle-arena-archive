@@ -196,8 +196,10 @@ int numlevelitems = 0;
 maplocation_t *maplocations = NULL;
 //camp spots
 campspot_t *campspots = NULL;
-//the game type
-int g_gametype = 0;
+//use single player entities
+qboolean g_singlePlayerEntities = qfalse;
+//use team gametype entities
+qboolean g_teamplayEntities = qfalse;
 //additional dropped item weight
 libvar_t *droppedweight = NULL;
 
@@ -1033,10 +1035,10 @@ int BotGetLevelItemGoal(int index, char *name, bot_goal_t *goal)
 	for (; li; li = li->next)
 	{
 		//
-		if (g_gametype == GT_SINGLE_PLAYER) {
+		if (g_singlePlayerEntities) {
 			if (li->flags & IFL_NOTSINGLE) continue;
 		}
-		else if (g_gametype >= GT_TEAM) {
+		if (g_teamplayEntities) {
 			if (li->flags & IFL_NOTTEAM) continue;
 		}
 		else {
@@ -1240,10 +1242,10 @@ void BotUpdateEntityItems(void)
 			//if this level item is already linked
 			if (li->entitynum) continue;
 			//
-			if (g_gametype == GT_SINGLE_PLAYER) {
+			if (g_singlePlayerEntities) {
 				if (li->flags & IFL_NOTSINGLE) continue;
 			}
-			else if (g_gametype >= GT_TEAM) {
+			if (g_teamplayEntities) {
 				if (li->flags & IFL_NOTTEAM) continue;
 			}
 			else {
@@ -1473,11 +1475,11 @@ int BotChooseLTGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 	//go through the items in the level
 	for (li = levelitems; li; li = li->next)
 	{
-		if (g_gametype == GT_SINGLE_PLAYER) {
+		if (g_singlePlayerEntities) {
 			if (li->flags & IFL_NOTSINGLE)
 				continue;
 		}
-		else if (g_gametype >= GT_TEAM) {
+		if (g_teamplayEntities) {
 			if (li->flags & IFL_NOTTEAM)
 				continue;
 		}
@@ -1644,11 +1646,11 @@ int BotChooseNBGItem(int goalstate, vec3_t origin, int *inventory, int travelfla
 	//go through the items in the level
 	for (li = levelitems; li; li = li->next)
 	{
-		if (g_gametype == GT_SINGLE_PLAYER) {
+		if (g_singlePlayerEntities) {
 			if (li->flags & IFL_NOTSINGLE)
 				continue;
 		}
-		else if (g_gametype >= GT_TEAM) {
+		if (g_teamplayEntities) {
 			if (li->flags & IFL_NOTTEAM)
 				continue;
 		}
@@ -1928,8 +1930,10 @@ int BotSetupGoalAI(void)
 {
 	char *filename;
 
+	//check if single player
+	g_singlePlayerEntities = LibVarValue("singleplayerentities", "0");
 	//check if teamplay is on
-	g_gametype = LibVarValue("g_gametype", "0");
+	g_teamplayEntities = LibVarValue("teamplayentities", "0");
 	//item configuration file
 	filename = LibVarString("itemconfig", "items.c");
 	//load the item configuration

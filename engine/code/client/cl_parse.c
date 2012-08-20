@@ -404,11 +404,7 @@ void CL_SystemInfoChanged( void ) {
 #endif
 	{
 		s = Info_ValueForKey( systemInfo, "sv_voip" );
-		if (
-#ifndef TA_SP
-			Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER ||
-#endif
-			Cvar_VariableValue("ui_singlePlayerActive"))
+		if ( Com_GameIsSinglePlayer() )
 			clc.voipEnabled = qfalse;
 		else
 			clc.voipEnabled = atoi(s);

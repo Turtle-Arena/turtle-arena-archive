@@ -149,10 +149,12 @@ typedef enum {
 	GT_LTEAMS,			// last team standing
 #endif
 	GT_CTF,				// capture the flag
+#ifdef MISSIONPACK
 	GT_1FCTF,
 	GT_OBELISK,
 #ifdef MISSIONPACK_HARVESTER
 	GT_HARVESTER,
+#endif
 #endif
 	GT_MAX_GAME_TYPE
 } gametype_t;
