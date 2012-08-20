@@ -1344,10 +1344,17 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 		}
 	}
 
+#ifdef TA_SP
+	// Don't allow extra splitscreen clients in arcade mode.
+	if (g_singlePlayer.integer && g_gametype.integer != GT_SINGLE_PLAYER && ent->r.mainClientNum != -1) {
+		return "Splitscreen not allowed in arcade mode.";
+	}
+#else
 	// Don't allow extra splitscreen clients in single player.
 	if (g_singlePlayer.integer && ent->r.mainClientNum != -1) {
 		return "Splitscreen not allowed in single player.";
 	}
+#endif
 
 	// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
 	if (ent->inuse) {
