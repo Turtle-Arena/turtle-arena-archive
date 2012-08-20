@@ -1343,6 +1343,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 			return "Invalid password";
 		}
 	}
+
+	// Don't allow extra splitscreen clients in single player.
+	if (g_singlePlayer.integer && ent->r.mainClientNum != -1) {
+		return "Splitscreen not allowed in single player.";
+	}
+
 	// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
 	if (ent->inuse) {
 		G_LogPrintf("Forcing disconnect on active client: %i\n", clientNum);

@@ -192,22 +192,6 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 		return;
 	}
 
-#ifdef TA_SP
-#if 0 // ZTM: FIXME: Move to GAME_CLIENT_CONNECT in game.
-	// Don't allow join in arcade mode
-	if (Com_GameIsSinglePlayer() && sv_gametype->integer != GT_SINGLE_PLAYER) {
-		SV_SendServerCommand( owner, "print \"Additional local clients not allowed in arcade mode.\n\"" );
-		return;
-	}
-#endif
-#else
-	// Don't allow joining in single player
-	if ( Com_GameIsSinglePlayer() ) {
-		SV_SendServerCommand( owner, "print \"Additional local clients not allowed in single player mode.\n\"" );
-		return;
-	}
-#endif
-
 	newcl = &temp;
 	Com_Memset (newcl, 0, sizeof(client_t));
 
@@ -288,7 +272,7 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 		// we can't just use VM_ArgPtr, because that is only valid inside a VM_Call
 		char *str = VM_ExplicitArgPtr( gvm, denied );
 
-		NET_OutOfBandPrint( NS_SERVER, owner->netchan.remoteAddress, "print\n(For Local Client %d): %s\n", lc+1, str );
+		SV_SendServerCommand( owner, "print \"Rejected local client %d: %s\n\"", lc+1, str );
 		Com_DPrintf ("Game rejected an extra local client: %s.\n", str);
 
 		// Free all allocated data on the client structure
