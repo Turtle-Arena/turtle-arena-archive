@@ -28,7 +28,7 @@ Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 // NOTE: Make sure BG_SAVE_VERSIONS stays up to date
 //         with current save code.
 
-#define	SAVE_VERSION 6 // current version of save/load routines
+#define	SAVE_VERSION 7 // current version of save/load routines
 
 typedef struct
 {
@@ -48,18 +48,20 @@ typedef struct
 	//
     byte version; // Save file version.
     char mapname[MAX_QPATH];
-    byte skill;
     byte maxclients;
     byte localClients;
 
 	// game only, server doesn't read these.
 	//
+    byte skill;
     save_client_t clients[MAX_SPLITVIEW];
 
 } save_t;
 
 save_t loadData;
 qboolean savegameLoaded = qfalse;
+
+extern vmCvar_t g_spSkill;
 
 /*
 ============
@@ -88,14 +90,15 @@ int G_LocalClientNumForGentitiyNum(int gentityNum) {
 	return -1;
 }
 
-
 /*
 ============
 G_SaveGame
 ============
 */
-qboolean G_SaveGame(fileHandle_t f)
+qboolean G_SaveGame(const char *savegame)
 {
+	char filename[MAX_QPATH];
+	fileHandle_t f;
 	save_t saveData;
 	int client;
 	int i;
@@ -103,6 +106,11 @@ qboolean G_SaveGame(fileHandle_t f)
 
 	if (!g_singlePlayer.integer || g_gametype.integer != GT_SINGLE_PLAYER) {
 		G_Printf("Can't savegame, saving is for single player only!\n");
+		return qfalse;
+	}
+
+	if (!savegame || !*savegame) {
+		G_Printf("G_SaveGame: No save name.\n");
 		return qfalse;
 	}
 
@@ -124,10 +132,8 @@ qboolean G_SaveGame(fileHandle_t f)
 		trap_Cvar_VariableStringBuffer( "mapname", saveData.mapname, MAX_QPATH );
 	}
 
-	saveData.skill = trap_Cvar_VariableIntegerValue("g_spSkill");
+	saveData.skill = g_spSkill.integer;
 	saveData.maxclients = level.maxclients;
-	if (saveData.maxclients > MAX_SPLITVIEW)
-		saveData.maxclients = MAX_SPLITVIEW;
 
 	// Bits get added are each local client in savegame.
 	saveData.localClients = 0;
@@ -163,7 +169,7 @@ qboolean G_SaveGame(fileHandle_t f)
 		saveData.clients[client].lives = level.clients[i].ps.persistant[PERS_LIVES];
 		saveData.clients[client].continues = level.clients[i].ps.persistant[PERS_CONTINUES];
 		client++;
-		if (client >= saveData.maxclients) {
+		if (client >= MAX_SPLITVIEW) {
 			break;
 		}
 	}
@@ -173,17 +179,50 @@ qboolean G_SaveGame(fileHandle_t f)
 		saveData.clients[client].localClientNum = 0xff;
 	}
 
+	// Open savefile
+	Com_sprintf( filename, MAX_QPATH, "saves/%s.sav", savegame );
+
+	trap_FS_FOpenFile( filename, &f, FS_WRITE );
+	
+	if (!f) {
+		G_Printf("WARNING: Failed to write savefile.\n");
+		return qfalse;
+	}
+
 	// Write saveData
 	trap_FS_Write(&saveData, sizeof (save_t), f);
+
+	trap_FS_FCloseFile(f);
 
 	return qtrue;
 }
 
-// Called after level is loaded.
-void G_LoadGame(fileHandle_t f)
+/*
+============
+G_LoadGame
+
+Called after level is loaded.
+============
+*/
+void G_LoadGame(void)
 {
+	int				len;
+	fileHandle_t	f;
+
+	len = trap_FS_FOpenFile( g_savegameFilename.string, &f, FS_READ );
+
+	if (len == -1) {
+		trap_FS_FCloseFile(f);
+		G_Error("Savegame file not found!");
+	}
+
 	// Read data
 	trap_FS_Read(&loadData, sizeof (save_t), f);
+
+	trap_FS_FCloseFile(f);
+
+	trap_Cvar_Set( "savegame_loading", "0" );
+	trap_Cvar_Set( "savegame_filename", "" );
 
 	// The server should check but just in case...
 	if (loadData.version != SAVE_VERSION) {
@@ -192,7 +231,21 @@ void G_LoadGame(fileHandle_t f)
         return;
 	}
 
-    // Server sets skill and maxclients before loading the level.
+	// Update cvars right away!
+	if (g_gametype.integer != GT_SINGLE_PLAYER) {
+		g_gametype.integer = GT_SINGLE_PLAYER;
+		trap_Cvar_Set( "g_gametype", va("%d", g_gametype.integer) );
+	}
+
+	if (!g_singlePlayer.integer) {
+		g_singlePlayer.integer = 1;
+		trap_Cvar_Set( "ui_singlePlayerActive", va("%d", g_singlePlayer.integer) );
+	}
+
+    if (g_spSkill.integer != loadData.skill) {
+		g_spSkill.integer = loadData.skill;
+		trap_Cvar_Set("g_spSkill", va("%d", loadData.skill));
+    }
 
     savegameLoaded = qtrue;
 }

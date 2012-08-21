@@ -250,7 +250,7 @@ static void LoadGame_MenuInit( void ) {
 	s_savegames.list.width				= 16;
 	s_savegames.list.height				= 14;
 	//Com_sprintf(extension, sizeof(extension), "dm_%d", (int)trap_Cvar_VariableValue( "protocol" ) );
-	s_savegames.list.numitems			= trap_FS_GetFileList( SAVEGAMEDIR, ".sav"/*extension*/, s_savegames.names, NAMEBUFSIZE );
+	s_savegames.list.numitems			= trap_FS_GetFileList( "saves", ".sav"/*extension*/, s_savegames.names, NAMEBUFSIZE );
 	s_savegames.list.itemnames			= (const char **)s_savegames.demolist;
 	s_savegames.list.columns			= 3;
 

@@ -175,6 +175,11 @@ static void SV_Map_f( void ) {
 	Com_sprintf (expanded, sizeof(expanded), "maps/%s.bsp", map);
 	if ( FS_ReadFile (expanded, NULL) == -1 ) {
 		Com_Printf ("Can't find map %s\n", expanded);
+#ifdef TA_SP
+		Cvar_Set("ui_singlePlayerActive", "0");
+		Cvar_Set("savegame_loading", "0");
+		Cvar_Set("savegame_filename", "");
+#endif
 		return;
 	}
 
@@ -1199,132 +1204,50 @@ static void SV_KillServer_f( void ) {
 }
 
 #ifdef TA_SP // Save/load
-static void SV_SaveGame_f(void) {
-	char savegame[MAX_TOKEN_CHARS];
-	char filename[MAX_QPATH];
-	fileHandle_t f;
-	char *curpos;
-	qboolean savedGame;
+/*
+==================
+SV_GetSaveGameInfo
 
-	// make sure server is running
-	if ( !com_sv_running->integer ) {
-		Com_Printf( "Server is not running.\n" );
-		return;
+See save_t in g_save.c for more info.
+==================
+*/
+qboolean SV_GetSaveGameInfo(fileHandle_t f, char *loadmap, byte *pMaxclients, byte *pLocalClients) {
+	char buffer[MAX_QPATH];
+	byte version;
+
+	FS_Read2 (&version, 1, f); // version
+
+	Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
+
+	if (!strstr(va("%d", version), buffer)) {
+		// Version not supported
+		return qfalse;
 	}
 
-	// Set savefile name.
-	if ( Cmd_Argc() < 2 ) {
-		strcpy(savegame, "autosave");
-	} else {
-		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
-	}
+	FS_Read2 (loadmap, MAX_QPATH, f); // map name
+	FS_Read2 (pMaxclients, 1, f); // maxclients
+	FS_Read2 (pLocalClients, 1, f); // localClients
 
-	if(!(curpos = Cvar_VariableString("fs_game")) || !*curpos)
-		curpos = com_basegame->string;
-
-	// path is "base/saves/name.sav"
-	Com_sprintf( filename, MAX_QPATH, "%s/%s/%s.sav", curpos, SAVEGAMEDIR, savegame );
-
-    // Open file
-	f = FS_SV_FOpenFileWrite(filename);
-
-	savedGame = VM_Call( gvm, GAME_SAVEGAME, f );
-
-	// Close file
-	FS_FCloseFile( f );
-
-	// If we just created a empty savefile, it should be deleted now.
-	if (!savedGame)
-	{
-		char *ospath;
-
-		ospath = FS_BuildOSPath(Cvar_VariableString("fs_homepath"), filename, "");
-		ospath[strlen(ospath)-1] = '\0';
-
-		FS_Remove(ospath);
-	}
+	return qtrue;
 }
 
 /*
 ==================
-SP_LoadGame
-See save_t in g_save.c for more info.
-
-Return value
--1 -invalid savefile version
-0 - no map changing needed.
-2 - no map loaded or wrong map loaded.
+SV_LoadGame_f
 ==================
 */
-int SP_LoadGame(fileHandle_t f, char *filenameWASD, char *loadmap, byte *pSkill, byte *pMaxclients, byte *pLocalClients)
-{
-	char buffer[MAX_QPATH];
-	char s[MAX_QPATH];
-	byte version;
-	byte skill;
+static void SV_LoadGame_f(void) {
+	char savegame[MAX_QPATH];
+	char filename[MAX_QPATH];
+	char loadmap[MAX_QPATH];
 	byte maxclients;
 	byte localClients;
-
-	FS_Read2 (&version, 1, f); // version
-	Cvar_VariableStringBuffer( "g_saveVersions", buffer, sizeof(buffer) );
-	sprintf(s, "%d", version);
-	if (!strstr(s, buffer))
-	{
-		// Didn't find version
-		return -1;
-	}
-
-	FS_Read2 (loadmap, MAX_QPATH, f); // map name
-	FS_Read2 (&skill, 1, f); // skill
-	FS_Read2 (&maxclients, 1, f); // maxclients
-	FS_Read2 (&localClients, 1, f); // localClients
-
-	if (pSkill) {
-		*pSkill = skill;
-	}
-	if (pMaxclients) {
-		*pMaxclients = maxclients;
-	}
-	if (pLocalClients) {
-		*pLocalClients = localClients;
-	}
-
-	Cvar_VariableStringBuffer( "mapname", buffer, sizeof(buffer) );
-
-	// If different map is loaded,
-	//   or no map is loaded.
-	if ((Q_stricmp(buffer, loadmap) != 0)
-		|| buffer[0] == '\0')
-	{
-		// Load the map from the savegame.
-		return 1;
-	}
-
-	return 0;
-}
-
-static void SV_LoadGame_f(void) {
-#if 1
-	// ZTM: FIXME: load game is broken now that GT_SINGLE_PLAYER isn't known in server.
-	Com_Printf("Loadgame is broken right now!\n");
-#else
-	char loadmap[MAX_QPATH];
-	byte skill, maxclients, localClients;
-	char savegame[MAX_TOKEN_CHARS];
-	char filename[MAX_QPATH];
 	fileHandle_t f;
-	int len;
 	char *curpos;
-	short load_atemp = 0;
-
-	if (Cmd_Argc() >= 3)
-	{
-		load_atemp = 1;
-	}
 
 	// Set savefile name.
 	if ( Cmd_Argc() < 2 ) {
-		strcpy(savegame, "autosave");
+		Com_Printf("Usage: loadgame <savename>\n");
 	} else {
 		Cmd_ArgvBuffer( 1, savegame, sizeof( savegame ) );
 	}
@@ -1333,64 +1256,41 @@ static void SV_LoadGame_f(void) {
 		curpos = com_basegame->string;
 
 	// path is "base/saves/name.sav"
-	Com_sprintf( filename, MAX_QPATH, "%s/%s/%s.sav", curpos, SAVEGAMEDIR, savegame );
+	Com_sprintf( filename, MAX_QPATH, "%s/saves/%s.sav", curpos, savegame );
 
     // Must open file here, this function can't be used in game.
-	len = FS_SV_FOpenFileRead(filename, &f);
-
-    if (len == -1)
+    if (FS_SV_FOpenFileRead(filename, &f) == -1)
     {
         Com_Printf("Failed to open savefile (%s)!\n", filename);
         FS_FCloseFile( f );
         return;
     }
 
-	// G_LoadGame
-
-	if (load_atemp == 0)
+	if (!SV_GetSaveGameInfo(f, loadmap, &maxclients, &localClients))
 	{
-		int load = SP_LoadGame(f, filename, loadmap, &skill, &maxclients, &localClients);
-
-		if (load == -1)
-		{
-			FS_FCloseFile( f );
-			Com_Printf("Warning: Unsupported savefile (%s)\n", savegame);
-			return;
-		}
-
-		Cvar_SetValue("g_gametype", GT_SINGLE_PLAYER);
-		Cvar_SetValue("ui_singlePlayerActive", 1);
-		Cvar_SetValue("g_spSkill", skill);
-		Cvar_SetValue("sv_maxclients", maxclients);
-		Cvar_SetValue("cl_localClients", localClients);
-
 		FS_FCloseFile( f );
-		// "loadgame" is called in SV_SpawnServer
-		Q_strncpyz(svs.loadgame, savegame, sizeof (svs.loadgame));
-		Cbuf_ExecuteText(EXEC_APPEND, va("spmap %s\n", loadmap));
+		Com_Printf("Warning: Unsupported savefile (%s)\n", savegame);
 		return;
+	}
+
+	FS_FCloseFile( f );
+
+	Cvar_SetValue("sv_maxclients", maxclients);
+	Cvar_SetValue("cl_localClients", localClients);
+
+	// Set filename for game
+	Cvar_SetValue("savegame_loading", 1);
+	Com_sprintf( filename, MAX_QPATH, "saves/%s.sav", savegame );
+	Cvar_Set("savegame_filename", filename);
+
+	if (com_sv_running->integer && sv_mapname->string[0] && Q_stricmp(loadmap, sv_mapname->string) == 0)
+	{
+		Cbuf_ExecuteText(EXEC_APPEND, "map_restart 0\n");
 	}
 	else
 	{
-		if (SP_LoadGame(f, filename, loadmap, NULL, NULL, NULL) == 1 || !gvm)
-		{
-			FS_FCloseFile( f );
-			// We still need to load the map, so quit.
-			//Com_Error( ERR_DROP, "Can't find map for savefile.\n%s\n", loadmap );
-			Com_Printf( "Error: Can't find map for savefile. (%s)\n", loadmap );
-			return;
-		}
+		Cbuf_ExecuteText(EXEC_APPEND, va("map %s\n", loadmap));
 	}
-
-	// Reset file reading.
-	FS_Seek(f, 0, FS_SEEK_SET);
-
-	// Load the savefile.
-	VM_Call( gvm, GAME_LOADGAME, f);
-
-	// Close file
-	FS_FCloseFile( f );
-#endif
 }
 #endif
 //===========================================================
@@ -1450,7 +1350,6 @@ void SV_AddOperatorCommands( void ) {
 	Cmd_AddCommand("exceptdel", SV_ExceptDel_f);
 	Cmd_AddCommand("flushbans", SV_FlushBans_f);
 #ifdef TA_SP // Save/load
-	Cmd_AddCommand("savegame", SV_SaveGame_f);
 	Cmd_AddCommand("loadgame", SV_LoadGame_f);
 #endif
 }

@@ -942,8 +942,8 @@ void G_AdvanceMap( void );
 //
 // g_save.c
 //
-qboolean G_SaveGame(fileHandle_t f);
-void G_LoadGame(fileHandle_t f);
+qboolean G_SaveGame(const char *savegame);
+void G_LoadGame(void);
 void G_LoadGameClient(int client);
 int G_LocalClientNumForGentitiyNum(int gentityNum);
 #endif
@@ -1061,6 +1061,8 @@ extern	vmCvar_t	g_singlePlayer;
 #endif
 #ifdef TA_SP
 extern	vmCvar_t	g_singlePlayer;
+extern	vmCvar_t	g_savegameLoading;
+extern	vmCvar_t	g_savegameFilename;
 extern	vmCvar_t	g_spSaveData;
 extern	vmCvar_t	g_saveVersions;
 extern	vmCvar_t	g_saveFilename;

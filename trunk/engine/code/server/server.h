@@ -250,10 +250,6 @@ typedef struct {
 	int			nextHeartbeatTime;
 	challenge_t	challenges[MAX_CHALLENGES];	// to prevent invalid IPs from connecting
 	netadr_t	redirectAddress;			// for rcon return messages
-
-#ifdef TA_SP // GAME_LOADGAME
-	char loadgame[MAX_QPATH];
-#endif
 } serverStatic_t;
 
 #define SERVER_MAXBANS	1024

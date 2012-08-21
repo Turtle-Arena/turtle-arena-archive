@@ -467,6 +467,26 @@ void	Svcmd_ListIPs_f( void ) {
 	trap_SendConsoleCommand( EXEC_NOW, "g_banIPs\n" );
 }
 
+#ifdef TA_SP
+/*
+===================
+Svcmd_Savegame_f
+===================
+*/
+void Svcmd_Savegame_f(void) {
+	char savegame[MAX_QPATH];
+
+	if ( trap_Argc() < 2 ) {
+		G_Printf("Usage: savegame <savename>\n");
+		return;
+	}
+
+	trap_Argv( 1, savegame, sizeof( savegame ) );
+
+	G_SaveGame(savegame);
+}
+#endif
+
 #if 0
 /*
 ===================
@@ -494,6 +514,9 @@ struct svcmd
   { "game_memory", qfalse, Svcmd_GameMem_f },
   { "listip", qfalse, Svcmd_ListIPs_f },
   { "removeip", qfalse, Svcmd_RemoveIP_f },
+#ifdef TA_SP
+  { "savegame", qfalse, Svcmd_Savegame_f },
+#endif
   //{ "say", qtrue, Svcmd_Say_f },
 };
 

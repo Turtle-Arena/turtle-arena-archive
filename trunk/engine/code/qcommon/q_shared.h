@@ -72,11 +72,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define BASEQ3				"baseq3"
 #define BASETA				"missionpack"
 
-#ifdef TA_SP
-  // It's really "fs_game\\saves", so each mod has its own saves dir.
-  #define SAVEGAMEDIR "saves"
-#endif
-
 #define Q3_VERSION PRODUCT_NAME " " PRODUCT_VERSION
 
 #define MAX_TEAMNAME		32
