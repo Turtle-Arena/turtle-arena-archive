@@ -1968,5 +1968,5 @@ void etpro_FinalizeTracemapClamp( int *x, int *y );
 #ifdef TA_SP
 // Set as defaults for g_saveVersions so server can tell if can load savefile.
 // They are setup in q3_ui/ui and game
-#define BG_SAVE_VERSIONS "6" // Example: "0;1;2;3"
+#define BG_SAVE_VERSIONS "7" // Example: "0;1;2;3"
 #endif

@@ -460,11 +460,5 @@ typedef enum {
 
 	BOTAI_START_FRAME				// ( int time );
 
-#ifdef TA_SP // Save/load
-	,GAME_SAVEGAME, // ( fileHandle_t f );
-
-	GAME_LOADGAME // ( fileHandle_t f );
-#endif
-
 } gameExport_t;
 

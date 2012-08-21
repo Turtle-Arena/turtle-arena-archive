@@ -113,6 +113,8 @@ vmCvar_t	g_enableBreath;
 vmCvar_t	g_proxMineTimeout;
 #endif
 #ifdef TA_SP
+vmCvar_t	g_savegameLoading;
+vmCvar_t	g_savegameFilename;
 vmCvar_t	g_spSaveData; // Used to save data between levels.
 //vmCvar_t	g_spSaveDataNet[MAX_CLIENTS]; // Save data for all clients
 vmCvar_t	g_saveVersions;
@@ -237,6 +239,8 @@ static cvarTable_t		gameCvarTable[] = {
 	{ &g_proxMineTimeout, "g_proxMineTimeout", "20000", 0, 0, qfalse },
 #endif
 #ifdef TA_SP
+	{ &g_savegameLoading, "savegame_loading", "0", 0, 0, qfalse},
+	{ &g_savegameFilename, "savegame_filename", "", 0, 0, qfalse},
 	{ &g_spSaveData, "g_spSaveData", "", CVAR_SYSTEMINFO, 0, qfalse, qfalse  },
 	{ &g_saveVersions, "g_saveVersions", BG_SAVE_VERSIONS, CVAR_ROM, 0, 0, qfalse },
 	{ &g_saveFilename, "g_saveFilename", "", CVAR_SERVERINFO, 0, 0, qfalse },
@@ -312,13 +316,6 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return 0;
 	case GAME_CONSOLE_COMMAND:
 		return ConsoleCommand();
-#ifdef TA_SP // Save/load
-	case GAME_SAVEGAME:
-		return G_SaveGame((fileHandle_t)arg0);
-	case GAME_LOADGAME:
-		G_LoadGame((fileHandle_t)arg0);
-		return 0;
-#endif
 	case BOTAI_START_FRAME:
 		return BotAIStartFrame( arg0 );
 	}
@@ -482,6 +479,13 @@ void G_RegisterCvars( void ) {
 	if ( g_gametype.integer == GT_SINGLE_PLAYER && !g_singlePlayer.integer) {
 		g_gametype.integer = GT_FFA;
 		trap_Cvar_Set( "g_gametype", va("%d", g_gametype.integer) );
+	}
+#endif
+
+#ifdef TA_SP
+	// Check if loading a savegame
+	if (g_savegameLoading.integer && g_savegameFilename.string[0]) {
+		G_LoadGame();
 	}
 #endif
 

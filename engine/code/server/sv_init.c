@@ -589,16 +589,6 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	sv.time += 100;
 	svs.time += 100;
 
-#ifdef TA_SP
-	// GAME_LOADGAME
-	if (svs.loadgame[0])
-	{
-		// We were loading a savegame...
-		Cbuf_ExecuteText(EXEC_APPEND, va("loadgame %s 1\n", svs.loadgame));
-		svs.loadgame[0] = '\0';
-	}
-#endif
-
 	// Force sv_pure to off if invalid default pk3s
 	if (sv_pure->integer && !com_fs_pure->integer) {
 		Cvar_Set( "sv_pure", "0" );
@@ -822,6 +812,10 @@ void SV_Shutdown( char *finalmsg ) {
 
 	Cvar_Set( "sv_running", "0" );
 	Cvar_Set("ui_singlePlayerActive", "0");
+#ifdef TA_SP
+	Cvar_Set("savegame_loading", "0");
+	Cvar_Set("savegame_filename", "");
+#endif
 	Cvar_Set("sv_public", "0");
 
 	Com_Printf( "---------------------------\n" );
