@@ -456,7 +456,7 @@ int BotLoadCachedCharacter(char *charfile, float skill, int reload)
 		cachedhandle = BotFindCachedCharacter(charfile, -1);
 		if (cachedhandle)
 		{
-			botimport.Print(PRT_MESSAGE, "loaded cached skill %f from %s\n", botcharacters[cachedhandle]->skill, charfile);
+			botimport.Print(PRT_DEVELOPER, "loaded cached skill %f from %s\n", botcharacters[cachedhandle]->skill, charfile);
 			return cachedhandle;
 		} //end if
 	} //end if

@@ -557,7 +557,7 @@ void PC_PrintDefineHashTable(define_t **definehash)
 
 int PC_NameHash(char *name)
 {
-	register int hash, i;
+	int register hash, i;
 
 	hash = 0;
 	for (i = 0; name[i] != '\0'; i++)

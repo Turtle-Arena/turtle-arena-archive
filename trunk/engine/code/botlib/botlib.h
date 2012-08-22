@@ -37,37 +37,7 @@ Suite 120, Rockville, Maryland 20850 USA.
  *
  *****************************************************************************/
 
-// ZTM: Botlib is not compatible with (io)quake3 (or anyone else)
-#if defined TA_WEAPSYS || defined IOQ3ZTM_NO_COMPAT || (defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT) || defined TA_HOLDSYS
-	
-	#ifdef TA_WEAPSYS // & 4
-		#define BOTLIB_API_BIT4 4
-	#else
-		#define BOTLIB_API_BIT4 0
-	#endif
-
-	#if !(defined TA_WEAPSYS && defined IOQ3ZTM_NO_COMPAT) // BOT_WEAP_WEIGHTS // & 32
-		#define BOTLIB_API_BIT32 32
-	#else
-		#define BOTLIB_API_BIT32 0
-	#endif
-
-	#if defined TA_WEAPSYS_EX && !defined TA_WEAPSYS_EX_COMPAT // & 8
-		#define BOTLIB_API_BIT8 8
-	#else
-		#define BOTLIB_API_BIT8 0
-	#endif
-
-	#ifdef TA_HOLDSYS // & 16
-		#define BOTLIB_API_BIT16 16
-	#else
-		#define BOTLIB_API_BIT16 0
-	#endif
-	
-	#define	BOTLIB_API_VERSION		(2|BOTLIB_API_BIT4|BOTLIB_API_BIT8|BOTLIB_API_BIT16|BOTLIB_API_BIT32)
-#else
 #define	BOTLIB_API_VERSION		2
-#endif
 
 struct aas_clientmove_s;
 struct aas_entityinfo_s;
