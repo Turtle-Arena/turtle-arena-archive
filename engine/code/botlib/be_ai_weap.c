@@ -147,11 +147,7 @@ int BotValidWeaponNumber(int weaponnum)
 {
 	if (weaponnum <= 0 || weaponnum > weaponconfig->numweapons)
 	{
-#ifdef IOQ3ZTM
-		botimport.Print(PRT_ERROR, "weapon number out of range (%i/%i)\n", weaponnum, weaponconfig->numweapons);
-#else
 		botimport.Print(PRT_ERROR, "weapon number out of range\n");
-#endif
 		return qfalse;
 	} //end if
 	return qtrue;

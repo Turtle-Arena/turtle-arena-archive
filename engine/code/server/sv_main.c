@@ -1188,11 +1188,7 @@ SV_FrameMsec
 Return time in millseconds until processing of the next server frame.
 ==================
 */
-#ifdef IOQ3ZTM
-int SV_FrameMsec( void )
-#else
 int SV_FrameMsec()
-#endif
 {
 	if(sv_fps)
 	{
