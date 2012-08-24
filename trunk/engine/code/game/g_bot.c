@@ -811,15 +811,6 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, key, headmodel );
 #endif
 
-#ifndef IOQ3ZTM // UNUSED_USERINFO
-	key = "gender";
-	s = Info_ValueForKey( botinfo, key );
-	if ( !*s ) {
-		s = "male";
-	}
-	Info_SetValueForKey( userinfo, "sex", s );
-#endif
-
 	key = "color1";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
