@@ -664,7 +664,6 @@ void SV_Init (void)
 	Cvar_Get ("fraglimit", "20", CVAR_SERVERINFO);
 #endif
 	Cvar_Get ("timelimit", "0", CVAR_SERVERINFO);
-	Cvar_Get ("ui_singlePlayerActive", "0", CVAR_SYSTEMINFO | CVAR_ROM );
 	sv_gametype = Cvar_Get ("g_gametype", "0", CVAR_SERVERINFO | CVAR_LATCH );
 	Cvar_Get ("sv_keywords", "", CVAR_SERVERINFO);
 	sv_mapname = Cvar_Get ("mapname", "nomap", CVAR_SERVERINFO | CVAR_ROM);
