@@ -1503,8 +1503,7 @@ void SV_UserinfoChanged( client_t *cl ) {
 		}
 	}
 #ifdef TA_SP // HANDICAP
-	if (Cvar_VariableValue("ui_singlePlayerActive")
-		&& cl->netchan.remoteAddress.type != NA_BOT)
+	if (Com_GameIsSinglePlayer() && cl->netchan.remoteAddress.type != NA_BOT)
 	{
 		// Humans do not use handicap in single player
 		Info_SetValueForKey( cl->userinfo, "handicap", "100" );
