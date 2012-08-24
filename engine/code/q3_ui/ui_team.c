@@ -179,7 +179,7 @@ void TeamMain_MenuInit( int localClient ) {
 	y += 20;
 
 #ifdef TA_SP
-	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+	if (ui_singlePlayerActive.integer) {
 		s_teammain.spectate.generic.flags |= QMF_GRAYED;
 	}
 #endif

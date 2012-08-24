@@ -338,7 +338,7 @@ void InGame_MenuInit( void ) {
 			s_ingame.team.style					= UI_CENTER|UI_SMALLFONT;
 
 #ifdef TA_SP
-			if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+			if (ui_singlePlayerActive.integer) {
 				s_ingame.team.generic.flags |= QMF_GRAYED;
 			}
 #endif
@@ -369,7 +369,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.addbots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TA_SP
-	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+	|| ui_singlePlayerActive.integer
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -389,7 +389,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.removebots.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" ) || !trap_Cvar_VariableValue( "bot_enable" )
 #ifdef TA_SP
-	|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )
+	|| ui_singlePlayerActive.integer
 #else
 	|| (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
@@ -443,7 +443,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
 
 #ifdef TA_SP
-	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" ) &&
+	if (ui_singlePlayerActive.integer &&
 		trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER)
 #else
 	if (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
@@ -480,7 +480,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.setupplayers.color				= text_big_color;
 	s_ingame.setupplayers.style				= UI_CENTER|UI_SMALLFONT;
 
-	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+	if (ui_singlePlayerActive.integer) {
 		s_ingame.setupplayers.generic.flags |= QMF_GRAYED;
 	}
 #endif
@@ -497,7 +497,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.inserver.color				= text_big_color;
 	s_ingame.inserver.style				= UI_CENTER|UI_SMALLFONT;
 	if( !trap_Cvar_VariableValue( "sv_running" )
-		|| trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+		|| ui_singlePlayerActive.integer) {
 		s_ingame.inserver.generic.flags |= QMF_GRAYED;
 	}
 #endif
@@ -518,7 +518,7 @@ void InGame_MenuInit( void ) {
 	s_ingame.server.style				= UI_CENTER|UI_SMALLFONT;
 
 #ifdef TA_SP
-	if (trap_Cvar_VariableValue( "ui_singlePlayerActive" )) {
+	if (ui_singlePlayerActive.integer) {
 		s_ingame.server.generic.flags |= QMF_GRAYED;
 	}
 #endif

@@ -622,7 +622,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 	}
 #ifdef TA_SP
 	else if (( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) )
-			&& !trap_Cvar_VariableIntegerValue("ui_singlePlayerActive"))
+			&& !g_singlePlayer.integer)
 #else
 	else if ( !Q_stricmp( s, "spectator" ) || !Q_stricmp( s, "s" ) )
 #endif
