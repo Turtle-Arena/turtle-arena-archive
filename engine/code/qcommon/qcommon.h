@@ -859,6 +859,7 @@ extern	cvar_t	*com_version;
 #ifndef NOBLOOD
 extern	cvar_t	*com_blood;
 #endif
+extern	cvar_t	*com_singlePlayerActive;
 extern	cvar_t	*com_buildScript;		// for building release pak files
 extern	cvar_t	*com_journal;
 extern	cvar_t	*com_cameraMode;
