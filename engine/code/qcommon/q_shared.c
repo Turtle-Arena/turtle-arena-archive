@@ -135,20 +135,14 @@ void COM_DefaultExtension( char *path, int maxSize, const char *extension )
 #ifdef IOQ3ZTM
 /*
 ==================
-Com_SetExt
+COM_SetExtension
 ==================
 */
-void Com_SetExt(char *filename, char *ext)
+void COM_SetExtension(char *path, int maxSize, const char *extension)
 {
-	int i;
+	COM_StripExtension(path, path, maxSize);
 
-	for (i = 0; filename[i] && filename[i] != '.'; i++)
-	{
-		// just increase i.
-	}
-	filename[i] = 0;
-
-	Q_strcat(filename, MAX_QPATH, ext);
+	Q_strcat(path, maxSize, extension);
 }
 #endif
 

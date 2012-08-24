@@ -406,7 +406,7 @@ static void CG_MiscObject( centity_t *cent ) {
 			}
 
 			Q_strncpyz(filename, modelName, MAX_QPATH);
-			Com_SetExt(filename, ".cfg");
+			COM_SetExtension(filename, sizeof (filename), ".cfg");
 		}
 
 		if ((cent->objectcfg = BG_ParseObjectCFGFile(filename)) != NULL) {
