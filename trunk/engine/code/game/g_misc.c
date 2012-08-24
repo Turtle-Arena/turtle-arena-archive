@@ -955,7 +955,7 @@ void SP_misc_object( gentity_t *ent ) {
 
 		ent->s.modelindex = G_ModelIndex( ent->model );
 		trap_GetConfigstring( CS_MODELS + ent->s.modelindex, filename, sizeof(filename));
-		Com_SetExt(filename, ".cfg");
+		COM_SetExtension(filename, sizeof (filename), ".cfg");
 
 		if (G_SpawnString( "config", "", &config) && *config) {
 			Q_strncpyz(filename, config, sizeof(filename));
