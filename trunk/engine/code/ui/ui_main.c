@@ -2407,17 +2407,12 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 		// hard coded mess here
 		if (select < 0) {
 			ui_gameType.integer--;
-#ifndef TA_SP // Don't skip SP
+#ifdef TURTLEARENA // Don't skip any gametypes
+			if (ui_gameType.integer < 0)
+#else
 			if (ui_gameType.integer == 2) {
 				ui_gameType.integer = 1;
-			} else
-#endif
-#ifdef TURTLEARENA // Don't skip FFA
-			if (ui_gameType.integer < 0)
-#elif defined TA_SP // Don't skip dual (Needed because of above TA_SP ifdef)
-			if (ui_gameType.integer < 1)
-#else
-			if (ui_gameType.integer < 2)
+			} else if (ui_gameType.integer < 2)
 #endif
 			{
 				ui_gameType.integer = uiInfo.numGameTypes - 1;
@@ -2425,13 +2420,13 @@ static qboolean UI_GameType_HandleKey(int flags, float *special, int key, qboole
 		} else {
 			ui_gameType.integer++;
 			if (ui_gameType.integer >= uiInfo.numGameTypes) {
-#ifdef TURTLEARENA // Don't skip FFA
+#ifdef TURTLEARENA // Don't skip any gametypes
 				ui_gameType.integer = 0;
 #else
 				ui_gameType.integer = 1;
 #endif
 			}
-#ifndef TA_SP // Don't skip SP
+#ifndef TURTLEARENA // Don't skip any gametypes
 			else if (ui_gameType.integer == 2) {
 				ui_gameType.integer = 3;
 			}
