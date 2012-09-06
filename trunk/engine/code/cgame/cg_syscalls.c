@@ -206,6 +206,10 @@ void	trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
 	syscall( CG_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
+void	trap_S_StopLoopingSound( int entityNum ) {
+	syscall( CG_S_STOPLOOPINGSOUND, entityNum );
+}
+
 void	trap_S_ClearLoopingSounds( qboolean killall ) {
 	syscall( CG_S_CLEARLOOPINGSOUNDS, killall );
 }
@@ -216,10 +220,6 @@ void	trap_S_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 
 void	trap_S_AddRealLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfx ) {
 	syscall( CG_S_ADDREALLOOPINGSOUND, entityNum, origin, velocity, sfx );
-}
-
-void	trap_S_StopLoopingSound( int entityNum ) {
-	syscall( CG_S_STOPLOOPINGSOUND, entityNum );
 }
 
 void	trap_S_UpdateEntityPosition( int entityNum, const vec3_t origin ) {
@@ -242,8 +242,16 @@ void	trap_S_StartBackgroundTrack( const char *intro, const char *loop ) {
 	syscall( CG_S_STARTBACKGROUNDTRACK, intro, loop );
 }
 
+void	trap_S_StopBackgroundTrack( void ) {
+	syscall( CG_S_STOPBACKGROUNDTRACK );
+}
+
 void	trap_R_LoadWorldMap( const char *mapname ) {
 	syscall( CG_R_LOADWORLDMAP, mapname );
+}
+
+qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
+	return syscall( CG_GET_ENTITY_TOKEN, buffer, bufferSize );
 }
 
 qhandle_t trap_R_RegisterModel( const char *name ) {
@@ -286,16 +294,16 @@ void    trap_R_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer ) {
 	syscall( CG_R_ADDPOLYBUFFERTOSCENE, pPolyBuffer );
 }
 
-int		trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir ) {
-	return syscall( CG_R_LIGHTFORPOINT, point, ambientLight, directedLight, lightDir );
-}
-
 void	trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
 	syscall( CG_R_ADDLIGHTTOSCENE, org, PASSFLOAT(intensity), PASSFLOAT(r), PASSFLOAT(g), PASSFLOAT(b) );
 }
 
 void	trap_R_AddAdditiveLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
 	syscall( CG_R_ADDADDITIVELIGHTTOSCENE, org, PASSFLOAT(intensity), PASSFLOAT(r), PASSFLOAT(g), PASSFLOAT(b) );
+}
+
+int		trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir ) {
+	return syscall( CG_R_LIGHTFORPOINT, point, ambientLight, directedLight, lightDir );
 }
 
 void	trap_R_RenderScene( const refdef_t *fd ) {
@@ -322,6 +330,10 @@ int		trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int e
 
 void	trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset ) {
 	syscall( CG_R_REMAP_SHADER, oldShader, newShader, timeOffset );
+}
+
+qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
+	return syscall( CG_R_INPVS, p1, p2 );
 }
 
 void		trap_GetGlconfig( glconfig_t *glconfig ) {
@@ -382,6 +394,26 @@ int trap_Key_GetKey( const char *binding ) {
 	return syscall( CG_KEY_GETKEY, binding );
 }
 
+void trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
+  syscall( CG_KEY_KEYNUMTOSTRINGBUF, keynum, buf, buflen );
+}
+
+void trap_Key_GetBindingBuf( int keynum, char *buf, int buflen ) {
+  syscall( CG_KEY_GETBINDINGBUF, keynum, buf, buflen );
+}
+
+void trap_Key_SetBinding( int keynum, const char *binding ) {
+  syscall( CG_KEY_SETBINDING, keynum, binding );
+}
+
+void trap_Key_SetOverstrikeMode( qboolean state ) {
+  syscall( CG_KEY_SETOVERSTRIKEMODE, state );
+}
+
+qboolean trap_Key_GetOverstrikeMode( void ) {
+  return syscall( CG_KEY_GETOVERSTRIKEMODE );
+}
+
 int trap_PC_AddGlobalDefine( char *define ) {
 	return syscall( CG_PC_ADD_GLOBAL_DEFINE, define );
 }
@@ -402,10 +434,6 @@ int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) {
 	return syscall( CG_PC_SOURCE_FILE_AND_LINE, handle, filename, line );
 }
 
-void	trap_S_StopBackgroundTrack( void ) {
-	syscall( CG_S_STOPBACKGROUNDTRACK );
-}
-
 int trap_RealTime(qtime_t *qtime) {
 	return syscall( CG_REAL_TIME, qtime );
 }
@@ -414,31 +442,22 @@ void trap_SnapVector( float *v ) {
 	syscall( CG_SNAPVECTOR, v );
 }
 
-// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to qfalse (do not alter gamestate)
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits) {
   return syscall(CG_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits);
 }
- 
-// stops playing the cinematic and ends it.  should always return FMV_EOF
-// cinematics must be stopped in reverse order of when they are started
+
 e_status trap_CIN_StopCinematic(int handle) {
   return syscall(CG_CIN_STOPCINEMATIC, handle);
 }
 
-
-// will run a frame of the cinematic but will not draw it.  Will return FMV_EOF if the end of the cinematic has been reached.
 e_status trap_CIN_RunCinematic (int handle) {
   return syscall(CG_CIN_RUNCINEMATIC, handle);
 }
- 
 
-// draws the current frame
 void trap_CIN_DrawCinematic (int handle) {
   syscall(CG_CIN_DRAWCINEMATIC, handle);
 }
- 
 
-// allows you to resize the animation dynamically
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   syscall(CG_CIN_SETEXTENTS, handle, x, y, w, h);
 }
@@ -456,34 +475,6 @@ qboolean trap_getCameraInfo( int time, vec3_t *origin, vec3_t *angles) {
 	return syscall( CG_GETCAMERAINFO, time, origin, angles );
 }
 */
-
-qboolean trap_GetEntityToken( char *buffer, int bufferSize ) {
-	return syscall( CG_GET_ENTITY_TOKEN, buffer, bufferSize );
-}
-
-qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
-	return syscall( CG_R_INPVS, p1, p2 );
-}
-
-void trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
-  syscall( CG_KEY_KEYNUMTOSTRINGBUF, keynum, buf, buflen );
-}
-
-void trap_Key_GetBindingBuf( int keynum, char *buf, int buflen ) {
-  syscall( CG_KEY_GETBINDINGBUF, keynum, buf, buflen );
-}
-
-void trap_Key_SetBinding( int keynum, const char *binding ) {
-  syscall( CG_KEY_SETBINDING, keynum, binding );
-}
-
-void trap_Key_SetOverstrikeMode( qboolean state ) {
-  syscall( CG_KEY_SETOVERSTRIKEMODE, state );
-}
-
-qboolean trap_Key_GetOverstrikeMode( void ) {
-  return syscall( CG_KEY_GETOVERSTRIKEMODE );
-}
 
 #ifdef IOQ3ZTM // BONES
 void trap_R_AddRefEntityToScene_CustomSkeleton( const refEntity_t *re, const refSkeleton_t *rs ) {

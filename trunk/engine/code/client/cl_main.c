@@ -3769,8 +3769,7 @@ void CL_Init( void ) {
 
 	// Main local client userinfo
 	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifdef TURTLEARENA
-	// DEFAULT_PLAYER
+#ifdef TURTLEARENA // DEFAULT_PLAYER
 #ifdef TA_SP // SPMODEL
 	Cvar_Get ("spmodel", "leo", CVAR_USERINFO | CVAR_ROM );
 	Cvar_Get ("spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
@@ -3781,9 +3780,6 @@ void CL_Init( void ) {
 	Cvar_Get ("team_model", "leo", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
-	// DEFAULT_TEAMS
-	Cvar_Get ("g_redTeam", "Clover", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Shell", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #else
 	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
 #ifdef IOQ3ZTM // BLANK_HEADMODEL
@@ -3795,8 +3791,6 @@ void CL_Init( void ) {
 	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
-	Cvar_Get ("g_redTeam", "Stroggs", CVAR_SERVERINFO | CVAR_ARCHIVE);
-	Cvar_Get ("g_blueTeam", "Pagans", CVAR_SERVERINFO | CVAR_ARCHIVE);
 #endif
 #ifdef TURTLEARENA
 	Cvar_Get ("color1",  "5", CVAR_USERINFO | CVAR_ARCHIVE );

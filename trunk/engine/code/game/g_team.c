@@ -915,10 +915,7 @@ int Team_TouchOurFlag( gentity_t *ent, gentity_t *other, int team ) {
 		} else if (player->client->sess.sessionTeam ==
 			cl->sess.sessionTeam) {
 #ifdef MISSIONPACK
-#ifndef IOQ3ZTM // IOQ3BUGFIX: Not needed after ioq3 r1644
-			if (player != other)
-#endif
-				AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
+			AddScore(player, ent->r.currentOrigin, CTF_TEAM_BONUS);
 #endif
 			// award extra points for capture assists
 			if (player->client->pers.teamState.lastreturnedflag + 

@@ -56,7 +56,7 @@ void CG_InitTeamChat(void) {
   memset(systemChat, 0, sizeof(systemChat));
 }
 
-void CG_SetPrintString(int type, const char *p) {
+void CG_SetPrintString(q3print_t type, const char *p) {
   if (type == SYSTEM_PRINT) {
     strcpy(systemChat, p);
   } else {

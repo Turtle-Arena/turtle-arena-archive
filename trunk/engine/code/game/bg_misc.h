@@ -1403,14 +1403,6 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 #endif
 #endif // TURTLEARENA
 
-#ifdef TURTLEARENA // DEFAULT_TEAMS
-#define DEFAULT_REDTEAM_NAME		"Clover"
-#define DEFAULT_BLUETEAM_NAME		"Shell"
-#else
-#define DEFAULT_REDTEAM_NAME		"Stroggs"
-#define DEFAULT_BLUETEAM_NAME		"Pagans"
-#endif
-
 // Moved footstep_t to bg_misc.h from cg_local.h
 typedef enum {
 	FOOTSTEP_NORMAL,
@@ -1723,6 +1715,14 @@ void PM_UpdateViewAngles( playerState_t *ps, const usercmd_t *cmd );
 void Pmove (pmove_t *pmove);
 
 //===================================================================================
+
+#ifdef TURTLEARENA // DEFAULT_TEAMS
+#define DEFAULT_REDTEAM_NAME		"Clover"
+#define DEFAULT_BLUETEAM_NAME		"Shell"
+#else
+#define DEFAULT_REDTEAM_NAME		"Pagans"
+#define DEFAULT_BLUETEAM_NAME		"Stroggs"
+#endif
 
 typedef enum {
 	TEAM_FREE,

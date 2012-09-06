@@ -145,12 +145,12 @@ qhandle_t trap_R_RegisterSkin( const char *name ) {
 	return syscall( UI_R_REGISTERSKIN, name );
 }
 
-void trap_R_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
-	syscall( UI_R_REGISTERFONT, fontName, pointSize, font );
-}
-
 qhandle_t trap_R_RegisterShaderNoMip( const char *name ) {
 	return syscall( UI_R_REGISTERSHADERNOMIP, name );
+}
+
+void trap_R_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font) {
+	syscall( UI_R_REGISTERFONT, fontName, pointSize, font );
 }
 
 void trap_R_ClearScene( void ) {
@@ -193,12 +193,16 @@ int trap_CM_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int e
 	return syscall( UI_CM_LERPTAG, tag, mod, startFrame, endFrame, PASSFLOAT(frac), tagName );
 }
 
-void trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
-	syscall( UI_S_STARTLOCALSOUND, sfx, channelNum );
+void	trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset ) {
+	syscall( UI_R_REMAP_SHADER, oldShader, newShader, timeOffset );
 }
 
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed ) {
 	return syscall( UI_S_REGISTERSOUND, sample, compressed );
+}
+
+void trap_S_StartLocalSound( sfxHandle_t sfx, int channelNum ) {
+	syscall( UI_S_STARTLOCALSOUND, sfx, channelNum );
 }
 
 int trap_S_SoundDuration( sfxHandle_t handle ) {
@@ -245,16 +249,32 @@ void trap_GetClipboardData( char *buf, int bufsize ) {
 	syscall( UI_GETCLIPBOARDDATA, buf, bufsize );
 }
 
-void trap_GetClientState( uiClientState_t *state ) {
-	syscall( UI_GETCLIENTSTATE, state );
-}
-
 void trap_GetGlconfig( glconfig_t *glconfig ) {
 	syscall( UI_GETGLCONFIG, glconfig );
 }
 
+void trap_GetClientState( uiClientState_t *state ) {
+	syscall( UI_GETCLIENTSTATE, state );
+}
+
 int trap_GetConfigString( int index, char* buff, int buffsize ) {
 	return syscall( UI_GETCONFIGSTRING, index, buff, buffsize );
+}
+
+int trap_LAN_GetPingQueueCount( void ) {
+	return syscall( UI_LAN_GETPINGQUEUECOUNT );
+}
+
+void trap_LAN_ClearPing( int n ) {
+	syscall( UI_LAN_CLEARPING, n );
+}
+
+void trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
+	syscall( UI_LAN_GETPING, n, buf, buflen, pingtime );
+}
+
+void trap_LAN_GetPingInfo( int n, char *buf, int buflen ) {
+	syscall( UI_LAN_GETPINGINFO, n, buf, buflen );
 }
 
 int	trap_LAN_GetServerCount( int source ) {
@@ -273,10 +293,6 @@ int trap_LAN_GetServerPing( int source, int n ) {
 	return syscall( UI_LAN_GETSERVERPING, source, n );
 }
 
-int trap_LAN_GetPingQueueCount( void ) {
-	return syscall( UI_LAN_GETPINGQUEUECOUNT );
-}
-
 int trap_LAN_ServerStatus( const char *serverAddress, char *serverStatus, int maxLen ) {
 	return syscall( UI_LAN_SERVERSTATUS, serverAddress, serverStatus, maxLen );
 }
@@ -291,18 +307,6 @@ void trap_LAN_LoadCachedServers( void ) {
 
 void trap_LAN_ResetPings(int n) {
 	syscall( UI_LAN_RESETPINGS, n );
-}
-
-void trap_LAN_ClearPing( int n ) {
-	syscall( UI_LAN_CLEARPING, n );
-}
-
-void trap_LAN_GetPing( int n, char *buf, int buflen, int *pingtime ) {
-	syscall( UI_LAN_GETPING, n, buf, buflen, pingtime );
-}
-
-void trap_LAN_GetPingInfo( int n, char *buf, int buflen ) {
-	syscall( UI_LAN_GETPINGINFO, n, buf, buflen );
 }
 
 void trap_LAN_MarkServerVisible( int source, int n, qboolean visible ) {
@@ -365,38 +369,24 @@ int trap_RealTime(qtime_t *qtime) {
 	return syscall( UI_REAL_TIME, qtime );
 }
 
-// this returns a handle.  arg0 is the name in the format "idlogo.roq", set arg1 to NULL, alteredstates to qfalse (do not alter gamestate)
 int trap_CIN_PlayCinematic( const char *arg0, int xpos, int ypos, int width, int height, int bits) {
   return syscall(UI_CIN_PLAYCINEMATIC, arg0, xpos, ypos, width, height, bits);
 }
- 
-// stops playing the cinematic and ends it.  should always return FMV_EOF
-// cinematics must be stopped in reverse order of when they are started
+
 e_status trap_CIN_StopCinematic(int handle) {
   return syscall(UI_CIN_STOPCINEMATIC, handle);
 }
 
-
-// will run a frame of the cinematic but will not draw it.  Will return FMV_EOF if the end of the cinematic has been reached.
 e_status trap_CIN_RunCinematic (int handle) {
   return syscall(UI_CIN_RUNCINEMATIC, handle);
 }
- 
 
-// draws the current frame
 void trap_CIN_DrawCinematic (int handle) {
   syscall(UI_CIN_DRAWCINEMATIC, handle);
 }
- 
 
-// allows you to resize the animation dynamically
 void trap_CIN_SetExtents (int handle, int x, int y, int w, int h) {
   syscall(UI_CIN_SETEXTENTS, handle, x, y, w, h);
-}
-
-
-void	trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset ) {
-	syscall( UI_R_REMAP_SHADER, oldShader, newShader, timeOffset );
 }
 
 #ifdef IOQ3ZTM // BONES

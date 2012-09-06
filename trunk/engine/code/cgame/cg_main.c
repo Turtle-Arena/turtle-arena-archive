@@ -40,6 +40,10 @@ displayContextDef_t cgDC;
 #ifndef TURTLEARENA // NO_CGFORCEMODLE
 int forceModelModificationCount = -1;
 #endif
+#ifdef MISSIONPACK
+int redTeamNameModificationCount = -1;
+int blueTeamNameModificationCount = -1;
+#endif
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
 void CG_Shutdown( void );
@@ -434,8 +438,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
 #endif
 #ifdef MISSIONPACK
-	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
-	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SERVERINFO | CVAR_USERINFO },
+	{ &cg_redTeamName, "g_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SYSTEMINFO },
+	{ &cg_blueTeamName, "g_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SYSTEMINFO },
 	{ &cg_currentSelectedPlayer, "cg_currentSelectedPlayer", "0", CVAR_ARCHIVE},
 	{ &cg_currentSelectedPlayerName, "cg_currentSelectedPlayerName", "", CVAR_ARCHIVE},
 #ifndef IOQ3ZTM
@@ -519,6 +523,10 @@ void CG_RegisterCvars( void ) {
 #ifndef TURTLEARENA // NO_CGFORCEMODLE
 	forceModelModificationCount = cg_forceModel.modificationCount;
 #endif
+#ifdef MISSIONPACK
+	redTeamNameModificationCount = cg_redTeamName.modificationCount;
+	blueTeamNameModificationCount = cg_blueTeamName.modificationCount;
+#endif
 
 #ifndef IOQ3ZTM
 	// ZTM: FIXME: Add extra local clients, or can this be safely removed?
@@ -529,8 +537,8 @@ void CG_RegisterCvars( void ) {
 #endif
 }
 
-#ifndef TURTLEARENA // NO_CGFORCEMODLE
-/*																																			
+#if defined MISSIONPACK || !defined TURTLEARENA // NO_CGFORCEMODLE
+/*
 ===================
 CG_ForceModelChange
 ===================
@@ -577,12 +585,32 @@ void CG_UpdateCvars( void ) {
 		}
 	}
 
+
+#ifdef MISSIONPACK
+	// if force model or a team name changed
+	if (
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
+	forceModelModificationCount != cg_forceModel.modificationCount ||
+#endif
+		redTeamNameModificationCount != cg_redTeamName.modificationCount
+		|| blueTeamNameModificationCount != cg_blueTeamName.modificationCount )
+	{
+#ifndef TURTLEARENA // NO_CGFORCEMODLE
+		forceModelModificationCount = cg_forceModel.modificationCount;
+#endif
+		redTeamNameModificationCount = cg_redTeamName.modificationCount;
+		blueTeamNameModificationCount = cg_blueTeamName.modificationCount;
+		CG_ForceModelChange();
+	}
+#else
 #ifndef TURTLEARENA // NO_CGFORCEMODLE
 	// if force model changed
-	if ( forceModelModificationCount != cg_forceModel.modificationCount ) {
+	if ( forceModelModificationCount != cg_forceModel.modificationCount )
+	{
 		forceModelModificationCount = cg_forceModel.modificationCount;
 		CG_ForceModelChange();
 	}
+#endif
 #endif
 }
 
