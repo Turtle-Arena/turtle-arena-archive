@@ -5899,17 +5899,10 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_new, "ui_new", "0", CVAR_TEMP },
 	{ &ui_debug, "ui_debug", "0", CVAR_TEMP },
 	{ &ui_initialized, "ui_initialized", "0", CVAR_TEMP },
-#ifdef TURTLEARENA // DEFAULT_TEAMS
-	{ &ui_teamName, "ui_teamName", "Clover", CVAR_ARCHIVE },
-	{ &ui_opponentName, "ui_opponentName", "Shell", CVAR_ARCHIVE },
-	{ &ui_redteam, "ui_redteam", "Clover", CVAR_ARCHIVE },
-	{ &ui_blueteam, "ui_blueteam", "Shell", CVAR_ARCHIVE },
-#else
-	{ &ui_teamName, "ui_teamName", "Pagans", CVAR_ARCHIVE },
-	{ &ui_opponentName, "ui_opponentName", "Stroggs", CVAR_ARCHIVE },
-	{ &ui_redteam, "ui_redteam", "Pagans", CVAR_ARCHIVE },
-	{ &ui_blueteam, "ui_blueteam", "Stroggs", CVAR_ARCHIVE },
-#endif
+	{ &ui_teamName, "ui_teamName", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE },
+	{ &ui_opponentName, "ui_opponentName", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE },
+	{ &ui_redteam, "ui_redteam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE },
+	{ &ui_blueteam, "ui_blueteam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE },
 	{ &ui_dedicated, "ui_dedicated", "0", CVAR_ARCHIVE },
 	{ &ui_gameType, "ui_gametype", "3", CVAR_ARCHIVE },
 	{ &ui_joinGameType, "ui_joinGametype", "0", CVAR_ARCHIVE },
@@ -5995,6 +5988,9 @@ void UI_RegisterCvars( void ) {
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 	}
+
+	trap_Cvar_Register( NULL, "g_redTeam", DEFAULT_REDTEAM_NAME, CVAR_ARCHIVE | CVAR_SYSTEMINFO );
+	trap_Cvar_Register( NULL, "g_blueTeam", DEFAULT_BLUETEAM_NAME, CVAR_ARCHIVE | CVAR_SYSTEMINFO );
 }
 
 /*

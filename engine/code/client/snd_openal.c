@@ -315,6 +315,7 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, qboolean cache)
 
 	void *data;
 	snd_info_t info;
+	int size_per_sec;
 	alSfx_t *curSfx = &knownSfx[sfx];
 
 	// Nothing?
@@ -336,6 +337,10 @@ static void S_AL_BufferLoad(sfxHandle_t sfx, qboolean cache)
 		S_AL_BufferUseDefault(sfx);
 		return;
 	}
+
+	size_per_sec = info.rate * info.channels * info.width;
+	if( size_per_sec > 0 )
+		curSfx->duration = (int)(1000.0f * ((double)info.size / size_per_sec));
 
 	curSfx->isDefaultChecked = qtrue;
 

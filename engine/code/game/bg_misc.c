@@ -1580,9 +1580,7 @@ int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
 void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
 void	trap_FS_Write( const void *buffer, int len, fileHandle_t f );
 void	trap_FS_FCloseFile( fileHandle_t f );
-//#ifndef CGAME // FIXME
 int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
-//#endif
 
 int BG_ItemNumForItem( bg_iteminfo_t *item )
 {

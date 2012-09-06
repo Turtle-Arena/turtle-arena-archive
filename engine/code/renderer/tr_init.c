@@ -301,23 +301,13 @@ static int	s_numVidModes = ARRAY_LEN( r_vidModes );
 qboolean R_GetModeInfo( int *width, int *height, float *windowAspect, int mode ) {
 	vidmode_t	*vm;
 
-#ifdef IOQ3ZTM
-	if ( mode < -2 )
-#else
-	if ( mode < -1 )
-#endif
-	{
+	if ( mode < -1 ) {
 		return qfalse;
 	}
 	if ( mode >= s_numVidModes ) {
 		return qfalse;
 	}
 
-#ifdef IOQ3ZTM
-	if ( mode == -2 ) {
-		// Must set width and height to display size before calling this function!
-	} else
-#endif
 	if ( mode == -1 ) {
 		*width = r_customwidth->integer;
 		*height = r_customheight->integer;
