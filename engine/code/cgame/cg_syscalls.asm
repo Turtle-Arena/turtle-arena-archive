@@ -98,6 +98,7 @@ equ trap_Key_SetBinding					-95
 equ trap_Key_SetOverstrikeMode			-96
 equ trap_Key_GetOverstrikeMode			-97
 equ	trap_R_AddPolyBufferToScene			-98
+equ	trap_R_SetClipRegion				-99
 
 equ	memset						-101
 equ	memcpy						-102
@@ -108,7 +109,8 @@ equ	atan2						-106
 equ	sqrt						-107
 equ floor						-108
 equ	ceil						-109
-equ acos						-110
+equ Q_acos						-110
+equ Q_asin						-111
 
 ;;IOQ3ZTM // BONES
 equ trap_R_AddRefEntityToScene_CustomSkeleton -201

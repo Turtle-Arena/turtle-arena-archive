@@ -875,6 +875,8 @@ typedef struct {
 	float camDistance; // Distance from client to put camera
 #endif
 
+	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
+
 	//qboolean cameraMode;		// if rendering from a loaded camera
 
 #ifdef IOQ3ZTM // LETTERBOX
@@ -932,8 +934,6 @@ typedef struct {
 
 	qboolean	mapRestart;			// set on a map restart to set back the weapon
 
-	qboolean	renderingThirdPerson;		// during deaths, chasecams, etc
-
 	// auto rotating items
 	vec3_t		autoAngles;
 	vec3_t		autoAxis[3];
@@ -971,14 +971,11 @@ typedef struct {
 	qboolean	showScores;
 	qboolean	scoreBoardShowing;
 	int			scoreFadeTime;
+#ifdef MISSIONPACK
 	char			spectatorList[MAX_STRING_CHARS];		// list of names
-	int				spectatorLen;												// length of list
-	float			spectatorWidth;											// width in device units
-	int				spectatorTime;											// next time to offset
-	int				spectatorPaintX;										// current paint x
-	int				spectatorPaintX2;										// current paint x
-	int				spectatorOffset;										// current offset from start
-	int				spectatorPaintLen; 									// current offset from start
+	int				spectatorTime;							// last time offset
+	float			spectatorOffset;						// current offset from start
+#endif
 
 	// sound buffer mainly for announcer sounds
 	int			soundBufferIn;
@@ -1671,7 +1668,7 @@ extern	vmCvar_t		cg_gun_frame;
 extern	vmCvar_t		cg_gun_x;
 extern	vmCvar_t		cg_gun_y;
 extern	vmCvar_t		cg_gun_z;
-extern	vmCvar_t		cg_drawGun;
+extern	vmCvar_t		cg_drawGun[MAX_SPLITVIEW];
 extern	vmCvar_t		cg_viewsize;
 extern	vmCvar_t		cg_tracerChance;
 extern	vmCvar_t		cg_tracerWidth;
@@ -1891,9 +1888,8 @@ void CG_PopScreenPlacement(void);
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
 void CG_FillRect( float x, float y, float width, float height, const float *color );
 void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader );
-void CG_DrawString( float x, float y, const char *string, 
-				   float charWidth, float charHeight, const float *modulate );
-
+void CG_SetClipRegion( float x, float y, float w, float h );
+void CG_ClearClipRegion( void );
 
 #define CENTER_X -640
 #ifdef IOQ3ZTM // FONT_REWRITE
@@ -1907,6 +1903,8 @@ void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t colo
 void CG_DrawFontString( font_t *font, int x, int y, const char *s, float alpha );
 void CG_DrawFontStringColor( font_t *font, int x, int y, const char *s, vec4_t color );
 #endif
+void CG_DrawString( float x, float y, const char *string, 
+				   float charWidth, float charHeight, const float *modulate );
 void CG_DrawStringExt( int x, int y, const char *string, const float *setColor, 
 		qboolean forceColor, qboolean shadow, int charWidth, int charHeight, int maxChars );
 
@@ -1949,8 +1947,9 @@ typedef enum {
   TEAMCHAT_PRINT
 } q3print_t;
 
-extern	int sortedTeamPlayers[TEAM_MAXOVERLAY];
-extern	int	numSortedTeamPlayers;
+extern	int sortedTeamPlayers[TEAM_NUM_TEAMS][TEAM_MAXOVERLAY];
+extern	int	numSortedTeamPlayers[TEAM_NUM_TEAMS];
+extern	int	sortedTeamPlayersTime[TEAM_NUM_TEAMS];
 extern	int drawTeamOverlayModificationCount;
 extern  char systemChat[256];
 extern  char teamChat1[256];
@@ -1958,7 +1957,7 @@ extern  char teamChat2[256];
 
 void CG_AddLagometerFrameInfo( void );
 void CG_AddLagometerSnapshotInfo( snapshot_t *snap );
-void CG_CenterPrint( const char *str, int y, int charWidth );
+void CG_CenterPrint( int localClientNum, const char *str, int y, int charWidth );
 void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t headAngles );
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawScreen2D( stereoFrame_t stereoView );
@@ -2127,7 +2126,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, refSkeleton_t *parentSkeleton, pla
 #ifndef TA_WEAPSYS_EX
 void CG_DrawWeaponSelect( void );
 
-void CG_OutOfAmmoChange( void );	// should this be in pmove?
+void CG_OutOfAmmoChange( int localClientNum );	// should this be in pmove?
 #endif
 #ifdef IOQ3ZTM // GHOST
 void CG_GhostRefEntity(refEntity_t *refEnt, ghostRefData_t *refs, int num, int *ghostTime);
@@ -2447,6 +2446,7 @@ void		trap_R_AddAdditiveLightToScene( const vec3_t org, float intensity, float r
 int			trap_R_LightForPoint( vec3_t point, vec3_t ambientLight, vec3_t directedLight, vec3_t lightDir );
 void		trap_R_RenderScene( const refdef_t *fd );
 void		trap_R_SetColor( const float *rgba );	// NULL = 1,1,1,1
+void		trap_R_SetClipRegion( const float *region );
 void		trap_R_DrawStretchPic( float x, float y, float w, float h, 
 			float s1, float t1, float s2, float t2, qhandle_t hShader );
 void		trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs );

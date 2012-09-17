@@ -144,45 +144,60 @@ Each string is "clientNum location health armor weapon powerups"
 
 =================
 */
-static void CG_ParseTeamInfo( void ) {
+static void CG_ParseTeamInfo( int start ) {
 	int		i;
 	int		client;
+	int		team;
 
-	numSortedTeamPlayers = atoi( CG_Argv( 1 ) );
-	if( numSortedTeamPlayers < 0 || numSortedTeamPlayers > TEAM_MAXOVERLAY )
+	team = atoi( CG_Argv( 1 + start ) );
+	if( team < 0 || team >= TEAM_NUM_TEAMS )
 	{
-		CG_Error( "CG_ParseTeamInfo: numSortedTeamPlayers out of range (%d)",
-				numSortedTeamPlayers );
+		CG_Error( "CG_ParseTeamInfo: team out of range (%d)",
+				team );
 		return;
 	}
 
-	for ( i = 0 ; i < numSortedTeamPlayers ; i++ ) {
+	sortedTeamPlayersTime[team] = cg.time;
+
+	numSortedTeamPlayers[team] = atoi( CG_Argv( 2 + start ) );
+	if( numSortedTeamPlayers[team] < 0 || numSortedTeamPlayers[team] > TEAM_MAXOVERLAY )
+	{
+		CG_Error( "CG_ParseTeamInfo: numSortedTeamPlayers out of range (%d)",
+				numSortedTeamPlayers[team] );
+		return;
+	}
+
+	for ( i = 0 ; i < numSortedTeamPlayers[team] ; i++ ) {
 #ifdef TURTLEARENA // NOARMOR
-		//
-		client = atoi( CG_Argv( i * 5 + 2 ) );
-
-		sortedTeamPlayers[i] = client;
-
-		cgs.clientinfo[ client ].location = atoi( CG_Argv( i * 5 + 3 ) );
-		cgs.clientinfo[ client ].health = atoi( CG_Argv( i * 5 + 4 ) );
-		//cgs.clientinfo[ client ].armor = 0;
-		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 5 + 5 ) );
-		cgs.clientinfo[ client ].powerups = atoi( CG_Argv( i * 5 + 6 ) );
-#else
-		client = atoi( CG_Argv( i * 6 + 2 ) );
+		client = atoi( CG_Argv( i * 5 + 3 + start ) );
 		if( client < 0 || client >= MAX_CLIENTS )
 		{
-		  CG_Error( "CG_ParseTeamInfo: bad client number: %d", client );
-		  return;
+			CG_Error( "CG_ParseTeamInfo: bad client number: %d", client );
+			return;
 		}
 
-		sortedTeamPlayers[i] = client;
+		sortedTeamPlayers[team][i] = client;
 
-		cgs.clientinfo[ client ].location = atoi( CG_Argv( i * 6 + 3 ) );
-		cgs.clientinfo[ client ].health = atoi( CG_Argv( i * 6 + 4 ) );
-		cgs.clientinfo[ client ].armor = atoi( CG_Argv( i * 6 + 5 ) );
-		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 6 + 6 ) );
-		cgs.clientinfo[ client ].powerups = atoi( CG_Argv( i * 6 + 7 ) );
+		cgs.clientinfo[ client ].location = atoi( CG_Argv( i * 5 + 4 + start ) );
+		cgs.clientinfo[ client ].health = atoi( CG_Argv( i * 5 + 5 + start) );
+		//cgs.clientinfo[ client ].armor = 0;
+		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 5 + 6 + start ) );
+		cgs.clientinfo[ client ].powerups = atoi( CG_Argv( i * 5 + 7 + start ) );
+#else
+		client = atoi( CG_Argv( i * 6 + 3 + start ) );
+		if( client < 0 || client >= MAX_CLIENTS )
+		{
+			CG_Error( "CG_ParseTeamInfo: bad client number: %d", client );
+			return;
+		}
+
+		sortedTeamPlayers[team][i] = client;
+
+		cgs.clientinfo[ client ].location = atoi( CG_Argv( i * 6 + 4 + start ) );
+		cgs.clientinfo[ client ].health = atoi( CG_Argv( i * 6 + 5 + start ) );
+		cgs.clientinfo[ client ].armor = atoi( CG_Argv( i * 6 + 6 + start ) );
+		cgs.clientinfo[ client ].curWeapon = atoi( CG_Argv( i * 6 + 7 + start ) );
+		cgs.clientinfo[ client ].powerups = atoi( CG_Argv( i * 6 + 8 + start ) );
 #endif
 	}
 }
@@ -406,7 +421,9 @@ static void CG_ConfigStringModified( void ) {
 		}
 	} else if ( num >= CS_PLAYERS && num < CS_PLAYERS+MAX_CLIENTS ) {
 		CG_NewClientInfo( num - CS_PLAYERS );
+#ifdef MISSIONPACK
 		CG_BuildSpectatorString();
+#endif
 	} else if ( num == CS_FLAGSTATUS ) {
 		if( cgs.gametype == GT_CTF ) {
 			// format is rb where its red/blue, 0 is at base, 1 is taken, 2 is dropped
@@ -562,11 +579,10 @@ static void CG_MapRestart( void ) {
 				continue;
 			}
 
-			cg.cur_lc = &cg.localClients[lc];
 #ifdef TA_DATA
-			CG_CenterPrint( "BEGIN!", 120, GIANTCHAR_WIDTH*2 );
+			CG_CenterPrint( lc, "BEGIN!", 120, GIANTCHAR_WIDTH*2 );
 #else
-			CG_CenterPrint( "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
+			CG_CenterPrint( lc, "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
 #endif
 		}
 	}
@@ -1173,11 +1189,10 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "cp" ) ) {
-		cg.cur_lc = &cg.localClients[lc];
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+		CG_CenterPrint( lc, CG_Argv(start+1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #else
-		CG_CenterPrint( CG_Argv(start+1), SCREEN_HEIGHT * 0.30, 0 );
+		CG_CenterPrint( lc, CG_Argv(start+1), SCREEN_HEIGHT * 0.30, 0 );
 #endif
 		return;
 	}
@@ -1286,11 +1301,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "tinfo" ) ) {
-		if (lc != 0) {
-			return;
-		}
-
-		CG_ParseTeamInfo();
+		CG_ParseTeamInfo(start);
 		return;
 	}
 

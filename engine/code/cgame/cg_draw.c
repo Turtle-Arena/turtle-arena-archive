@@ -52,8 +52,9 @@ int drawTeamOverlayModificationCount = -1;
 #define HUD_HEIGHT (64 + 4 + ICON_SIZE)
 #endif
 
-int sortedTeamPlayers[TEAM_MAXOVERLAY];
-int	numSortedTeamPlayers;
+int sortedTeamPlayers[TEAM_NUM_TEAMS][TEAM_MAXOVERLAY];
+int	numSortedTeamPlayers[TEAM_NUM_TEAMS];
+int sortedTeamPlayersTime[TEAM_NUM_TEAMS];
 
 char systemChat[256];
 char teamChat1[256];
@@ -1563,23 +1564,31 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	clientInfo_t *ci;
 	gitem_t	*item;
 	int ret_y, count;
+	int team;
 
 	if ( !cg_drawTeamOverlay.integer ) {
 		return y;
 	}
 
-	if ( cg.cur_ps->persistant[PERS_TEAM] != TEAM_RED && cg.cur_ps->persistant[PERS_TEAM] != TEAM_BLUE ) {
+	team = cg.cur_ps->persistant[PERS_TEAM];
+
+	if ( team != TEAM_RED && team != TEAM_BLUE ) {
 		return y; // Not on any team
+	}
+
+	if (cg.time - sortedTeamPlayersTime[team] > 5000) {
+		// Info is too out of date.
+		return y;
 	}
 
 	plyrs = 0;
 
 	// max player name width
 	pwidth = 0;
-	count = (numSortedTeamPlayers > 8) ? 8 : numSortedTeamPlayers;
+	count = (numSortedTeamPlayers[team] > 8) ? 8 : numSortedTeamPlayers[team];
 	for (i = 0; i < count; i++) {
-		ci = cgs.clientinfo + sortedTeamPlayers[i];
-		if ( ci->infoValid && ci->team == cg.cur_ps->persistant[PERS_TEAM]) {
+		ci = cgs.clientinfo + sortedTeamPlayers[team][i];
+		if ( ci->infoValid && ci->team == team) {
 			plyrs++;
 #ifdef IOQ3ZTM // FONT_REWRITE
 			len = Com_FontStringWidth(&cgs.media.fontTiny, ci->name, 0);
@@ -1643,12 +1652,12 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 		ret_y = y;
 	}
 
-	if ( cg.cur_ps->persistant[PERS_TEAM] == TEAM_RED ) {
+	if ( team == TEAM_RED ) {
 		hcolor[0] = 1.0f;
 		hcolor[1] = 0.0f;
 		hcolor[2] = 0.0f;
 		hcolor[3] = 0.33f;
-	} else { // if ( cg.cur_ps->persistant[PERS_TEAM] == TEAM_BLUE )
+	} else { // if ( team == TEAM_BLUE )
 		hcolor[0] = 0.0f;
 		hcolor[1] = 0.0f;
 		hcolor[2] = 1.0f;
@@ -1659,8 +1668,8 @@ static float CG_DrawTeamOverlay( float y, qboolean right, qboolean upper ) {
 	trap_R_SetColor( NULL );
 
 	for (i = 0; i < count; i++) {
-		ci = cgs.clientinfo + sortedTeamPlayers[i];
-		if ( ci->infoValid && ci->team == cg.cur_ps->persistant[PERS_TEAM]) {
+		ci = cgs.clientinfo + sortedTeamPlayers[team][i];
+		if ( ci->infoValid && ci->team == team) {
 
 			hcolor[0] = hcolor[1] = hcolor[2] = hcolor[3] = 1.0;
 
@@ -2697,23 +2706,26 @@ Called for important messages that should stay in the center of the screen
 for a few moments
 ==============
 */
-void CG_CenterPrint( const char *str, int y, int charWidth ) {
+void CG_CenterPrint( int localClientNum, const char *str, int y, int charWidth ) {
+	cglc_t	*lc;
 	char	*s;
 
-	Q_strncpyz( cg.cur_lc->centerPrint, str, sizeof(cg.cur_lc->centerPrint) );
+	lc = &cg.localClients[localClientNum];
 
-	cg.cur_lc->centerPrintTime = cg.time;
-	cg.cur_lc->centerPrintY = y;
+	Q_strncpyz( lc->centerPrint, str, sizeof(lc->centerPrint) );
+
+	lc->centerPrintTime = cg.time;
+	lc->centerPrintY = y;
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	cg.cur_lc->centerPrintCharWidth = charWidth;
+	lc->centerPrintCharWidth = charWidth;
 #endif
 
 	// count the number of lines for centering
-	cg.cur_lc->centerPrintLines = 1;
-	s = cg.cur_lc->centerPrint;
+	lc->centerPrintLines = 1;
+	s = lc->centerPrint;
 	while( *s ) {
 		if (*s == '\n')
-			cg.cur_lc->centerPrintLines++;
+			lc->centerPrintLines++;
 		s++;
 	}
 }
@@ -2815,7 +2827,7 @@ static void CG_DrawCrosshair(void)
 		return;
 	}
 
-	if ( cg.renderingThirdPerson ) {
+	if ( cg.cur_lc->renderingThirdPerson ) {
 		return;
 	}
 
@@ -2884,7 +2896,7 @@ static void CG_DrawCrosshair3D(void)
 		return;
 	}
 
-	if ( cg.renderingThirdPerson ) {
+	if ( cg.cur_lc->renderingThirdPerson ) {
 		return;
 	}
 
@@ -2988,7 +3000,7 @@ static void CG_DrawCrosshairNames( void ) {
 	if ( !cg_drawCrosshairNames.integer ) {
 		return;
 	}
-	if ( cg.renderingThirdPerson ) {
+	if ( cg.cur_lc->renderingThirdPerson ) {
 		return;
 	}
 
@@ -3127,7 +3139,7 @@ static void CG_DrawTeamVote(void) {
 
 static qboolean CG_DrawScoreboard( void ) {
 #ifdef MISSIONPACK_HUD
-	static qboolean firstTime = qtrue;
+	static qboolean firstTime[MAX_SPLITVIEW] = {qtrue, qtrue, qtrue, qtrue};
 
 	CG_SetScreenPlacement(PLACE_CENTER);
 
@@ -3136,14 +3148,14 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 	if (cg_paused.integer) {
 		cg.deferredPlayerLoading = 0;
-		firstTime = qtrue;
+		firstTime[cg.cur_localClientNum] = qtrue;
 		return qfalse;
 	}
 
 	// should never happen in Team Arena
 	if (cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc && cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		cg.deferredPlayerLoading = 0;
-		firstTime = qtrue;
+		firstTime[cg.cur_localClientNum] = qtrue;
 		return qfalse;
 	}
 
@@ -3161,7 +3173,7 @@ static qboolean CG_DrawScoreboard( void ) {
 			if (cg.cur_lc) {
 				cg.cur_lc->killerName[0] = 0;
 			}
-			firstTime = qtrue;
+			firstTime[cg.cur_localClientNum] = qtrue;
 			return qfalse;
 		}
 	}
@@ -3175,9 +3187,12 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 
 	if (menuScoreboard) {
-		if (firstTime) {
+		if (firstTime[cg.cur_localClientNum]) {
+			firstTime[cg.cur_localClientNum] = qfalse;
 			CG_SetScoreSelection(menuScoreboard);
-			firstTime = qfalse;
+
+			// Update time now to prevent spectator list from jumping.
+			cg.spectatorTime = trap_Milliseconds();
 		}
 		Menu_Paint(menuScoreboard, qtrue);
 	}

@@ -159,7 +159,7 @@ vmCvar_t	cg_footsteps;
 vmCvar_t	cg_addMarks;
 vmCvar_t	cg_brassTime;
 vmCvar_t	cg_viewsize;
-vmCvar_t	cg_drawGun;
+vmCvar_t	cg_drawGun[MAX_SPLITVIEW];
 vmCvar_t	cg_gun_frame;
 vmCvar_t	cg_gun_x;
 vmCvar_t	cg_gun_y;
@@ -278,9 +278,15 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_autoswitch[3], "4cg_autoswitch", "1", CVAR_ARCHIVE },
 #endif
 #ifdef TURTLEARENA
-	{ &cg_drawGun, "cg_drawViewWeapons", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[0], "cg_drawViewWeapons", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[1], "2cg_drawViewWeapons", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[2], "3cg_drawViewWeapons", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[3], "4cg_drawViewWeapons", "1", CVAR_ARCHIVE },
 #else
-	{ &cg_drawGun, "cg_drawGun", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[0], "cg_drawGun", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[1], "2cg_drawGun", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[2], "3cg_drawGun", "1", CVAR_ARCHIVE },
+	{ &cg_drawGun[3], "4cg_drawGun", "1", CVAR_ARCHIVE },
 #endif
 #ifndef TURTLEARENA // NOZOOM
 	{ &cg_zoomFov, "cg_zoomfov", "22.5", CVAR_ARCHIVE },
@@ -1642,6 +1648,7 @@ static void CG_RegisterGraphics( void ) {
 
 
 
+#ifdef MISSIONPACK
 /*																																			
 =======================
 CG_BuildSpectatorString
@@ -1656,12 +1663,8 @@ void CG_BuildSpectatorString(void) {
 			Q_strcat(cg.spectatorList, sizeof(cg.spectatorList), va("%s     ", cgs.clientinfo[i].name));
 		}
 	}
-	i = strlen(cg.spectatorList);
-	if (i != cg.spectatorLen) {
-		cg.spectatorLen = i;
-		cg.spectatorWidth = -1;
-	}
 }
+#endif
 
 
 /*																																			
@@ -1704,7 +1707,9 @@ static void CG_RegisterClients( void ) {
 #endif
 		CG_NewClientInfo( i );
 	}
+#ifdef MISSIONPACK
 	CG_BuildSpectatorString();
+#endif
 }
 
 //===========================================================================

@@ -183,11 +183,10 @@ static void CG_spWin_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-	cg.cur_lc = &cg.localClients[0];
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
+	CG_CenterPrint(0, "YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
-	CG_CenterPrint("YOU WIN!", SCREEN_HEIGHT * .30, 0);
+	CG_CenterPrint(0, "YOU WIN!", SCREEN_HEIGHT * .30, 0);
 #endif
 }
 
@@ -205,11 +204,10 @@ static void CG_spLose_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-	cg.cur_lc = &cg.localClients[0];
 #if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
+	CG_CenterPrint(0, "YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
 #else
-	CG_CenterPrint("YOU LOSE...", SCREEN_HEIGHT * .30, 0);
+	CG_CenterPrint(0, "YOU LOSE...", SCREEN_HEIGHT * .30, 0);
 #endif
 }
 
@@ -288,9 +286,12 @@ static void CG_PrevTeamMember_f( void ) {
 // ASS U ME's enumeration order as far as task specific orders, OFFENSE is zero, CAMP is last
 //
 static void CG_NextOrder_f( void ) {
-	clientInfo_t *ci = cgs.clientinfo + cg.snap->pss[0].clientNum;
+	int clientNum = cg.snap->pss[0].clientNum;
+	int team = cg.snap->pss[0].persistant[PERS_TEAM];
+	clientInfo_t *ci = cgs.clientinfo + clientNum;
+
 	if (ci) {
-		if (!ci->teamLeader && sortedTeamPlayers[cg_currentSelectedPlayer.integer] != cg.snap->pss[0].clientNum) {
+		if (!ci->teamLeader && sortedTeamPlayers[team][cg_currentSelectedPlayer.integer] != clientNum) {
 			return;
 		}
 	}

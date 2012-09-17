@@ -67,7 +67,8 @@ equ	atan2					-106
 equ	sqrt					-107
 equ floor					-108
 equ	ceil					-109
-equ acos					-110
+equ	Q_acos					-110
+equ	Q_asin					-111
 
 
 

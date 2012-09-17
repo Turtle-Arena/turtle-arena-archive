@@ -199,6 +199,32 @@ void CG_DrawPic( float x, float y, float width, float height, qhandle_t hShader 
 	trap_R_DrawStretchPic( x, y, width, height, 0, 0, 1, 1, hShader );
 }
 
+/*
+================
+CG_SetClipRegion
+=================
+*/
+void CG_SetClipRegion( float x, float y, float w, float h ) {
+	vec4_t clip;
+
+	CG_AdjustFrom640( &x, &y, &w, &h );
+
+	clip[ 0 ] = x;
+	clip[ 1 ] = y;
+	clip[ 2 ] = x + w;
+	clip[ 3 ] = y + h;
+
+	trap_R_SetClipRegion( clip );
+}
+
+/*
+================
+CG_ClearClipRegion
+=================
+*/
+void CG_ClearClipRegion( void ) {
+	trap_R_SetClipRegion( NULL );
+}
 
 
 #ifdef IOQ3ZTM // FONT_REWRITE
@@ -825,6 +851,8 @@ void CG_TileClear( void ) {
 		return;		// full screen rendering
 	}
 
+	CG_SetScreenPlacement(PLACE_STRETCH);
+
 	// viewport coords
 	x = y = 0;
 	w = SCREEN_WIDTH;
@@ -848,6 +876,8 @@ void CG_TileClear( void ) {
 
 	// clear right of view screen
 	CG_TileClearBox( right, top, w - right, bottom - top + 1, cgs.media.backTileShader );
+
+	CG_PopScreenPlacement();
 }
 
 

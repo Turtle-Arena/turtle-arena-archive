@@ -820,6 +820,10 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		re.SetColor( VMA(1) );
 		return 0;
 
+	case UI_R_SETCLIPREGION:
+		re.SetClipRegion( VMA(1) );
+		return 0;
+
 	case UI_R_DRAWSTRETCHPIC:
 		re.DrawStretchPic( VMF(1), VMF(2), VMF(3), VMF(4), VMF(5), VMF(6), VMF(7), VMF(8), args[9] );
 		return 0;
@@ -1010,7 +1014,10 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return FloatAsInt( ceil( VMF(1) ) );
 
 	case TRAP_ACOS:
-		return FloatAsInt( acos( VMF(1) ) );
+		return FloatAsInt( Q_acos( VMF(1) ) );
+
+	case TRAP_ASIN:
+		return FloatAsInt( Q_asin( VMF(1) ) );
 
 	case UI_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMA(1) );

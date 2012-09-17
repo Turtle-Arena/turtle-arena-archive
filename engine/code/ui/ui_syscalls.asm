@@ -85,6 +85,7 @@ equ trap_LAN_ServerIsVisible				-82
 equ trap_LAN_CompareServers					-83
 equ trap_FS_Seek							-84
 equ trap_S_SoundDuration					-85
+equ	trap_R_SetClipRegion					-86
 
 ;; IOQ3ZTM // BONES
 equ trap_R_AddRefEntityToScene_CustomSkeleton -86
@@ -102,5 +103,6 @@ equ	atan2						-106
 equ	sqrt						-107
 equ floor						-108
 equ	ceil						-109
-equ	acos						-110
+equ	Q_acos						-110
+equ	Q_asin						-111
 

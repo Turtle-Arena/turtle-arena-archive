@@ -126,10 +126,11 @@ double floor( double x );
 double sqrt( double x );
 double sin( double x );
 double cos( double x );
+float Q_acos( float c );
+float Q_asin( float c );
 double atan2( double y, double x );
 double tan( double x );
 int abs( int n );
 double fabs( double x );
-double acos( double x );
 
 #endif // BG_LIB_H
