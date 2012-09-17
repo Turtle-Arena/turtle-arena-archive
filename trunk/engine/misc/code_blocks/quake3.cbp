@@ -248,7 +248,6 @@
 		<Linker>
 			<Add library="SDLmain" />
 			<Add library="SDL" />
-			<Add library="theora" />
 			<Add directory="../../code/SDL12" />
 			<Add directory="../../code/libcurl" />
 			<Add directory="../../code/AL" />
