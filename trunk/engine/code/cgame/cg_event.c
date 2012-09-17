@@ -277,7 +277,6 @@ static void CG_Obituary( entityState_t *ent ) {
 				continue;
 			}
 
-			cg.cur_lc = &cg.localClients[i];
 			ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 
 #ifdef NOTRATEDM // frag to KO
@@ -299,15 +298,12 @@ static void CG_Obituary( entityState_t *ent ) {
 #endif
 #ifdef MISSIONPACK
 			if (!(cg_singlePlayerActive.integer && cg_cameraOrbit.integer)) {
-				CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+				CG_CenterPrint( i, s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 			} 
 #else
-			CG_CenterPrint( s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+			CG_CenterPrint( i, s, SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 #endif
 		}
-
-		// Restore cg.cur_lc
-		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 
 		// print the text message as well
 	}
@@ -470,11 +466,9 @@ static void CG_UseItem( centity_t *cent ) {
 			continue;
 		}
 
-		cg.cur_lc = &cg.localClients[i];
-
 #ifndef TA_HOLDSYS
 		if ( !itemNum ) {
-			CG_CenterPrint( "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+			CG_CenterPrint( i, "No item to use", SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 		} else
 #endif
 #ifdef TURTLEARENA // HOLD_SHURIKEN
@@ -485,16 +479,13 @@ static void CG_UseItem( centity_t *cent ) {
 			if (item) {
 #ifdef TA_DATA // Eat pizza, don't "use" it.
 				if (itemNum == HI_MEDKIT) {
-					CG_CenterPrint( va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+					CG_CenterPrint( i, va("Ate %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 				} else
 #endif
-				CG_CenterPrint( va("Use %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
+				CG_CenterPrint( i, va("Use %s", item->pickup_name), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
 			}
 		}
 	}
-
-	// Restore cg.cur_lc
-	cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 
 	switch ( itemNum ) {
 	default:
@@ -548,7 +539,8 @@ CG_ItemPickup
 A new item was picked up this frame
 ================
 */
-static void CG_ItemPickup( int itemNum ) {
+static void CG_ItemPickup( int localClientNum, int itemNum ) {
+	cglc_t *lc = &cg.localClients[localClientNum];
 #if defined TA_ITEMSYS || defined TA_HOLDSYS || defined TURTLEARENA // NIGTHS_ITEMS
 	gitem_t *item;
 
@@ -564,9 +556,10 @@ static void CG_ItemPickup( int itemNum ) {
 		return; // Do not count as a pickup item
 	}
 #endif
-	cg.cur_lc->itemPickup = itemNum;
-	cg.cur_lc->itemPickupTime = cg.time;
-	cg.cur_lc->itemPickupBlendTime = cg.time;
+
+	lc->itemPickup = itemNum;
+	lc->itemPickupTime = cg.time;
+	lc->itemPickupBlendTime = cg.time;
 
 #ifdef TA_HOLDSYS
 	if (item->giType == IT_HOLDABLE)
@@ -597,21 +590,21 @@ static void CG_ItemPickup( int itemNum ) {
 #ifdef TA_WEAPSYS_EX
 		// always switch
 #elif defined TA_WEAPSYS || defined IOQ3ZTM
-		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer )
+		if ( cg_autoswitch[localClientNum].integer )
 #elif defined TA_ITEMSYS
-		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer && item->giTag != WP_MACHINEGUN )
+		if ( cg_autoswitch[localClientNum].integer && item->giTag != WP_MACHINEGUN )
 #else
-		if ( cg_autoswitch[cg.cur_lc-cg.localClients].integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
+		if ( cg_autoswitch[localClientNum].integer && bg_itemlist[itemNum].giTag != WP_MACHINEGUN )
 #endif
 		{
 #ifdef TA_WEAPSYS_EX // The weapon "should" be selected in game and sent in the next snap too
-			cg.cur_lc->predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
+			lc->predictedPlayerState.stats[STAT_PENDING_WEAPON] = item->giTag;
 #else
-			cg.cur_lc->weaponSelectTime = cg.time;
+			lc->weaponSelectTime = cg.time;
 #ifdef TA_ITEMSYS
-			cg.cur_lc->weaponSelect = item->giTag;
+			lc->weaponSelect = item->giTag;
 #else
-			cg.cur_lc->weaponSelect = bg_itemlist[itemNum].giTag;
+			lc->weaponSelect = bg_itemlist[itemNum].giTag;
 #endif
 #endif
 		}
@@ -1118,11 +1111,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			// show icon and name on status bar
 			for (i = 0; i < MAX_SPLITVIEW; i++) {
 				if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-					cg.cur_lc = &cg.localClients[i];
-					CG_ItemPickup( index );
+					CG_ItemPickup( i, index );
 				}
 			}
-			cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 		}
 		break;
 
@@ -1161,11 +1152,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 			// show icon and name on status bar
 			for (i = 0; i < MAX_SPLITVIEW; i++) {
 				if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-					cg.cur_lc = &cg.localClients[i];
-					CG_ItemPickup( index );
+					CG_ItemPickup( i, index );
 				}
 			}
-			cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
 		}
 		break;
 
@@ -1183,13 +1172,9 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 //		trap_S_StartSound (NULL, es->number, CHAN_AUTO, cgs.media.noAmmoSound );
 		for (i = 0; i < MAX_SPLITVIEW; i++) {
 			if ( cg.snap->lcIndex[i] != -1 && es->number == cg.snap->pss[cg.snap->lcIndex[i]].clientNum ) {
-				cg.cur_lc = &cg.localClients[i];
-				cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
-				CG_OutOfAmmoChange();
+				CG_OutOfAmmoChange(i);
 			}
 		}
-		cg.cur_lc = &cg.localClients[cg.cur_localClientNum];
-		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[cg.cur_localClientNum]];
 		break;
 #endif
 	case EV_CHANGE_WEAPON:
@@ -1514,12 +1499,16 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #ifndef TA_WEAPSYS
 		cent->currentState.weapon = WP_RAILGUN;
 		
-		if(es->clientNum == cg.snap->ps.clientNum && !cg.renderingThirdPerson)
-		{
-			if(cg_drawGun.integer == 2)
-				VectorMA(es->origin2, 8, cg.refdef.viewaxis[1], es->origin2);
-			else if(cg_drawGun.integer == 3)
-				VectorMA(es->origin2, 4, cg.refdef.viewaxis[1], es->origin2);
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if ( cg.snap->lcIndex[i] != -1 && es->clientNum == cg.snap->pss[cg.snap->lcIndex[i]].clientNum 
+				&& !cg.localClients[i].renderingThirdPerson)
+			{
+				if(cg_drawGun[i].integer == 2)
+					VectorMA(es->origin2, 8, cg.refdef.viewaxis[1], es->origin2);
+				else if(cg_drawGun[i].integer == 3)
+					VectorMA(es->origin2, 4, cg.refdef.viewaxis[1], es->origin2);
+				break;
+			}
 		}
 #endif
 

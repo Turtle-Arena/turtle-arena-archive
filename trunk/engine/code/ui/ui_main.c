@@ -273,6 +273,33 @@ void AssetCache( void ) {
 	uiInfo.newHighScoreSound = trap_S_RegisterSound("sound/feedback/voc_newhighscore.wav", qfalse);
 }
 
+/*
+================
+UI_SetClipRegion
+=================
+*/
+void UI_SetClipRegion( float x, float y, float w, float h ) {
+	vec4_t clip;
+
+	UI_AdjustFrom640( &x, &y, &w, &h );
+
+	clip[ 0 ] = x;
+	clip[ 1 ] = y;
+	clip[ 2 ] = x + w;
+	clip[ 3 ] = y + h;
+
+	trap_R_SetClipRegion( clip );
+}
+
+/*
+================
+UI_ClearClipRegion
+=================
+*/
+void UI_ClearClipRegion( void ) {
+	trap_R_SetClipRegion( NULL );
+}
+
 void _UI_DrawSides(float x, float y, float w, float h, float size) {
 	UI_AdjustFrom640( &x, &y, &w, &h );
 	size *= uiInfo.uiDC.xscale;
@@ -549,6 +576,7 @@ void Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const cha
 }
 
 
+#if 0
 static void Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t color, const char* text, float adjust, int limit) {
   int len, count;
 	vec4_t newColor;
@@ -603,6 +631,7 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t 
   }
 
 }
+#endif
 
 
 void UI_ShowPostGame(qboolean newHigh) {
@@ -1937,63 +1966,27 @@ static void UI_DrawServerRefreshDate(rectDef_t *rect, float scale, vec4_t color,
 	}
 }
 
+#define MOTD_PIXELS_PER_SECOND 30.0f
+
 static void UI_DrawServerMOTD(rectDef_t *rect, float scale, vec4_t color) {
-	if (uiInfo.serverStatus.motdLen) {
-		float maxX;
-	 
-		if (uiInfo.serverStatus.motdWidth == -1) {
-			uiInfo.serverStatus.motdWidth = 0;
-			uiInfo.serverStatus.motdPaintX = rect->x + 1;
-			uiInfo.serverStatus.motdPaintX2 = -1;
-		}
+	char  *text = uiInfo.serverStatus.motd;
+	float textWidth = MAX(rect->w, Text_Width( text, scale, 0 ));
+	int now = uiInfo.uiDC.realTime;
+	int delta = now - uiInfo.serverStatus.motdTime;
 
-		if (uiInfo.serverStatus.motdOffset > uiInfo.serverStatus.motdLen) {
-			uiInfo.serverStatus.motdOffset = 0;
-			uiInfo.serverStatus.motdPaintX = rect->x + 1;
-			uiInfo.serverStatus.motdPaintX2 = -1;
-		}
+	UI_SetClipRegion( rect->x, rect->y, rect->w, rect->h );
 
-		if (uiInfo.uiDC.realTime > uiInfo.serverStatus.motdTime) {
-			uiInfo.serverStatus.motdTime = uiInfo.uiDC.realTime + 10;
-			if (uiInfo.serverStatus.motdPaintX <= rect->x + 2) {
-				if (uiInfo.serverStatus.motdOffset < uiInfo.serverStatus.motdLen) {
-					uiInfo.serverStatus.motdPaintX += Text_Width(&uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], scale, 1) - 1;
-					uiInfo.serverStatus.motdOffset++;
-				} else {
-					uiInfo.serverStatus.motdOffset = 0;
-					if (uiInfo.serverStatus.motdPaintX2 >= 0) {
-						uiInfo.serverStatus.motdPaintX = uiInfo.serverStatus.motdPaintX2;
-					} else {
-						uiInfo.serverStatus.motdPaintX = rect->x + rect->w - 2;
-					}
-					uiInfo.serverStatus.motdPaintX2 = -1;
-				}
-			} else {
-				//serverStatus.motdPaintX--;
-				uiInfo.serverStatus.motdPaintX -= 2;
-				if (uiInfo.serverStatus.motdPaintX2 >= 0) {
-					//serverStatus.motdPaintX2--;
-					uiInfo.serverStatus.motdPaintX2 -= 2;
-				}
-			}
-		}
+	Text_Paint( rect->x - uiInfo.serverStatus.motdOffset, rect->y + rect->h - 3, scale, color, text, 0, 0, 0 );
+	Text_Paint( rect->x + textWidth - uiInfo.serverStatus.motdOffset, rect->y + rect->h - 3, scale, color, text, 0, 0, 0 );
 
-		maxX = rect->x + rect->w - 2;
-		Text_Paint_Limit(&maxX, uiInfo.serverStatus.motdPaintX, rect->y + rect->h - 3, scale, color, &uiInfo.serverStatus.motd[uiInfo.serverStatus.motdOffset], 0, 0); 
-		if (uiInfo.serverStatus.motdPaintX2 >= 0) {
-			float maxX2 = rect->x + rect->w - 2;
-			Text_Paint_Limit(&maxX2, uiInfo.serverStatus.motdPaintX2, rect->y + rect->h - 3, scale, color, uiInfo.serverStatus.motd, 0, uiInfo.serverStatus.motdOffset); 
-		}
-		if (uiInfo.serverStatus.motdOffset && maxX > 0) {
-			// if we have an offset ( we are skipping the first part of the string ) and we fit the string
-			if (uiInfo.serverStatus.motdPaintX2 == -1) {
-						uiInfo.serverStatus.motdPaintX2 = rect->x + rect->w - 2;
-			}
-		} else {
-			uiInfo.serverStatus.motdPaintX2 = -1;
-		}
+	UI_ClearClipRegion( );
 
-	}
+	uiInfo.serverStatus.motdOffset += ( delta / 1000.0f ) * MOTD_PIXELS_PER_SECOND;
+
+	while( uiInfo.serverStatus.motdOffset > textWidth )
+		uiInfo.serverStatus.motdOffset -= textWidth;
+
+	uiInfo.serverStatus.motdTime = now;
 }
 
 static void UI_DrawKeyBindStatus(rectDef_t *rect, float scale, vec4_t color, int textStyle) {
@@ -3822,11 +3815,6 @@ static void UI_BuildServerDisplayList(qboolean force) {
 	len = strlen(uiInfo.serverStatus.motd);
 	if (len == 0) {
 		strcpy(uiInfo.serverStatus.motd, "Welcome to Team Arena!");
-		len = strlen(uiInfo.serverStatus.motd);
-	} 
-	if (len != uiInfo.serverStatus.motdLen) {
-		uiInfo.serverStatus.motdLen = len;
-		uiInfo.serverStatus.motdWidth = -1;
 	} 
 
 	lanSource = UI_SourceForLAN();

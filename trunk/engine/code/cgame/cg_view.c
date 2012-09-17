@@ -1332,7 +1332,7 @@ static int CG_CalcViewValues( void ) {
 		}
 	} else
 #endif
-	if ( cg.renderingThirdPerson ) {
+	if ( cg.cur_lc->renderingThirdPerson ) {
 		// back away from character
 		CG_OffsetThirdPersonView();
 	} else {
@@ -1839,10 +1839,10 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 		// decide on third person view
 #ifdef IOQ3ZTM // IOQ3BUGFIX: Third person fix, have spectator always be in first person.
-		cg.renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
+		cg.cur_lc->renderingThirdPerson = cg.cur_ps->persistant[PERS_TEAM] != TEAM_SPECTATOR
 							&& (cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0));
 #else
-		cg.renderingThirdPerson = cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0);
+		cg.cur_lc->renderingThirdPerson = cg_thirdPerson[cg.cur_localClientNum].integer || (cg.cur_ps->stats[STAT_HEALTH] <= 0);
 #endif
 
 		CG_PB_ClearPolyBuffers();
@@ -1853,7 +1853,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 #ifndef NOBLOOD
 		// first person blend blobs, done after AnglesToAxis
-		if ( !cg.renderingThirdPerson ) {
+		if ( !cg.cur_lc->renderingThirdPerson ) {
 			CG_DamageBlendBlob();
 		}
 #endif
@@ -1887,7 +1887,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		CG_PowerupTimerSounds();
 
 		// update audio positions
-		trap_S_Respatialize( cg.cur_ps->clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater, !cg.renderingThirdPerson );
+		trap_S_Respatialize( cg.cur_ps->clientNum, cg.refdef.vieworg, cg.refdef.viewaxis, inwater, !cg.cur_lc->renderingThirdPerson );
 
 		// make sure the lagometerSample and frame timing isn't done twice when in stereo
 		if ( stereoView != STEREO_RIGHT && cg.viewport == 0 ) {

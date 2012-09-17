@@ -2948,9 +2948,9 @@ void CG_AddPlayerWeapon( refEntity_t *parent, refSkeleton_t *parentSkeleton, pla
 	VectorMA(gun.origin, lerped.origin[0], parent->axis[0], gun.origin);
 
 	// Make weapon appear left-handed for 2 and centered for 3
-	if(ps && cg_drawGun.integer == 2)
+	if(ps && cg_drawGun[cg.cur_localClientNum].integer == 2)
 		VectorMA(gun.origin, -lerped.origin[1], parent->axis[1], gun.origin);
-	else if(!ps || cg_drawGun.integer != 3)
+	else if(!ps || cg_drawGun[cg.cur_localClientNum].integer != 3)
 	       	VectorMA(gun.origin, lerped.origin[1], parent->axis[1], gun.origin);
 
 	VectorMA(gun.origin, lerped.origin[2], parent->axis[2], gun.origin);
@@ -3053,7 +3053,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, refSkeleton_t *parentSkeleton, pla
 			// impulse flash
 			if ( cg.time - cent->muzzleFlashTime > MUZZLE_FLASH_TIME ) {
 #ifdef IOQ3ZTM // GRAPPLE_RETURN // Always update flash origin
-				if ( ps || cg.renderingThirdPerson ||
+				if ( ps || cg.cur_lc->renderingThirdPerson ||
 						cent->currentState.number != cg.cur_lc->predictedPlayerState.clientNum ) {
 					memset( &flash, 0, sizeof( flash ) );
 #ifdef TA_WEAPSYS
@@ -3154,7 +3154,7 @@ void CG_AddPlayerWeapon( refEntity_t *parent, refSkeleton_t *parentSkeleton, pla
 		trap_R_AddRefEntityToScene( &flash );
 
 
-		if ( ps || cg.renderingThirdPerson ||
+		if ( ps || cg.cur_lc->renderingThirdPerson ||
 			cent->currentState.number != cg.cur_lc->predictedPlayerState.clientNum ) {
 #ifdef TA_WEAPSYS
 			VectorCopy(flash.origin, nonPredictedCent->pe.flashOrigin[i]);
@@ -3227,14 +3227,14 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 
 	// no gun if in third person view or a camera is active
-	//if ( cg.renderingThirdPerson || cg.cameraMode) {
-	if ( cg.renderingThirdPerson ) {
+	//if ( cg.cur_lc->renderingThirdPerson || cg.cur_lc->cameraMode) {
+	if ( cg.cur_lc->renderingThirdPerson ) {
 		return;
 	}
 
 
 	// allow the gun to be completely removed
-	if ( !cg_drawGun.integer ) {
+	if ( !cg_drawGun[cg.cur_localClientNum].integer ) {
 		vec3_t		origin;
 
 		if ( cg.cur_lc->predictedPlayerState.eFlags & EF_FIRING ) {
@@ -3707,14 +3707,19 @@ CG_OutOfAmmoChange
 The current weapon has just run out of ammo
 ===================
 */
-void CG_OutOfAmmoChange( void ) {
-	int		i;
+void CG_OutOfAmmoChange( int localClientNum ) {
+	cglc_t			*lc;
+	playerState_t	*ps;
+	int				i;
 
-	cg.cur_lc->weaponSelectTime = cg.time;
+	lc = &cg.localClients[localClientNum];
+	ps = &cg.snap->pss[cg.snap->lcIndex[localClientNum]];
+
+	lc->weaponSelectTime = cg.time;
 
 	for ( i = MAX_WEAPONS-1 ; i > 0 ; i-- ) {
-		if ( CG_WeaponSelectable( cg.cur_ps, i ) ) {
-			cg.cur_lc->weaponSelect = i;
+		if ( CG_WeaponSelectable( ps, i ) ) {
+			lc->weaponSelect = i;
 			break;
 		}
 	}
@@ -3981,7 +3986,7 @@ void CG_PlayerHitEffect( vec3_t origin, int entityNum, qboolean meleeDamage ) {
 	// don't show player's own blood in view
 	if ( CG_LocalClientPlayerStateForClientNum(entityNum) && (!cg.snap || cg.snap->numPSs <= 1)
 #ifdef IOQ3ZTM // Show player their own blood in third person
-		&& !cg.renderingThirdPerson
+		&& !cg.cur_lc->renderingThirdPerson
 #endif
 		)
 	{

@@ -902,7 +902,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return FloatAsInt( ceil( VMF(1) ) );
 
 	case TRAP_ACOS:
-		return FloatAsInt( acos( VMF(1) ) );
+		return FloatAsInt( Q_acos( VMF(1) ) );
+
+	case TRAP_ASIN:
+		return FloatAsInt( Q_asin( VMF(1) ) );
 
 
 	default:
