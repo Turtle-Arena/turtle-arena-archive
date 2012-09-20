@@ -3206,11 +3206,7 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	refEntity_t	hand;
 	centity_t	*cent;
 	clientInfo_t	*ci;
-#ifdef IOQ3ZTM // FOV
 	vec3_t		fovOffset;
-#else
-	float		fovOffset;
-#endif
 	vec3_t		angles;
 #ifdef TA_WEAPSYS
 	weaponGroupInfo_t	*weapon;
@@ -3290,24 +3286,15 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 		return;
 	}
 
-#ifdef IOQ3ZTM // FOV
 	VectorClear(fovOffset);
 
-	if ( cg_fov.integer > 90 ) {
+	if ( cg.fov > 90 ) {
 		// drop gun lower at higher fov
-		fovOffset[2] = -0.2 * ( cg_fov.integer - 90 );
-	} else if ( cg_fov.integer < 90 ) {
+		fovOffset[2] = -0.2 * ( cg.fov - 90 ) * cg.refdef.fov_x / cg.fov;
+	} else if ( cg.fov < 90 ) {
 		// move gun forward at lowerer fov
-		fovOffset[0] = ( cg_fov.integer - 90 ) / -10;
+		fovOffset[0] = -0.2 * ( cg.fov - 90 ) * cg.refdef.fov_x / cg.fov;
 	}
-#else
-	// drop gun lower at higher fov
-	if ( cg_fov.integer > 90 ) {
-		fovOffset = -0.2 * ( cg_fov.integer - 90 );
-	} else {
-		fovOffset = 0;
-	}
-#endif
 
 	cent = &cg.cur_lc->predictedPlayerEntity;	// &cg_entities[cg.snap->ps.clientNum];
 #ifdef TA_WEAPSYS
@@ -3330,15 +3317,9 @@ void CG_AddViewWeapon( playerState_t *ps ) {
 	}
 #endif
 
-#ifdef IOQ3ZTM // FOV
 	VectorMA( hand.origin, (cg_gun_x.value+fovOffset[0]), cg.refdef.viewaxis[0], hand.origin );
 	VectorMA( hand.origin, (cg_gun_y.value+fovOffset[1]), cg.refdef.viewaxis[1], hand.origin );
 	VectorMA( hand.origin, (cg_gun_z.value+fovOffset[2]), cg.refdef.viewaxis[2], hand.origin );
-#else
-	VectorMA( hand.origin, cg_gun_x.value, cg.refdef.viewaxis[0], hand.origin );
-	VectorMA( hand.origin, cg_gun_y.value, cg.refdef.viewaxis[1], hand.origin );
-	VectorMA( hand.origin, (cg_gun_z.value+fovOffset), cg.refdef.viewaxis[2], hand.origin );
-#endif
 
 	AnglesToAxis( angles, hand.axis );
 

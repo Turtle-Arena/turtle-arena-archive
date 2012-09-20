@@ -1094,9 +1094,9 @@ static int CG_CalcFov( void ) {
 	if ( cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		// if in intermission, use a fixed value
 #ifdef TURTLEARENA // FOV
-		fov_x = 70;
+		cg.fov = fov_x = 70;
 #else
-		fov_x = 90;
+		cg.fov = fov_x = 90;
 #endif
 	} else {
 		// user selectable
@@ -1115,6 +1115,8 @@ static int CG_CalcFov( void ) {
 				fov_x = 160;
 			}
 		}
+
+		cg.fov = fov_x;
 
 #ifndef TURTLEARENA // NOZOOM
 		// account for zooms
