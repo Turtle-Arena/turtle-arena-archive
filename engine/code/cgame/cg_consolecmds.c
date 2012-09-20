@@ -183,11 +183,7 @@ static void CG_spWin_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.winnerSound);
 	//trap_S_StartLocalSound(cgs.media.winnerSound, CHAN_ANNOUNCER);
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	CG_CenterPrint(0, "YOU WIN!", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
-#else
-	CG_CenterPrint(0, "YOU WIN!", SCREEN_HEIGHT * .30, 0);
-#endif
+	CG_GlobalCenterPrint("YOU WIN!", SCREEN_HEIGHT/2, 2.0);
 }
 
 static void CG_spLose_f( void) {
@@ -204,11 +200,7 @@ static void CG_spLose_f( void) {
 #endif
 	CG_AddBufferedSound(cgs.media.loserSound);
 	//trap_S_StartLocalSound(cgs.media.loserSound, CHAN_ANNOUNCER);
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	CG_CenterPrint(0, "YOU LOSE...", SCREEN_HEIGHT * .30, BIGCHAR_WIDTH);
-#else
-	CG_CenterPrint(0, "YOU LOSE...", SCREEN_HEIGHT * .30, 0);
-#endif
+	CG_GlobalCenterPrint("YOU LOSE...", SCREEN_HEIGHT/2, 2.0);
 }
 
 #endif

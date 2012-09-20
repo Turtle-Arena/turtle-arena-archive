@@ -451,3 +451,4 @@ playerState_t *CG_LocalClientPlayerStateForClientNum(int clientNum) {
 
 	return NULL;
 }
+
