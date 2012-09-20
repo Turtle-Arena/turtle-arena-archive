@@ -23,8 +23,6 @@
       * If (!(animations[run].prefixType & AP_LEGS)) PM_ContinueAnim(LEGS_RUN);
 
 == Single Player ==
-  * STARTED: Savegames for single player.
-
   * STARTED: Have a completed game menu/screen.
     * sp_complete and sp_gameover
 
@@ -34,8 +32,6 @@
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
 == Teamplay ==
-  * TODO: Data: Update flag skins for new default teams
-
   * TODO: Per-team flag skins? (Team icon is on flag skin)
      * Would a shader remap work?
 
@@ -103,16 +99,11 @@
     * Add support for animation blending for IQM.
   * TODO-after-above: Re-rig and reanimate players in Blender for single IQM? (and/or add IQM export to Maverick Model 3D?)
 
-  * TODO: Allow setting splitscreen clients for joinning in Multiplayer Search menu?
-    * Allows filtering out servers without enough player slots
-
   * TODO: Tell which clients are splitscreen players
     * Special icon on HUD?
     * Automaticly name splitscreen players (mainClientName[spilt#]) and don't allow custom names?
 
   * TODO: Remove say, say_team, and tell for splitscreen clients?
-
-  * TODO: Add support for starting splitscreen in 'single player' in q3_ui
 
   * Splitview mode for viewing multiple players online
     * Need someway to tell server which clients we want in splitview.
