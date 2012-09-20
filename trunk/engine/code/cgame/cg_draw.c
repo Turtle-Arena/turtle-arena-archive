@@ -108,11 +108,17 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 		shadowofs = 0;
 	}
 
+	// y for this function is bottom of text line, not top...
+	y -= CG_Text_Height(text, scale, 0);
+
 	CG_DrawFontStringExt( font, scale, x, y, text, color, qfalse, qfalse, shadowofs, qtrue, adjust, limit, NULL );
 }
 
 void CG_Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t color, const char* text, float adjust, int limit) {
 	font_t *font = CG_FontForScale(scale);
+
+	// y for this function is bottom of text line, not top...
+	y -= CG_Text_Height(text, scale, limit);
 
 	CG_DrawFontStringExt( font, scale, x, y, text, color, qfalse, qfalse, 0, qtrue, adjust, limit, maxX );
 }
@@ -1367,7 +1373,7 @@ void CG_DrawScoreChain(void)
 
 	s = va("%d Link", cg.cur_ps->chain-1);
 
-	y = SCREEN_HEIGHT - 32 - CG_Text_Height(s, frac, 0);
+	y = SCREEN_HEIGHT - 32;
 	CG_Text_Paint(CENTER_X, y, frac, color, s, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 }
 #endif
@@ -2702,11 +2708,11 @@ CENTER PRINTING
 ==============
 CG_CenterPrint
 
-Called for important messages that should stay in the center of the screen
+Called for important messages that should stay in the center of the viewport
 for a few moments
 ==============
 */
-void CG_CenterPrint( int localClientNum, const char *str, int y, int charWidth ) {
+void CG_CenterPrint( int localClientNum, const char *str, int y, float charScale ) {
 	cglc_t	*lc;
 	char	*s;
 
@@ -2716,9 +2722,7 @@ void CG_CenterPrint( int localClientNum, const char *str, int y, int charWidth )
 
 	lc->centerPrintTime = cg.time;
 	lc->centerPrintY = y;
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	lc->centerPrintCharWidth = charWidth;
-#endif
+	lc->centerPrintCharScale = charScale;
 
 	// count the number of lines for centering
 	lc->centerPrintLines = 1;
@@ -2742,7 +2746,10 @@ static void CG_DrawCenterString( void ) {
 	int		y;
 #if defined MISSIONPACK_HUD || defined IOQ3ZTM
 	int		h;
+#else
+	int		charWidth;
 #endif
+	int		charHeight;
 	float	*color;
 
 	if ( !cg.cur_lc->centerPrintTime ) {
@@ -2760,7 +2767,14 @@ static void CG_DrawCenterString( void ) {
 
 	start = cg.cur_lc->centerPrint;
 
-	y = cg.cur_lc->centerPrintY - cg.cur_lc->centerPrintLines * BIGCHAR_HEIGHT / 2;
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
+	charHeight = CG_Text_Height("I", cg.cur_lc->centerPrintCharScale, 0);
+#else
+	charWidth = BIGCHAR_WIDTH * 2 * cg.cur_lc->centerPrintCharScale;
+	charHeight = (int)(charWidth * 1.5);
+#endif
+
+	y = cg.cur_lc->centerPrintY - cg.cur_lc->centerPrintLines * charHeight / 2;
 
 	while ( 1 ) {
 		char linebuffer[1024];
@@ -2774,14 +2788,14 @@ static void CG_DrawCenterString( void ) {
 		linebuffer[l] = 0;
 
 #if defined MISSIONPACK_HUD || defined IOQ3ZTM
-		h = CG_Text_Height(linebuffer, 0.5, 0);
-		CG_Text_Paint(CENTER_X, y + h, 0.5, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
+		h = CG_Text_Height(linebuffer, cg.cur_lc->centerPrintCharScale, 0);
+		CG_Text_Paint(CENTER_X, y + h, cg.cur_lc->centerPrintCharScale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 		y += h + 6;
 #else
 		CG_DrawStringExt( CENTER_X, y, linebuffer, color, qfalse, qtrue,
-			cg.cur_lc->centerPrintCharWidth, (int)(cg.cur_lc->centerPrintCharWidth * 1.5), 0 );
+			charWidth, charHeight, 0 );
 
-		y += cg.cur_lc->centerPrintCharWidth * 1.5;
+		y += charHeight;
 #endif
 		while ( *start && ( *start != '\n' ) ) {
 			start++;
@@ -2795,6 +2809,108 @@ static void CG_DrawCenterString( void ) {
 	trap_R_SetColor( NULL );
 }
 
+
+/*
+==============
+CG_GlobalCenterPrint
+
+Called for important messages that should stay in the center of the screen
+for a few moments
+==============
+*/
+void CG_GlobalCenterPrint( const char *str, int y, float charScale ) {
+	char	*s;
+
+	Q_strncpyz( cg.centerPrint, str, sizeof(cg.centerPrint) );
+
+	cg.centerPrintTime = cg.time;
+	cg.centerPrintY = y;
+	cg.centerPrintCharScale = charScale;
+
+	// count the number of lines for centering
+	cg.centerPrintLines = 1;
+	s = cg.centerPrint;
+	while( *s ) {
+		if (*s == '\n')
+			cg.centerPrintLines++;
+		s++;
+	}
+}
+
+
+/*
+===================
+CG_DrawGlobalCenterString
+===================
+*/
+static void CG_DrawGlobalCenterString( void ) {
+	char	*start;
+	int		l;
+	int		y;
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
+	int		h;
+#else
+	int		charWidth;
+#endif
+	int		charHeight;
+	float	*color;
+
+	if ( !cg.centerPrintTime ) {
+		return;
+	}
+
+	color = CG_FadeColor( cg.centerPrintTime, 1000 * cg_centertime.value );
+	if ( !color ) {
+		return;
+	}
+
+	CG_SetScreenPlacement(PLACE_CENTER);
+
+	trap_R_SetColor( color );
+
+	start = cg.centerPrint;
+
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
+	charHeight = CG_Text_Height("I", cg.centerPrintCharScale, 0);
+#else
+	charWidth = BIGCHAR_WIDTH * 2 * cg.centerPrintCharScale;
+	charHeight = (int)(charWidth * 1.5);
+#endif
+
+	y = cg.centerPrintY - cg.centerPrintLines * charHeight / 2;
+
+	while ( 1 ) {
+		char linebuffer[1024];
+
+		for ( l = 0; l < 50; l++ ) {
+			if ( !start[l] || start[l] == '\n' ) {
+				break;
+			}
+			linebuffer[l] = start[l];
+		}
+		linebuffer[l] = 0;
+
+#if defined MISSIONPACK_HUD || defined IOQ3ZTM
+		h = CG_Text_Height(linebuffer, cg.centerPrintCharScale, 0);
+		CG_Text_Paint(CENTER_X, y + h, cg.centerPrintCharScale, color, linebuffer, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
+		y += h + 6;
+#else
+		CG_DrawStringExt( CENTER_X, y, linebuffer, color, qfalse, qtrue,
+			charWidth, charHeight, 0 );
+
+		y += charHeight;
+#endif
+		while ( *start && ( *start != '\n' ) ) {
+			start++;
+		}
+		if ( !*start ) {
+			break;
+		}
+		start++;
+	}
+
+	trap_R_SetColor( NULL );
+}
 
 
 /*
@@ -3019,7 +3135,7 @@ static void CG_DrawCrosshairNames( void ) {
 	name = cgs.clientinfo[ cg.cur_lc->crosshairClientNum ].name;
 #if defined MISSIONPACK_HUD || defined IOQ3ZTM
 	color[3] *= 0.5f;
-	CG_Text_Paint( CENTER_X, 190, 0.3f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
+	CG_Text_Paint( CENTER_X, 170 + CG_Text_Height(name, 0.3f, 0), 0.3f, color, name, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 #else
 	CG_DrawBigString( CENTER_X, 170, name, color[3] * 0.5f );
 #endif
@@ -3245,7 +3361,7 @@ static void CG_DrawSPIntermission( void ) {
 	Com_sprintf(str, sizeof (str), "%s got through the level", name);
 
 #if defined MISSIONPACK_HUD || defined IOQ3ZTM
-	CG_Text_Paint( CENTER_X, 210, 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
+	CG_Text_Paint( CENTER_X, 210 + CG_Text_Height(name, 0.3f, 0), 0.3f, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWED);
 #else
 	CG_DrawBigString( CENTER_X, 210, str, color[3] );
 #endif
@@ -3619,7 +3735,7 @@ void CG_DrawGameOver(void)
 		CG_Text_Paint(CENTER_X, y, 0.5, color, str, 0, 0, ITEM_TEXTSTYLE_SHADOWEDMORE);
 #else
 		charWidth = GIANTCHAR_WIDTH*2;
-		y = 120 + GIANTCHAR_HEIGHT / 2;
+		y = 120;
 
 		CG_DrawStringExt( CENTER_X, y, str, color, qfalse, qtrue,
 			charWidth, (int)(charWidth * 1.5), 0 );
@@ -3684,6 +3800,8 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 
 #ifdef MISSIONPACK_HUD
 			if ( cg_drawStatus.integer ) {
+				CG_SetScreenPlacement(PLACE_CENTER);
+
 				Menu_PaintAll();
 				CG_DrawTimedMenus();
 			}
@@ -3752,9 +3870,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	CG_DrawLowerLeft();
 #endif
 
-	if ( !CG_DrawFollow() ) {
-		CG_DrawWarmup();
-	}
+	CG_DrawFollow();
 
 	// don't draw center string if scoreboard is up
 	if (!cg.showScores && !cg.scoreBoardShowing && !CG_DrawScoreboard()) {
@@ -3830,8 +3946,15 @@ void CG_DrawScreen2D( stereoFrame_t stereoView ) {
 		return;
 	}
 
+	CG_DrawWarmup();
+
 	// Draw scoreboard over all viewports.
 	cg.scoreBoardShowing = CG_DrawScoreboard();
+
+	// don't draw center string if scoreboard is up
+	if (!cg.scoreBoardShowing) {
+		CG_DrawGlobalCenterString();
+	}
 }
 
 #ifdef IOQ3ZTM // LETTERBOX

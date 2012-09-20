@@ -1759,11 +1759,29 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 #ifdef TURTLEARENA
 	// Single camera mode only uses one viewport for viewing all local clients or all clients on server.
-	cg.singleCamera = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2))
-						|| (cgs.gametype != GT_SINGLE_PLAYER && cg.snap->pss[0].pm_type == PM_INTERMISSION);
+	cg.singleCamera = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2));
+
+	if (cgs.gametype != GT_SINGLE_PLAYER) {
+		// Use single camera/viewport at intermission
+		for (i = 0; i < MAX_SPLITVIEW; i++) {
+			if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[i].pm_type != PM_INTERMISSION) {
+				// client present and not at intermission, keep viewports separate.
+				break;
+			}
+		}
+		if (i == MAX_SPLITVIEW) {
+			cg.singleCamera = qtrue;
+		}
+	}
 #else
-	// Single camera mode only uses one viewport for viewing all local clients
-	cg.singleCamera = (cg.snap->pss[0].pm_type == PM_INTERMISSION);
+	// Use single camera/viewport at intermission
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[i].pm_type != PM_INTERMISSION) {
+			// client present and not at intermission, keep viewports separate.
+			break;
+		}
+	}
+	cg.singleCamera = (i == MAX_SPLITVIEW);
 #endif
 
 	cg.numViewports = 0;

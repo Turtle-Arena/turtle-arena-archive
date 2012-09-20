@@ -774,9 +774,7 @@ typedef struct {
 
 	// centerprinting
 	int			centerPrintTime;
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-	int			centerPrintCharWidth;
-#endif
+	float		centerPrintCharScale;
 	int			centerPrintY;
 	char		centerPrint[1024];
 	int			centerPrintLines;
@@ -962,6 +960,13 @@ typedef struct {
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
+
+	// global centerprinting (drawn over all viewports)
+	int			centerPrintTime;
+	float		centerPrintCharScale;
+	int			centerPrintY;
+	char		centerPrint[1024];
+	int			centerPrintLines;
 
 	// scoreboard
 	int			scoresRequestTime;
@@ -1958,7 +1963,8 @@ extern  char teamChat2[256];
 
 void CG_AddLagometerFrameInfo( void );
 void CG_AddLagometerSnapshotInfo( snapshot_t *snap );
-void CG_CenterPrint( int localClientNum, const char *str, int y, int charWidth );
+void CG_CenterPrint( int localClientNum, const char *str, int y, float charScale );
+void CG_GlobalCenterPrint( const char *str, int y, float charScale );
 void CG_DrawHead( float x, float y, float w, float h, int clientNum, vec3_t headAngles );
 void CG_DrawActive( stereoFrame_t stereoView );
 void CG_DrawScreen2D( stereoFrame_t stereoView );

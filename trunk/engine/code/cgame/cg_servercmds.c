@@ -133,12 +133,12 @@ static void CG_ParseScores( int start ) {
 =================
 CG_ParseTeamInfo
 
-#ifdef TURTLEARENA
 Format:
-"tinfo" numstrings string(there are numstrings strings)
-// NOARMOR
+"tinfo" team numstrings string(there are numstrings strings)
+
+#ifdef TURTLEARENA// NOARMOR
 Each string is "clientNum location health weapon powerups"
-// with-armor is
+#else
 Each string is "clientNum location health armor weapon powerups"
 #endif
 
@@ -250,13 +250,7 @@ static void CG_ParseWarmup( void ) {
 
 	} else if ( warmup > 0 && cg.warmup <= 0 ) {
 #ifdef MISSIONPACK
-		if (cgs.gametype >= GT_CTF
-#ifndef MISSIONPACK_HARVESTER
-		&& cgs.gametype <= GT_OBELISK
-#else
-		&& cgs.gametype <= GT_HARVESTER
-#endif
-		) {
+		if (cgs.gametype >= GT_CTF) {
 #ifdef TA_MISC // COMIC_ANNOUCER
 			CG_AddAnnouncement(ANNOUNCE_PREPAREYOURTEAM, -1);
 #else
@@ -570,21 +564,13 @@ static void CG_MapRestart( void ) {
 	// we really should clear more parts of cg here and stop sounds
 
 	// play the "fight" sound if this is a restart without warmup
-	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */ )
-	{
+	if ( cg.warmup == 0 /* && cgs.gametype == GT_TOURNAMENT */ ) {
 		trap_S_StartLocalSound( cgs.media.countFightSound, CHAN_ANNOUNCER );
-		// ZTM: TODO: Only show this message once in center of screen (drawn over all viewports)
-		for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
-			if ( cg.snap->lcIndex[lc] == -1 ) {
-				continue;
-			}
-
 #ifdef TA_DATA
-			CG_CenterPrint( lc, "BEGIN!", 120, GIANTCHAR_WIDTH*2 );
+		CG_GlobalCenterPrint( "BEGIN!", SCREEN_HEIGHT/2, 2.0 );
 #else
-			CG_CenterPrint( lc, "FIGHT!", 120, GIANTCHAR_WIDTH*2 );
+		CG_GlobalCenterPrint( "FIGHT!", SCREEN_HEIGHT/2, 2.0 );
 #endif
-		}
 	}
 #ifdef MISSIONPACK
 	if (cg_singlePlayerActive.integer) {
@@ -1189,11 +1175,7 @@ static void CG_ServerCommand( void ) {
 	}
 
 	if ( !strcmp( cmd, "cp" ) ) {
-#if !defined MISSIONPACK_HUD && !defined IOQ3ZTM
-		CG_CenterPrint( lc, CG_Argv(start+1), SCREEN_HEIGHT * 0.30, BIGCHAR_WIDTH );
-#else
-		CG_CenterPrint( lc, CG_Argv(start+1), SCREEN_HEIGHT * 0.30, 0 );
-#endif
+		CG_CenterPrint( lc, CG_Argv(start+1), SCREEN_HEIGHT * 0.30, 0.5 );
 		return;
 	}
 
