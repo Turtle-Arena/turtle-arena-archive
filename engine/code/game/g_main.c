@@ -1121,14 +1121,6 @@ If a new client connects, this will be called after the spawn function.
 ========================
 */
 void MoveClientToIntermission( gentity_t *ent ) {
-#ifdef TA_SP
-	if ( g_gametype.integer == GT_SINGLE_PLAYER )
-	{
-		// Don't move clients in single player.
-		ent->client->ps.pm_type = PM_SPINTERMISSION;
-		return;
-	}
-#endif
 	// take out of follow mode if needed
 	if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
 		StopFollowing( ent );
@@ -1213,16 +1205,21 @@ void BeginIntermission( void ) {
 		client = g_entities + i;
 		if (!client->inuse)
 			continue;
-		// respawn if dead
-		if (client->health <= 0
+
 #ifdef TA_SP
-			&& g_gametype.integer != GT_SINGLE_PLAYER
+		if ( g_gametype.integer == GT_SINGLE_PLAYER ) {
+			// Don't move clients in single player.
+			client->client->ps.pm_type = PM_SPINTERMISSION;
+			continue;
+		}
 #endif
-			)
-		{
+
+		// respawn if dead
+		if (client->health <= 0 ) {
 			ClientRespawn(client);
 		}
 		MoveClientToIntermission( client );
+		trap_UnlinkEntity(client);
 	}
 
 #ifdef TA_SP

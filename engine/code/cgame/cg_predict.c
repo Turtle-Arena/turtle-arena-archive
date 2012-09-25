@@ -88,7 +88,7 @@ void CG_BuildSolidList( void ) {
 	for ( i = 0 ; i < snap->numPSs ; i++ ) {
 		ps = &snap->pss[i];
 		cent = &cg_entities[ps->clientNum];
-		if ( ps->contents ) {
+		if ( ps->linked && ps->contents ) {
 			cg_solidEntities[cg_numSolidEntities] = cent;
 			cg_numSolidEntities++;
 		}

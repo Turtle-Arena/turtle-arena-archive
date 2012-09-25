@@ -306,6 +306,11 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 		// notice that it is from a different serverid and that the
 		// gamestate message was not just sent, forcing a retransmit
 		newcl->gamestateMessageNum = newcl->netchan.outgoingSequence;
+
+		// Owner is already active, so go active now!
+		if (owner->state == CS_ACTIVE) {
+			SV_ClientEnterWorld( newcl, NULL );
+		}
 	} else {
 		Com_DPrintf( "Going from CS_FREE to CS_CONNECTED for %s\n", newcl->name );
 		newcl->state = CS_CONNECTED;

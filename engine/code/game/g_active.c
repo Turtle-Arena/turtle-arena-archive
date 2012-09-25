@@ -1317,6 +1317,9 @@ void ClientThink_real( gentity_t *ent ) {
 		//	return;
 	}
 
+	// update linked
+	client->ps.linked = ent->r.linked;
+
 	//
 	// check for exiting intermission
 	//
@@ -2152,6 +2155,9 @@ while a slow client may have multiple ClientEndFrame between ClientThink.
 */
 void ClientEndFrame( gentity_t *ent ) {
 	int			i;
+
+	// update linked
+	ent->client->ps.linked = ent->r.linked;
 
 	if ( ent->client->sess.sessionTeam == TEAM_SPECTATOR
 #ifdef IOQ3ZTM // PEAKING
