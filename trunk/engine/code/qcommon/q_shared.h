@@ -1213,6 +1213,8 @@ typedef struct playerState_s {
 	int			eFlags;			// copied to entityState_t->eFlags
 	int			contents;		// copied to entityState_t->contents
 
+	qboolean	linked;			// copied from entityShared_t->linked
+
 	int			eventSequence;	// pmove generated events
 	int			events[MAX_PS_EVENTS];
 	int			eventParms[MAX_PS_EVENTS];
