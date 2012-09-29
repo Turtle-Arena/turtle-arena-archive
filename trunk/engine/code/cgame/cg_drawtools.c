@@ -31,18 +31,23 @@ Suite 120, Rockville, Maryland 20850 USA.
 // cg_drawtools.c -- helper functions called by cg_draw, cg_scoreboard, cg_info, etc
 #include "cg_local.h"
 
-static screenPlacement_e cg_screenPlacement = PLACE_CENTER;
-static screenPlacement_e cg_lastScreenPlacement = PLACE_CENTER;
+static screenPlacement_e cg_horizontalPlacement = PLACE_CENTER;
+static screenPlacement_e cg_verticalPlacement = PLACE_CENTER;
+static screenPlacement_e cg_lastHorizontalPlacement = PLACE_CENTER;
+static screenPlacement_e cg_lastVerticalPlacement = PLACE_CENTER;
 
 /*
 ================
 CG_SetScreenPlacement
 ================
 */
-void CG_SetScreenPlacement(screenPlacement_e pos)
+void CG_SetScreenPlacement(screenPlacement_e hpos, screenPlacement_e vpos)
 {
-	cg_lastScreenPlacement = cg_screenPlacement;
-	cg_screenPlacement = pos;
+	cg_lastHorizontalPlacement = cg_horizontalPlacement;
+	cg_lastVerticalPlacement = cg_horizontalPlacement;
+
+	cg_horizontalPlacement = hpos;
+	cg_verticalPlacement = vpos;
 }
 
 /*
@@ -52,7 +57,8 @@ CG_PopScreenPlacement
 */
 void CG_PopScreenPlacement(void)
 {
-	cg_screenPlacement = cg_lastScreenPlacement;
+	cg_horizontalPlacement = cg_lastHorizontalPlacement;
+	cg_verticalPlacement = cg_lastVerticalPlacement;
 }
 
 /*
@@ -100,28 +106,38 @@ void CG_AdjustFrom640( float *x, float *y, float *w, float *h ) {
 		}
 	}
 
-	if (cg_screenPlacement == PLACE_STRETCH) {
+	if (cg_horizontalPlacement == PLACE_STRETCH) {
 		// scale for screen sizes (not aspect correct in wide screen)
 		*x *= cgs.screenXScaleStretch;
-		*y *= cgs.screenYScaleStretch;
 		*w *= cgs.screenXScaleStretch;
-		*h *= cgs.screenYScaleStretch;
 	} else {
 		// scale for screen sizes
 		*x *= cgs.screenXScale;
-		*y *= cgs.screenYScale;
 		*w *= cgs.screenXScale;
-		*h *= cgs.screenYScale;
 
 		// Screen Placement
-		if (cg_screenPlacement == PLACE_CENTER) {
+		if (cg_horizontalPlacement == PLACE_CENTER) {
 			*x += cgs.screenXBias;
-		} else if (cg_screenPlacement == PLACE_RIGHT) {
+		} else if (cg_horizontalPlacement == PLACE_RIGHT) {
 			*x += cgs.screenXBias*2;
 		}
 
 		// Offset for widescreen
 		*x += cgs.screenXBias*(viewXBias);
+	}
+
+	if (cg_verticalPlacement == PLACE_STRETCH) {
+		*y *= cgs.screenYScaleStretch;
+		*h *= cgs.screenYScaleStretch;
+	} else {
+		*y *= cgs.screenYScale;
+		*h *= cgs.screenYScale;
+
+		if (cg_verticalPlacement == PLACE_CENTER) {
+			*y += cgs.screenYBias;
+		} else if (cg_verticalPlacement == PLACE_BOTTOM) {
+			*y += cgs.screenYBias*2;
+		}
 	}
 }
 
@@ -150,7 +166,7 @@ Coords are virtual 640x480
 */
 void CG_DrawSides(float x, float y, float w, float h, float size) {
 	CG_AdjustFrom640( &x, &y, &w, &h );
-	if (cg_screenPlacement == PLACE_STRETCH) {
+	if (cg_horizontalPlacement == PLACE_STRETCH) {
 		size *= cgs.screenXScaleStretch;
 	} else {
 		size *= cgs.screenXScale;
@@ -161,7 +177,7 @@ void CG_DrawSides(float x, float y, float w, float h, float size) {
 
 void CG_DrawTopBottom(float x, float y, float w, float h, float size) {
 	CG_AdjustFrom640( &x, &y, &w, &h );
-	if (cg_screenPlacement == PLACE_STRETCH) {
+	if (cg_verticalPlacement == PLACE_STRETCH) {
 		size *= cgs.screenYScaleStretch;
 	} else {
 		size *= cgs.screenYScale;
@@ -851,7 +867,7 @@ void CG_TileClear( void ) {
 		return;		// full screen rendering
 	}
 
-	CG_SetScreenPlacement(PLACE_STRETCH);
+	CG_SetScreenPlacement(PLACE_STRETCH, PLACE_STRETCH);
 
 	// viewport coords
 	x = y = 0;
