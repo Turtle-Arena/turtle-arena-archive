@@ -176,10 +176,15 @@ void SV_UnlinkEntity( sharedEntity_t *gEnt ) {
 	svEntity_t		*ent;
 	svEntity_t		*scan;
 	worldSector_t	*ws;
+	playerState_t	*ps;
 
 	ent = SV_SvEntityForGentity( gEnt );
 
 	gEnt->r.linked = qfalse;
+	if (gEnt->s.number < MAX_CLIENTS) {
+		ps = SV_GameClientNum(gEnt->s.number);
+		ps->linked = qfalse;
+	}
 
 	ws = ent->worldSector;
 	if ( !ws ) {
@@ -220,6 +225,7 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 	int			lastLeaf;
 	float		*origin, *angles;
 	svEntity_t	*ent;
+	playerState_t	*ps;
 
 	ent = SV_SvEntityForGentity( gEnt );
 
@@ -331,6 +337,10 @@ void SV_LinkEntity( sharedEntity_t *gEnt ) {
 	node->entities = ent;
 
 	gEnt->r.linked = qtrue;
+	if (gEnt->s.number < MAX_CLIENTS) {
+		ps = SV_GameClientNum(gEnt->s.number);
+		ps->linked = qtrue;
+	}
 }
 
 /*

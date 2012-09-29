@@ -260,9 +260,14 @@ static void CG_CalcVrect (void) {
 		// wide screen
 		cgs.screenXBias = 0.5 * ( viewWidth - ( viewHeight * (640.0/480.0) ) );
 		cgs.screenXScale = cgs.screenYScale;
+		// no narrow screen
+		cgs.screenYBias = 0;
 	} else {
-		cgs.screenXScale = cgs.screenXScaleStretch;
-		cgs.screenYScale = cgs.screenYScaleStretch;
+		cgs.screenXScale = viewWidth * (1.0/640.0);
+		cgs.screenYScale = viewHeight * (1.0/480.0);
+		// narrow screen
+		cgs.screenYBias = 0.5 * ( viewHeight - ( viewWidth * (480.0/640.0) ) );
+		cgs.screenYScale = cgs.screenXScale;
 		// no wide screen
 		cgs.screenXBias = 0;
 	}

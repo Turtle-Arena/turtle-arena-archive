@@ -1522,6 +1522,7 @@ typedef struct {
 	float			screenXScale;		// derived from glconfig
 	float			screenYScale;
 	float			screenXBias;
+	float			screenYBias;
 	float			screenXScaleStretch;
 	float			screenYScaleStretch;
 
@@ -1883,13 +1884,19 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 // cg_drawtools.c
 //
 typedef enum {
+	PLACE_STRETCH,
 	PLACE_CENTER,
+
+	// horizontal only
 	PLACE_LEFT,
 	PLACE_RIGHT,
-	PLACE_STRETCH
+
+	// vertical only
+	PLACE_TOP,
+	PLACE_BOTTOM
 } screenPlacement_e;
 
-void CG_SetScreenPlacement(screenPlacement_e pos);
+void CG_SetScreenPlacement(screenPlacement_e hpos, screenPlacement_e vpos);
 void CG_PopScreenPlacement(void);
 void CG_AdjustFrom640( float *x, float *y, float *w, float *h );
 void CG_FillRect( float x, float y, float width, float height, const float *color );

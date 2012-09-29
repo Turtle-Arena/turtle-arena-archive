@@ -736,7 +736,7 @@ void CG_DrawTeamBackground( int x, int y, int w, int h, float alpha, int team, i
 		return;
 	}
 	trap_R_SetColor( hcolor );
-	CG_SetScreenPlacement(PLACE_STRETCH);
+	CG_SetScreenPlacement(PLACE_STRETCH, PLACE_STRETCH);
 	CG_DrawPic( x, y, w, h, cgs.media.teamStatusBar );
 	CG_PopScreenPlacement();
 	trap_R_SetColor( NULL );
@@ -1036,7 +1036,7 @@ static void CG_DrawStatusBar( void ) {
 #endif
 
 #ifdef TURTLEARENA
-	CG_SetScreenPlacement(PLACE_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_TOP);
 
 	ps = cg.cur_ps;
 	cent = &cg_entities[ps->clientNum];
@@ -1188,7 +1188,7 @@ static void CG_DrawStatusBar( void ) {
 #endif
 	}
 #else
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_BOTTOM);
 
 	ps = cg.cur_ps;
 	cent = &cg_entities[ps->clientNum];
@@ -1322,7 +1322,7 @@ void CG_DrawMiddleLeft(void)
 {
 	int y;
 
-	CG_SetScreenPlacement(PLACE_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_CENTER);
 
 	y = SCREEN_HEIGHT/2;
 
@@ -1359,7 +1359,7 @@ void CG_DrawScoreChain(void)
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_BOTTOM);
 
 	fadeColor = CG_FadeColor( cg.cur_lc->scorePickupTime, 2000 );
 	if (!fadeColor) {
@@ -1791,7 +1791,7 @@ static void CG_DrawUpperRight(stereoFrame_t stereoFrame)
 
 	y = 0;
 
-	CG_SetScreenPlacement(PLACE_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT, PLACE_TOP);
 
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 1 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qtrue );
@@ -2165,7 +2165,7 @@ static void CG_DrawLowerRight( void ) {
 	y = 480 - ICON_SIZE;
 #endif
 
-	CG_SetScreenPlacement(PLACE_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT, PLACE_BOTTOM);
 
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 2 ) {
 		y = CG_DrawTeamOverlay( y, qtrue, qfalse );
@@ -2238,7 +2238,7 @@ static void CG_DrawLowerLeft( void ) {
 
 	y = 480 - ICON_SIZE;
 
-	CG_SetScreenPlacement(PLACE_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_BOTTOM);
 
 	if ( cgs.gametype >= GT_TEAM && cg_drawTeamOverlay.integer == 3 ) {
 		y = CG_DrawTeamOverlay( y, qfalse, qfalse );
@@ -2355,9 +2355,9 @@ static void CG_DrawPersistantPowerup( void ) {
 	int		value;
 
 #ifdef TURTLEARENA
-	CG_SetScreenPlacement(PLACE_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_CENTER);
 #else
-	CG_SetScreenPlacement(PLACE_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT, PLACE_CENTER);
 #endif
 
 	value = cg.cur_ps->stats[STAT_PERSISTANT_POWERUP];
@@ -2389,7 +2389,7 @@ static void CG_DrawReward( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	color = CG_FadeColor( cg.cur_lc->rewardTime, REWARD_TIME );
 	if ( !color ) {
@@ -2543,7 +2543,7 @@ static void CG_DrawDisconnect( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	// also add text in center of screen
 	s = "Connection Interrupted";
@@ -2555,11 +2555,11 @@ static void CG_DrawDisconnect( void ) {
 	}
 
 #ifdef TURTLEARENA
-	CG_SetScreenPlacement(PLACE_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_BOTTOM);
 
 	CG_DrawPic( 0, 0, 48, 48, trap_R_RegisterShader("gfx/2d/net.tga" ) );
 #else
-	CG_SetScreenPlacement(PLACE_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT, PLACE_BOTTOM);
 
 	x = 640 - 48;
 	y = 480 - 48;
@@ -2590,9 +2590,9 @@ static void CG_DrawLagometer( void ) {
 	}
 
 #ifdef TURTLEARENA
-	CG_SetScreenPlacement(PLACE_LEFT);
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_BOTTOM);
 #else
-	CG_SetScreenPlacement(PLACE_RIGHT);
+	CG_SetScreenPlacement(PLACE_RIGHT, PLACE_BOTTOM);
 #endif
 
 	//
@@ -2761,7 +2761,7 @@ static void CG_DrawCenterString( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	trap_R_SetColor( color );
 
@@ -2864,7 +2864,7 @@ static void CG_DrawGlobalCenterString( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	trap_R_SetColor( color );
 
@@ -2947,7 +2947,7 @@ static void CG_DrawCrosshair(void)
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	// set color based on health
 	if ( cg_crosshairHealth.integer ) {
@@ -3016,7 +3016,7 @@ static void CG_DrawCrosshair3D(void)
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	w = cg_crosshairSize.value;
 
@@ -3120,7 +3120,7 @@ static void CG_DrawCrosshairNames( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	// scan the known entities to see if the crosshair is sighted on one
 	CG_ScanForCrosshairEntity();
@@ -3151,7 +3151,7 @@ CG_DrawSpectator
 =================
 */
 static void CG_DrawSpectator(void) {
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_BOTTOM);
 	CG_DrawBigString(CENTER_X, 440, "SPECTATOR", 1.0F);
 	if ( cgs.gametype == GT_TOURNAMENT ) {
 		CG_DrawBigString(CENTER_X, 460, "waiting to play", 1.0F);
@@ -3181,7 +3181,11 @@ static void CG_DrawVote(void) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_LEFT);
+#ifdef TURTLEARENA
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_BOTTOM);
+#else
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_TOP);
+#endif
 
 	// play a talk beep whenever it is modified
 	if ( cgs.voteModified ) {
@@ -3230,7 +3234,11 @@ static void CG_DrawTeamVote(void) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_LEFT);
+#ifdef TURTLEARENA
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_BOTTOM);
+#else
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_TOP);
+#endif
 
 	// play a talk beep whenever it is modified
 	if ( cgs.teamVoteModified[cs_offset] ) {
@@ -3257,7 +3265,7 @@ static qboolean CG_DrawScoreboard( void ) {
 #ifdef MISSIONPACK_HUD
 	static qboolean firstTime[MAX_SPLITVIEW] = {qtrue, qtrue, qtrue, qtrue};
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	if (menuScoreboard) {
 		menuScoreboard->window.flags &= ~WINDOW_FORCED;
@@ -3344,7 +3352,7 @@ static void CG_DrawSPIntermission( void ) {
 	color[2] = 1;
 	color[3] = 1;
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_CENTER);
 
 	if (cg_singlePlayerActive.integer) {
 		if (cgs.clientinfo[ cg.cur_ps->clientNum ].headModelName[0] == '*') {
@@ -3406,7 +3414,7 @@ static qboolean CG_DrawFollow( void ) {
 		return qfalse;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_TOP);
 
 	CG_DrawBigString( CENTER_X, 24, "following", 1.0F );
 
@@ -3434,7 +3442,7 @@ static qboolean CG_DrawUseEntity(void)
 	if (!(cg.cur_ps->eFlags & EF_USE_ENT))
 		return qfalse;
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_BOTTOM);
 
 	s = "Use Entity!";
 
@@ -3473,7 +3481,7 @@ static void CG_DrawAmmoWarning( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_TOP);
 
 	if ( cg.cur_lc->lowAmmoWarning == 2 ) {
 		s = "OUT OF AMMO";
@@ -3501,7 +3509,7 @@ static void CG_DrawProxWarning( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_TOP);
 
   if (proxTime == 0) {
     proxTime = cg.time + 5000;
@@ -3547,7 +3555,7 @@ static void CG_DrawWarmup( void ) {
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_TOP);
 
 	if ( sec < 0 ) {
 		s = "Waiting for players";
@@ -3716,7 +3724,7 @@ void CG_DrawGameOver(void)
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_CENTER);
+	CG_SetScreenPlacement(PLACE_CENTER, PLACE_BOTTOM);
 
 	ps = cg.cur_ps;
 
@@ -3800,7 +3808,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 
 #ifdef MISSIONPACK_HUD
 			if ( cg_drawStatus.integer ) {
-				CG_SetScreenPlacement(PLACE_CENTER);
+				CG_SetScreenPlacement(PLACE_CENTER, PLACE_BOTTOM);
 
 				Menu_PaintAll();
 				CG_DrawTimedMenus();
@@ -4037,7 +4045,7 @@ void CG_DrawLetterbox(void)
 		return;
 	}
 
-	CG_SetScreenPlacement(PLACE_STRETCH);
+	CG_SetScreenPlacement(PLACE_STRETCH, PLACE_STRETCH);
 	CG_FillRect(0, 0, 640, pixels, color);
 	CG_FillRect(0, 480-pixels, 640, pixels, color);
 }
