@@ -453,11 +453,11 @@ static void UI_SPLevelMenu_ResetAction( qboolean result ) {
 
 	// clear game variables
 	UI_NewGame();
-#ifdef TA_SP // ZTM: -4 starts on training (trainingTier) level (i dont have one)
-	trap_Cvar_SetValue( "ui_spSelection", 0 );
-#else
-	trap_Cvar_SetValue( "ui_spSelection", -4 );
-#endif
+	if ( UI_GetSpecialArenaInfo( "training" ) ) {
+		trap_Cvar_SetValue( "ui_spSelection", -4 );
+	} else {
+		trap_Cvar_SetValue( "ui_spSelection", 0 );
+	}
 
 	// make the level select menu re-initialize
 	UI_PopMenu();

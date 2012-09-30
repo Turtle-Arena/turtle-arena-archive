@@ -1921,12 +1921,12 @@ static void ArenaServers_MenuInit( void ) {
 #endif
 
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.mappic );
-	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.list );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.status );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.statusbar );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.arrows );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.up );
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.down );
+	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.list );
 
 #ifdef TA_DATA
 	Menu_AddItem( &g_arenaservers.menu, (void*) &g_arenaservers.add );
