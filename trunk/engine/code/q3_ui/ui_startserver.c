@@ -329,7 +329,7 @@ static void StartArcade_SaveMenuItems( int gametype ) {
 		trap_Cvar_SetValue( "ui_ctf_friendly", friendlyfire );
 		break;
 
-#ifdef MISSIONPACK // MP_GAMETYPES
+#ifdef MISSIONPACK
 	case GT_1FCTF:
 		trap_Cvar_SetValue( "ui_1flag_capturelimit", flaglimit );
 		trap_Cvar_SetValue( "ui_1flag_timelimit", timelimit );
@@ -397,7 +397,7 @@ static void StartArcade_SetMenuItems( void ) {
 		s_arcade.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_ctf_friendly" ) );
 		break;
 
-#ifdef MISSIONPACK // MP_GAMETYPES
+#ifdef MISSIONPACK
 	case GT_1FCTF:
 		Com_sprintf( s_arcade.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_1flag_capturelimit" ) ) );
 		Com_sprintf( s_arcade.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_1flag_timelimit" ) ) );
@@ -594,15 +594,18 @@ static int GametypeBits( char *string ) {
 			bits |= 1 << GT_CTF;
 			continue;
 		}
-#ifdef MISSIONPACK // ZTM: Support MISSIONPACK gametypes!
+
+#ifdef MISSIONPACK
 		if( Q_stricmp( token, "oneflag" ) == 0 ) {
 			bits |= 1 << GT_1FCTF;
 			continue;
 		}
+
 		if( Q_stricmp( token, "overload" ) == 0 ) {
 			bits |= 1 << GT_OBELISK;
 			continue;
 		}
+
 #ifdef MISSIONPACK_HARVESTER
 		if( Q_stricmp( token, "harvester" ) == 0 ) {
 			bits |= 1 << GT_HARVESTER;
@@ -1346,15 +1349,18 @@ static int GametypeBits( char *string ) {
 			bits |= 1 << GT_CTF;
 			continue;
 		}
-#ifdef MISSIONPACK // ZTM: Support MISSIONPACK gametypes!
+
+#ifdef MISSIONPACK
 		if( Q_stricmp( token, "oneflag" ) == 0 ) {
 			bits |= 1 << GT_1FCTF;
 			continue;
 		}
+
 		if( Q_stricmp( token, "overload" ) == 0 ) {
 			bits |= 1 << GT_OBELISK;
 			continue;
 		}
+
 #ifdef MISSIONPACK_HARVESTER
 		if( Q_stricmp( token, "harvester" ) == 0 ) {
 			bits |= 1 << GT_HARVESTER;
@@ -2142,7 +2148,7 @@ static void ServerOptions_Start( void ) {
 		trap_Cvar_SetValue( "ui_ctf_friendly", friendlyfire );
 		break;
 
-#ifdef MISSIONPACK // MP_GAMETYPES
+#ifdef MISSIONPACK
 	case GT_1FCTF:
 		trap_Cvar_SetValue( "ui_1flag_capturelimit", flaglimit );
 		trap_Cvar_SetValue( "ui_1flag_timelimit", timelimit );
@@ -2720,7 +2726,7 @@ static void ServerOptions_SetMenuItems( void ) {
 		s_serveroptions.friendlyfire.curvalue = (int)Com_Clamp( 0, 1, trap_Cvar_VariableValue( "ui_ctf_friendly" ) );
 		break;
 
-#ifdef MISSIONPACK // MP_GAMETYPES
+#ifdef MISSIONPACK
 	case GT_1FCTF:
 		Com_sprintf( s_serveroptions.flaglimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 100, trap_Cvar_VariableValue( "ui_1flag_capturelimit" ) ) );
 		Com_sprintf( s_serveroptions.timelimit.field.buffer, 4, "%i", (int)Com_Clamp( 0, 999, trap_Cvar_VariableValue( "ui_1flag_timelimit" ) ) );
@@ -2870,12 +2876,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-#ifdef MISSIONPACK // TA_MISSIONPACK
-	if( s_serveroptions.gametype <= GT_TEAM )
-#else
-	if( s_serveroptions.gametype != GT_CTF )
-#endif
-	{
+	if( s_serveroptions.gametype <= GT_TEAM ) {
 		s_serveroptions.fraglimit.generic.type       = MTYPE_FIELD;
 #ifdef NOTRATEDM // frag to score
 		s_serveroptions.fraglimit.generic.name       = "Score Limit:";
@@ -3094,12 +3095,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 	if (s_serveroptions.gametype != GT_SINGLE_PLAYER)
 	{
 #endif
-#ifdef MISSIONPACK // TA_MISSIONPACK
-	if( s_serveroptions.gametype <= GT_TEAM )
-#else
-	if( s_serveroptions.gametype != GT_CTF )
-#endif
-	{
+	if( s_serveroptions.gametype <= GT_TEAM ) {
 		Menu_AddItem( &s_serveroptions.menu, &s_serveroptions.fraglimit );
 	}
 	else {

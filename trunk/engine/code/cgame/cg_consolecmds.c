@@ -97,7 +97,7 @@ static void CG_Viewpos_f (void) {
 static void CG_ScoresDown_f( void ) {
 
 #ifdef MISSIONPACK_HUD
-		CG_BuildSpectatorString();
+	CG_BuildSpectatorString();
 #endif
 	if ( cg.scoresRequestTime + 2000 < cg.time ) {
 		// the scores are more than two seconds out of data,
@@ -792,9 +792,6 @@ static consoleCommand_t	commands[] = {
 #ifdef MISSIONPACK
 	{ "vtell_target", CG_VoiceTellTarget_f },
 	{ "vtell_attacker", CG_VoiceTellAttacker_f },
-#ifdef MISSIONPACK_HUD
-	{ "loadhud", CG_LoadHud_f },
-#endif
 	{ "nextTeamMember", CG_NextTeamMember_f },
 	{ "prevTeamMember", CG_PrevTeamMember_f },
 	{ "nextOrder", CG_NextOrder_f },
@@ -821,6 +818,7 @@ static consoleCommand_t	commands[] = {
 	{ "spLose", CG_spLose_f },
 #endif
 #ifdef MISSIONPACK_HUD
+	{ "loadhud", CG_LoadHud_f },
 	{ "scoresDown", CG_scrollScoresDown_f },
 	{ "scoresUp", CG_scrollScoresUp_f },
 #endif

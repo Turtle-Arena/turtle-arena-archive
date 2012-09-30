@@ -494,7 +494,7 @@ int ArenaServers_GametypeForGames(int games) {
 		gametype = GT_CTF;
 		break;
 
-#ifdef MISSIONPACK // MP_GAMETYPES
+#ifdef MISSIONPACK
 	case GAMES_1FCTF:
 		gametype = GT_1FCTF;
 		break;
@@ -503,7 +503,7 @@ int ArenaServers_GametypeForGames(int games) {
 		gametype = GT_OBELISK;
 		break;
 #ifdef MISSIONPACK_HARVESTER
-	case GAMES_OBELISK:
+	case GAMES_HARVESTER:
 		gametype = GT_HARVESTER;
 		break;
 #endif
@@ -760,6 +760,28 @@ static void ArenaServers_UpdateMenu( void ) {
 				continue;
 			}
 			break;
+	
+#ifdef MISSIONPACK
+		case GAMES_1FCTF:
+			if( servernodeptr->gametype != GT_1FCTF ) {
+				continue;
+			}
+			break;
+
+		case GAMES_OBELISK:
+			if( servernodeptr->gametype != GT_OBELISK ) {
+				continue;
+			}
+			break;
+
+#ifdef MISSIONPACK_HARVESTER
+		case GAMES_HARVESTER:
+			if( servernodeptr->gametype != GT_HARVESTER ) {
+				continue;
+			}
+			break;
+#endif
+#endif
 		}
 #endif
 
