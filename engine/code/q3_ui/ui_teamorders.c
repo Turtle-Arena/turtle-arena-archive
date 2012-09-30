@@ -355,7 +355,7 @@ static void UI_TeamOrdersMenu_ListEvent( void *ptr, int event ) {
 #ifdef MISSIONPACK
 	if (teamOrdersMenuInfo.selectedBot == 0) // Everyone
 	{
-		if (buttons[selection] != NULL)
+		if (voiceChats[selection] != NULL && buttons[selection] != NULL)
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "cmd vsay_team %s; +button%s; wait; -button%s", voiceChats[selection], buttons[selection], buttons[selection] ));
 		else if (voiceChats[selection] != NULL)
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "cmd vsay_team %s", voiceChats[selection] ) );
@@ -364,7 +364,7 @@ static void UI_TeamOrdersMenu_ListEvent( void *ptr, int event ) {
 	}
 	else
 	{
-		if (buttons[selection] != NULL)
+		if (voiceChats[selection] != NULL && buttons[selection] != NULL)
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "cmd vtell %s %s; +button%s; wait; -button%s", teamOrdersMenuInfo.botNames[teamOrdersMenuInfo.selectedBot], voiceChats[selection], buttons[selection], buttons[selection] ) );
 		else if (voiceChats[selection] != NULL)
 			trap_Cmd_ExecuteText( EXEC_APPEND, va( "cmd vtell %s", voiceChats[selection] ) );

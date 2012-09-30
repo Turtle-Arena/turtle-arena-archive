@@ -119,7 +119,7 @@ vmCvar_t	ui_ctf_capturelimit;
 vmCvar_t	ui_ctf_timelimit;
 vmCvar_t	ui_ctf_friendly;
 
-#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
+#ifdef MISSIONPACK
 vmCvar_t	ui_1flag_capturelimit;
 vmCvar_t	ui_1flag_timelimit;
 vmCvar_t	ui_1flag_friendly;
@@ -223,7 +223,7 @@ static cvarTable_t		cvarTable[] = {
 	{ &ui_ctf_timelimit, "ui_ctf_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_ctf_friendly, "ui_ctf_friendly",  "0", CVAR_ARCHIVE },
 
-#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
+#ifdef MISSIONPACK
 	{ &ui_1flag_capturelimit, "ui_1flag_capturelimit", "5", CVAR_ARCHIVE },
 	{ &ui_1flag_timelimit, "ui_1flag_timelimit", "30", CVAR_ARCHIVE },
 	{ &ui_1flag_friendly, "ui_1flag_friendly",  "0", CVAR_ARCHIVE },

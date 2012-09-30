@@ -50,7 +50,9 @@ MAIN MENU
 #define ID_SETUP				12
 #define ID_DEMOS				13
 #define ID_CINEMATICS			14
-#define ID_TEAMARENA		15
+#ifndef MISSIONPACK
+#define ID_TEAMARENA			15
+#endif
 #define ID_MODS					16
 #endif
 #define ID_EXIT					17
@@ -78,7 +80,9 @@ typedef struct {
 #ifndef TA_SP
 	menutext_s		demos;
 	menutext_s		cinematics;
+#ifndef MISSIONPACK
 	menutext_s		teamArena;
+#endif
 	menutext_s		mods;
 #endif
 	menutext_s		exit;
@@ -170,10 +174,12 @@ void Main_MenuEvent (void* ptr, int event) {
 		UI_ModsMenu();
 		break;
 
+#ifndef MISSIONPACK
 	case ID_TEAMARENA:
 		trap_Cvar_Set( "fs_game", BASETA);
 		trap_Cmd_ExecuteText( EXEC_APPEND, "vid_restart;" );
 		break;
+#endif
 #endif
 
 	case ID_EXIT:
@@ -305,7 +311,7 @@ static void Main_MenuDraw( void ) {
 }
 
 
-#ifndef TA_SP
+#ifndef MISSIONPACK
 /*
 ===============
 UI_TeamArenaExists
@@ -346,7 +352,9 @@ and that local cinematics are killed
 void UI_MainMenu( void ) {
 	int		y;
 #ifndef TA_SP
+#ifndef MISSIONPACK
 	qboolean teamArena = qfalse;
+#endif
 #endif
 	int		style = UI_CENTER | UI_DROPSHADOW;
 
@@ -501,6 +509,7 @@ void UI_MainMenu( void ) {
 	s_main.cinematics.color					= text_big_color;
 	s_main.cinematics.style					= style;
 
+#ifndef MISSIONPACK
 	if (UI_TeamArenaExists()) {
 		teamArena = qtrue;
 		y += MAIN_MENU_VERTICAL_SPACING;
@@ -514,6 +523,7 @@ void UI_MainMenu( void ) {
 		s_main.teamArena.color					= text_big_color;
 		s_main.teamArena.style					= style;
 	}
+#endif
 
 	y += MAIN_MENU_VERTICAL_SPACING;
 	s_main.mods.generic.type			= MTYPE_PTEXT;
@@ -554,9 +564,11 @@ void UI_MainMenu( void ) {
 #ifndef TA_SP // Moved to PLAY Menu.
 	Menu_AddItem( &s_main.menu,	&s_main.demos );
 	Menu_AddItem( &s_main.menu,	&s_main.cinematics );
+#ifndef MISSIONPACK
 	if (teamArena) {
 		Menu_AddItem( &s_main.menu,	&s_main.teamArena );
 	}
+#endif
 	Menu_AddItem( &s_main.menu,	&s_main.mods );
 #endif
 	Menu_AddItem( &s_main.menu,	&s_main.exit );             

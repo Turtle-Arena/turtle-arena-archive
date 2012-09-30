@@ -289,7 +289,7 @@ void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text
 		trap_R_SetColor( NULL );
 	}
 }
-#endif
+#endif // MISSIONPACK_HUD
 
 /*
 ==============
@@ -1890,7 +1890,7 @@ static float CG_DrawScores( float y ) {
 	} else if ( cgs.gametype >= GT_TEAM ) {
 		x = 640;
 
-#ifdef MISSIONPACK // ZTM: Support missionpack with old hud; oddly flagShader wasn't used
+#ifdef MISSIONPACK
 		if ( cgs.gametype == GT_1FCTF ) {
 			// Display flag status
 			item = BG_FindItemForPowerup( PW_NEUTRALFLAG );
@@ -2073,7 +2073,7 @@ static float CG_DrawPowerups( float y ) {
 			continue;
 		}
 
-#ifdef MISSIONPACK // IOQ3ZTM // ZTM: Skip persistant powerups!
+#ifdef MISSIONPACK
 		if (i == PW_SCOUT
 			|| i == PW_GUARD
 			|| i == PW_DOUBLER
@@ -2349,8 +2349,7 @@ static void CG_DrawHoldableItem( void ) {
 CG_DrawPersistantPowerup
 ===================
 */
-//#if 0 // sos001208 - DEAD
-#ifndef MISSIONPACK_HUD // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
+#ifndef MISSIONPACK_HUD
 static void CG_DrawPersistantPowerup( void ) { 
 	int		value;
 
@@ -2370,7 +2369,7 @@ static void CG_DrawPersistantPowerup( void ) {
 #endif
 	}
 }
-#endif
+#endif // MISSIONPACK_HUD
 #endif // MISSIONPACK
 
 
@@ -3842,7 +3841,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 #ifndef TURTLEARENA
 			CG_DrawHoldableItem();
 #endif
-#ifdef MISSIONPACK // IOQ3ZTM // ZTM: For playing MISSIONPACK without new HUD.
+#ifdef MISSIONPACK
 			CG_DrawPersistantPowerup();
 #endif
 #endif

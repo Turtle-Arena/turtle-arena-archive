@@ -54,7 +54,7 @@ extern vmCvar_t	ui_ctf_capturelimit;
 extern vmCvar_t	ui_ctf_timelimit;
 extern vmCvar_t	ui_ctf_friendly;
 
-#ifdef MISSIONPACK // ZTM: MP_GAMETYPES
+#ifdef MISSIONPACK
 extern vmCvar_t	ui_1flag_capturelimit;
 extern vmCvar_t	ui_1flag_timelimit;
 extern vmCvar_t	ui_1flag_friendly;
