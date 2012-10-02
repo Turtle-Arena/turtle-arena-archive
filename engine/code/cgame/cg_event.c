@@ -552,7 +552,7 @@ static void CG_ItemPickup( int localClientNum, int itemNum ) {
 #endif
 #ifdef TURTLEARENA // NIGTHS_ITEMS
 	if (item->giType == IT_SCORE) {
-		cg.cur_lc->scorePickupTime = cg.time;
+		lc->scorePickupTime = cg.time;
 		return; // Do not count as a pickup item
 	}
 #endif
@@ -566,17 +566,17 @@ static void CG_ItemPickup( int localClientNum, int itemNum ) {
 	{
 #ifdef TA_HOLDSYS/*2*/
 		// Select the holdable
-		cg.cur_lc->holdableSelect = item->giTag;
+		lc->holdableSelect = item->giTag;
 #endif
 
 		// holdable is really given in game, but do it anyway...
 		if (item->quantity == 0)
-			cg.cur_lc->predictedPlayerState.holdable[item->giTag] = 1;
+			lc->predictedPlayerState.holdable[item->giTag] = 1;
 		else
-			cg.cur_lc->predictedPlayerState.holdable[item->giTag] += item->quantity;
+			lc->predictedPlayerState.holdable[item->giTag] += item->quantity;
 
-		if (cg.cur_lc->predictedPlayerState.holdable[item->giTag] > MAX_SHURIKENS)
-			cg.cur_lc->predictedPlayerState.holdable[item->giTag] = MAX_SHURIKENS;
+		if (lc->predictedPlayerState.holdable[item->giTag] > MAX_SHURIKENS)
+			lc->predictedPlayerState.holdable[item->giTag] = MAX_SHURIKENS;
 	}
 #endif
 	// see if it should be the grabbed weapon
