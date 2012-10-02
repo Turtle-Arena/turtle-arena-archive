@@ -1913,7 +1913,7 @@ void CG_MouseEvent(int localClientNum, int x, int y) {
 
 	lc = &cg.localClients[0];
 
-	if ( (lc->predictedPlayerState.pm_type == PM_NORMAL || lc->predictedPlayerState.pm_type == PM_SPECTATOR) && cg.showScores == qfalse) {
+	if ( (lc->predictedPlayerState.pm_type == PM_NORMAL || lc->predictedPlayerState.pm_type == PM_SPECTATOR) && lc->showScores == qfalse) {
     trap_Key_SetCatcher(0);
 		return;
 	}
@@ -1998,7 +1998,7 @@ void CG_KeyEvent(int key, qboolean down) {
 		return;
 	}
 
-	if ( cg.cur_lc->predictedPlayerState.pm_type == PM_NORMAL || (cg.cur_lc->predictedPlayerState.pm_type == PM_SPECTATOR && cg.showScores == qfalse)) {
+	if ( cg.cur_lc->predictedPlayerState.pm_type == PM_NORMAL || (cg.cur_lc->predictedPlayerState.pm_type == PM_SPECTATOR && cg.cur_lc->showScores == qfalse)) {
 		CG_EventHandling(CGAME_EVENT_NONE);
     trap_Key_SetCatcher(0);
 		return;

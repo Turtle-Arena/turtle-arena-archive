@@ -884,6 +884,10 @@ typedef struct {
 	int		letterboxTime; // Time that the letter box move was started, or -1 if instant.
 #endif
 
+	// scoreboard
+	qboolean	showScores;
+	qboolean	scoreBoardShowing;
+	int			scoreFadeTime;
 	char		killerName[MAX_NAME_LENGTH];
 
 #ifdef TURTLEARENA
@@ -957,6 +961,9 @@ typedef struct {
 	int			numViewports;
 	int			viewport;
 	qboolean	singleCamera; // Rending multiple clients using one viewport
+#ifdef TURTLEARENA
+	qboolean	allLocalClientsAtIntermission;
+#endif
 
 	// information screen text during loading
 	char		infoScreenText[MAX_STRING_CHARS];
@@ -974,9 +981,6 @@ typedef struct {
 	int			selectedScore;
 	int			teamScores[2];
 	score_t		scores[MAX_CLIENTS];
-	qboolean	showScores;
-	qboolean	scoreBoardShowing;
-	int			scoreFadeTime;
 #ifdef MISSIONPACK
 	char			spectatorList[MAX_STRING_CHARS];		// list of names
 	int				spectatorTime;							// last time offset

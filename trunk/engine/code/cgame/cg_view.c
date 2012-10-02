@@ -1014,27 +1014,29 @@ static void CG_OffsetMultiple2dModeView(qboolean everyone) {
 //======================================================================
 
 #ifndef TURTLEARENA // NOZOOM
-void CG_ZoomDown( int localClient ) { 
-	cg.cur_lc = &cg.localClients[localClient];
+void CG_ZoomDown( int localClientNum ) {
+	cglc_t *lc = &cg.localClients[localClientNum];
 
-	if ( cg.cur_lc->zoomed ) {
+	if ( lc->zoomed ) {
 		return;
 	}
 
-	cg.cur_lc->zoomed = qtrue;
-	cg.cur_lc->zoomTime = cg.time;
+	lc->zoomed = qtrue;
+	lc->zoomTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
 	CG_ToggleLetterbox(qtrue, qfalse);
 #endif
-}
+ }
+ 
+void CG_ZoomUp( int localClientNum ) {
+	cglc_t *lc = &cg.localClients[localClientNum];
 
-void CG_ZoomUp( int localClient ) { 
-	cg.cur_lc = &cg.localClients[localClient];
-	if ( !cg.cur_lc->zoomed ) {
+	if ( !lc->zoomed ) {
 		return;
 	}
-	cg.cur_lc->zoomed = qfalse;
-	cg.cur_lc->zoomTime = cg.time;
+
+	lc->zoomed = qfalse;
+	lc->zoomTime = cg.time;
 #ifdef IOQ3ZTM // LETTERBOX
 	CG_ToggleLetterbox(qfalse, qfalse);
 #endif
@@ -1728,6 +1730,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	int		weaponSelect;
 	qboolean renderClientViewport[MAX_SPLITVIEW];
 	int		i;
+#ifdef TURTLEARENA
+	qboolean	twodMode;
+#endif
 
 	cg.time = serverTime;
 	cg.demoPlayback = demoPlayback;
@@ -1763,21 +1768,20 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.clientFrame++;
 
 #ifdef TURTLEARENA
-	// Single camera mode only uses one viewport for viewing all local clients or all clients on server.
-	cg.singleCamera = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2));
-
-	if (cgs.gametype != GT_SINGLE_PLAYER) {
-		// Use single camera/viewport at intermission
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
-			if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[i].pm_type != PM_INTERMISSION) {
-				// client present and not at intermission, keep viewports separate.
-				break;
-			}
-		}
-		if (i == MAX_SPLITVIEW) {
-			cg.singleCamera = qtrue;
+	// Use single camera/viewport at intermission
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[i].pm_type != PM_INTERMISSION) {
+			// client present and not at intermission, keep viewports separate.
+			break;
 		}
 	}
+	cg.allLocalClientsAtIntermission = (i == MAX_SPLITVIEW);
+
+	// 2D mode views all local clients or all clients on server.
+	twodMode = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2));
+
+	// Use single camera/viewport in 2d mode and (non-Coop) intermission.
+	cg.singleCamera = (cg.snap->numPSs > 1) && (twodMode || (cgs.gametype != GT_SINGLE_PLAYER && cg.allLocalClientsAtIntermission));
 #else
 	// Use single camera/viewport at intermission
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -1786,7 +1790,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 			break;
 		}
 	}
-	cg.singleCamera = (i == MAX_SPLITVIEW);
+	cg.singleCamera = (cg.snap->numPSs > 1) && (i == MAX_SPLITVIEW);
 #endif
 
 	cg.numViewports = 0;
@@ -1945,24 +1949,20 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 	if (cg.numViewports != 1) {
 		// Setup single viewport
-		cg.singleCamera = qtrue;
 		cg.numViewports = 1;
 		cg.viewport = 0;
 
 		// calculate size of viewport
 		CG_CalcVrect();
-
-		// Not drawing single client view.
-		cg.cur_lc = NULL;
-		cg.cur_ps = NULL;
 	}
-
-	// Draw over all viewports
-	CG_DrawScreen2D( stereoView );
 
 	// Not drawing single client view.
 	cg.cur_lc = NULL;
 	cg.cur_ps = NULL;
+	cg.cur_localClientNum = -1;
+
+	// Draw over all viewports
+	CG_DrawScreen2D( stereoView );
 
 	if ( cg_stats.integer ) {
 		CG_Printf( "cg.clientFrame:%i\n", cg.clientFrame );

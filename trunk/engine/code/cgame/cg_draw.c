@@ -3271,7 +3271,9 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 	if (cg_paused.integer) {
 		cg.deferredPlayerLoading = 0;
-		firstTime[cg.cur_localClientNum] = qtrue;
+		if (cg.cur_lc) {
+			firstTime[cg.cur_localClientNum] = qtrue;
+		}
 		return qfalse;
 	}
 
@@ -3283,19 +3285,17 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 
 	// don't draw scoreboard during death while warmup up
-	if ( cg.warmup && !cg.showScores ) {
+	if ( cg.warmup && cg.cur_lc && !cg.cur_lc->showScores ) {
 		return qfalse;
 	}
 
-	if ( cg.showScores || (cg.cur_lc && (cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD ||
-		 cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION)) ) {
+	if ( !cg.cur_lc || cg.cur_lc->showScores || cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD ||
+		 cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
 	} else {
-		if ( !CG_FadeColor( cg.scoreFadeTime, FADE_TIME ) ) {
+		if ( !CG_FadeColor( cg.cur_lc->scoreFadeTime, FADE_TIME ) ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
-			if (cg.cur_lc) {
-				cg.cur_lc->killerName[0] = 0;
-			}
+			cg.cur_lc->killerName[0] = 0;
 			firstTime[cg.cur_localClientNum] = qtrue;
 			return qfalse;
 		}
@@ -3310,7 +3310,7 @@ static qboolean CG_DrawScoreboard( void ) {
 	}
 
 	if (menuScoreboard) {
-		if (firstTime[cg.cur_localClientNum]) {
+		if (cg.cur_lc && firstTime[cg.cur_localClientNum]) {
 			firstTime[cg.cur_localClientNum] = qfalse;
 			CG_SetScoreSelection(menuScoreboard);
 
@@ -3397,8 +3397,8 @@ static void CG_DrawIntermission( void ) {
 		return;
 	}
 #endif
-	cg.scoreFadeTime = cg.time;
-	cg.scoreBoardShowing = CG_DrawScoreboard();
+	cg.cur_lc->scoreFadeTime = cg.time;
+	cg.cur_lc->scoreBoardShowing = CG_DrawScoreboard();
 }
 
 /*
@@ -3767,6 +3767,10 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 		return;
 	}
 
+	if ( cg.singleCamera ) {
+		return;
+	}
+
 	if ( cg_draw2D.integer == 0 ) {
 		return;
 	}
@@ -3801,7 +3805,7 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 		// don't draw any status if dead or the scoreboard is being explicitly shown
 		if (
 #ifndef TURTLEARENA
-		!cg.showScores &&
+		!cg.cur_lc->showScores &&
 #endif
 		cg.cur_ps->stats[STAT_HEALTH] > 0 ) {
 
@@ -3880,7 +3884,8 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 	CG_DrawFollow();
 
 	// don't draw center string if scoreboard is up
-	if (!cg.showScores && !cg.scoreBoardShowing && !CG_DrawScoreboard()) {
+	cg.cur_lc->scoreBoardShowing = CG_DrawScoreboard();
+	if (!cg.cur_lc->scoreBoardShowing) {
 #ifdef TA_SP
 		CG_DrawGameOver();
 #endif
@@ -3955,11 +3960,14 @@ void CG_DrawScreen2D( stereoFrame_t stereoView ) {
 
 	CG_DrawWarmup();
 
-	// Draw scoreboard over all viewports.
-	cg.scoreBoardShowing = CG_DrawScoreboard();
-
-	// don't draw center string if scoreboard is up
-	if (!cg.scoreBoardShowing) {
+#ifdef TURTLEARENA
+	if ( cg.singleCamera && cgs.gametype != GT_SINGLE_PLAYER && cg.allLocalClientsAtIntermission )
+#else
+	if ( cg.singleCamera )
+#endif
+	{
+		CG_DrawScoreboard();
+	} else {
 		CG_DrawGlobalCenterString();
 	}
 }

@@ -816,6 +816,7 @@ static menucommon_s *g_looking_mini_controls[] = {
 };
 
 static menucommon_s *g_misc_mini_controls[] = {
+	(menucommon_s *)&s_controls.showscores,
 #ifndef TA_MISC
 	(menucommon_s *)&s_controls.useitem,
 #endif
@@ -837,7 +838,6 @@ static menucommon_s *g_unused_controls[] = {
 	(menucommon_s *)&s_controls.freelook,
 
 	// misc
-	(menucommon_s *)&s_controls.showscores,
 	(menucommon_s *)&s_controls.chat,
 	(menucommon_s *)&s_controls.chat2,
 	(menucommon_s *)&s_controls.chat3,
