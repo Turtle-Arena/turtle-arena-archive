@@ -360,32 +360,30 @@ qboolean CG_DrawOldScoreboard( void ) {
 	}
 
 	// don't draw scoreboard during death while warmup up
-	if ( cg.warmup && !cg.showScores ) {
+	if ( cg.warmup && cg.cur_lc && !cg.cur_lc->showScores ) {
 		return qfalse;
 	}
 
 #ifdef TA_SP
 	if ( cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc && cg.cur_lc->predictedPlayerState.stats[STAT_HEALTH] <= 0
-		&& !cg.showScores )
+		&& !cg.cur_lc->showScores )
 	{
 		cg.deferredPlayerLoading = 0;
 		return qfalse;
 	}
 #endif
 
-	if ( cg.showScores || (cg.cur_lc && (cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD ||
-		 cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION)) ) {
+	if ( !cg.cur_lc || cg.cur_lc->showScores || cg.cur_lc->predictedPlayerState.pm_type == PM_DEAD ||
+		 cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
 		fade = 1.0;
 		fadeColor = colorWhite;
 	} else {
-		fadeColor = CG_FadeColor( cg.scoreFadeTime, FADE_TIME );
+		fadeColor = CG_FadeColor( cg.cur_lc->scoreFadeTime, FADE_TIME );
 		
 		if ( !fadeColor ) {
 			// next time scoreboard comes up, don't print killer
 			cg.deferredPlayerLoading = 0;
-			if (cg.cur_lc) {
-				cg.cur_lc->killerName[0] = 0;
-			}
+			cg.cur_lc->killerName[0] = 0;
 			return qfalse;
 		}
 		fade = *fadeColor;

@@ -93,8 +93,30 @@ static void CG_Viewpos_f (void) {
 		(int)cg.refdefViewAngles[YAW]);
 }
 
+/*
+=============
+CG_AnyScoreboardShowing
+=============
+*/
+static qboolean CG_AnyScoreboardShowing(void) {
+	int i;
 
-static void CG_ScoresDown_f( void ) {
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		if (cg.snap->lcIndex[i] != -1 && cg.localClients[i].scoreBoardShowing) {
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
+
+/*
+=============
+CG_ScoresDown
+=============
+*/
+static void CG_ScoresDown(int localClientNum) {
+	cglc_t *lc = &cg.localClients[localClientNum];
 
 #ifdef MISSIONPACK_HUD
 	CG_BuildSpectatorString();
@@ -107,22 +129,102 @@ static void CG_ScoresDown_f( void ) {
 
 		// leave the current scores up if they were already
 		// displayed, but if this is the first hit, clear them out
-		if ( !cg.showScores ) {
-			cg.showScores = qtrue;
+		if ( !CG_AnyScoreboardShowing() ) {
 			cg.numScores = 0;
 		}
+
+		lc->showScores = qtrue;
 	} else {
 		// show the cached contents even if they just pressed if it
 		// is within two seconds
-		cg.showScores = qtrue;
+		lc->showScores = qtrue;
 	}
 }
 
-static void CG_ScoresUp_f( void ) {
-	if ( cg.showScores ) {
-		cg.showScores = qfalse;
-		cg.scoreFadeTime = cg.time;
+/*
+=============
+CG_ScoresUp
+=============
+*/
+static void CG_ScoresUp( int localClientNum ) {
+	cglc_t *lc = &cg.localClients[localClientNum];
+
+	if ( lc->showScores ) {
+		lc->showScores = qfalse;
+		lc->scoreFadeTime = cg.time;
 	}
+}
+
+/*
+=============
+CG_ScoresDown_f
+=============
+*/
+void CG_ScoresDown_f(void) {
+	CG_ScoresDown(0);
+}
+
+/*
+=============
+CG_ScoresUp_f
+=============
+*/
+void CG_ScoresUp_f(void) {
+	CG_ScoresUp(0);
+}
+
+/*
+=============
+CG_2ScoresDown_f
+=============
+*/
+void CG_2ScoresDown_f(void) {
+	CG_ScoresDown(1);
+}
+
+/*
+=============
+CG_2ScoresUp_f
+=============
+*/
+void CG_2ScoresUp_f(void) {
+	CG_ScoresUp(1);
+}
+
+/*
+=============
+CG_3ScoresDown_f
+=============
+*/
+void CG_3ScoresDown_f(void) {
+	CG_ScoresDown(2);
+}
+
+/*
+=============
+CG_3ScoresUp_f
+=============
+*/
+void CG_3ScoresUp_f(void) {
+	CG_ScoresUp(2);
+}
+
+/*
+=============
+CG_4ScoresDown_f
+=============
+*/
+void CG_4ScoresDown_f(void) {
+	CG_ScoresDown(3);
+}
+
+/*
+=============
+CG_4ScoresUp_f
+=============
+*/
+void CG_4ScoresUp_f(void) {
+	CG_ScoresUp(3);
 }
 
 #ifdef MISSIONPACK_HUD
@@ -149,7 +251,7 @@ static void CG_LoadHud_f( void) {
 
 
 static void CG_scrollScoresDown_f( void) {
-	if (menuScoreboard && cg.scoreBoardShowing) {
+	if (menuScoreboard && CG_AnyScoreboardShowing()) {
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_SCOREBOARD, qtrue);
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_REDTEAM_LIST, qtrue);
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_BLUETEAM_LIST, qtrue);
@@ -158,7 +260,7 @@ static void CG_scrollScoresDown_f( void) {
 
 
 static void CG_scrollScoresUp_f( void) {
-	if (menuScoreboard && cg.scoreBoardShowing) {
+	if (menuScoreboard && CG_AnyScoreboardShowing()) {
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_SCOREBOARD, qfalse);
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_REDTEAM_LIST, qfalse);
 		Menu_ScrollFeeder(menuScoreboard, FEEDER_BLUETEAM_LIST, qfalse);
@@ -708,6 +810,12 @@ static consoleCommand_t	commands[] = {
 	{ "viewpos", CG_Viewpos_f },
 	{ "+scores", CG_ScoresDown_f },
 	{ "-scores", CG_ScoresUp_f },
+	{ "+2scores", CG_2ScoresDown_f },
+	{ "-2scores", CG_2ScoresUp_f },
+	{ "+3scores", CG_3ScoresDown_f },
+	{ "-3scores", CG_3ScoresUp_f },
+	{ "+4scores", CG_4ScoresDown_f },
+	{ "-4scores", CG_4ScoresUp_f },
 #ifndef TURTLEARENA // NOZOOM
 	{ "+zoom", CG_ZoomDown_f },
 	{ "-zoom", CG_ZoomUp_f },
