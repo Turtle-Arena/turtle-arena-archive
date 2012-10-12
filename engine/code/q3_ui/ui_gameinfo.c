@@ -371,22 +371,19 @@ static void UI_LoadBots( void ) {
 	char*		dirptr;
 	int			i;
 	int			dirlen;
-#ifdef IOQ3ZTM // RANDOMBOT
-	char info[MAX_INFO_STRING];
-#endif
+	char		info[MAX_INFO_STRING];
 
 	ui_numBots = 0;
 
-#ifdef IOQ3ZTM // RANDOMBOT
+	// setup random bot option
 	memset(info, 0, MAX_INFO_STRING);
-        Info_SetValueForKey(info, "name", "Random");
-        // Random bot doesn't have a model, but it has a icon.
-        Info_SetValueForKey(info, "model", "Random");
-        ui_botInfos[ui_numBots] = UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1);
-		if (ui_botInfos[ui_numBots])
-			strcpy(ui_botInfos[ui_numBots], info);
-        ui_numBots++;
-#endif
+	Info_SetValueForKey(info, "name", "Random");
+	Info_SetValueForKey(info, "model", "random");
+	ui_botInfos[ui_numBots] = UI_Alloc(strlen(info) + strlen("\\num\\") + strlen(va("%d", MAX_ARENAS)) + 1);
+	if (ui_botInfos[ui_numBots]) {
+		strcpy(ui_botInfos[ui_numBots], info);
+	}
+	ui_numBots++;
 
 	trap_Cvar_Register( &botsFile, "g_botsFile", "", CVAR_INIT|CVAR_ROM );
 	if( *botsFile.string ) {
