@@ -315,41 +315,19 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 }
 #endif
 
-
-#ifdef IOQ3ZTM // RANDOMBOT
 /*
 ===============
 G_SelectRandomBotForAdd
 ===============
 */
-int G_SelectRandomBotForAdd( int team )
-#else
-/*
-===============
-G_AddRandomBot
-===============
-*/
-void G_AddRandomBot( int team )
-#endif
-{
+int G_SelectRandomBotForAdd( int team ) {
 	int		i, n, num;
-#ifdef IOQ3ZTM // RANDOMBOT
 	char	*value;
-#else
-	float	skill;
-	char	*value, netname[36], *teamstr;
-#endif
 	gclient_t	*cl;
 
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef IOQ3ZTM // RANDOMBOT
-		// Skip random bot.
-		if ( !Q_stricmp( value, "Random" ) ) {
-			continue;
-		}
-#endif
 		//
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
@@ -373,12 +351,6 @@ void G_AddRandomBot( int team )
 	num = random() * num;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
-#ifdef IOQ3ZTM // RANDOMBOT
-		// Skip random bot.
-		if ( !Q_stricmp( value, "Random" ) ) {
-			continue;
-		}
-#endif
 		//
 		for ( i=0 ; i< g_maxclients.integer ; i++ ) {
 			cl = level.clients + i;
@@ -398,32 +370,15 @@ void G_AddRandomBot( int team )
 		if (i >= g_maxclients.integer) {
 			num--;
 			if (num <= 0) {
-#ifdef IOQ3ZTM // RANDOMBOT
 				return n;
-#else
-				skill = trap_Cvar_VariableValue( "g_spSkill" );
-				if (team == TEAM_RED) teamstr = "red";
-				else if (team == TEAM_BLUE) teamstr = "blue";
-				else teamstr = "";
-				strncpy(netname, value, sizeof(netname)-1);
-				netname[sizeof(netname)-1] = '\0';
-				Q_CleanStr(netname);
-				trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
-				return;
-#endif
 			}
 		}
 	}
-#ifdef IOQ3ZTM // RANDOMBOT
-	// If we made it here all of the bot types are used in this team (or game if non-team)
-	//  Happens when there isn't enough bots types.
 
-	// Randomly select any bot.
-	return abs(rand())%g_numBots;
-#endif
+	// all bot types are on this team, randomly choose any bot type
+	return random()*(g_numBots-1);
 }
 
-#ifdef IOQ3ZTM // RANDOMBOT
 /*
 ===============
 G_AddRandomBot
@@ -442,13 +397,12 @@ void G_AddRandomBot( int team ) {
 	skill = trap_Cvar_VariableValue( "g_spSkill" );
 	if (team == TEAM_RED) teamstr = "red";
 	else if (team == TEAM_BLUE) teamstr = "blue";
-	else teamstr = "";
+	else teamstr = "free";
 	strncpy(netname, value, sizeof(netname)-1);
 	netname[sizeof(netname)-1] = '\0';
 	Q_CleanStr(netname);
 	trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
 }
-#endif
 
 /*
 ===============
@@ -717,6 +671,7 @@ G_AddBot
 */
 static void G_AddBot( const char *name, float skill, const char *team, int delay, char *altname) {
 	int				clientNum;
+	int				t;
 	char			*botinfo;
 	gentity_t		*bot;
 	char			*key;
@@ -726,12 +681,31 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	char			*headmodel;
 	char			userinfo[MAX_INFO_STRING];
 
-#ifdef IOQ3ZTM // RANDOMBOT
-    // ZTM: Check for random bot.
-    if (Q_stricmp(name, "Random") == 0)
-    {
-    	int t;
+	// have the server allocate a client slot
+	clientNum = trap_BotAllocateClient();
+	if ( clientNum == -1 ) {
+		G_Printf( S_COLOR_RED "Unable to add bot. All player slots are in use.\n" );
+		G_Printf( S_COLOR_RED "Start server with more 'open' slots (or check setting of sv_maxclients cvar).\n" );
+		return;
+	}
 
+	// set default team
+	if( !team || !*team ) {
+		if( g_gametype.integer >= GT_TEAM ) {
+			if( PickTeam(clientNum) == TEAM_RED) {
+				team = "red";
+			}
+			else {
+				team = "blue";
+			}
+		}
+		else {
+			team = "free";
+		}
+	}
+
+	// get the botinfo from bots.txt
+	if (Q_stricmp(name, "random") == 0) {
 		if (Q_stricmp(team, "blue") == 0)
 			t = TEAM_BLUE;
 		else if (Q_stricmp(team, "red") == 0)
@@ -739,15 +713,17 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 		else
 			t = TEAM_FREE;
 
-        // Get info of randomly selected bot.
-		botinfo = G_GetBotInfoByNumber(G_SelectRandomBotForAdd(t));
-    }
-    else
-#endif
-	// get the botinfo from bots.txt
-	botinfo = G_GetBotInfoByName( name );
+		// get info of a randomly selected bot
+		botinfo = G_GetBotInfoByNumber( G_SelectRandomBotForAdd( t ) );
+	}
+	else {
+		// get info of the bot
+		botinfo = G_GetBotInfoByName( name );
+	}
+
 	if ( !botinfo ) {
 		G_Printf( S_COLOR_RED "Error: Bot '%s' not defined\n", name );
+		trap_BotFreeClient(clientNum);
 		return;
 	}
 
@@ -836,31 +812,11 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	s = Info_ValueForKey(botinfo, "aifile");
 	if (!*s ) {
 		trap_Print( S_COLOR_RED "Error: bot has no aifile specified\n" );
-		return;
-	}
-
-	// have the server allocate a client slot
-	clientNum = trap_BotAllocateClient();
-	if ( clientNum == -1 ) {
-		G_Printf( S_COLOR_RED "Unable to add bot. All player slots are in use.\n" );
-		G_Printf( S_COLOR_RED "Start server with more 'open' slots (or check setting of sv_maxclients cvar).\n" );
+		trap_BotFreeClient(clientNum);
 		return;
 	}
 
 	// initialize the bot settings
-	if( !team || !*team ) {
-		if( g_gametype.integer >= GT_TEAM ) {
-			if( PickTeam(clientNum) == TEAM_RED) {
-				team = "red";
-			}
-			else {
-				team = "blue";
-			}
-		}
-		else {
-			team = "red";
-		}
-	}
 	Info_SetValueForKey( userinfo, "characterfile", Info_ValueForKey( botinfo, "aifile" ) );
 	Info_SetValueForKey( userinfo, "skill", va( "%5.2f", skill ) );
 	Info_SetValueForKey( userinfo, "team", team );
