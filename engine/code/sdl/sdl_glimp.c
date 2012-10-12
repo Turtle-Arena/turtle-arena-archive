@@ -263,18 +263,6 @@ static int GLimp_SetMode(int mode, qboolean fullscreen, qboolean noborder)
 		}
 	}
 
-#ifdef IOQ3ZTM
-	if( videoInfo->current_h > 0 ) {
-		glConfig.displayWidth = glConfig.vidWidth = videoInfo->current_w;
-		glConfig.displayHeight = glConfig.vidHeight = videoInfo->current_h;
-	} else {
-		glConfig.displayWidth = glConfig.vidWidth = 480;
-		glConfig.displayHeight = glConfig.vidHeight = 640;
-		ri.Printf( PRINT_ALL,
-				"Cannot determine display resolution, assuming 640x480\n" );
-	}
-#endif
-
 	ri.Printf (PRINT_ALL, "...setting mode %d:", mode );
 
 	if (mode == -2)
@@ -734,11 +722,9 @@ void GLimp_Init( void )
 	if( ri.Cvar_VariableIntegerValue( "com_abnormalExit" ) )
 	{
 		ri.Cvar_Set( "r_mode", va( "%d", R_MODE_FALLBACK ) );
-#ifdef TURTLEARENA
 		ri.Cvar_Set( "r_picmap", "1" );
 		ri.Cvar_Set( "r_texturebits", "0" );
 		ri.Cvar_Set( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST" );
-#endif
 		ri.Cvar_Set( "r_fullscreen", "0" );
 		ri.Cvar_Set( "r_centerWindow", "0" );
 		ri.Cvar_Set( "com_abnormalExit", "0" );
