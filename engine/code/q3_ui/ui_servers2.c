@@ -372,28 +372,6 @@ static int ArenaServers_MaxPing( void ) {
 	return maxPing;
 }
 
-/*
-=================
-ArenaServers_SourceForLAN
-
-Convert ui's g_servertype to AS_* used by trap calls.
-=================
-*/
-int ArenaServers_SourceForLAN(void) {
-	switch( g_servertype ) {
-	default:
-	case UIAS_LOCAL:
-		return AS_LOCAL;
-	case UIAS_GLOBAL1:
-	case UIAS_GLOBAL2:
-	case UIAS_GLOBAL3:
-	case UIAS_GLOBAL4:
-	case UIAS_GLOBAL5:
-		return AS_GLOBAL;
-	case UIAS_FAVORITES:
-		return AS_FAVORITES;
-	}
-}
 
 /*
 =================
@@ -457,7 +435,29 @@ static int QDECL ArenaServers_Compare( const void *arg1, const void *arg2 ) {
 	return 0;
 }
 
-#ifdef IOQ3ZTM
+/*
+=================
+ArenaServers_SourceForLAN
+
+Convert ui's g_servertype to AS_* used by trap calls.
+=================
+*/
+int ArenaServers_SourceForLAN(void) {
+	switch( g_servertype ) {
+	default:
+	case UIAS_LOCAL:
+		return AS_LOCAL;
+	case UIAS_GLOBAL1:
+	case UIAS_GLOBAL2:
+	case UIAS_GLOBAL3:
+	case UIAS_GLOBAL4:
+	case UIAS_GLOBAL5:
+		return AS_GLOBAL;
+	case UIAS_FAVORITES:
+		return AS_FAVORITES;
+	}
+}
+
 /*
 =================
 ArenaServers_GametypeForGames
@@ -502,6 +502,7 @@ int ArenaServers_GametypeForGames(int games) {
 	case GAMES_OBELISK:
 		gametype = GT_OBELISK;
 		break;
+
 #ifdef MISSIONPACK_HARVESTER
 	case GAMES_HARVESTER:
 		gametype = GT_HARVESTER;
@@ -512,7 +513,6 @@ int ArenaServers_GametypeForGames(int games) {
 
 	return gametype;
 }
-#endif
 
 /*
 =================
@@ -571,9 +571,7 @@ static void ArenaServers_UpdateMenu( void ) {
 	table_t*		tableptr;
 	char			*pingColor;
 	int				clients;
-#ifdef IOQ3ZTM
 	int				gametype;
-#endif
 
 	if( g_arenaservers.numqueriedservers > 0 ) {
 		// servers found
@@ -727,63 +725,10 @@ static void ArenaServers_UpdateMenu( void ) {
 		}
 #endif
 
-#ifdef IOQ3ZTM
 		gametype = ArenaServers_GametypeForGames(g_gametype);
 		if( gametype != -1 && servernodeptr->gametype != gametype ) {
 			continue;
 		}
-#else
-		switch( g_gametype ) {
-		case GAMES_ALL:
-			break;
-
-		case GAMES_FFA:
-			if( servernodeptr->gametype != GT_FFA ) {
-				continue;
-			}
-			break;
-
-		case GAMES_TEAMPLAY:
-			if( servernodeptr->gametype != GT_TEAM ) {
-				continue;
-			}
-			break;
-
-		case GAMES_TOURNEY:
-			if( servernodeptr->gametype != GT_TOURNAMENT ) {
-				continue;
-			}
-			break;
-
-		case GAMES_CTF:
-			if( servernodeptr->gametype != GT_CTF ) {
-				continue;
-			}
-			break;
-	
-#ifdef MISSIONPACK
-		case GAMES_1FCTF:
-			if( servernodeptr->gametype != GT_1FCTF ) {
-				continue;
-			}
-			break;
-
-		case GAMES_OBELISK:
-			if( servernodeptr->gametype != GT_OBELISK ) {
-				continue;
-			}
-			break;
-
-#ifdef MISSIONPACK_HARVESTER
-		case GAMES_HARVESTER:
-			if( servernodeptr->gametype != GT_HARVESTER ) {
-				continue;
-			}
-			break;
-#endif
-#endif
-		}
-#endif
 
 		if( servernodeptr->pingtime < servernodeptr->minPing ) {
 			pingColor = S_COLOR_BLUE;
@@ -1281,6 +1226,7 @@ static
 void ArenaServers_StartRefresh( void )
 {
 	int		i;
+	int		gametype;
 	char	myargs[32], protocol[32];
 
 	memset( g_arenaservers.serverlist, 0, g_arenaservers.maxservers*sizeof(table_t) );
@@ -1309,39 +1255,14 @@ void ArenaServers_StartRefresh( void )
 	}
 
 	if( g_servertype >= UIAS_GLOBAL1 && g_servertype <= UIAS_GLOBAL5 ) {
-#ifdef IOQ3ZTM
-		int gametype = ArenaServers_GametypeForGames(g_arenaservers.gametype.curvalue);
+		gametype = ArenaServers_GametypeForGames(g_arenaservers.gametype.curvalue);
 
-		// Add requested gametype to args for dpmaster
+		// add requested gametype to args for dpmaster protocol
 		if (gametype != -1) {
 			Com_sprintf( myargs, sizeof (myargs), " gametype=%i", gametype );
 		} else {
 			myargs[0] = '\0';
 		}
-#else
-		switch( g_arenaservers.gametype.curvalue ) {
-		default:
-		case GAMES_ALL:
-			myargs[0] = 0;
-			break;
-
-		case GAMES_FFA:
-			strcpy( myargs, " ffa" );
-			break;
-
-		case GAMES_TEAMPLAY:
-			strcpy( myargs, " team" );
-			break;
-
-		case GAMES_TOURNEY:
-			strcpy( myargs, " tourney" );
-			break;
-
-		case GAMES_CTF:
-			strcpy( myargs, " ctf" );
-			break;
-		}
-#endif
 
 		if (g_emptyservers) {
 			strcat(myargs, " empty");
