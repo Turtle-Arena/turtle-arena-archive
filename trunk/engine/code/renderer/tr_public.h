@@ -197,6 +197,7 @@ typedef struct {
 	e_status (*CIN_RunCinematic) (int handle);
 
 	void	(*CL_WriteAVIVideoFrame)( const byte *buffer, int size );
+	int		(*CL_MaxSplitView)( void );
 
 	// input event handling
 	void	(*IN_Init)( void );

@@ -1769,13 +1769,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 
 #ifdef TURTLEARENA
 	// Use single camera/viewport at intermission
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[i].pm_type != PM_INTERMISSION) {
 			// client present and not at intermission, keep viewports separate.
 			break;
 		}
 	}
-	cg.allLocalClientsAtIntermission = (i == MAX_SPLITVIEW);
+	cg.allLocalClientsAtIntermission = (i == CG_MaxSplitView());
 
 	// 2D mode views all local clients or all clients on server.
 	twodMode = (cg_2dmode.integer && !(cg_2dmodeOverride.integer && cg_2dmode.integer != 2));
@@ -1784,17 +1784,17 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 	cg.singleCamera = (cg.snap->numPSs > 1) && (twodMode || (cgs.gametype != GT_SINGLE_PLAYER && cg.allLocalClientsAtIntermission));
 #else
 	// Use single camera/viewport at intermission
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[i].pm_type != PM_INTERMISSION) {
 			// client present and not at intermission, keep viewports separate.
 			break;
 		}
 	}
-	cg.singleCamera = (cg.snap->numPSs > 1) && (i == MAX_SPLITVIEW);
+	cg.singleCamera = (cg.snap->numPSs > 1) && (i == CG_MaxSplitView());
 #endif
 
 	cg.numViewports = 0;
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		if (cg.snap->lcIndex[i] == -1) {
 			renderClientViewport[i] = qfalse;
 			continue;
@@ -1857,7 +1857,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		renderClientViewport[0] = qtrue;
 	}
 
-	for (i = 0, cg.viewport = -1; i < MAX_SPLITVIEW; i++) {
+	for (i = 0, cg.viewport = -1; i < CG_MaxSplitView(); i++) {
 		if (!renderClientViewport[i]) {
 			continue;
 		}

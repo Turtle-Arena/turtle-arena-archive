@@ -750,7 +750,7 @@ static void UI_PlayerSetupMenu_Init( int maxLocalClients, void (*action)(void), 
 
 		if (i > 0) {
 			// Extra players default to disabled in main menu.
-			s_playersetup.default_clientEnabled[i-1] = (inGame && cs.lcIndex[i] != -1);
+			s_playersetup.default_clientEnabled[i-1] = (inGame && cs.clientNums[i] != -1);
 
 			if (!s_playersetup.default_clientEnabled[i-1]) {
 				s_playersetup.clientEnabled[i-1].curvalue = 0;

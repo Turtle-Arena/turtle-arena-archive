@@ -134,9 +134,9 @@ static void UI_SelectPlayer_MenuInit( const char *banner ) {
 	selectPlayerMenu.framer.width  					= 256;
 	selectPlayerMenu.framer.height  				= 334;
 
-	y = (SCREEN_HEIGHT - MAX_SPLITVIEW*SETUP_MENU_VERTICAL_SPACING) * 0.5f;
+	y = (SCREEN_HEIGHT - UI_MaxSplitView()*SETUP_MENU_VERTICAL_SPACING) / 2;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < UI_MaxSplitView(); i++) {
 		Com_sprintf(selectPlayerMenu.playerString[i], sizeof (selectPlayerMenu.playerString[i]), "Player %d", i+1);
 
 		selectPlayerMenu.player[i].generic.type			= MTYPE_PTEXT;
@@ -167,7 +167,7 @@ static void UI_SelectPlayer_MenuInit( const char *banner ) {
 	Menu_AddItem( &selectPlayerMenu.menu, &selectPlayerMenu.framel );
 	Menu_AddItem( &selectPlayerMenu.menu, &selectPlayerMenu.framer );
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < UI_MaxSplitView(); i++) {
 		Menu_AddItem( &selectPlayerMenu.menu, &selectPlayerMenu.player[i] );
 	}
 
@@ -194,6 +194,11 @@ UI_SelectPlayerMenu
 */
 void UI_SelectPlayerMenu( void (*playerfunc)(int), const char *banner )
 {
+	if (UI_MaxSplitView() == 1) {
+		playerfunc(0);
+		return;
+	}
+
 	UI_SelectPlayer_MenuInit(banner);
 	selectPlayerMenu.playerfunc = playerfunc;
 	UI_PushMenu( &selectPlayerMenu.menu );

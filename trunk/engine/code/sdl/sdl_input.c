@@ -538,10 +538,21 @@ static void IN_DeactivateMouse( void )
 	}
 }
 
-static int joyKeyStart[MAX_SPLITVIEW] = {K_JOY1, K_2JOY1, K_3JOY1, K_4JOY1};
+static int joyKeyStart[CL_MAX_SPLITVIEW] = {
+	K_JOY1,
+#if CL_MAX_SPLITVIEW > 1
+	K_2JOY1,
+#endif
+#if CL_MAX_SPLITVIEW > 2
+	K_3JOY1,
+#endif
+#if CL_MAX_SPLITVIEW > 3
+	K_4JOY1
+#endif
+	};
 
 // We translate axes movement into keypresses
-static int joy_keys[MAX_SPLITVIEW][16] = {
+static int joy_keys[CL_MAX_SPLITVIEW][16] = {
 	// Client 1
 	{
 		K_LEFTARROW, K_RIGHTARROW,
@@ -553,6 +564,7 @@ static int joy_keys[MAX_SPLITVIEW][16] = {
 		K_JOY25, K_JOY26,
 		K_JOY27, K_JOY28
 	},
+#if CL_MAX_SPLITVIEW > 1
 	// Client 2
 	{
 		K_2JOY17, K_2JOY18,
@@ -564,6 +576,8 @@ static int joy_keys[MAX_SPLITVIEW][16] = {
 		K_2JOY29, K_2JOY30,
 		K_2JOY31, K_2JOY32
 	},
+#endif
+#if CL_MAX_SPLITVIEW > 2
 	// Client 3
 	{
 		K_3JOY17, K_3JOY18,
@@ -575,6 +589,8 @@ static int joy_keys[MAX_SPLITVIEW][16] = {
 		K_3JOY29, K_3JOY30,
 		K_3JOY31, K_3JOY32
 	},
+#endif
+#if CL_MAX_SPLITVIEW > 3
 	// Client 4
 	{
 		K_4JOY17, K_4JOY18,
@@ -586,11 +602,12 @@ static int joy_keys[MAX_SPLITVIEW][16] = {
 		K_4JOY29, K_4JOY30,
 		K_4JOY31, K_4JOY32
 	}
+#endif
 };
 
 // translate hat events into keypresses
 // the 4 highest buttons are used for the first hat ...
-static int hat_keys[MAX_SPLITVIEW][16] = {
+static int hat_keys[CL_MAX_SPLITVIEW][16] = {
 	// Client 1
 	{
 		K_JOY29, K_JOY30,
@@ -602,6 +619,7 @@ static int hat_keys[MAX_SPLITVIEW][16] = {
 		K_JOY17, K_JOY18,
 		K_JOY19, K_JOY20
 	},
+#if CL_MAX_SPLITVIEW > 1
 	// Client 2
 	{
 		K_2JOY29, K_2JOY30,
@@ -613,6 +631,8 @@ static int hat_keys[MAX_SPLITVIEW][16] = {
 		K_2JOY17, K_2JOY18,
 		K_2JOY19, K_2JOY20
 	},
+#endif
+#if CL_MAX_SPLITVIEW > 2
 	// Client 3
 	{
 		K_3JOY29, K_3JOY30,
@@ -624,6 +644,8 @@ static int hat_keys[MAX_SPLITVIEW][16] = {
 		K_3JOY17, K_3JOY18,
 		K_3JOY19, K_3JOY20
 	},
+#endif
+#if CL_MAX_SPLITVIEW > 3
 	// Client 4
 	{
 		K_4JOY29, K_4JOY30,
@@ -635,6 +657,7 @@ static int hat_keys[MAX_SPLITVIEW][16] = {
 		K_4JOY17, K_4JOY18,
 		K_4JOY19, K_4JOY20
 	}
+#endif
 };
 
 
@@ -644,7 +667,7 @@ struct
 	unsigned int oldaxes;
 	int oldaaxes[MAX_JOYSTICK_AXIS];
 	unsigned int oldhats;
-} stick_state[MAX_SPLITVIEW];
+} stick_state[CL_MAX_SPLITVIEW];
 
 
 /*
@@ -659,7 +682,7 @@ static void IN_InitJoystick( void )
 	char buf[16384] = "";
 	qboolean joyEnabled = qfalse;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		if (stick[i] != NULL)
 			SDL_JoystickClose(stick[i]);
 
@@ -700,7 +723,7 @@ static void IN_InitJoystick( void )
 		return;
 	}
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		if( !in_joystick[i]->integer ) {
 			continue;
 		}
@@ -739,7 +762,7 @@ static void IN_ShutdownJoystick( void )
 {
 	int		i;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		if (stick[i]) {
 			SDL_JoystickClose(stick[i]);
 			stick[i] = NULL;
@@ -763,13 +786,13 @@ static void IN_JoyMove( void )
 	int i = 0;
 	int joy;
 
-	for (joy = 0; joy < MAX_SPLITVIEW; joy++) {
+	for (joy = 0; joy < CL_MAX_SPLITVIEW; joy++) {
 		if (stick[joy]) {
 			break;
 		}
 	}
 
-	if (joy == MAX_SPLITVIEW) {
+	if (joy == CL_MAX_SPLITVIEW) {
 		return;
 	}
 
@@ -777,7 +800,7 @@ static void IN_JoyMove( void )
 
 	memset(joy_pressed, '\0', sizeof (joy_pressed));
 
-	for (joy = 0; joy < MAX_SPLITVIEW; joy++) {
+	for (joy = 0; joy < CL_MAX_SPLITVIEW; joy++) {
 		// update the ball state.
 		total = SDL_JoystickNumBalls(stick[joy]);
 		if (total > 0)
@@ -1151,7 +1174,7 @@ void IN_Init( void )
 	in_mouse = Cvar_Get( "in_mouse", "1", CVAR_ARCHIVE );
 	in_nograb = Cvar_Get( "in_nograb", "0", CVAR_ARCHIVE );
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		in_joystick[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystick"), "0", CVAR_ARCHIVE|CVAR_LATCH );
 		in_joystickDebug[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickDebug"), "0", CVAR_TEMP );
 		in_joystickThreshold[i] = Cvar_Get( Com_LocalClientCvarName(i, "in_joystickThreshold"), "0.15", CVAR_ARCHIVE );

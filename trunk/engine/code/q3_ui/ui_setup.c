@@ -195,6 +195,7 @@ UI_SetupMenu_Init
 */
 static void UI_SetupMenu_Init( void ) {
 	int				y;
+	int				numItems;
 
 	UI_SetupMenu_Cache();
 
@@ -230,13 +231,20 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.framer.height  					= 334;
 
 #ifdef TA_SP
-	if( trap_Cvar_VariableValue( "cl_paused" ) )
-		y = (480 - SETUP_MENU_VERTICAL_SPACING * 3) / 2;
-	else
-		y = (480 - SETUP_MENU_VERTICAL_SPACING * 7) / 2;
+	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
+		numItems = 7; // 9
+	} else {
+		numItems = 3;
+	}
 #else
-	y = 134;
+	if( !trap_Cvar_VariableValue( "cl_paused" ) ) {
+		numItems = 5; // 7
+	} else {
+		numItems = 4;
+	}
 #endif
+
+	y = (SCREEN_HEIGHT - numItems*SETUP_MENU_VERTICAL_SPACING) / 2;
 #ifndef TA_MISC
 	setupMenuInfo.setupplayers.generic.type			= MTYPE_PTEXT;
 	setupMenuInfo.setupplayers.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -244,7 +252,7 @@ static void UI_SetupMenu_Init( void ) {
 	setupMenuInfo.setupplayers.generic.y				= y;
 	setupMenuInfo.setupplayers.generic.id			= ID_CUSTOMIZEPLAYER;
 	setupMenuInfo.setupplayers.generic.callback		= UI_SetupMenu_Event; 
-	setupMenuInfo.setupplayers.string				= "PLAYERS";
+	setupMenuInfo.setupplayers.string				= (UI_MaxSplitView() == 1) ? "PLAYER": "PLAYERS";
 	setupMenuInfo.setupplayers.color					= text_big_color;
 	setupMenuInfo.setupplayers.style					= UI_CENTER;
 

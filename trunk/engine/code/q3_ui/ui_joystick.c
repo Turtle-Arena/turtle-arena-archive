@@ -253,7 +253,7 @@ static void UI_Joystick_MenuInit( int localClient ) {
 	joystickMenu.framer.width  					= 256;
 	joystickMenu.framer.height  				= 334;
 
-	y = (SCREEN_HEIGHT - MAX_JOYSTICKS * JOY_MENU_VERTICAL_SPACING) * 0.5f;
+	y = (SCREEN_HEIGHT - MAX_JOYSTICKS * JOY_MENU_VERTICAL_SPACING) / 2;
 
 	for (i = 0; i < MAX_JOYSTICKS; i++) {
 		joystickMenu.joysticks[i].generic.type		= MTYPE_PTEXT;

@@ -47,6 +47,12 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include "speex/speex_preprocess.h"
 #endif
 
+// Lower this define to change max supported local clients for client/renderer,
+// cgame/ui get max from client when they are initialized.
+#ifndef CL_MAX_SPLITVIEW
+#define CL_MAX_SPLITVIEW MAX_SPLITVIEW
+#endif
+
 // file full of random crap that gets used to create cl_guid
 #define QKEY_FILE "qkey"
 #define QKEY_SIZE 2048
@@ -150,11 +156,11 @@ typedef struct {
 
 	int			parseEntitiesNum;	// index (not anded off) into cl_parse_entities[]
 
-	calc_t		localClients[MAX_SPLITVIEW];
+	calc_t		localClients[CL_MAX_SPLITVIEW];
 
 	// cmds[cmdNumber] is the predicted command, [cmdNumber-1] is the last
 	// properly generated command
-	usercmd_t	cmdss[MAX_SPLITVIEW][CMD_BACKUP];	// each mesage will send several old cmds
+	usercmd_t	cmdss[CL_MAX_SPLITVIEW][CMD_BACKUP];	// each mesage will send several old cmds
 	int			cmdNumber;			// incremented each frame, because multiple
 									// frames may need to be packed into a single packet
 
@@ -190,7 +196,7 @@ typedef struct {
 
 	connstate_t	state;				// connection status
 
-	int			clientNum;
+	int			clientNums[MAX_SPLITVIEW];
 	int			lastPacketSentTime;			// for retransmits during connection
 	int			lastPacketTime;				// for timeouts
 
@@ -407,11 +413,11 @@ extern	cvar_t	*cl_timeNudge;
 extern	cvar_t	*cl_showTimeDelta;
 extern	cvar_t	*cl_freezeDemo;
 
-extern	cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
-extern	cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
-extern	cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
+extern	cvar_t	*cl_yawspeed[CL_MAX_SPLITVIEW];
+extern	cvar_t	*cl_pitchspeed[CL_MAX_SPLITVIEW];
+extern	cvar_t	*cl_anglespeedkey[CL_MAX_SPLITVIEW];
 #ifndef TURTLEARENA // ALWAYS_RUN
-extern	cvar_t	*cl_run[MAX_SPLITVIEW];
+extern	cvar_t	*cl_run[CL_MAX_SPLITVIEW];
 #endif
 
 extern	cvar_t	*cl_sensitivity;
@@ -428,16 +434,16 @@ extern	cvar_t	*m_forward;
 extern	cvar_t	*m_side;
 extern	cvar_t	*m_filter;
 
-extern	cvar_t	*j_pitch[MAX_SPLITVIEW];
-extern	cvar_t	*j_yaw[MAX_SPLITVIEW];
-extern	cvar_t	*j_forward[MAX_SPLITVIEW];
-extern	cvar_t	*j_side[MAX_SPLITVIEW];
-extern	cvar_t	*j_up[MAX_SPLITVIEW];
-extern	cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_forward_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_side_axis[MAX_SPLITVIEW];
-extern	cvar_t	*j_up_axis[MAX_SPLITVIEW];
+extern	cvar_t	*j_pitch[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_yaw[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_forward[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_side[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_up[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_pitch_axis[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_yaw_axis[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_forward_axis[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_side_axis[CL_MAX_SPLITVIEW];
+extern	cvar_t	*j_up_axis[CL_MAX_SPLITVIEW];
 
 extern	cvar_t	*cl_timedemo;
 extern	cvar_t	*cl_aviFrameRate;
@@ -535,6 +541,7 @@ void CL_InitInput(void);
 void CL_ShutdownInput(void);
 void CL_SendCmd (void);
 void CL_ClearState (void);
+void CL_InitConnection (qboolean clear);
 void CL_ReadPackets (void);
 
 void CL_WritePacket( void );

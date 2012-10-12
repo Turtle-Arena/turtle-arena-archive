@@ -54,7 +54,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return UI_API_VERSION;
 
 	case UI_INIT:
-		UI_Init();
+		UI_Init(arg0, arg1);
 		return 0;
 
 	case UI_SHUTDOWN:

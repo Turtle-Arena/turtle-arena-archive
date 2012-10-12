@@ -51,7 +51,6 @@ void SHOWNET( msg_t *msg, char *s) {
 	}
 }
 
-
 /*
 =========================================================================
 
@@ -59,6 +58,30 @@ MESSAGE PARSING
 
 =========================================================================
 */
+
+/*
+==================
+CL_LocalClientAdded
+==================
+*/
+void CL_LocalClientAdded(int localClientNum, int clientNum) {
+	if (clientNum < 0 || clientNum >= MAX_CLIENTS)
+		return;
+
+	clc.clientNums[localClientNum] = clientNum;
+}
+
+/*
+==================
+CL_LocalClientRemoved
+==================
+*/
+void CL_LocalClientRemoved(int localClientNum) {
+	if (clc.clientNums[localClientNum] == -1)
+		return;
+
+	clc.clientNums[localClientNum] = -1;
+}
 
 /*
 ==================
@@ -307,13 +330,24 @@ void CL_ParseSnapshot( msg_t *msg ) {
 	}
 
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (newSnap.lcIndex[i] == -1) {
-			continue;
+		// Read player states
+		if (newSnap.lcIndex[i] != -1) {
+			if (old && old->lcIndex[i] != -1) {
+				MSG_ReadDeltaPlayerstate( msg, &old->pss[old->lcIndex[i]], &newSnap.pss[newSnap.lcIndex[i]] );
+			} else {
+				MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[newSnap.lcIndex[i]] );
+			}
 		}
-		if ( old && old->lcIndex[i] != -1) {
-			MSG_ReadDeltaPlayerstate( msg, &old->pss[old->lcIndex[i]], &newSnap.pss[newSnap.lcIndex[i]] );
-		} else {
-			MSG_ReadDeltaPlayerstate( msg, NULL, &newSnap.pss[newSnap.lcIndex[i]] );
+
+		// Server added local client
+		if (old && old->lcIndex[i] == -1 && newSnap.lcIndex[i] != -1) {
+			// ZTM: FIXME: Not the most reliable way to get clientNum, ps could be a followed client.
+			CL_LocalClientAdded(i, newSnap.pss[newSnap.lcIndex[i]].clientNum);
+		}
+
+		// Server removed local client
+		if (old && old->lcIndex[i] != -1 && newSnap.lcIndex[i] == -1) {
+			CL_LocalClientRemoved(i);
 		}
 	}
 
@@ -553,7 +587,14 @@ void CL_ParseGamestate( msg_t *msg ) {
 		}
 	}
 
-	clc.clientNum = MSG_ReadLong(msg);
+	// read clientNums
+	for ( i = 0; i < MAX_SPLITVIEW; i++ ) {
+		newnum = MSG_ReadLong(msg);
+		if (newnum >= 0 && newnum < MAX_CLIENTS)
+			CL_LocalClientAdded(i, newnum);
+		else
+			CL_LocalClientRemoved(i);
+	}
 	// read the checksum feed
 	clc.checksumFeed = MSG_ReadLong( msg );
 
@@ -690,16 +731,23 @@ void CL_ParseDownload ( msg_t *msg ) {
 static
 qboolean CL_ShouldIgnoreVoipSender(int sender)
 {
+	int i;
+
 	if (!cl_voip->integer)
 		return qtrue;  // VoIP is disabled.
-	else if ((sender == clc.clientNum) && (!clc.demoplaying))
-		return qtrue;  // ignore own voice (unless playing back a demo).
 	else if (clc.voipMuteAll)
 		return qtrue;  // all channels are muted with extreme prejudice.
 	else if (clc.voipIgnore[sender])
 		return qtrue;  // just ignoring this guy.
 	else if (clc.voipGain[sender] == 0.0f)
 		return qtrue;  // too quiet to play.
+
+	if (!clc.demoplaying) {
+		for ( i = 0; i < CL_MAX_SPLITVIEW; i++ ) {
+			if (sender == clc.clientNums[i])
+				return qtrue;  // ignore own voice (unless playing back a demo).
+		}
+	}
 
 	return qfalse;
 }

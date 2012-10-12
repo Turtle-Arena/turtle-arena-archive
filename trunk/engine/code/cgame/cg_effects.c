@@ -489,7 +489,7 @@ void CG_ScorePlum( int client, vec3_t org, int score ) {
 
 	// Select local clients to show the plum to
 	localClients = 0;
-	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+	for (lc = 0; lc < CG_MaxSplitView(); lc++) {
 		if (cg.snap->lcIndex[lc] != -1 && client == cg.localClients[lc].predictedPlayerState.clientNum) {
 			localClients |= (1<<lc);
 		}

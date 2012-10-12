@@ -79,7 +79,7 @@ typedef struct
 	// NOTE: in_mlooking should be moved here if multiple mice are supported.
 } clientInput_t;
 
-clientInput_t cis[MAX_SPLITVIEW];
+clientInput_t cis[CL_MAX_SPLITVIEW];
 
 #ifdef USE_VOIP
 kbutton_t	in_voiprecord;
@@ -495,7 +495,7 @@ void IN_4Button15Down(void) {IN_KeyDown(&cis[3].in_buttons[15]);}
 void IN_4Button15Up(void) {IN_KeyUp(&cis[3].in_buttons[15]);}
 
 void IN_CenterView_Main(int localClientNum) {
-	if (localClientNum < 0 || localClientNum >= MAX_SPLITVIEW || cl.snap.lcIndex[localClientNum] == -1) {
+	if (localClientNum < 0 || localClientNum >= CL_MAX_SPLITVIEW || cl.snap.lcIndex[localClientNum] == -1) {
 		return;
 	}
 	cl.localClients[localClientNum].viewangles[PITCH] = -SHORT2ANGLE(cl.snap.pss[cl.snap.lcIndex[localClientNum]].delta_angles[PITCH]);
@@ -520,13 +520,13 @@ void IN_4CenterView (void) {
 
 //==========================================================================
 
-cvar_t	*cl_yawspeed[MAX_SPLITVIEW];
-cvar_t	*cl_pitchspeed[MAX_SPLITVIEW];
+cvar_t	*cl_yawspeed[CL_MAX_SPLITVIEW];
+cvar_t	*cl_pitchspeed[CL_MAX_SPLITVIEW];
 
-cvar_t	*cl_anglespeedkey[MAX_SPLITVIEW];
+cvar_t	*cl_anglespeedkey[CL_MAX_SPLITVIEW];
 
 #ifndef TURTLEARENA // ALWAYS_RUN
-cvar_t	*cl_run[MAX_SPLITVIEW];
+cvar_t	*cl_run[CL_MAX_SPLITVIEW];
 #endif
 
 /*
@@ -630,6 +630,10 @@ CL_MouseEvent
 void CL_MouseEvent( int localClientNum, int dx, int dy, int time ) {
 	calc_t *lc;
 
+	if ( localClientNum < 0 || localClientNum >= CL_MAX_SPLITVIEW) {
+		return;
+	}
+
 	if ( Key_GetCatcher( ) & KEYCATCH_UI ) {
 		VM_Call(uivm, UI_MOUSE_EVENT, localClientNum, dx, dy);
 	} else if (Key_GetCatcher( ) & KEYCATCH_CGAME) {
@@ -649,6 +653,9 @@ Joystick values stay set until changed
 =================
 */
 void CL_JoystickEvent( int localClientNum, int axis, int value, int time ) {
+	if ( localClientNum < 0 || localClientNum >= CL_MAX_SPLITVIEW) {
+		return;
+	}
 	if ( axis < 0 || axis >= MAX_JOYSTICK_AXIS ) {
 		Com_Error( ERR_DROP, "CL_JoystickEvent: bad axis %i", axis );
 	}
@@ -987,7 +994,7 @@ void CL_CreateNewCommands( void ) {
 	cl.cmdNumber++;
 	cmdNum = cl.cmdNumber & CMD_MASK;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		if (cl.snap.valid && cl.snap.lcIndex[i] == -1) {
 			continue;
 		}
@@ -1159,7 +1166,7 @@ void CL_WritePacket( void ) {
 				MSG_Bitstream (&fakemsg);
 				MSG_WriteLong (&fakemsg, clc.reliableAcknowledge);
 				MSG_WriteByte (&fakemsg, svc_voip);
-				MSG_WriteShort (&fakemsg, clc.clientNum);
+				MSG_WriteShort (&fakemsg, clc.clientNums[0]);
 				MSG_WriteByte (&fakemsg, clc.voipOutgoingGeneration);
 				MSG_WriteLong (&fakemsg, clc.voipOutgoingSequence);
 				MSG_WriteByte (&fakemsg, clc.voipOutgoingDataFrames);
@@ -1219,7 +1226,7 @@ void CL_WritePacket( void ) {
 		{
 			int lc;
 
-			for (lc = 1; lc < MAX_SPLITVIEW; lc++) {
+			for (lc = 1; lc < CL_MAX_SPLITVIEW; lc++) {
 				if (cl.snap.valid && cl.snap.lcIndex[lc] == -1) {
 					continue;
 				}
@@ -1377,6 +1384,7 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-voiprecord", IN_VoipRecordUp);
 #endif
 
+#if CL_MAX_SPLITVIEW > 1
 	Cmd_AddCommand ("2centerview",IN_2CenterView);
 
 	Cmd_AddCommand ("+2moveup",IN_2UpDown);
@@ -1441,7 +1449,9 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-2button13", IN_2Button13Up);
 	Cmd_AddCommand ("+2button14", IN_2Button14Down);
 	Cmd_AddCommand ("-2button14", IN_2Button14Up);
+#endif
 
+#if CL_MAX_SPLITVIEW > 2
 	Cmd_AddCommand ("3centerview",IN_3CenterView);
 
 	Cmd_AddCommand ("+3moveup",IN_3UpDown);
@@ -1506,7 +1516,9 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-3button13", IN_3Button13Up);
 	Cmd_AddCommand ("+3button14", IN_3Button14Down);
 	Cmd_AddCommand ("-3button14", IN_3Button14Up);
+#endif
 
+#if CL_MAX_SPLITVIEW > 3
 	Cmd_AddCommand ("4centerview",IN_4CenterView);
 
 	Cmd_AddCommand ("+4moveup",IN_4UpDown);
@@ -1571,6 +1583,7 @@ void CL_InitInput( void ) {
 	Cmd_AddCommand ("-4button13", IN_4Button13Up);
 	Cmd_AddCommand ("+4button14", IN_4Button14Down);
 	Cmd_AddCommand ("-4button14", IN_4Button14Up);
+#endif
 
 	cl_nodelta = Cvar_Get ("cl_nodelta", "0", 0);
 	cl_debugMove = Cvar_Get ("cl_debugMove", "0", 0);

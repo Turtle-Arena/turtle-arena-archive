@@ -144,7 +144,7 @@ void UI_TogglePlayerIngame(int localClientNum)
 	trap_GetClientState( &cs );
 
 	if (localClientNum == 0) {
-		trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
+		trap_GetConfigString( CS_PLAYERS + cs.clientNums[localClientNum], info, MAX_INFO_STRING );
 
 		team = atoi( Info_ValueForKey( info, "t" ) );
 		if( team == TEAM_SPECTATOR ) {
@@ -153,7 +153,7 @@ void UI_TogglePlayerIngame(int localClientNum)
 		} else {
 			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team hide\n" );
 		}
-	} else if (cs.lcIndex[localClientNum] == -1) {
+	} else if (cs.clientNums[localClientNum] == -1) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropin")) );
 	} else {
 		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropout")) );
@@ -258,6 +258,9 @@ void InGame_MenuInit( void ) {
 	uiClientState_t	cs;
 	char	info[MAX_INFO_STRING];
 	int		team;
+#ifdef TA_MISC // SMART_JOIN_MENU
+	int		numLocalClients;
+#endif
 
 	memset( &s_ingame, 0 ,sizeof(ingamemenu_t) );
 
@@ -277,9 +280,13 @@ void InGame_MenuInit( void ) {
 #ifdef TA_MISC // INGAME_SERVER_MENU
 	y = 88+INGAME_MENU_VERTICAL_SPACING/2;
 #else
-	//y = 96;
-	y = 88;
+	if (UI_MaxSplitView() > 1) {
+		y = 88;
+	} else {
+		y = 96;
+	}
 #endif
+
 #ifdef TA_MISC
 	s_ingame.resume.generic.type			= MTYPE_PTEXT;
 	s_ingame.resume.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
@@ -295,17 +302,18 @@ void InGame_MenuInit( void ) {
 #endif
 #ifdef TA_MISC // SMART_JOIN_MENU
 	trap_GetClientState( &cs );
-	trap_GetConfigString( CS_PLAYERS + cs.clientNum, info, MAX_INFO_STRING );
+	trap_GetConfigString( CS_PLAYERS + cs.clientNums[0], info, MAX_INFO_STRING );
+	numLocalClients = UI_NumLocalClients(&cs);
 
 	// Force if more than one local client
-	if (cs.numLocalClients > 1 || (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
+	if (numLocalClients > 1 || (trap_Cvar_VariableValue( "g_gametype" ) >= GT_TEAM) ) {
 		s_ingame.team.generic.type			= MTYPE_PTEXT;
 		s_ingame.team.generic.flags			= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
 		s_ingame.team.generic.x				= 320;
 		s_ingame.team.generic.y				= y;
 		s_ingame.team.generic.id			= ID_TEAM;
 		s_ingame.team.generic.callback		= InGame_Event;
-		if (cs.numLocalClients > 1)
+		if (numLocalClients > 1)
 			s_ingame.team.string			= "Change Teams";
 		else
 			s_ingame.team.string			= "Change Team";
@@ -427,29 +435,31 @@ void InGame_MenuInit( void ) {
 	}
 
 #ifndef TA_MISC
-	y += INGAME_MENU_VERTICAL_SPACING;
-	s_ingame.localPlayers.generic.type		= MTYPE_PTEXT;
-	s_ingame.localPlayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
-	s_ingame.localPlayers.generic.x			= 320;
-	s_ingame.localPlayers.generic.y			= y;
-	s_ingame.localPlayers.generic.id		= ID_LOCALPLAYERS;
-	s_ingame.localPlayers.generic.callback	= InGame_Event;
+	if (UI_MaxSplitView() > 1) {
+		y += INGAME_MENU_VERTICAL_SPACING;
+		s_ingame.localPlayers.generic.type		= MTYPE_PTEXT;
+		s_ingame.localPlayers.generic.flags		= QMF_CENTER_JUSTIFY|QMF_PULSEIFFOCUS;
+		s_ingame.localPlayers.generic.x			= 320;
+		s_ingame.localPlayers.generic.y			= y;
+		s_ingame.localPlayers.generic.id		= ID_LOCALPLAYERS;
+		s_ingame.localPlayers.generic.callback	= InGame_Event;
 #ifdef TA_MISC
-	s_ingame.localPlayers.string			= "Local Players";
+		s_ingame.localPlayers.string			= "Local Players";
 #else
-	s_ingame.localPlayers.string			= "LOCAL PLAYERS";
+		s_ingame.localPlayers.string			= "LOCAL PLAYERS";
 #endif
-	s_ingame.localPlayers.color				= text_big_color;
-	s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
+		s_ingame.localPlayers.color				= text_big_color;
+		s_ingame.localPlayers.style				= UI_CENTER|UI_SMALLFONT;
 
 #ifdef TA_SP
-	if (ui_singlePlayerActive.integer &&
-		trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER)
+		if (ui_singlePlayerActive.integer &&
+			trap_Cvar_VariableValue( "g_gametype" ) != GT_SINGLE_PLAYER)
 #else
-	if (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
+		if (trap_Cvar_VariableValue( "g_gametype" ) == GT_SINGLE_PLAYER)
 #endif
-	{
-		s_ingame.localPlayers.generic.flags |= QMF_GRAYED;
+		{
+			s_ingame.localPlayers.generic.flags |= QMF_GRAYED;
+		}
 	}
 #endif
 
@@ -593,7 +603,9 @@ void InGame_MenuInit( void ) {
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.teamorders );
 #ifndef TA_MISC
-	Menu_AddItem( &s_ingame.menu, &s_ingame.localPlayers);
+	if (UI_MaxSplitView() > 1) {
+		Menu_AddItem( &s_ingame.menu, &s_ingame.localPlayers);
+	}
 #endif
 	Menu_AddItem( &s_ingame.menu, &s_ingame.setup );
 #ifdef TA_MISC

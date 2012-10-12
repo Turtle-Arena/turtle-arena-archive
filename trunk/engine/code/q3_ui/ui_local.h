@@ -682,9 +682,10 @@ typedef struct {
 	float				bias;
 	qboolean			demoversion;
 	qboolean			firstdraw;
+	int					maxSplitView;
 } uiStatic_t;
 
-extern void			UI_Init( void );
+extern void			UI_Init( qboolean inGameLoad, int maxSplitView );
 extern void			UI_Shutdown( void );
 extern void			UI_KeyEvent( int key, int down );
 extern void			UI_MouseEvent( int localClientNum, int dx, int dy );
@@ -726,6 +727,8 @@ extern void			UI_ForceMenuOff (void);
 extern char			*UI_Argv( int arg );
 extern char			*UI_Cvar_VariableString( const char *var_name );
 extern void			UI_Refresh( int time );
+extern int			UI_MaxSplitView(void);
+extern int			UI_NumLocalClients(uiClientState_t *cs);
 extern void			UI_StartDemoLoop( void );
 extern qboolean		m_entersound;
 extern uiStatic_t	uis;

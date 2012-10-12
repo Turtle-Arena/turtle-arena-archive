@@ -1555,13 +1555,13 @@ static void CG_CalcEntityLerpPositions( centity_t *cent ) {
 
 	// adjust for riding a mover if it wasn't rolled into the predicted
 	// player state
-	for (i = 0; i < MAX_SPLITVIEW; ++i) {
+	for (i = 0; i < CG_MaxSplitView(); ++i) {
 		if (cent == &cg.localClients[i].predictedPlayerEntity) {
 			break;
 		}
 	}
 
-	if ( i == MAX_SPLITVIEW ) {
+	if ( i == CG_MaxSplitView() ) {
 		CG_AdjustPositionForMover( cent->lerpOrigin, cent->currentState.groundEntityNum, 
 		cg.snap->serverTime, cg.time, cent->lerpOrigin, cent->lerpAngles, cent->lerpAngles);
 	}
@@ -1874,7 +1874,7 @@ void CG_AddPacketEntities( void ) {
 	AnglesToAxis( cg.autoAnglesFast, cg.autoAxisFast );
 
 	// generate and add the entity from the playerstate
-	for ( num = 0 ; num < MAX_SPLITVIEW ; num++ ) {
+	for ( num = 0 ; num < CG_MaxSplitView() ; num++ ) {
 		if (cg.snap->lcIndex[num] == -1) {
 			continue;
 		}
