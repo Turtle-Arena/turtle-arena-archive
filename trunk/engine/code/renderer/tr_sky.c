@@ -724,7 +724,6 @@ void RB_DrawSun( void ) {
 	if ( !r_drawSun->integer ) {
 		return;
 	}
-
 	qglLoadMatrixf( backEnd.viewParms.world.modelMatrix );
 	qglTranslatef (backEnd.viewParms.or.origin[0], backEnd.viewParms.or.origin[1], backEnd.viewParms.or.origin[2]);
 

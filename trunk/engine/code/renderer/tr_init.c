@@ -1184,20 +1184,12 @@ void R_Register( void )
 			"0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_ext_max_anisotropy = ri.Cvar_Get( "r_ext_max_anisotropy", "2", CVAR_ARCHIVE | CVAR_LATCH );
 
-#ifdef TURTLEARENA
 	r_picmip = ri.Cvar_Get ("r_picmip", "0", CVAR_ARCHIVE | CVAR_LATCH );
-#else
-	r_picmip = ri.Cvar_Get ("r_picmip", "1", CVAR_ARCHIVE | CVAR_LATCH );
-#endif
 	r_roundImagesDown = ri.Cvar_Get ("r_roundImagesDown", "1", CVAR_ARCHIVE | CVAR_LATCH );
 	r_colorMipLevels = ri.Cvar_Get ("r_colorMipLevels", "0", CVAR_LATCH );
 	ri.Cvar_CheckRange( r_picmip, 0, 16, qtrue );
 	r_detailTextures = ri.Cvar_Get( "r_detailtextures", "1", CVAR_ARCHIVE | CVAR_LATCH );
-#ifdef TURTLEARENA
 	r_texturebits = ri.Cvar_Get( "r_texturebits", "32", CVAR_ARCHIVE | CVAR_LATCH );
-#else
-	r_texturebits = ri.Cvar_Get( "r_texturebits", "0", CVAR_ARCHIVE | CVAR_LATCH );
-#endif
 	r_colorbits = ri.Cvar_Get( "r_colorbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
 	r_stencilbits = ri.Cvar_Get( "r_stencilbits", "8", CVAR_ARCHIVE | CVAR_LATCH );
 	r_depthbits = ri.Cvar_Get( "r_depthbits", "0", CVAR_ARCHIVE | CVAR_LATCH );
@@ -1208,7 +1200,7 @@ void R_Register( void )
 #ifdef IOQ3ZTM // ZTM: Default to display resolution!
 	r_mode = ri.Cvar_Get( "r_mode", "-2", CVAR_ARCHIVE | CVAR_LATCH );
 #else
-	r_mode = ri.Cvar_Get( "r_mode", "3", CVAR_ARCHIVE | CVAR_LATCH );
+	r_mode = ri.Cvar_Get( "r_mode", "6", CVAR_ARCHIVE | CVAR_LATCH );
 #endif
 	r_fullscreen = ri.Cvar_Get( "r_fullscreen", "1", CVAR_ARCHIVE );
 	r_noborder = ri.Cvar_Get("r_noborder", "0", CVAR_ARCHIVE);
@@ -1253,11 +1245,7 @@ void R_Register( void )
 	r_dynamiclight = ri.Cvar_Get( "r_dynamiclight", "1", CVAR_ARCHIVE );
 	r_dlightBacks = ri.Cvar_Get( "r_dlightBacks", "1", CVAR_ARCHIVE );
 	r_finish = ri.Cvar_Get ("r_finish", "0", CVAR_ARCHIVE);
-#ifdef TURTLEARENA
 	r_textureMode = ri.Cvar_Get( "r_textureMode", "GL_LINEAR_MIPMAP_LINEAR", CVAR_ARCHIVE );
-#else
-	r_textureMode = ri.Cvar_Get( "r_textureMode", "GL_LINEAR_MIPMAP_NEAREST", CVAR_ARCHIVE );
-#endif
 	r_swapInterval = ri.Cvar_Get( "r_swapInterval", "0",
 					CVAR_ARCHIVE | CVAR_LATCH );
 	r_gamma = ri.Cvar_Get( "r_gamma", "1", CVAR_ARCHIVE );
