@@ -217,7 +217,7 @@ typedef enum {
 	CG_GETAPIVERSION,	// system reserved
 
 	CG_INIT,
-//	void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum )
+//	void CG_Init( int serverMessageNum, int serverCommandSequence, int maxSplitView, int clientNum0, int clientNum1, int clientNum2, int clientNum3 )
 	// called when the level loads or when the renderer is restarted
 	// all media should be registered at this time
 	// cgame will display loading status by calling SCR_Update, which

@@ -1415,7 +1415,7 @@ static void Controls_GetConfig( void )
 		if (!bindptr->label)
 			break;
 
-		for (j = 0; j < MAX_SPLITVIEW; j++) {
+		for (j = 0; j < UI_MaxSplitView(); j++) {
 			Controls_GetKeyAssignment(Com_LocalClientCvarName(j, bindptr->command), twokeys);
 
 			g_bindings_list[j][i].bind1 = twokeys[0];
@@ -1459,7 +1459,7 @@ static void Controls_SetConfig( void )
 		if (!bindptr->label)
 			break;
 
-		for (j = 0; j < MAX_SPLITVIEW; j++) {
+		for (j = 0; j < UI_MaxSplitView(); j++) {
 			if (g_bindings_list[j][i].bind1 != -1)
 			{
 				trap_Key_SetBinding( g_bindings_list[j][i].bind1, Com_LocalClientCvarName(j, bindptr->command) );
@@ -1623,7 +1623,7 @@ static sfxHandle_t Controls_MenuKey( int key )
 		// remove from any other bind
 		int j;
 
-		for (j = 0; j < MAX_SPLITVIEW; j++) {
+		for (j = 0; j < UI_MaxSplitView(); j++) {
 			bindptr = g_bindings_list[j];
 
 			for (i=0; ;i++,bindptr++)

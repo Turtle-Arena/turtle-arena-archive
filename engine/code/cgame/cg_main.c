@@ -45,7 +45,7 @@ int redTeamNameModificationCount = -1;
 int blueTeamNameModificationCount = -1;
 #endif
 
-void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum );
+void CG_Init( int serverMessageNum, int serverCommandSequence, int maxSplitView, int clientNum0, int clientNum1, int clientNum2, int clientNum3 );
 void CG_Shutdown( void );
 
 
@@ -63,7 +63,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	case CG_GETAPIVERSION:
 		return CG_API_VERSION;
 	case CG_INIT:
-		CG_Init( arg0, arg1, arg2 );
+		CG_Init( arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
 		return 0;
 	case CG_SHUTDOWN:
 		CG_Shutdown();
@@ -518,6 +518,10 @@ void CG_RegisterCvars( void ) {
 	char		var[MAX_TOKEN_CHARS];
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
+		if (Com_LocalClientForCvarName(cv->cvarName) >= CG_MaxSplitView()) {
+			continue;
+		}
+
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName,
 			cv->defaultString, cv->cvarFlags );
 	}
@@ -574,6 +578,10 @@ void CG_UpdateCvars( void ) {
 	cvarTable_t	*cv;
 
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
+		if (Com_LocalClientForCvarName(cv->cvarName) >= CG_MaxSplitView()) {
+			continue;
+		}
+
 		trap_Cvar_Update( cv->vmCvar );
 	}
 
@@ -621,7 +629,7 @@ void CG_UpdateCvars( void ) {
 }
 
 int CG_CrosshairPlayer( int localClientNum ) {
-	if (localClientNum < 0 || localClientNum >= MAX_SPLITVIEW) {
+	if (localClientNum < 0 || localClientNum >= CG_MaxSplitView()) {
 		return -1;
 	}
 
@@ -633,7 +641,7 @@ int CG_CrosshairPlayer( int localClientNum ) {
 }
 
 int CG_LastAttacker( int localClientNum ) {
-	if (localClientNum < 0 || localClientNum >= MAX_SPLITVIEW) {
+	if (localClientNum < 0 || localClientNum >= CG_MaxSplitView()) {
 		return -1;
 	}
 
@@ -729,6 +737,14 @@ const char *CG_Argv( int arg ) {
 	return buffer;
 }
 
+/*
+================
+CG_MaxSplitView
+================
+*/
+int CG_MaxSplitView(void) {
+	return cgs.maxSplitView;
+}
 
 //========================================================================
 
@@ -1647,6 +1663,29 @@ static void CG_RegisterGraphics( void ) {
 }
 
 
+/*
+==================
+CG_LocalClientAdded
+==================
+*/
+void CG_LocalClientAdded(int localClientNum, int clientNum) {
+	if (clientNum < 0 || clientNum >= MAX_CLIENTS)
+		return;
+
+	cg.localClients[localClientNum].clientNum = clientNum;
+}
+
+/*
+==================
+CG_LocalClientRemoved
+==================
+*/
+void CG_LocalClientRemoved(int localClientNum) {
+	if (cg.localClients[localClientNum].clientNum == -1)
+		return;
+
+	cg.localClients[localClientNum].clientNum = -1;
+}
 
 #ifdef MISSIONPACK
 /*																																			
@@ -1676,9 +1715,11 @@ static void CG_RegisterClients( void ) {
 	int		i;
 #ifndef TURTLEARENA // NO_LOADING_ICONS
 	int		j;
-	int		numLocalClients = 1; // cg.snap->numPSs; ZTM: FIXME?: cg.snap is NULL here, how can we get number?
 
-	for (i = 0; i < numLocalClients; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
+		if (cg.localClients[i].clientNum == -1) {
+			continue;
+		}
 		CG_LoadingClient(cg.localClients[i].clientNum);
 		CG_NewClientInfo(cg.localClients[i].clientNum);
 	}
@@ -1688,12 +1729,12 @@ static void CG_RegisterClients( void ) {
 		const char		*clientInfo;
 
 #ifndef TURTLEARENA // NO_LOADING_ICONS
-		for (j = 0; j < numLocalClients; j++) {
+		for (j = 0; j < CG_MaxSplitView(); j++) {
 			if (cg.localClients[j].clientNum == i) {
 				break;
 			}
 		}
-		if (j != numLocalClients) {
+		if (j != CG_MaxSplitView()) {
 			continue;
 		}
 #endif
@@ -2434,7 +2475,8 @@ Called after every level change or subsystem restart
 Will perform callbacks to make the loading info screen update.
 =================
 */
-void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
+void CG_Init( int serverMessageNum, int serverCommandSequence, int maxSplitView, int clientNum0, int clientNum1, int clientNum2, int clientNum3 ) {
+	int	clientNums[MAX_SPLITVIEW];
 	const char	*s;
 	int			i;
 
@@ -2454,10 +2496,21 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 	memset( cg_npcs, 0, sizeof(cg_npcs) );
 #endif
 
+	cgs.maxSplitView = Com_Clamp(1, MAX_SPLITVIEW, maxSplitView);
 	cg.numViewports = 1;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		cg.localClients[i].clientNum = clientNum;
+	clientNums[0] = clientNum0;
+	clientNums[1] = clientNum1;
+	clientNums[2] = clientNum2;
+	clientNums[3] = clientNum3;
+
+	for (i = 0; i < CG_MaxSplitView(); i++) {
+		if (clientNums[i] < 0 || clientNums[i] >= MAX_CLIENTS) {
+			cg.localClients[i].clientNum = -1;
+			continue;
+		}
+
+		CG_LocalClientAdded(i, clientNums[i]);
 	}
 
 	cgs.processedSnapshotNum = serverMessageNum;
@@ -2492,7 +2545,7 @@ void CG_Init( int serverMessageNum, int serverCommandSequence, int clientNum ) {
 
 	CG_InitConsoleCommands();
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 #ifdef TA_HOLDSYS/*2*/
 		cg.localClients[i].holdableSelect = HI_NO_SELECT;
 #endif

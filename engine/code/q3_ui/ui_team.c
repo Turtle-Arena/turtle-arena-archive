@@ -195,7 +195,7 @@ void TeamMain_MenuInit( int localClient ) {
 	s_teammain.hide.color            = colorRed;
 	y += 20;
 
-	if (cs.numLocalClients <= 1) {
+	if (UI_NumLocalClients(&cs) <= 1) {
 		s_teammain.hide.generic.flags  |= QMF_GRAYED;
 	}
 

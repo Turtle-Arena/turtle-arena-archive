@@ -581,7 +581,7 @@ static void CG_MapRestart( void ) {
 	}
 #endif
 
-	for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+	for (lc = 0; lc < CG_MaxSplitView(); lc++) {
 		cg.localClients[lc].rewardTime = 0;
 		cg.localClients[lc].rewardStack = 0;
 
@@ -1165,7 +1165,7 @@ static void CG_ServerCommand( void ) {
 	if (cmd[0] == 'l' && cmd[1] =='c' && isdigit(cmd[2])) {
 		lc = atoi(&cmd[2]);
 
-		if (lc > MAX_SPLITVIEW) {
+		if (lc > CG_MaxSplitView()) {
 			return;
 		}
 

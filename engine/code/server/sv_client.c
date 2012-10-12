@@ -841,6 +841,14 @@ static void SV_SendClientGameState( client_t *client ) {
 
 	MSG_WriteLong( &msg, client - svs.clients);
 
+	for ( i = 0; i < MAX_SPLITVIEW-1; i++ ) {
+		if (client->localClients[i]) {
+			MSG_WriteLong( &msg, client->localClients[i] - svs.clients);
+		} else {
+			MSG_WriteLong( &msg, -1);
+		}
+	}
+
 	// write the checksum feed
 	MSG_WriteLong( &msg, sv.checksumFeed);
 

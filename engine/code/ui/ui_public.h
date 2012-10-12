@@ -36,12 +36,11 @@ Suite 120, Rockville, Maryland 20850 USA.
 typedef struct {
 	connstate_t		connState;
 	int				connectPacketCount;
-	int				clientNum;
+	int				clientNums[MAX_SPLITVIEW];
+	int				psClientNums[MAX_SPLITVIEW]; // clientNum from local client's playerState_t, which could be a followed client.
 	char			servername[MAX_STRING_CHARS];
 	char			updateInfoString[MAX_STRING_CHARS];
 	char			messageString[MAX_STRING_CHARS];
-	int				numLocalClients;
-	int				lcIndex[MAX_SPLITVIEW];
 } uiClientState_t;
 
 typedef enum {
@@ -163,7 +162,7 @@ typedef enum {
 	UI_GETAPIVERSION = 0,	// system reserved
 
 	UI_INIT,
-//	void	UI_Init( void );
+//	void	UI_Init( qboolean inGameLoad, int maxSplitView );
 
 	UI_SHUTDOWN,
 //	void	UI_Shutdown( void );

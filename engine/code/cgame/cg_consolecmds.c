@@ -101,7 +101,7 @@ CG_AnyScoreboardShowing
 static qboolean CG_AnyScoreboardShowing(void) {
 	int i;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		if (cg.snap->lcIndex[i] != -1 && cg.localClients[i].scoreBoardShowing) {
 			return qtrue;
 		}
@@ -937,7 +937,6 @@ static consoleCommand_t	commands[] = {
 	{ "generateTracemap", CG_GenerateTracemap }
 };
 
-
 /*
 =================
 CG_ConsoleCommand
@@ -953,7 +952,11 @@ qboolean CG_ConsoleCommand( void ) {
 	cmd = CG_Argv(0);
 
 	for ( i = 0 ; i < ARRAY_LEN( commands ) ; i++ ) {
-		if ( !Q_stricmp( cmd, commands[i].cmd ) ) {
+		if (Com_LocalClientForCvarName(commands[i].cmd) >= CG_MaxSplitView()) {
+			continue;
+		}
+
+		if ( !Q_stricmp( cmd, commands[i].cmd )) {
 			commands[i].function();
 			return qtrue;
 		}
@@ -975,6 +978,10 @@ void CG_InitConsoleCommands( void ) {
 	int		i;
 
 	for ( i = 0 ; i < ARRAY_LEN( commands ) ; i++ ) {
+		if (Com_LocalClientForCvarName(commands[i].cmd) >= CG_MaxSplitView()) {
+			continue;
+		}
+
 		trap_AddCommand( commands[i].cmd );
 	}
 
@@ -982,7 +989,7 @@ void CG_InitConsoleCommands( void ) {
 	// the game server will interpret these commands, which will be automatically
 	// forwarded to the server after they are not recognized locally
 	//
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		trap_AddCommand(Com_LocalClientCvarName(i, "say"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "say_team"));
 		trap_AddCommand(Com_LocalClientCvarName(i, "tell"));

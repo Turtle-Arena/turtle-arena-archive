@@ -1299,7 +1299,9 @@ typedef struct playerState_s {
 #define PATHMODE_BACK 3
 #endif
 
-// Max local clients for splitscreen.
+// Max local clients for splitscreen
+// Also see CL_MAX_SPLITVIEW in client.h for lowering max supported splitview
+// clients in client/renderer, while still keep network and mod compatibility.
 #define MAX_SPLITVIEW 4
 
 //====================================================================
@@ -1500,7 +1502,8 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
 float Com_FontStringHeight( font_t *font, const char *s, int limit );
 #endif
 
-char *Com_LocalClientCvarName(int localClient, char *in_cvarName);
+char *Com_LocalClientCvarName(int localClient, const char *in_cvarName);
+int Com_LocalClientForCvarName(const char *in_cvarName);
 
 #define Square(x) ((x)*(x))
 

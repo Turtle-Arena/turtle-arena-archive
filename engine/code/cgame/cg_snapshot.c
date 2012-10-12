@@ -34,7 +34,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include "cg_local.h"
 
 
-
 /*
 ==================
 CG_ResetEntity
@@ -97,13 +96,6 @@ void CG_SetInitialSnapshot( snapshot_t *snap ) {
 	entityState_t	*state;
 
 	cg.snap = snap;
-
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
-		if (cg.snap->lcIndex[i] != -1) {
-			// Set clientNum as extra local client don't have it yet.
-			cg.localClients[i].clientNum = cg.snap->pss[cg.snap->lcIndex[i]].clientNum;
-		}
-	}
 
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
@@ -171,6 +163,19 @@ static void CG_TransitionSnapshot( void ) {
 	oldFrame = cg.snap;
 	cg.snap = cg.nextSnap;
 
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		// Server added local client
+		if (oldFrame && oldFrame->lcIndex[i] == -1 && cg.snap->lcIndex[i] != -1) {
+			// ZTM: FIXME: Not the most reliable way to get clientNum, ps could be a followed client.
+			CG_LocalClientAdded(i, cg.snap->pss[cg.snap->lcIndex[i]].clientNum);
+		}
+
+		// Server removed local client
+		if (oldFrame && oldFrame->lcIndex[i] != -1 && cg.snap->lcIndex[i] == -1) {
+			CG_LocalClientRemoved(i);
+		}
+	}
+
 	for (i = 0; i < cg.snap->numPSs; i++) {
 		BG_PlayerStateToEntityState( &cg.snap->pss[i], &cg_entities[ cg.snap->pss[i].clientNum ].currentState, qfalse );
 		cg_entities[ cg.snap->pss[i].clientNum ].interpolate = qfalse;
@@ -190,7 +195,7 @@ static void CG_TransitionSnapshot( void ) {
 	if ( oldFrame ) {
 		playerState_t	*ops, *ps;
 
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
+		for (i = 0; i < CG_MaxSplitView(); i++) {
 			if (oldFrame->lcIndex[i] == -1 || cg.snap->lcIndex[i] == -1) {
 				continue;
 			}
@@ -443,7 +448,7 @@ CG_LocalClientPlayerStateForClientNum
 playerState_t *CG_LocalClientPlayerStateForClientNum(int clientNum) {
 	int i;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		if (cg.snap->lcIndex[i] != -1 && cg.snap->pss[cg.snap->lcIndex[i]].clientNum == clientNum) {
 			return &cg.snap->pss[cg.snap->lcIndex[i]];
 		}

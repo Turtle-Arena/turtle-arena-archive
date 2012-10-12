@@ -2096,7 +2096,7 @@ static void ServerOptions_Start( void ) {
 		}
 		maxclients++;
 	}
-	for( n = 0, localClients = 1; n < MAX_SPLITVIEW; n++ ) {
+	for( n = 0, localClients = 1; n < UI_MaxSplitView(); n++ ) {
 		if( s_serveroptions.playerType[n].curvalue != PT_HUMAN ) {
 			continue;
 		}
@@ -2245,7 +2245,7 @@ static void ServerOptions_Start( void ) {
 	if( dedicated == 0 && s_serveroptions.gametype >= GT_TEAM ) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, va( "wait 5; team %s\n", playerTeam_list[s_serveroptions.playerTeam[0].curvalue] ) );
 
-		for (n = 1; n < MAX_SPLITVIEW; ++n) {
+		for (n = 1; n < UI_MaxSplitView(); ++n) {
 			if (s_serveroptions.playerType[n].curvalue == PT_HUMAN) {
 				trap_Cmd_ExecuteText( EXEC_APPEND, va( "%s %s\n", Com_LocalClientCvarName(n, "team"), playerTeam_list[s_serveroptions.playerTeam[n].curvalue] ) );
 			}
@@ -2303,7 +2303,7 @@ static void ServerOptions_InitPlayerItems( void ) {
 #endif
 		Q_CleanStr( s_serveroptions.playerNameBuffers[0] );
 
-		for (n = 1; n < MAX_SPLITVIEW; n++) {
+		for (n = 1; n < UI_MaxSplitView(); n++) {
 			s_serveroptions.playerType[n].curvalue = PT_CLOSED;
 		}
 	}
@@ -2351,7 +2351,7 @@ static void ServerOptions_SetPlayerItems( int playerType ) {
 #endif
 		s_serveroptions.playerName[0].generic.flags &= ~QMF_HIDDEN;
 
-		for (n = 1; n < MAX_SPLITVIEW; n++) {
+		for (n = 1; n < UI_MaxSplitView(); n++) {
 			if (playerType != n && playerType != -1) {
 				continue;
 			}
@@ -2597,7 +2597,7 @@ static void ServerOptions_InitBotNames( void ) {
 		return;
 	}
 
-	start = count = MAX_SPLITVIEW;	// skip the first few slots, reserved for humans
+	start = count = UI_MaxSplitView();	// skip the first few slots, reserved for humans
 
 #ifdef TA_SP
 	if (!s_serveroptions.multiplayer) {
@@ -3011,7 +3011,7 @@ static void ServerOptions_MenuInit( qboolean multiplayer ) {
 		s_serveroptions.playerType[n].generic.callback	= ServerOptions_Event;
 		s_serveroptions.playerType[n].generic.x			= 32;
 		s_serveroptions.playerType[n].generic.y			= y;
-		if (n < MAX_SPLITVIEW)
+		if (n < UI_MaxSplitView())
 			s_serveroptions.playerType[n].itemnames		= humanPlayerType_list;
 		else
 			s_serveroptions.playerType[n].itemnames		= playerType_list;

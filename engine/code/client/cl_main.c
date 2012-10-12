@@ -100,16 +100,16 @@ cvar_t	*m_forward;
 cvar_t	*m_side;
 cvar_t	*m_filter;
 
-cvar_t	*j_pitch[MAX_SPLITVIEW];
-cvar_t	*j_yaw[MAX_SPLITVIEW];
-cvar_t	*j_forward[MAX_SPLITVIEW];
-cvar_t	*j_side[MAX_SPLITVIEW];
-cvar_t	*j_up[MAX_SPLITVIEW];
-cvar_t	*j_pitch_axis[MAX_SPLITVIEW];
-cvar_t	*j_yaw_axis[MAX_SPLITVIEW];
-cvar_t	*j_forward_axis[MAX_SPLITVIEW];
-cvar_t	*j_side_axis[MAX_SPLITVIEW];
-cvar_t	*j_up_axis[MAX_SPLITVIEW];
+cvar_t	*j_pitch[CL_MAX_SPLITVIEW];
+cvar_t	*j_yaw[CL_MAX_SPLITVIEW];
+cvar_t	*j_forward[CL_MAX_SPLITVIEW];
+cvar_t	*j_side[CL_MAX_SPLITVIEW];
+cvar_t	*j_up[CL_MAX_SPLITVIEW];
+cvar_t	*j_pitch_axis[CL_MAX_SPLITVIEW];
+cvar_t	*j_yaw_axis[CL_MAX_SPLITVIEW];
+cvar_t	*j_forward_axis[CL_MAX_SPLITVIEW];
+cvar_t	*j_side_axis[CL_MAX_SPLITVIEW];
+cvar_t	*j_up_axis[CL_MAX_SPLITVIEW];
 
 cvar_t	*cl_activeAction;
 
@@ -177,6 +177,19 @@ void CL_CheckForResend( void );
 void CL_ShowIP_f(void);
 void CL_ServerStatus_f(void);
 void CL_ServerStatusResponse( netadr_t from, msg_t *msg );
+
+const int cl_userinfoFlags[CL_MAX_SPLITVIEW] = {
+		CVAR_USERINFO,
+#if CL_MAX_SPLITVIEW > 1
+		CVAR_USERINFO2,
+#endif
+#if CL_MAX_SPLITVIEW > 2
+		CVAR_USERINFO3,
+#endif
+#if CL_MAX_SPLITVIEW > 3
+		CVAR_USERINFO4
+#endif
+		};
 
 #ifdef USE_MUMBLE
 static
@@ -818,8 +831,10 @@ void CL_Record_f( void ) {
 	
 	// finished writing the gamestate stuff
 
-	// write the client num
-	MSG_WriteLong(&buf, clc.clientNum);
+	// write the client nums
+	for ( i = 0; i < MAX_SPLITVIEW; i++ ) {
+		MSG_WriteLong(&buf, clc.clientNums[i]);
+	}
 	// write the checksum feed
 	MSG_WriteLong(&buf, clc.checksumFeed);
 
@@ -1348,6 +1363,26 @@ void CL_ClearState (void) {
 }
 
 /*
+=====================
+CL_InitConnection
+=====================
+*/
+void CL_InitConnection (qboolean clear) {
+	int i;
+
+	if (clear) {
+		// wipe the client connection
+		Com_Memset( &clc, 0, sizeof( clc ) );
+	}
+
+	clc.state = CA_DISCONNECTED;	// no longer CA_UNINITIALIZED
+
+	for (i = 0; i < MAX_SPLITVIEW; i++) {
+		clc.clientNums[i] = -1;
+	}
+}
+
+/*
 ====================
 CL_UpdateGUID
 
@@ -1464,11 +1499,7 @@ void CL_Disconnect( qboolean showMainMenu ) {
 	FS_PureServerSetLoadedPaks("", "");
 	
 	CL_ClearState ();
-
-	// wipe the client connection
-	Com_Memset( &clc, 0, sizeof( clc ) );
-
-	clc.state = CA_DISCONNECTED;
+	CL_InitConnection (qtrue);
 
 	// allow cheats locally
 	Cvar_Set( "sv_cheats", "1" );
@@ -1594,89 +1625,63 @@ void CL_ForwardToServer_f( void ) {
 	}
 }
 
+#if CL_MAX_SPLITVIEW > 1
 /*
 ==================
-CL_2DropOut_f
+CL_DropIn
 ==================
 */
-void CL_2DropOut_f( void ) {
+void CL_DropIn( int localClientNum ) {
 	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
 		Com_Printf ("Not connected to a server.\n");
 		return;
 	}
 
-	CL_AddReliableCommand("dropout2", qfalse);
+	CL_AddReliableCommand(va("dropin%d \"%s\"", localClientNum+1, Cvar_InfoString( cl_userinfoFlags[localClientNum] )), qfalse);
 }
 
 /*
 ==================
-CL_3DropOut_f
+CL_DropOut
 ==================
 */
-void CL_3DropOut_f( void ) {
+void CL_DropOut( int localClientNum ) {
 	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
 		Com_Printf ("Not connected to a server.\n");
 		return;
 	}
 
-	CL_AddReliableCommand("dropout3", qfalse);
+	CL_AddReliableCommand(va("dropout%d", localClientNum+1), qfalse);
 }
 
-/*
-==================
-CL_4DropOut_f
-==================
-*/
-void CL_4DropOut_f( void ) {
-	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand("dropout4", qfalse);
-}
-
-/*
-==================
-CL_2DropIn_f
-==================
-*/
 void CL_2DropIn_f( void ) {
-	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand(va("dropin2 \"%s\"", Cvar_InfoString( CVAR_USERINFO2 )), qfalse);
+	CL_DropIn(1);
 }
 
-/*
-==================
-CL_3DropIn_f
-==================
-*/
+void CL_2DropOut_f( void ) {
+	CL_DropOut(1);
+}
+#endif
+
+#if CL_MAX_SPLITVIEW > 2
 void CL_3DropIn_f( void ) {
-	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand(va("dropin3 \"%s\"", Cvar_InfoString( CVAR_USERINFO3 )), qfalse);
+	CL_DropIn(2);
 }
 
-/*
-==================
-CL_4DropIn_f
-==================
-*/
+void CL_3DropOut_f( void ) {
+	CL_DropOut(2);
+}
+#endif
+
+#if CL_MAX_SPLITVIEW > 3
 void CL_4DropIn_f( void ) {
-	if ( clc.state != CA_ACTIVE || clc.demoplaying ) {
-		Com_Printf ("Not connected to a server.\n");
-		return;
-	}
-
-	CL_AddReliableCommand(va("dropin4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 )), qfalse);
+	CL_DropIn(3);
 }
+
+void CL_4DropOut_f( void ) {
+	CL_DropOut(3);
+}
+#endif
 
 /*
 ==================
@@ -2323,11 +2328,10 @@ Resend a connect message if the last one has timed out
 void CL_CheckForResend( void ) {
 	int		port, i;
 	int		size, j;
-	const int cvarflag[MAX_SPLITVIEW] = {CVAR_USERINFO, CVAR_USERINFO2, CVAR_USERINFO3, CVAR_USERINFO4};
 	int		localClients;
 	int		protocol;
 	char	info[MAX_INFO_STRING];
-	char	data[MAX_INFO_STRING*MAX_SPLITVIEW];
+	char	data[MAX_INFO_STRING*CL_MAX_SPLITVIEW];
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying ) {
@@ -2375,25 +2379,25 @@ void CL_CheckForResend( void ) {
 		size = 8;
 
 		// Check how many local client user wants
-		localClients = Com_Clamp(1, (1<<MAX_SPLITVIEW)-1, Cvar_VariableIntegerValue("cl_localClients"));
+		localClients = Com_Clamp(1, (1<<CL_MAX_SPLITVIEW)-1, Cvar_VariableIntegerValue("cl_localClients"));
 
 		// Reset cl_localClients (set before each join)
 		Cvar_Set("cl_localClients", "1");
 
-		for (i = 0; i < MAX_SPLITVIEW; i++) {
+		for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 			if (!(localClients & (1<<(i)))) {
 				// Dummy string.
 				data[size] = '"'; size++;
 				data[size] = '"'; size++;
 
 				// Add space between info strings.
-				if (i != MAX_SPLITVIEW-1) {
+				if (i != CL_MAX_SPLITVIEW-1) {
 					data[size] = ' '; size++;
 				}
 				continue;
 			}
 
-			Q_strncpyz( info, Cvar_InfoString( cvarflag[i] ), sizeof( info ) );
+			Q_strncpyz( info, Cvar_InfoString( cl_userinfoFlags[i] ), sizeof( info ) );
 
 			// ZTM: FIXME: Do we need to set these for more than the first client?
 			Info_SetValueForKey( info, "protocol", va("%i", protocol ) );
@@ -2410,7 +2414,7 @@ void CL_CheckForResend( void ) {
 			data[size] = '"'; size++;
 
 			// Add space between info strings.
-			if (i != MAX_SPLITVIEW-1) {
+			if (i != CL_MAX_SPLITVIEW-1) {
 				data[size] = ' '; size++;
 			}
 		}
@@ -2955,6 +2959,10 @@ CL_CheckUserinfo
 ==================
 */
 void CL_CheckUserinfo( void ) {
+#if CL_MAX_SPLITVIEW > 1
+	int i;
+#endif
+
 	// don't add reliable commands when not yet connected
 	if(clc.state < CA_CONNECTED)
 		return;
@@ -2969,21 +2977,16 @@ void CL_CheckUserinfo( void ) {
 		cvar_modifiedFlags &= ~CVAR_USERINFO;
 		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), qfalse);
 	}
-	if(cvar_modifiedFlags & CVAR_USERINFO2)
+#if CL_MAX_SPLITVIEW > 1
+	for (i = 1; i < CL_MAX_SPLITVIEW; i++)
 	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO2;
-		CL_AddReliableCommand(va("userinfo2 \"%s\"", Cvar_InfoString( CVAR_USERINFO2 ) ), qfalse);
+		if(cvar_modifiedFlags & cl_userinfoFlags[i])
+		{
+			cvar_modifiedFlags &= ~cl_userinfoFlags[i];
+			CL_AddReliableCommand(va("userinfo%d \"%s\"", i+1, Cvar_InfoString( cl_userinfoFlags[i] ) ), qfalse);
+		}
 	}
-	if(cvar_modifiedFlags & CVAR_USERINFO3)
-	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO3;
-		CL_AddReliableCommand(va("userinfo3 \"%s\"", Cvar_InfoString( CVAR_USERINFO3 ) ), qfalse);
-	}
-	if(cvar_modifiedFlags & CVAR_USERINFO4)
-	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO4;
-		CL_AddReliableCommand(va("userinfo4 \"%s\"", Cvar_InfoString( CVAR_USERINFO4 ) ), qfalse);
-	}
+#endif
 }
 
 /*
@@ -3319,6 +3322,10 @@ int CL_ScaledMilliseconds(void) {
 	return Sys_Milliseconds()*com_timescale->value;
 }
 
+int CL_MaxSplitView(void) {
+	return CL_MAX_SPLITVIEW;
+}
+
 /*
 ============
 CL_InitRef
@@ -3404,6 +3411,7 @@ void CL_InitRef( void ) {
 	ri.CIN_RunCinematic = CIN_RunCinematic;
   
 	ri.CL_WriteAVIVideoFrame = CL_WriteAVIVideoFrame;
+	ri.CL_MaxSplitView = CL_MaxSplitView;
 #ifdef IOQ3ZTM // PNG_SCREENSHOTS
 	ri.CL_GetMapMessage = CL_GetMapMessage;
 	ri.CL_GetClientLocation = CL_GetClientLocation;
@@ -3614,7 +3622,7 @@ void CL_Init( void ) {
 	if(!com_fullyInitialized)
 	{
 		CL_ClearState();
-		clc.state = CA_DISCONNECTED;	// no longer CA_UNINITIALIZED
+		CL_InitConnection(qfalse);
 		cls.oldGameSet = qfalse;
 	}
 
@@ -3649,7 +3657,7 @@ void CL_Init( void ) {
 
 	rconAddress = Cvar_Get ("rconAddress", "", 0);
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		cl_yawspeed[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_yawspeed"), "140", CVAR_ARCHIVE);
 		cl_pitchspeed[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_pitchspeed"), "140", CVAR_ARCHIVE);
 		cl_anglespeedkey[i] = Cvar_Get (Com_LocalClientCvarName(i, "cl_anglespeedkey"), "1.5", 0);
@@ -3697,7 +3705,7 @@ void CL_Init( void ) {
 #ifndef TA_WEAPSYS_EX
 	// init autoswitch so the ui will have it correctly even
 	// if the cgame hasn't been started
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		Cvar_Get (Com_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
 	}
 #endif
@@ -3713,7 +3721,7 @@ void CL_Init( void ) {
 	m_filter = Cvar_Get ("m_filter", "0", CVAR_ARCHIVE);
 #endif
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		j_pitch[i] =        Cvar_Get (Com_LocalClientCvarName(i, "j_pitch"),        "0.022", CVAR_ARCHIVE);
 		j_yaw[i] =          Cvar_Get (Com_LocalClientCvarName(i, "j_yaw"),          "-0.022", CVAR_ARCHIVE);
 		j_forward[i] =      Cvar_Get (Com_LocalClientCvarName(i, "j_forward"),      "-0.25", CVAR_ARCHIVE);
@@ -3802,6 +3810,7 @@ void CL_Init( void ) {
 	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
 	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
 
+#if CL_MAX_SPLITVIEW > 1
 	// Second local client userinfo
 	Cvar_Get ("2name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
@@ -3831,7 +3840,9 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("2handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
 	Cvar_Get ("2teamtask", "0", CVAR_USERINFO2 );
+#endif
 
+#if CL_MAX_SPLITVIEW > 2
 	// Third local client userinfo
 	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
@@ -3861,7 +3872,9 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("3handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
 	Cvar_Get ("3teamtask", "0", CVAR_USERINFO3 );
+#endif
 
+#if CL_MAX_SPLITVIEW > 3
 	// Fourth local client userinfo
 	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
 #ifdef TA_SP // SPMODEL
@@ -3891,6 +3904,7 @@ void CL_Init( void ) {
 #endif
 	Cvar_Get ("4handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
 	Cvar_Get ("4teamtask", "0", CVAR_USERINFO4 );
+#endif
 
 #ifdef USE_MUMBLE
 	cl_useMumble = Cvar_Get ("cl_useMumble", "0", CVAR_ARCHIVE | CVAR_LATCH);
@@ -3937,12 +3951,18 @@ void CL_Init( void ) {
 	// register our commands
 	//
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
-	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
-	Cmd_AddCommand ("3dropout", CL_3DropOut_f);
-	Cmd_AddCommand ("4dropout", CL_4DropOut_f);
+#if CL_MAX_SPLITVIEW > 1
 	Cmd_AddCommand ("2dropin", CL_2DropIn_f);
+	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
+#endif
+#if CL_MAX_SPLITVIEW > 2
 	Cmd_AddCommand ("3dropin", CL_3DropIn_f);
+	Cmd_AddCommand ("3dropout", CL_3DropOut_f);
+#endif
+#if CL_MAX_SPLITVIEW > 3
 	Cmd_AddCommand ("4dropin", CL_4DropIn_f);
+	Cmd_AddCommand ("4dropout", CL_4DropOut_f);
+#endif
 	Cmd_AddCommand ("configstrings", CL_Configstrings_f);
 	Cmd_AddCommand ("clientinfo", CL_Clientinfo_f);
 	Cmd_AddCommand ("snd_restart", CL_Snd_Restart_f);
@@ -3996,6 +4016,7 @@ CL_Shutdown
 void CL_Shutdown(char *finalmsg, qboolean disconnect, qboolean quit)
 {
 	static qboolean recursive = qfalse;
+	int i;
 	
 	// check whether the client is running at all.
 	if(!(com_cl_running && com_cl_running->integer))
@@ -4018,12 +4039,10 @@ void CL_Shutdown(char *finalmsg, qboolean disconnect, qboolean quit)
 	CL_Snd_Shutdown();
 
 	Cmd_RemoveCommand ("cmd");
-	Cmd_RemoveCommand ("2dropout");
-	Cmd_RemoveCommand ("3dropout");
-	Cmd_RemoveCommand ("4dropout");
-	Cmd_RemoveCommand ("2dropin");
-	Cmd_RemoveCommand ("3dropin");
-	Cmd_RemoveCommand ("4dropin");
+	for (i = 1; i < CL_MAX_SPLITVIEW; i++) {
+		Cmd_RemoveCommand (Com_LocalClientCvarName(i, "dropout"));
+		Cmd_RemoveCommand (Com_LocalClientCvarName(i, "dropin"));
+	}
 	Cmd_RemoveCommand ("configstrings");
 	Cmd_RemoveCommand ("clientinfo");
 	Cmd_RemoveCommand ("snd_restart");

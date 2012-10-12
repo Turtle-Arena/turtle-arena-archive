@@ -1530,6 +1530,8 @@ typedef struct {
 	float			screenXScaleStretch;
 	float			screenYScaleStretch;
 
+	int				maxSplitView;
+
 	int				serverCommandSequence;	// reliable command stream counter
 	int				processedSnapshotNum;// the number of snapshots cgame has requested
 
@@ -1780,9 +1782,14 @@ extern vmCvar_t			cg_2dmodeOverride;
 const char *CG_ConfigString( int index );
 const char *CG_Argv( int arg );
 
+int CG_MaxSplitView(void);
+
 void QDECL CG_DPrintf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 void QDECL CG_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 void QDECL CG_Error( const char *msg, ... ) __attribute__ ((noreturn, format (printf, 1, 2)));
+
+void CG_LocalClientAdded(int localClientNum, int clientNum);
+void CG_LocalClientRemoved(int localClientNum);
 
 void CG_StartMusic( void );
 
@@ -2243,6 +2250,7 @@ void CG_DrawLetterbox(void);
 //
 void CG_ProcessSnapshots( void );
 playerState_t *CG_LocalClientPlayerStateForClientNum( int clientNum );
+
 
 //
 // cg_spawn.c

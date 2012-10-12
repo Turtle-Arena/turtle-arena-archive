@@ -233,7 +233,7 @@ void CG_Respawn( int clientNum ) {
 	// no error decay on player movement
 	cg.thisFrameTeleport = qtrue;
 
-	for (i = 0; i < MAX_SPLITVIEW; i++) {
+	for (i = 0; i < CG_MaxSplitView(); i++) {
 		if (clientNum != -1 && (cg.snap->lcIndex[i] == -1 || cg.snap->pss[cg.snap->lcIndex[i]].clientNum != clientNum)) {
 			continue;
 		}

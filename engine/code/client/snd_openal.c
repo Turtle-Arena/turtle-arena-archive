@@ -2195,7 +2195,7 @@ void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int 
 
 	S_UpdateListener(entityNum, origin, axis, inwater, firstPerson);
 
-	if (clc.clientNum != entityNum)
+	if (clc.clientNums[0] != entityNum)
 	{
 		// ZTM: FIXME: Support multiple listeners!
 		return;

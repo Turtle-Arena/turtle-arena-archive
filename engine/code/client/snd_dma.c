@@ -569,7 +569,7 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 	} else {
 		if (entityNum == MAX_GENTITIES) {
 			// Special case for sounds started using StartLocalSound
-			allowed = 4 * MAX_SPLITVIEW;
+			allowed = 4 * CL_MAX_SPLITVIEW;
 			fullVolume = qtrue;
 		} else if (S_HearingThroughEntity(entityNum)) {
 			allowed = 8;
@@ -802,7 +802,7 @@ void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 	loopSounds[entityNum].sfx = sfx;
 
 	// ZTM: FIXME: Support doppler effect for all listeners
-	mainListener = S_ListenerNumForEntity(clc.clientNum, qfalse);
+	mainListener = S_ListenerNumForEntity(clc.clientNums[0], qfalse);
 
 	if (mainListener >= 0 && s_doppler->integer && VectorLengthSquared(velocity)>0.0) {
 		vec3_t	out;
