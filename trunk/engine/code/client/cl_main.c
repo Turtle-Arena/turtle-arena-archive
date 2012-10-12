@@ -3176,7 +3176,7 @@ void CL_ShutdownRef( void ) {
 	Com_Memset( &re, 0, sizeof( re ) );
 }
 
-#ifdef TA_DATA // LOADING_SCREEN
+#ifdef TA_DATA
 /*
 ==========
 CL_DrawPicFullScreen
@@ -3210,6 +3210,28 @@ void CL_DrawPicFullScreen(qhandle_t hShader)
 
 	re.DrawStretchPic( x, y, w, h, s1, t1, s2, t2, hShader );
 }
+#else
+/*
+==========
+CL_DrawCenteredPic
+
+In widescreen, center shader.
+==========
+*/
+void CL_DrawCenteredPic(qhandle_t hShader)
+{
+	float x = 0, y = 0, w = SCREEN_WIDTH, h = SCREEN_HEIGHT;
+
+	SCR_AdjustFrom640( &x, &y, &w, &h );
+	// adjust for wide screens
+	if ( cls.glconfig.vidWidth * 480 > cls.glconfig.vidHeight * 640 ) {
+		x += 0.5 * ( cls.glconfig.vidWidth - ( cls.glconfig.vidHeight * 640 / 480 ) );
+		w -= ( cls.glconfig.vidWidth - ( cls.glconfig.vidHeight * 640 / 480 ) );
+	}
+
+	re.DrawStretchPic( x, y, w, h, 0, 0, 1, 1, hShader );
+}
+#endif
 
 /*
 ============
@@ -3218,9 +3240,30 @@ CL_DrawLoadingScreen
 */
 void CL_DrawLoadingScreen(void)
 {
+	qhandle_t hShader;
+
 	re.BeginFrame( STEREO_CENTER );
 
-	CL_DrawPicFullScreen(re.RegisterShaderNoMip("clientLoading"));
+	// Need to draw extra stuff or screen is completely white for some shaders.
+	re.SetColor( g_color_table[0] );
+	re.DrawStretchPic( 0, 0, cls.glconfig.vidWidth, cls.glconfig.vidHeight, 0, 0, 0, 0, cls.whiteShader );
+	re.SetColor( NULL );
+
+#ifdef TA_DATA
+	// get loading shader
+	hShader = re.RegisterShaderNoMip("clientLoading");
+	CL_DrawPicFullScreen(hShader);
+#else
+	// Q3A menu background logo
+	if (cls.glconfig.hardwareType == GLHW_RAGEPRO ) {
+		// the blend effect turns to shit with the normal 
+		hShader = re.RegisterShaderNoMip("menubackRagePro");
+	} else {
+		hShader = re.RegisterShaderNoMip("menuback");
+	}
+
+	CL_DrawCenteredPic(hShader);
+#endif
 
 	if ( com_speeds->integer ) {
 		re.EndFrame( &time_frontend, &time_backend );
@@ -3228,7 +3271,6 @@ void CL_DrawLoadingScreen(void)
 		re.EndFrame( NULL, NULL );
 	}
 }
-#endif
 
 /*
 ============
@@ -3239,13 +3281,13 @@ void CL_InitRenderer( void ) {
 	// this sets up the renderer and calls R_Init
 	re.BeginRegistration( &cls.glconfig );
 
-#ifdef TA_DATA // LOADING_SCREEN
-	// Draw loading screen the first time the game starts.
-	extern qboolean	com_fullyInitialized;
-	if (!com_fullyInitialized) {
+	cls.whiteShader = re.RegisterShader( "white" );
+
+	// draw loading screen when the game is starting up
+	if (!cls.drawnLoadingScreen) {
 		CL_DrawLoadingScreen();
+		cls.drawnLoadingScreen = qtrue;
 	}
-#endif
 
 	// load character sets
 #ifdef IOQ3ZTM // FONT_REWRITE
@@ -3257,7 +3299,6 @@ void CL_InitRenderer( void ) {
 #else
 	cls.charSetShader = re.RegisterShader( "gfx/2d/bigchars" );
 #endif
-	cls.whiteShader = re.RegisterShader( "white" );
 	cls.consoleShader = re.RegisterShader( "console" );
 	g_console_field_width = cls.glconfig.vidWidth / SMALLCHAR_WIDTH - 2;
 	g_consoleField.widthInChars = g_console_field_width;
@@ -3624,6 +3665,7 @@ void CL_Init( void ) {
 		CL_ClearState();
 		CL_InitConnection(qfalse);
 		cls.oldGameSet = qfalse;
+		cls.drawnLoadingScreen = qfalse;
 	}
 
 	cls.realtime = 0;
