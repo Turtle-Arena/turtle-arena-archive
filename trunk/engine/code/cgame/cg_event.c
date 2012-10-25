@@ -325,8 +325,7 @@ static void CG_Obituary( entityState_t *ent ) {
 
 	if ( attacker != ENTITYNUM_WORLD ) {
 #ifdef TA_WEAPSYS
-		if (mod == MOD_PROJECTILE || mod == MOD_PROJECTILE_EXPLOSION)
-		{
+		if (mod == MOD_PROJECTILE || mod == MOD_PROJECTILE_EXPLOSION) {
 			if (mod == MOD_PROJECTILE_EXPLOSION)
 				message = "almost dodged";
 			else
@@ -335,15 +334,15 @@ static void CG_Obituary( entityState_t *ent ) {
 					targetName, message, attackerName, &bg_projectileinfo[ent->weapon].name[2]);
 			return;
 		}
-		if (mod == MOD_WEAPON_PRIMARY ||
-			mod == MOD_WEAPON_SECONDARY)
-		{
+
+		if (mod == MOD_WEAPON_PRIMARY || mod == MOD_WEAPON_SECONDARY) {
 			message = "was killed by";
 			CG_Printf( "%s %s %s's %s\n",
 					targetName, message, attackerName, &bg_weapongroupinfo[ent->weapon].weapon[mod-MOD_WEAPON_PRIMARY]->name[2]);
 			return;
 		}
 #endif
+
 		switch (mod) {
 		case MOD_GRAPPLE:
 			message = "was caught by";
