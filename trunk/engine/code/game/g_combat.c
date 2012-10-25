@@ -652,6 +652,10 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	int			killer;
 	int			i;
 	char		*killerName, *obit;
+#ifdef TA_WEAPSYS
+	int			weaponGroup;
+	int			projectile;
+#endif
 
 	if ( self->client->ps.pm_type == PM_DEAD ) {
 		return;
@@ -705,6 +709,49 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 
 	if ( meansOfDeath < 0 || meansOfDeath >= modNamesSize ) {
 		obit = "<bad obituary>";
+#ifdef TA_WEAPSYS
+	} else if (meansOfDeath == MOD_PROJECTILE || meansOfDeath == MOD_PROJECTILE_EXPLOSION) {
+		if (inflictor && inflictor->s.eType == ET_MISSILE) {
+			projectile = inflictor->s.weapon;
+		}
+		// Check for instant damage guns
+		else if (attacker && attacker == inflictor && (attacker->client
+#ifdef TA_NPCSYS
+			|| attacker->s.eType == ET_NPC
+#endif
+			) && bg_weapongroupinfo[attacker->s.weapon].weapon[0]->proj->instantDamage)
+		{
+			projectile = bg_weapongroupinfo[attacker->s.weapon].weapon[0]->projnum;
+		}
+		else {
+			projectile = 0;
+		}
+
+		if (projectile > 0 && projectile < BG_NumProjectiles()) {
+			obit = va("%s [%s]", modNames[meansOfDeath], bg_projectileinfo[projectile].name);
+		} else {
+			projectile = 0;
+			obit = va("%s <unknown-projectile>", modNames[meansOfDeath]);
+		}
+	} else if (meansOfDeath == MOD_WEAPON_PRIMARY || meansOfDeath == MOD_WEAPON_SECONDARY) {
+		if (attacker && (attacker->client
+#ifdef TA_NPCSYS
+			|| attacker->s.eType == ET_NPC
+#endif
+			))
+		{
+			weaponGroup = attacker->s.weapon;
+		} else {
+			weaponGroup = 0;
+		}
+
+		if (weaponGroup > 0 && weaponGroup < BG_NumWeaponGroups()) {
+			obit = va("%s [%s]", modNames[meansOfDeath], bg_weapongroupinfo[weaponGroup].weapon[meansOfDeath-MOD_WEAPON_PRIMARY]->name);
+		} else {
+			weaponGroup = 0;
+			obit = va("%s <unknown-weapon>", modNames[meansOfDeath]);
+		}
+#endif
 	} else {
 		obit = modNames[meansOfDeath];
 	}
@@ -723,34 +770,13 @@ void player_die( gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int
 	ent->s.otherEntityNum = self->s.number;
 	ent->s.otherEntityNum2 = killer;
 #ifdef TA_WEAPSYS
-	ent->s.weapon = 0; // unknown projectile/weapon
-	// projectile or weapon group number, for MOD_PROJECTILE, MOD_PROJECTILE_EXPLOSION, or MOD_WEAPON_*
-	if (meansOfDeath == MOD_PROJECTILE || meansOfDeath == MOD_PROJECTILE_EXPLOSION)
-	{
-		if (inflictor && inflictor->s.eType == ET_MISSILE) {
-			ent->s.weapon = inflictor->s.weapon;
-		}
-		// Check for instant damage guns
-		else if (attacker && attacker == inflictor && (attacker->client
-#ifdef TA_NPCSYS
-			|| attacker->s.eType == ET_NPC
-#endif
-			) && bg_weapongroupinfo[attacker->s.weapon].weapon[0]->proj->instantDamage)
-		{
-			ent->s.weapon = bg_weapongroupinfo[attacker->s.weapon].weapon[0]->projnum;
-		}
-	}
-	else if (meansOfDeath == MOD_WEAPON_PRIMARY
-		|| meansOfDeath == MOD_WEAPON_SECONDARY)
-	{
-		if (attacker && (attacker->client
-#ifdef TA_NPCSYS
-			|| attacker->s.eType == ET_NPC
-#endif
-		))
-		{
-			ent->s.weapon = attacker->s.weapon;
-		}
+	// projectile or weapon group number
+	if (meansOfDeath == MOD_PROJECTILE || meansOfDeath == MOD_PROJECTILE_EXPLOSION) {
+		ent->s.weapon = projectile;
+	} else if (meansOfDeath == MOD_WEAPON_PRIMARY || meansOfDeath == MOD_WEAPON_SECONDARY) {
+		ent->s.weapon = weaponGroup;
+	} else {
+		ent->s.weapon = 0;
 	}
 #endif
 	ent->r.svFlags = SVF_BROADCAST;	// send to everyone
