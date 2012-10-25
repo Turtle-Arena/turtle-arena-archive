@@ -465,7 +465,9 @@ type "ctf_flagcarrierkill"
 	//ask who the team leader is
 type "whoisteamleader"
 {
-"Who's the leader of this rag-tag bunch?";
+"Who's the team leader?";
+"Who's team leader?";
+"Is there a team leader?";
 }
 
 	//I am the team leader
