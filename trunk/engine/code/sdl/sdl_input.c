@@ -413,6 +413,39 @@ static void IN_GobbleMotionEvents( void )
 
 /*
 ===============
+IN_GetUIMousePosition
+===============
+*/
+static void IN_GetUIMousePosition( int localClientNum, int *x, int *y )
+{
+	if( uivm )
+	{
+		int pos = VM_Call( uivm, UI_MOUSE_POSITION, localClientNum );
+		*x = Com_Clamp(0, cls.glconfig.vidWidth - 1, pos & 0xFFFF);
+		*y = Com_Clamp(0, cls.glconfig.vidHeight - 1, ( pos >> 16 ) & 0xFFFF);
+	}
+	else
+	{
+		*x = cls.glconfig.vidWidth / 2;
+		*y = cls.glconfig.vidHeight / 2;
+	}
+}
+
+/*
+===============
+IN_SetUIMousePosition
+===============
+*/
+static void IN_SetUIMousePosition( int localClientNum, int x, int y )
+{
+	if( uivm )
+	{
+		VM_Call( uivm, UI_SET_MOUSE_POSITION, localClientNum, x, y );
+	}
+}
+
+/*
+===============
 IN_ActivateMouse
 ===============
 */
@@ -492,15 +525,15 @@ static void IN_ActivateMouse( void )
 IN_DeactivateMouse
 ===============
 */
-static void IN_DeactivateMouse( void )
+static void IN_DeactivateMouse( qboolean showSystemCursor )
 {
 	if( !SDL_WasInit( SDL_INIT_VIDEO ) )
 		return;
 
-	// Always show the cursor when the mouse is disabled,
+	// Show the cursor when the mouse is disabled and not drawing UI cursor,
 	// but not when fullscreen
 	if( !Cvar_VariableIntegerValue("r_fullscreen") )
-		SDL_ShowCursor( 1 );
+		SDL_ShowCursor( showSystemCursor );
 
 	if( !mouseAvailable )
 		return;
@@ -532,7 +565,11 @@ static void IN_DeactivateMouse( void )
 
 		// Don't warp the mouse unless the cursor is within the window
 		if( SDL_GetAppState( ) & SDL_APPMOUSEFOCUS )
-			SDL_WarpMouse( cls.glconfig.vidWidth / 2, cls.glconfig.vidHeight / 2 );
+		{
+			int x, y;
+			IN_GetUIMousePosition( 0, &x, &y );
+			SDL_WarpMouse( x, y );
+		}
 
 		mouseActive = qfalse;
 	}
@@ -1103,30 +1140,44 @@ IN_Frame
 void IN_Frame( void )
 {
 	qboolean loading;
+	qboolean cursorShowing;
+	int x, y;
 
 	IN_JoyMove( );
 	IN_ProcessEvents( );
 
 	// If not DISCONNECTED (main menu) or ACTIVE (in game), we're loading
 	loading = ( clc.state != CA_DISCONNECTED && clc.state != CA_ACTIVE );
+	cursorShowing = Key_GetCatcher() & KEYCATCH_UI;
 
 	if( !Cvar_VariableIntegerValue("r_fullscreen") && ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) )
 	{
 		// Console is down in windowed mode
-		IN_DeactivateMouse( );
+		IN_DeactivateMouse( qtrue );
 	}
 	else if( !Cvar_VariableIntegerValue("r_fullscreen") && loading )
 	{
 		// Loading in windowed mode
-		IN_DeactivateMouse( );
+		IN_DeactivateMouse( qtrue );
+	}
+	else if( !Cvar_VariableIntegerValue("r_fullscreen") && cursorShowing )
+	{
+		// Showing cursor in windowed mode
+		IN_DeactivateMouse( qfalse );
 	}
 	else if( !( SDL_GetAppState() & SDL_APPINPUTFOCUS ) )
 	{
 		// Window not got focus
-		IN_DeactivateMouse( );
+		IN_DeactivateMouse( qtrue );
 	}
 	else
 		IN_ActivateMouse( );
+
+	if( !mouseActive )
+	{
+		SDL_GetMouseState( &x, &y );
+		IN_SetUIMousePosition( 0, x, y );
+	}
 
 	/* in case we had to delay actual restart of video system... */
 	if ( (vidRestartTime != 0) && (vidRestartTime < Sys_Milliseconds()) )
@@ -1189,7 +1240,7 @@ void IN_Init( void )
 	keyRepeatEnabled = qtrue;
 
 	mouseAvailable = ( in_mouse->value != 0 );
-	IN_DeactivateMouse( );
+	IN_DeactivateMouse( qtrue );
 
 	appState = SDL_GetAppState( );
 	Cvar_SetValue( "com_unfocused",	!( appState & SDL_APPINPUTFOCUS ) );
@@ -1208,7 +1259,7 @@ IN_Shutdown
 */
 void IN_Shutdown( void )
 {
-	IN_DeactivateMouse( );
+	IN_DeactivateMouse( qtrue );
 	mouseAvailable = qfalse;
 
 	IN_ShutdownJoystick( );

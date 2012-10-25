@@ -132,5 +132,6 @@ double atan2( double y, double x );
 double tan( double x );
 int abs( int n );
 double fabs( double x );
+double rint( double v );
 
 #endif // BG_LIB_H

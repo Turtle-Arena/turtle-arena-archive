@@ -2265,7 +2265,7 @@ static void FixRenderCommandList( int newShader ) {
 					sortedIndex = (( drawSurf->sort >> QSORT_SHADERNUM_SHIFT ) & (MAX_SHADERS-1));
 					if( sortedIndex >= newShader ) {
 						sortedIndex++;
-						R_ComposeSort(drawSurf, sortedIndex, sortOrder, (entityNum << QSORT_ENTITYNUM_SHIFT),
+						R_ComposeSort(drawSurf, sortedIndex, sortOrder, (entityNum << QSORT_REFENTITYNUM_SHIFT),
 										fogNum, dlightMap);
 					}
 				}

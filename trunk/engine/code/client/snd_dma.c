@@ -521,14 +521,14 @@ void S_SpatializeOrigin (vec3_t origin, int master_vol, int *left_vol, int *righ
 
 /*
 ====================
-S_StartSound
+S_Base_StartSoundEx
 
 Validates the parms and ques the sound up
-if pos is NULL, the sound will be dynamically sourced from the entity
+if origin is NULL, the sound will be dynamically sourced from the entity
 Entchannel 0 will never override a playing sound
 ====================
 */
-void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle ) {
+static void S_Base_StartSoundEx( vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle, qboolean localSound ) {
 	channel_t	*ch;
 	sfx_t		*sfx;
 	int			i, oldest, chosen, time;
@@ -563,24 +563,18 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 //	Com_Printf("playing %s\n", sfx->soundName);
 	// pick a channel to play on
 
-	if (origin) {
-		allowed = 4;
-		fullVolume = qfalse;
+	if (localSound) {
+		allowed = 4 * CL_MAX_SPLITVIEW;
+	} else if (S_EntityIsListener(entityNum)) {
+		allowed = 8;
 	} else {
-		if (entityNum == MAX_GENTITIES) {
-			// Special case for sounds started using StartLocalSound
-			allowed = 4 * CL_MAX_SPLITVIEW;
-			fullVolume = qtrue;
-		} else if (S_HearingThroughEntity(entityNum)) {
-			allowed = 8;
-			fullVolume = qtrue;
-		} else if (S_EntityIsListener(entityNum)) {
-			allowed = 8;
-			fullVolume = qfalse;
-		} else {
-			allowed = 4;
-			fullVolume = qfalse;
-		}
+		allowed = 4;
+	}
+
+	if (localSound || (!origin && S_HearingThroughEntity(entityNum))) {
+		fullVolume = qtrue;
+	} else {
+		fullVolume = qfalse;
 	}
 
 	ch = s_channels;
@@ -661,6 +655,16 @@ void S_Base_StartSound(vec3_t origin, int entityNum, int entchannel, sfxHandle_t
 	ch->fullVolume = fullVolume;
 }
 
+/*
+====================
+S_StartSound
+
+if origin is NULL, the sound will be dynamically sourced from the entity
+====================
+*/
+void S_Base_StartSound( vec3_t origin, int entityNum, int entchannel, sfxHandle_t sfxHandle ) {
+	S_Base_StartSoundEx( origin, entityNum, entchannel, sfxHandle, qfalse );
+}
 
 /*
 ==================
@@ -677,7 +681,7 @@ void S_Base_StartLocalSound( sfxHandle_t sfxHandle, int channelNum ) {
 		return;
 	}
 
-	S_Base_StartSound (NULL, MAX_GENTITIES, channelNum, sfxHandle );
+	S_Base_StartSoundEx( NULL, MAX_GENTITIES, channelNum, sfxHandle, qtrue );
 }
 
 
@@ -771,7 +775,7 @@ Include velocity in case I get around to doing doppler...
 */
 void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t velocity, sfxHandle_t sfxHandle ) {
 	sfx_t *sfx;
-	int mainListener;
+	int listener;
 
 	if ( !s_soundStarted || s_soundMuted ) {
 		return;
@@ -801,17 +805,16 @@ void S_Base_AddLoopingSound( int entityNum, const vec3_t origin, const vec3_t ve
 	loopSounds[entityNum].dopplerScale = 1.0;
 	loopSounds[entityNum].sfx = sfx;
 
-	// ZTM: FIXME: Support doppler effect for all listeners
-	mainListener = S_ListenerNumForEntity(clc.clientNums[0], qfalse);
+	listener = S_ClosestListener(loopSounds[entityNum].origin);
 
-	if (mainListener >= 0 && s_doppler->integer && VectorLengthSquared(velocity)>0.0) {
+	if (listener >= 0 && listener < MAX_LISTENERS && s_doppler->integer && VectorLengthSquared(velocity)>0.0) {
 		vec3_t	out;
 		float	lena, lenb;
 
 		loopSounds[entityNum].doppler = qtrue;
-		lena = DistanceSquared(loopSounds[listeners[mainListener].number].origin, loopSounds[entityNum].origin);
+		lena = DistanceSquared(listeners[listener].origin, loopSounds[entityNum].origin);
 		VectorAdd(loopSounds[entityNum].origin, loopSounds[entityNum].velocity, out);
-		lenb = DistanceSquared(loopSounds[listeners[mainListener].number].origin, out);
+		lenb = DistanceSquared(listeners[listener].origin, out);
 		if ((loopSounds[entityNum].framenum+1) != cls.framecount) {
 			loopSounds[entityNum].oldDopplerScale = 1.0;
 		} else {
@@ -1125,7 +1128,7 @@ void S_Base_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], in
 		return;
 	}
 
-	S_UpdateListener(entityNum, origin, axis, inwater, firstPerson);
+	S_UpdateListener(entityNum, origin, (const vec3_t *)axis, inwater, firstPerson);
 	respatialize = qtrue;
 }
 
@@ -1195,7 +1198,7 @@ void S_Base_Update( void ) {
 				continue;
 			}
 
-			// anything coming from the view entity will always be full volume
+			// local and first person sounds will always be full volume
 			if (ch->fullVolume) {
 				ch->leftvol = ch->master_vol;
 				ch->rightvol = ch->master_vol;
@@ -1235,8 +1238,6 @@ void S_Base_Update( void ) {
 
 	// mix some sound
 	S_Update_();
-
-	S_ListenersEndFrame();
 }
 
 void S_GetSoundtime(void)
@@ -1611,8 +1612,6 @@ qboolean S_Base_Init( soundInterface_t *si ) {
 		s_paintedtime = 0;
 
 		respatialize = 0;
-
-		S_ListenersInit();
 
 		S_Base_StopAllSounds( );
 	} else {

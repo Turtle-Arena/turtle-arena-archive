@@ -770,6 +770,19 @@ double atan2( double y, double x ) {
 
 /*
 ===============
+rint
+===============
+*/
+double rint( double v )
+{
+  if( v >= 0.5f )
+    return ceil( v );
+  else
+    return floor( v );
+}
+
+/*
+===============
 powN
 
 Raise a double to a integer power

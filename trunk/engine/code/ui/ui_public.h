@@ -31,7 +31,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 #ifndef __UI_PUBLIC_H__
 #define __UI_PUBLIC_H__
 
-#define UI_API_VERSION	101
+#define UI_API_VERSION	102
 
 typedef struct {
 	connstate_t		connState;
@@ -172,6 +172,12 @@ typedef enum {
 
 	UI_MOUSE_EVENT,
 //	void	UI_MouseEvent( int localClientNum, int dx, int dy );
+
+	UI_MOUSE_POSITION,
+//  int		UI_MousePosition( int localClientNum );
+
+	UI_SET_MOUSE_POSITION,
+//  void	UI_SetMousePosition( int localClientNum, int x, int y );
 
 	UI_REFRESH,
 //	void	UI_Refresh( int time );

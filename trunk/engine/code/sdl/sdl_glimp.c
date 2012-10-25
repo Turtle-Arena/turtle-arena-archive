@@ -48,7 +48,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include <math.h>
 
 #include "../renderer/tr_local.h"
-#include "../client/client.h"
 #include "../sys/sys_local.h"
 #include "sdl_icon.h"
 

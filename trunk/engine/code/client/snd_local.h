@@ -182,8 +182,11 @@ void S_ListenersInit(void);
 void S_ListenersEndFrame(void);
 qboolean S_HearingThroughEntity( int entityNum );
 qboolean S_EntityIsListener(int entityNum);
+int S_ClosestListener(const vec3_t origin);
+float S_ListenersClosestDistance(const vec3_t origin);
+float S_ListenersClosestDistanceSquared(const vec3_t origin);
 int S_ListenerNumForEntity(int entityNum, qboolean create);
-void S_UpdateListener(int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson);
+void S_UpdateListener(int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater, qboolean firstPerson);
 
 /*
 ====================================================================

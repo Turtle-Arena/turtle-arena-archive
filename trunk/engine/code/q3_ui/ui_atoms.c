@@ -1414,6 +1414,7 @@ void UI_MouseEvent( int localClientNum, int dx, int dy )
 {
 	int				i;
 	menucommon_s*	m;
+	float			biasScaled = uis.bias / uis.xscale;
 
 	if (localClientNum != 0) {
 		// q3_ui currently only supports one cursor
@@ -1425,10 +1426,10 @@ void UI_MouseEvent( int localClientNum, int dx, int dy )
 
 	// update mouse screen position
 	uis.cursorx += dx;
-	if (uis.cursorx < -uis.bias)
-		uis.cursorx = -uis.bias;
-	else if (uis.cursorx > SCREEN_WIDTH+uis.bias)
-		uis.cursorx = SCREEN_WIDTH+uis.bias;
+	if (uis.cursorx < -biasScaled)
+		uis.cursorx = -biasScaled;
+	else if (uis.cursorx > SCREEN_WIDTH+biasScaled)
+		uis.cursorx = SCREEN_WIDTH+biasScaled;
 
 	uis.cursory += dy;
 	if (uis.cursory < 0)
@@ -1472,6 +1473,40 @@ void UI_MouseEvent( int localClientNum, int dx, int dy )
 		// out of any region
 		((menucommon_s*)(uis.activemenu->items[uis.activemenu->cursor]))->flags &= ~QMF_HASMOUSEFOCUS;
 	}
+}
+
+/*
+=================
+UI_MousePosition
+=================
+*/
+int UI_MousePosition( int localClientNum )
+{
+	if (localClientNum != 0) {
+		// ui currently only supports one cursor
+		return 0;
+	}
+
+	return (int)rint( uis.cursorx * uis.xscale + uis.bias ) |
+			(int)rint( uis.cursory * uis.yscale ) << 16;
+}
+
+/*
+=================
+UI_SetMousePosition
+=================
+*/
+void UI_SetMousePosition( int localClientNum, int x, int y )
+{
+	if (localClientNum != 0) {
+		// ui currently only supports one cursor
+		return;
+	}
+
+	uis.cursorx = x / uis.xscale - (uis.bias / uis.xscale);
+	uis.cursory = y / uis.yscale;
+
+	UI_MouseEvent(localClientNum, 0, 0);
 }
 
 char *UI_Argv( int arg ) {

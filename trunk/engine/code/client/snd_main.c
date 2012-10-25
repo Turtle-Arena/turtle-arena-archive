@@ -129,6 +129,80 @@ qboolean S_EntityIsListener(int entityNum)
 
 /*
 ====================
+S_ClosestListener
+====================
+*/
+int S_ClosestListener(const vec3_t origin) {
+	float dist, closestDist = INT_MAX;
+	int closestListener = -1;
+	int i;
+
+	// NOTE: Listeners may be one frame out of date.
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		if (listeners[i].valid)
+		{
+			dist = Distance(origin, listeners[i].origin);
+			if (dist < closestDist) {
+				closestDist = dist;
+				closestListener = i;
+			}
+		}
+	}
+
+	return closestListener;
+}
+
+/*
+====================
+S_ListenersClosestDistance
+====================
+*/
+float S_ListenersClosestDistance(const vec3_t origin) {
+	float dist, closestDist = INT_MAX;
+	int i;
+
+	// NOTE: Listeners may be one frame out of date.
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		if (listeners[i].valid)
+		{
+			dist = Distance(origin, listeners[i].origin);
+			if (dist < closestDist) {
+				closestDist = dist;
+			}
+		}
+	}
+	
+	return closestDist;
+}
+
+/*
+====================
+S_ListenersClosestDistanceSquared
+====================
+*/
+float S_ListenersClosestDistanceSquared(const vec3_t origin) {
+	float dist, closestDist = INT_MAX;
+	int i;
+
+	// NOTE: Listeners may be one frame out of date.
+	for (i = 0; i < MAX_LISTENERS; ++i)
+	{
+		if (listeners[i].valid)
+		{
+			dist = DistanceSquared(origin, listeners[i].origin);
+			if (dist < closestDist) {
+				closestDist = dist;
+			}
+		}
+	}
+	
+	return closestDist;
+}
+
+/*
+====================
 S_ListenerNumForEntity
 ====================
 */
@@ -142,10 +216,24 @@ int S_ListenerNumForEntity(int entityNum, qboolean create)
 		if (listeners[i].valid)
 		{
 			if (listeners[i].number == entityNum)
-				return entityNum;
+				return i;
 		}
 		else if (create && freeListener == -1)
 			freeListener = i;
+	}
+
+	if (create && freeListener == -1)
+	{
+		// Find listener that might be freed next frame, otherwise we
+		// could fail to get a slot when listener changes entityNums.
+		for (i = MAX_LISTENERS-1; i >= 0; --i)
+		{
+			if (listeners[i].valid && !listeners[i].updated)
+			{
+				freeListener = i;
+				break;
+			}
+		}
 	}
 
 	return freeListener;
@@ -156,7 +244,7 @@ int S_ListenerNumForEntity(int entityNum, qboolean create)
 S_UpdateListener
 =================
 */
-void S_UpdateListener(int entityNum, const vec3_t origin, vec3_t axis[3], int inwater, qboolean firstPerson)
+void S_UpdateListener(int entityNum, const vec3_t origin, const vec3_t axis[3], int inwater, qboolean firstPerson)
 {
 	int listener;
 
@@ -394,6 +482,8 @@ void S_Update( void )
 	if( si.Update ) {
 		si.Update( );
 	}
+
+	S_ListenersEndFrame();
 }
 
 /*
@@ -842,6 +932,7 @@ void S_Init( void )
 	} else {
 
 		S_CodecInit( );
+		S_ListenersInit( );
 
 		Cmd_AddCommand( "play", S_Play_f );
 		Cmd_AddCommand( "music", S_Music_f );
