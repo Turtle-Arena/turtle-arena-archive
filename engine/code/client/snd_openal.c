@@ -575,7 +575,6 @@ static src_t srcList[MAX_SRC];
 static int srcCount = 0;
 static int srcActiveCnt = 0;
 static qboolean alSourcesInitialised = qfalse;
-static vec3_t lastListenerOrigin = { 0.0f, 0.0f, 0.0f };
 
 typedef struct sentity_s
 {
@@ -608,7 +607,6 @@ static void _S_AL_SanitiseVector( vec3_t v, int line )
 	}
 }
 
-
 /*
 =================
 S_AL_Gain
@@ -636,7 +634,7 @@ static void S_AL_ScaleGain(src_t *chksrc, vec3_t origin)
 	float distance;
 	
 	if(!chksrc->local)
-		distance = Distance(origin, lastListenerOrigin);
+		distance = S_ListenersClosestDistance(origin);
 		
 	// If we exceed a certain distance, scale the gain linearly until the sound
 	// vanishes into nothingness.
@@ -1216,7 +1214,7 @@ static void S_AL_StartSound( vec3_t origin, int entnum, int entchannel, sfxHandl
 	S_AL_SanitiseVector(sorigin);
 	
 	if((srcActiveCnt > 5 * srcCount / 3) &&
-		(DistanceSquared(sorigin, lastListenerOrigin) >=
+		(S_ListenersClosestDistanceSquared(sorigin) >=
 		(s_alMaxDistance->value + s_alGraceDistance->value) * (s_alMaxDistance->value + s_alGraceDistance->value)))
 	{
 		// We're getting tight on sources and source is not within hearing distance so don't add it
@@ -2193,18 +2191,17 @@ void S_AL_Respatialize( int entityNum, const vec3_t origin, vec3_t axis[3], int 
 	S_AL_SanitiseVector( axis[ 1 ] );
 	S_AL_SanitiseVector( axis[ 2 ] );
 
-	S_UpdateListener(entityNum, origin, axis, inwater, firstPerson);
+	S_UpdateListener(entityNum, origin, (const vec3_t *)axis, inwater, firstPerson);
 
-	if (clc.clientNums[0] != entityNum)
+	if (entityNum != clc.clientNums[0])
 	{
-		// ZTM: FIXME: Support multiple listeners!
+		// ZTM: FIXME: Support playing sounds relative to all listeners!
+		// ZTM: NOTE: Sounds from all first person listeners will be full volume as they are suppose to.
 		return;
 	}
 
 	orientation[0] = axis[0][0]; orientation[1] = axis[0][1]; orientation[2] = axis[0][2];
 	orientation[3] = axis[2][0]; orientation[4] = axis[2][1]; orientation[5] = axis[2][2];
-
-	VectorCopy( sorigin, lastListenerOrigin );
 
 	// Set OpenAL listener paramaters
 	qalListenerfv(AL_POSITION, (ALfloat *)sorigin);
@@ -2270,8 +2267,6 @@ void S_AL_Update( void )
 	s_musicVolume->modified = qfalse;
 	s_alMinDistance->modified = qfalse;
 	s_alRolloff->modified = qfalse;
-
-	S_ListenersEndFrame();
 }
 
 /*
@@ -2445,8 +2440,6 @@ qboolean S_AL_Init( soundInterface_t *si )
 	if( !si ) {
 		return qfalse;
 	}
-
-	S_ListenersInit();
 
 	for (i = 0; i < MAX_RAW_STREAMS; i++) {
 		streamSourceHandles[i] = -1;

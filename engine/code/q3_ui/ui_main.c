@@ -69,6 +69,13 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		UI_MouseEvent( arg0, arg1, arg2 );
 		return 0;
 
+	case UI_MOUSE_POSITION:
+		return UI_MousePosition( arg0 );
+
+	case UI_SET_MOUSE_POSITION:
+		UI_SetMousePosition( arg0, arg1, arg2 );
+		return 0;
+
 	case UI_REFRESH:
 		UI_Refresh( arg0 );
 		return 0;

@@ -927,8 +927,8 @@ the bits are allocated as follows:
 */
 
 #define	QSORT_FOGNUM_SHIFT		2
-#define	QSORT_ENTITYNUM_SHIFT	7
-#define	QSORT_ORDER_SHIFT		(QSORT_ENTITYNUM_SHIFT+ENTITYNUM_BITS)
+#define	QSORT_REFENTITYNUM_SHIFT	7
+#define	QSORT_ORDER_SHIFT		(QSORT_REFENTITYNUM_SHIFT+REFENTITYNUM_BITS)
 #define	QSORT_SHADERNUM_SHIFT	(QSORT_ORDER_SHIFT+5) // sort order is 5 bit
 #if (QSORT_SHADERNUM_SHIFT+SHADERNUM_BITS) > 64
 	#error "Need to update sorting, too many bits."
@@ -1049,7 +1049,7 @@ typedef struct {
 	trRefEntity_t			*currentEntity;
 	trRefEntity_t			worldEntity;		// point currentEntity at this when rendering world
 	int						currentEntityNum;
-	int						shiftedEntityNum;	// currentEntityNum << QSORT_ENTITYNUM_SHIFT
+	int						shiftedEntityNum;	// currentEntityNum << QSORT_REFENTITYNUM_SHIFT
 	model_t					*currentModel;
 
 	viewParms_t				viewParms;
@@ -1840,7 +1840,7 @@ typedef enum {
 typedef struct {
 	drawSurf_t	drawSurfs[MAX_DRAWSURFS];
 	dlight_t	dlights[MAX_DLIGHTS];
-	trRefEntity_t	entities[MAX_ENTITIES];
+	trRefEntity_t	entities[MAX_REFENTITIES];
 #ifdef IOQ3ZTM // BONES
 	refSkeleton_t	skeletons[MAX_CUSTOM_SKELETONS];
 #endif

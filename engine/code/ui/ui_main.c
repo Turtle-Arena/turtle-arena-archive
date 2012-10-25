@@ -179,6 +179,8 @@ void _UI_Init( qboolean inGameLoad, int maxSplitView );
 void _UI_Shutdown( void );
 void _UI_KeyEvent( int key, qboolean down );
 void _UI_MouseEvent( int localClientNum, int dx, int dy );
+int _UI_MousePosition( int localClientNum );
+void _UI_SetMousePosition( int localClientNum, int x, int y );
 void _UI_Refresh( int realtime );
 qboolean _UI_IsFullscreen( void );
 Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
@@ -200,6 +202,13 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 
 	  case UI_MOUSE_EVENT:
 		  _UI_MouseEvent( arg0, arg1, arg2 );
+		  return 0;
+
+	  case UI_MOUSE_POSITION:
+		  return _UI_MousePosition( arg0 );
+
+	  case UI_SET_MOUSE_POSITION:
+		  _UI_SetMousePosition( arg0, arg1, arg2 );
 		  return 0;
 
 	  case UI_REFRESH:
@@ -5320,6 +5329,42 @@ void _UI_MouseEvent( int localClientNum, int dx, int dy )
 		Display_MouseMove(NULL, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory);
   }
 
+}
+
+/*
+=================
+UI_MousePosition
+=================
+*/
+int _UI_MousePosition( int localClientNum )
+{
+	if (localClientNum != 0) {
+		// ui currently only supports one cursor
+		return 0;
+	}
+
+	return (int)rint( uiInfo.uiDC.cursorx * uiInfo.uiDC.xscale ) |
+			(int)rint( uiInfo.uiDC.cursory * uiInfo.uiDC.yscale ) << 16;
+}
+
+/*
+=================
+UI_SetMousePosition
+=================
+*/
+void _UI_SetMousePosition( int localClientNum, int x, int y )
+{
+	if (localClientNum != 0) {
+		// ui currently only supports one cursor
+		return;
+	}
+
+	uiInfo.uiDC.cursorx = x / uiInfo.uiDC.xscale;
+	uiInfo.uiDC.cursory = y / uiInfo.uiDC.yscale;
+
+	if( Menu_Count( ) > 0 ) {
+		Display_MouseMove( NULL, uiInfo.uiDC.cursorx, uiInfo.uiDC.cursory );
+	}
 }
 
 void UI_LoadNonIngame( void ) {

@@ -35,11 +35,15 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define	MAX_DLIGHTS		32		// can't be increased, because bit flags are used on surfaces
 
 #ifdef IOQ3ZTM_NO_COMPAT // MORE_ENTITIES
-#define	ENTITYNUM_BITS		14		// can't be increased without changing drawsurf bit packing
+#define	REFENTITYNUM_BITS	14		// can't be increased without changing drawsurf bit packing
 #else
-#define	ENTITYNUM_BITS		12		// can't be increased without changing drawsurf bit packing
+#define	REFENTITYNUM_BITS	12		// can't be increased without changing drawsurf bit packing
 #endif
-#define	MAX_ENTITIES		((1<<ENTITYNUM_BITS) - 1)
+#define	REFENTITYNUM_MASK	((1<<REFENTITYNUM_BITS) - 1)
+// the last N-bit number (2^REFENTITYNUM_BITS - 1) is reserved for the special world refentity,
+//  and this is reflected by the value of MAX_REFENTITIES (which therefore is not a power-of-2)
+#define	MAX_REFENTITIES		((1<<REFENTITYNUM_BITS) - 1)
+#define	REFENTITYNUM_WORLD	((1<<REFENTITYNUM_BITS) - 1)
 
 // renderfx flags
 #define	RF_MINLIGHT		0x0001		// allways have some light (viewmodel, some items)
