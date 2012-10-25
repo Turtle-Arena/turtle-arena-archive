@@ -230,7 +230,7 @@ GOODBYE0 = {
 
 GOODBYE1 = {
 	"My ", animal, " is begging to be let out, ttfn.";
-	peeps, " is killing my ", animal, " gotta go stop it!";
+//	peeps, " is killing my ", animal, " gotta go stop it!";
 	"ttfn";
 	"Later tater";
 }
@@ -258,7 +258,7 @@ GOODBYE4 = {
 HELLO0 = {
 	"Hello me lovlies!";
 	"Are you ready to die, because you will.";
-	"Greetings and salutations, now prepare to be fragged.";
+//	"Greetings and salutations, now prepare to be fragged.";
 	"Wake up... time to die!";
 }
 
@@ -319,7 +319,7 @@ KILL_INSULT2 = {
 KILL_INSULT3 = {
 	"Yet they say violence isn't necessary...";
 	"Are you a fan of Ghandi?  Because non-violence will not work here.";
-	number, " dollars says you don't get a frag this match.";
+//	number, " dollars says you don't get a frag this match.";
 	"Man, ", 0," I thought with a name like yours you'd be a challenge.";
 }
 
@@ -426,7 +426,7 @@ LEVEL_START2 = {
 }
 
 LEVEL_START3 = {
-	4, " needs work, it is far to easy for me to frag you.";
+//	4, " needs work, it is far to easy for me to frag you.";
 	"Oh, here we go again, ", fighter, "s thinking they have a chance.";
 	"Ooooh, ", 4, ".  FUN!";
 	"*Everybody now!  'Come as you are, as you were, as I want you to be'...";

@@ -258,17 +258,15 @@ type "returnflag_start"
 type "attackenemybase_start"
 {
 "Got it, their base is toast.";
-"I'm off to destroy their base and frag a few fools.";
-"Death to the infidels!";
+"I'm off to destroy their base.";
+"I'm heading to their base.";
 
 }
 
 	//harvest
 type "harvest_start"
 {
-"Death to the infidels!  Their skulls will be mine!";
-"Death to the infidels!";
-"The infidels shall die!";
+"Time to harvest some skulls!";
 }
 
 	//the checkpoint is invalid
