@@ -499,10 +499,6 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	clientSnapshot_t			*frame;
 	snapshotEntityNumbers_t		entityNumbers;
 	int							i;
-#if 0
-	int							j, k;
-	int							viewclients[MAX_SPLITVIEW] = {-1, -1, -1, -1};
-#endif
 	sharedEntity_t				*ent;
 	entityState_t				*state;
 	svEntity_t					*svEnt;
@@ -545,51 +541,6 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		frame->lcIndex[i] = frame->numPSs;
 		frame->numPSs++;
 	}
-
-#if 0 // ZTM: FIXME: Set viewclients, should be done in game
-	j = 1;
-	for (i = 0; i < sv_maxclients->integer; i++)
-	{
-		if (i == client - svs.clients) {
-			continue;
-		}
-		if (!svs.clients[i].state) {
-			continue;
-		}
-
-		for (k = 1; k < MAX_SPLITVIEW; k++) {
-			if (client->localClients[k-1] == i) {
-				break;
-			}
-		}
-		if (k != MAX_SPLITVIEW) {
-			continue;
-		}
-
-		viewclients[j-1] = i;
-		j++;
-		if (j >= MAX_SPLITVIEW) {
-			break;
-		}
-	}
-#endif
-
-#if 0
-	// Add viewclients
-	for (i = 1; i < MAX_SPLITVIEW; i++) {
-		if ((viewclients[i-1] < 0 || viewclients[i-1] >= MAX_CLIENTS)) {
-			continue;
-		}
-		ps = SV_GameClientNum( viewclients[i-1] );
-		frame->pss[frame->numPSs] = *ps;
-		frame->pss[frame->numPSs].pm_flags |= PMF_FOLLOW;
-		frame->lcIndex[i] = frame->numPSs;
-		frame->numPSs++;
-		if (frame->numPSs >= MAX_SPLITVIEW) {
-			break;
-		}
-	}
-#endif
 
 	// never send client's own entity, because it can
 	// be regenerated from the playerstate
