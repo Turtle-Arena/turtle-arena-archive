@@ -105,7 +105,7 @@ void RE_ClearScene( void ) {
 	r_firstSceneSkeleton = r_numskeletons;
 #endif
 	r_firstScenePoly = r_numpolys;
-	r_firstScenePoly = r_numpolybuffers;
+	r_firstScenePolybuffer = r_numpolybuffers;
 }
 
 /*
