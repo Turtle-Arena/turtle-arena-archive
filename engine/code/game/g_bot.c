@@ -680,6 +680,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	char			*model;
 	char			*headmodel;
 	char			userinfo[MAX_INFO_STRING];
+	qboolean		modelSet;
 
 	// have the server allocate a client slot
 	clientNum = trap_BotAllocateClient();
@@ -755,12 +756,9 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 
 	key = "model";
 	model = Info_ValueForKey( botinfo, key );
-	if ( !*model ) {
-#ifdef TURTLEARENA // DEFAULT_MODEL
-		model = "raph/default";
-#else
-		model = "visor/default";
-#endif
+	modelSet = ( *model );
+	if ( !modelSet ) {
+		model = DEFAULT_MODEL;
 	}
 	Info_SetValueForKey( userinfo, key, model );
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
@@ -775,7 +773,11 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "headmodel";
 	headmodel = Info_ValueForKey( botinfo, key );
 	if ( !*headmodel ) {
-		headmodel = model;
+		if (!modelSet) {
+			headmodel = DEFAULT_HEAD;
+		} else {
+			headmodel = model;
+		}
 	}
 	Info_SetValueForKey( userinfo, key, headmodel );
 #ifndef IOQ3ZTM_NO_TEAM_MODEL
@@ -790,22 +792,14 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	key = "color1";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
-#ifdef TURTLEARENA
-		s = "5";
-#else
-		s = "4";
-#endif
+		s = va("%d", DEFAULT_CLIENT_COLOR1);
 	}
 	Info_SetValueForKey( userinfo, key, s );
 
 	key = "color2";
 	s = Info_ValueForKey( botinfo, key );
 	if ( !*s ) {
-#ifdef TURTLEARENA
-		s = "4";
-#else
-		s = "5";
-#endif
+		s =  va("%d", DEFAULT_CLIENT_COLOR2);
 	}
 	Info_SetValueForKey( userinfo, key, s );
 
@@ -917,7 +911,7 @@ void Svcmd_BotList_f( void ) {
 	for (i = 0; i < g_numBots; i++) {
 		strcpy(name, Info_ValueForKey( g_botInfos[i], "name" ));
 		if ( !*name ) {
-			strcpy(name, "UnnamedPlayer");
+			strcpy(name, DEFAULT_CLIENT_NAME);
 		}
 		strcpy(funname, Info_ValueForKey( g_botInfos[i], "funname" ));
 		if ( !*funname ) {
@@ -930,7 +924,7 @@ void Svcmd_BotList_f( void ) {
 		}
 #else
 		if ( !*model ) {
-			strcpy(model, "visor/default");
+			strcpy(model, DEFAULT_MODEL);
 		}
 #endif
 		strcpy(aifile, Info_ValueForKey( g_botInfos[i], "aifile"));
