@@ -1897,7 +1897,7 @@ void R_DecomposeSort( const drawSurf_t *drawSurf, shader_t **shader, int *sortOr
 	*sortOrder = ( drawSurf->sort >> QSORT_ORDER_SHIFT ) & 31;
 	*entityNum = ( drawSurf->sort >> QSORT_REFENTITYNUM_SHIFT ) & REFENTITYNUM_MASK;
 	*fogNum = ( drawSurf->sort >> QSORT_FOGNUM_SHIFT ) & 31;
-	*pshadowMap = (drawSurf->sort & 2) >> 1;
+	*pshadowMap = (drawSurf->sort >> QSORT_PSHADOW_SHIFT ) & 1;
 	*dlightMap = drawSurf->sort & 1;
 }
 
