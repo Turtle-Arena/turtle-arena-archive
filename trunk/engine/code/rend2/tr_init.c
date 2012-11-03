@@ -949,6 +949,27 @@ void GL_SetDefaultState( void )
 	qglDisable( GL_BLEND );
 }
 
+/*
+================
+R_PrintLongString
+
+Workaround for ri.Printf's 1024 characters buffer limit.
+================
+*/
+void R_PrintLongString(const char *string) {
+	char buffer[1024];
+	const char *p;
+	int size = strlen(string);
+
+	p = string;
+	while(size > 0)
+	{
+		Q_strncpyz(buffer, p, sizeof (buffer) );
+		ri.Printf( PRINT_ALL, "%s", buffer );
+		p += 1023;
+		size -= 1023;
+	}
+}
 
 /*
 ================
@@ -971,28 +992,9 @@ void GfxInfo_f( void )
 	ri.Printf( PRINT_ALL, "\nGL_VENDOR: %s\n", glConfig.vendor_string );
 	ri.Printf( PRINT_ALL, "GL_RENDERER: %s\n", glConfig.renderer_string );
 	ri.Printf( PRINT_ALL, "GL_VERSION: %s\n", glConfig.version_string );
-	// this was really bugging me
-	if (strlen(glConfig.extensions_string) > 1008)
-	{
-		char buffer[1024];
-		char *p;
-		int size = strlen(glConfig.extensions_string);
-		ri.Printf( PRINT_ALL, "GL_EXTENSIONS: ");
-
-		p = glConfig.extensions_string;
-		while(size > 0)
-		{
-			Q_strncpyz(buffer, p, 1024);
-			ri.Printf( PRINT_ALL, "%s", buffer );
-			p += 1023;
-			size -= 1023;
-		}
-		ri.Printf( PRINT_ALL, "\n" );
-	}
-	else
-	{
-		ri.Printf( PRINT_ALL, "GL_EXTENSIONS: %s\n", glConfig.extensions_string );
-	}
+	ri.Printf( PRINT_ALL, "GL_EXTENSIONS: " );
+	R_PrintLongString( glConfig.extensions_string );
+	ri.Printf( PRINT_ALL, "\n" );
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_SIZE: %d\n", glConfig.maxTextureSize );
 	ri.Printf( PRINT_ALL, "GL_MAX_TEXTURE_UNITS_ARB: %d\n", glConfig.numTextureUnits );
 	ri.Printf( PRINT_ALL, "\nPIXELFORMAT: color(%d-bits) Z(%d-bit) stencil(%d-bits)\n", glConfig.colorBits, glConfig.depthBits, glConfig.stencilBits );
@@ -1314,7 +1316,7 @@ void R_InitQueries(void)
 		return;
 
 #ifdef REACTION
-	qglGenQueriesARB(ARRAY_SIZE(tr.sunFlareQuery), tr.sunFlareQuery);
+	qglGenQueriesARB(ARRAY_LEN(tr.sunFlareQuery), tr.sunFlareQuery);
 #endif
 }
 
@@ -1324,7 +1326,7 @@ void R_ShutDownQueries(void)
 		return;
 
 #ifdef REACTION
-	qglDeleteQueriesARB(ARRAY_SIZE(tr.sunFlareQuery), tr.sunFlareQuery);
+	qglDeleteQueriesARB(ARRAY_LEN(tr.sunFlareQuery), tr.sunFlareQuery);
 #endif
 }
 
@@ -1426,7 +1428,8 @@ void R_Init( void ) {
 
 	R_InitImages();
 
-	FBO_Init();
+	if (glRefConfig.framebufferObject)
+		FBO_Init();
 
 	GLSL_InitGPUShaders();
 
@@ -1477,13 +1480,15 @@ void RE_Shutdown( qboolean destroyWindow ) {
 	ri.Cmd_RemoveCommand("minimize");
 	ri.Cmd_RemoveCommand( "modelist" );
 	ri.Cmd_RemoveCommand( "shaderstate" );
+	ri.Cmd_RemoveCommand( "gfxmeminfo" );
 
 
 	if ( tr.registered ) {
 		R_SyncRenderThread();
 		R_ShutdownCommandBuffers();
 		R_ShutDownQueries();
-		FBO_Shutdown();
+		if (glRefConfig.framebufferObject)
+			FBO_Shutdown();
 		R_DeleteTextures();
 		R_ShutdownVBOs();
 		GLSL_ShutdownGPUShaders();

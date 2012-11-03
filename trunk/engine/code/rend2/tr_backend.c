@@ -776,7 +776,7 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 					{
 						depth[0] = 0;
 						depth[1] = 0.3f;
- 						qglDepthRange (0, 0.3);
+ 						qglDepthRange (depth[0], depth[1]);
 	 				}
 #endif
 				}
@@ -828,7 +828,8 @@ void RB_RenderDrawSurfList( drawSurf_t *drawSurfs, int numDrawSurfs ) {
 	}
 #endif
 
-	FBO_Bind(fbo);
+	if (glRefConfig.framebufferObject)
+		FBO_Bind(fbo);
 
 	// go back to the world modelview matrix
 
@@ -1206,12 +1207,12 @@ const void	*RB_DrawSurfs( const void *data ) {
 	// clear the z buffer, set the modelview, etc
 	RB_BeginDrawingView ();
 
-	if ((backEnd.viewParms.flags & VPF_DEPTHCLAMP) && glRefConfig.depthClamp)
+	if (glRefConfig.framebufferObject && (backEnd.viewParms.flags & VPF_DEPTHCLAMP) && glRefConfig.depthClamp)
 	{
 		qglEnable(GL_DEPTH_CLAMP);
 	}
 
-	if (!(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && (r_depthPrepass->integer || (backEnd.viewParms.flags & VPF_DEPTHSHADOW)))
+	if (glRefConfig.framebufferObject && !(backEnd.refdef.rdflags & RDF_NOWORLDMODEL) && (r_depthPrepass->integer || (backEnd.viewParms.flags & VPF_DEPTHSHADOW)))
 	{
 		FBO_t *oldFbo = glState.currentFBO;
 
@@ -1429,7 +1430,7 @@ const void	*RB_DrawSurfs( const void *data ) {
 		SetViewportAndScissor();
 	}
 
-	if ((backEnd.viewParms.flags & VPF_DEPTHCLAMP) && glRefConfig.depthClamp)
+	if (glRefConfig.framebufferObject && (backEnd.viewParms.flags & VPF_DEPTHCLAMP) && glRefConfig.depthClamp)
 	{
 		qglDisable(GL_DEPTH_CLAMP);
 	}
@@ -1448,8 +1449,8 @@ const void	*RB_DrawSurfs( const void *data ) {
 		RB_RenderFlares();
 	}
 
-	if (glRefConfig.framebufferObject)
-		FBO_Bind(NULL);
+	//if (glRefConfig.framebufferObject)
+		//FBO_Bind(NULL);
 
 	return (const void *)(cmd + 1);
 }
@@ -1465,6 +1466,9 @@ const void	*RB_DrawBuffer( const void *data ) {
 	const drawBufferCommand_t	*cmd;
 
 	cmd = (const drawBufferCommand_t *)data;
+
+	if (glRefConfig.framebufferObject)
+		FBO_Bind(NULL);
 
 	qglDrawBuffer( cmd->buffer );
 
@@ -1577,14 +1581,18 @@ const void *RB_ClearDepth(const void *data)
 	if (r_showImages->integer)
 		RB_ShowImages();
 
-	if (backEnd.framePostProcessed && (backEnd.refdef.rdflags & RDF_NOWORLDMODEL))
+	if (glRefConfig.framebufferObject)
 	{
-		FBO_Bind(tr.screenScratchFbo);
+		if (backEnd.framePostProcessed && (backEnd.refdef.rdflags & RDF_NOWORLDMODEL))
+		{
+			FBO_Bind(tr.screenScratchFbo);
+		}
+		else
+		{
+			FBO_Bind(tr.renderFbo);
+		}
 	}
-	else
-	{
-		FBO_Bind(tr.renderFbo);
-	}
+
 	qglClear(GL_DEPTH_BUFFER_BIT);
 
 	// if we're doing MSAA, clear the depth texture for the resolve buffer
