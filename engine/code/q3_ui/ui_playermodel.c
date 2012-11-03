@@ -283,11 +283,6 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 	switch (key)
 	{
 		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
@@ -315,11 +310,6 @@ static sfxHandle_t PlayerModel_MenuKey( int key )
 			break;
 
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			m = Menu_ItemAtCursor(&s_playermodel.menu);
 			picnum = m->id - ID_PLAYERPIC0;

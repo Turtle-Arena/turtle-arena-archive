@@ -547,16 +547,6 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 			if (!(rb->generic.flags & QMF_HASMOUSEFOCUS))
 				break;
 
-		case K_KP_LEFTARROW:
-		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if ((key == K_KP_LEFTARROW || key == K_KP_RIGHTARROW)
-				&& trap_Key_IsDown(K_KP_NUMLOCK))
-			{
-				break;
-			}
-#endif
-
 		case K_JOY1:
 		case K_JOY2:
 		case K_JOY3:
@@ -575,7 +565,9 @@ static sfxHandle_t RadioButton_Key( menuradiobutton_s *rb, int key )
 		case K_4JOY4:
 		case K_ENTER:
 		case K_KP_ENTER:
+		case K_KP_LEFTARROW:
 		case K_LEFTARROW:
+		case K_KP_RIGHTARROW:
 		case K_RIGHTARROW:
 			rb->curvalue = !rb->curvalue;
 			if ( rb->generic.callback )
@@ -711,12 +703,6 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 			break;
 
 		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				sound = 0;
-				break;
-			}
-#endif
 		case K_LEFTARROW:
 			if (s->curvalue > s->minvalue)
 			{
@@ -728,12 +714,6 @@ static sfxHandle_t Slider_Key( menuslider_s *s, int key )
 			break;			
 
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				sound = 0;
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			if (s->curvalue < s->maxvalue)
 			{
@@ -979,11 +959,6 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 	switch (key)
 	{
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 		case K_MOUSE1:
 #ifdef IOQ3ZTM // IOQ3BUGFIX: ?
@@ -1008,11 +983,6 @@ static sfxHandle_t SpinControl_Key( menulist_s *s, int key )
 			break;
 		
 		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
@@ -1190,11 +1160,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			break;
 
 		case K_KP_HOME:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_HOME:
 			l->oldvalue = l->curvalue;
 			l->curvalue = 0;
@@ -1208,11 +1173,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return (menu_buzz_sound);
 
 		case K_KP_END:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_END:
 			l->oldvalue = l->curvalue;
 			l->curvalue = l->numitems-1;
@@ -1233,13 +1193,8 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			}
 			return (menu_buzz_sound);
 
-		case K_KP_PGUP:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_PGUP:
+		case K_KP_PGUP:
 			if( l->columns > 1 ) {
 				return menu_null_sound;
 			}
@@ -1261,14 +1216,8 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			}
 			return (menu_buzz_sound);
 
-
-		case K_KP_PGDN:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_PGDN:
+		case K_KP_PGDN:
 			if( l->columns > 1 ) {
 				return menu_null_sound;
 			}
@@ -1291,11 +1240,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return (menu_buzz_sound);
 
 		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_UPARROW:
 			if( l->curvalue == 0 ) {
 				return menu_buzz_sound;
@@ -1320,11 +1264,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return (menu_move_sound);
 
 		case K_KP_DOWNARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_DOWNARROW:
 			if( l->curvalue == l->numitems - 1 ) {
 				return menu_buzz_sound;
@@ -1349,11 +1288,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return menu_move_sound;
 
 		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:
@@ -1380,11 +1314,6 @@ sfxHandle_t ScrollList_Key( menulist_s *l, int key )
 			return menu_move_sound;
 
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			if( l->columns == 1 ) {
 				return menu_null_sound;
@@ -1937,11 +1866,6 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 #endif
 
 		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_UPARROW:
 			cursor_prev    = m->cursor;
 			m->cursor_prev = m->cursor;
@@ -1953,14 +1877,9 @@ sfxHandle_t Menu_DefaultKey( menuframework_s *m, int key )
 			}
 			break;
 
-		case K_KP_DOWNARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
-		case K_DOWNARROW:
 		case K_TAB:
+		case K_KP_DOWNARROW:
+		case K_DOWNARROW:
 			cursor_prev    = m->cursor;
 			m->cursor_prev = m->cursor;
 			m->cursor++;
