@@ -1286,12 +1286,22 @@ ClientHandicap
 float ClientHandicap( gclient_t *client ) {
 	char	userinfo[MAX_INFO_STRING];
 	float	handicap;
+	int		clientNum;
 
 	if (!client) {
 		return 100;
 	}
 
-	trap_GetUserinfo( client - level.clients, userinfo, sizeof(userinfo) );
+	clientNum = client - level.clients;
+
+#ifdef TA_SP // HANDICAP
+	if (g_singlePlayer.integer && !(g_entities[clientNum].r.svFlags & SVF_BOT)) {
+		// Humans don't use handicap in single player.
+		return 100;
+	}
+#endif
+
+	trap_GetUserinfo( clientNum, userinfo, sizeof(userinfo) );
 
 	handicap = atof( Info_ValueForKey( userinfo, "handicap" ) );
 	if ( handicap < 1 || handicap > 100) {

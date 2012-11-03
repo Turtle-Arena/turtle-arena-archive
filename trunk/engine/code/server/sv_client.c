@@ -1324,14 +1324,6 @@ void SV_UserinfoChanged( client_t *cl ) {
 			cl->rate = 3000;
 		}
 	}
-#ifdef TA_SP // HANDICAP
-	// ZTM: TODO: Move this to game!
-	if (Com_GameIsSinglePlayer() && cl->netchan.remoteAddress.type != NA_BOT)
-	{
-		// Humans do not use handicap in single player
-		Info_SetValueForKey( cl->userinfo, "handicap", "100" );
-	}
-#endif
 
 	// snaps command
 	val = Info_ValueForKey (cl->userinfo, "snaps");
