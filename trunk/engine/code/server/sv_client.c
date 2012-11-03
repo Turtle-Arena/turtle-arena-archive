@@ -299,8 +299,6 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	if (owner->state >= CS_PRIMED) {
 		Com_DPrintf( "Going from CS_FREE to CS_PRIMED for %s\n", newcl->name );
 		newcl->state = CS_PRIMED;
-		newcl->pureAuthentic = owner->pureAuthentic;
-		newcl->gotCP = owner->gotCP;
 
 		// when we receive the first packet from the client, we will
 		// notice that it is from a different serverid and that the
@@ -774,8 +772,6 @@ static void SV_SendClientGameState( client_t *client ) {
  	Com_DPrintf ("SV_SendClientGameState() for %s\n", client->name);
 	Com_DPrintf( "Going from CS_CONNECTED to CS_PRIMED for %s\n", client->name );
 	client->state = CS_PRIMED;
-	client->pureAuthentic = 0;
-	client->gotCP = qfalse;
 
 	// when we receive the first packet from the client, we will
 	// notice that it is from a different serverid and that the
@@ -792,8 +788,6 @@ static void SV_SendClientGameState( client_t *client ) {
 		Com_DPrintf ("SV_SendClientGameState() for %s\n", lc->name);
 		Com_DPrintf( "Going from CS_CONNECTED to CS_PRIMED for %s\n", lc->name );
 		lc->state = CS_PRIMED;
-		lc->pureAuthentic = 0;
-		lc->gotCP = qfalse;
 
 		// when we receive the first packet from the client, we will
 		// notice that it is from a different serverid and that the
@@ -848,9 +842,6 @@ static void SV_SendClientGameState( client_t *client ) {
 			MSG_WriteLong( &msg, -1);
 		}
 	}
-
-	// write the checksum feed
-	MSG_WriteLong( &msg, sv.checksumFeed);
 
 	// deliver this to the client
 	SV_SendMessageToClient( &msg, client );
@@ -1298,188 +1289,6 @@ static void SV_Disconnect_f( client_t *cl ) {
 
 /*
 =================
-SV_VerifyPaks_f
-
-If we are pure, disconnect the client if they do no meet the following conditions:
-
-1. the first two checksums match our view of cgame and ui
-2. there are no any additional checksums that we do not have
-
-This routine would be a bit simpler with a goto but i abstained
-
-=================
-*/
-static void SV_VerifyPaks_f( client_t *cl ) {
-	int nChkSum1, nChkSum2, nClientPaks, nServerPaks, i, j, nCurArg;
-	int nClientChkSum[1024];
-	int nServerChkSum[1024];
-	const char *pPaks, *pArg;
-	qboolean bGood = qtrue;
-
-	// if we are pure, we "expect" the client to load certain things from 
-	// certain pk3 files, namely we want the client to have loaded the
-	// ui and cgame that we think should be loaded based on the pure setting
-	//
-	if ( sv_pure->integer != 0 ) {
-
-		nChkSum1 = nChkSum2 = 0;
-		// we run the game, so determine which cgame and ui the client "should" be running
-		bGood = (FS_FileIsInPAK("vm/cgame.qvm", &nChkSum1) == 1);
-		if (bGood)
-			bGood = (FS_FileIsInPAK("vm/ui.qvm", &nChkSum2) == 1);
-
-		nClientPaks = Cmd_Argc();
-
-		// start at arg 2 ( skip serverId cl_paks )
-		nCurArg = 1;
-
-		pArg = Cmd_Argv(nCurArg++);
-		if(!pArg) {
-			bGood = qfalse;
-		}
-		else
-		{
-			// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=475
-			// we may get incoming cp sequences from a previous checksumFeed, which we need to ignore
-			// since serverId is a frame count, it always goes up
-			if (atoi(pArg) < sv.checksumFeedServerId)
-			{
-				Com_DPrintf("ignoring outdated cp command from client %s\n", cl->name);
-				return;
-			}
-		}
-	
-		// we basically use this while loop to avoid using 'goto' :)
-		while (bGood) {
-
-			// must be at least 6: "cl_paks cgame ui @ firstref ... numChecksums"
-			// numChecksums is encoded
-			if (nClientPaks < 6) {
-				bGood = qfalse;
-				break;
-			}
-			// verify first to be the cgame checksum
-			pArg = Cmd_Argv(nCurArg++);
-			if (!pArg || *pArg == '@' || atoi(pArg) != nChkSum1 ) {
-				bGood = qfalse;
-				break;
-			}
-			// verify the second to be the ui checksum
-			pArg = Cmd_Argv(nCurArg++);
-			if (!pArg || *pArg == '@' || atoi(pArg) != nChkSum2 ) {
-				bGood = qfalse;
-				break;
-			}
-			// should be sitting at the delimeter now
-			pArg = Cmd_Argv(nCurArg++);
-			if (*pArg != '@') {
-				bGood = qfalse;
-				break;
-			}
-			// store checksums since tokenization is not re-entrant
-			for (i = 0; nCurArg < nClientPaks; i++) {
-				nClientChkSum[i] = atoi(Cmd_Argv(nCurArg++));
-			}
-
-			// store number to compare against (minus one cause the last is the number of checksums)
-			nClientPaks = i - 1;
-
-			// make sure none of the client check sums are the same
-			// so the client can't send 5 the same checksums
-			for (i = 0; i < nClientPaks; i++) {
-				for (j = 0; j < nClientPaks; j++) {
-					if (i == j)
-						continue;
-					if (nClientChkSum[i] == nClientChkSum[j]) {
-						bGood = qfalse;
-						break;
-					}
-				}
-				if (bGood == qfalse)
-					break;
-			}
-			if (bGood == qfalse)
-				break;
-
-			// get the pure checksums of the pk3 files loaded by the server
-			pPaks = FS_LoadedPakPureChecksums();
-			Cmd_TokenizeString( pPaks );
-			nServerPaks = Cmd_Argc();
-			if (nServerPaks > 1024)
-				nServerPaks = 1024;
-
-			for (i = 0; i < nServerPaks; i++) {
-				nServerChkSum[i] = atoi(Cmd_Argv(i));
-			}
-
-			// check if the client has provided any pure checksums of pk3 files not loaded by the server
-			for (i = 0; i < nClientPaks; i++) {
-				for (j = 0; j < nServerPaks; j++) {
-					if (nClientChkSum[i] == nServerChkSum[j]) {
-						break;
-					}
-				}
-				if (j >= nServerPaks) {
-					bGood = qfalse;
-					break;
-				}
-			}
-			if ( bGood == qfalse ) {
-				break;
-			}
-
-			// check if the number of checksums was correct
-			nChkSum1 = sv.checksumFeed;
-			for (i = 0; i < nClientPaks; i++) {
-				nChkSum1 ^= nClientChkSum[i];
-			}
-			nChkSum1 ^= nClientPaks;
-			if (nChkSum1 != nClientChkSum[nClientPaks]) {
-				bGood = qfalse;
-				break;
-			}
-
-			// break out
-			break;
-		}
-
-		cl->gotCP = qtrue;
-
-		if (bGood) {
-			cl->pureAuthentic = 1;
-
-			// Copy pure info to extra local clients
-			for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-				if (!cl->localClients[i]) {
-					continue;
-				}
-
-				cl->localClients[i]->gotCP = qtrue;
-				cl->localClients[i]->pureAuthentic = 1;
-			}
-		} 
-		else {
-			cl->pureAuthentic = 0;
-			cl->lastSnapshotTime = 0;
-			cl->state = CS_ACTIVE;
-			SV_SendClientSnapshot( cl );
-			SV_DropClient( cl, "Unpure client detected. Invalid .PK3 files referenced!" );
-		}
-	}
-}
-
-/*
-=================
-SV_ResetPureClient_f
-=================
-*/
-static void SV_ResetPureClient_f( client_t *cl ) {
-	cl->pureAuthentic = 0;
-	cl->gotCP = qfalse;
-}
-
-/*
-=================
 SV_UserinfoChanged
 
 Pull specific info from a newly changed userinfo string
@@ -1516,22 +1325,11 @@ void SV_UserinfoChanged( client_t *cl ) {
 		}
 	}
 #ifdef TA_SP // HANDICAP
+	// ZTM: TODO: Move this to game!
 	if (Com_GameIsSinglePlayer() && cl->netchan.remoteAddress.type != NA_BOT)
 	{
 		// Humans do not use handicap in single player
 		Info_SetValueForKey( cl->userinfo, "handicap", "100" );
-	}
-	else
-	{
-#endif
-	val = Info_ValueForKey (cl->userinfo, "handicap");
-	if (strlen(val)) {
-		i = atoi(val);
-		if (i<=0 || i>100 || strlen(val) > 4) {
-			Info_SetValueForKey( cl->userinfo, "handicap", "100" );
-		}
-	}
-#ifdef TA_SP
 	}
 #endif
 
@@ -1835,8 +1633,6 @@ static ucmd_t ucmds[] = {
 	{"dropin3", SV_DropIn3_f},
 	{"dropin4", SV_DropIn4_f},
 	{"disconnect", SV_Disconnect_f},
-	{"cp", SV_VerifyPaks_f},
-	{"vdr", SV_ResetPureClient_f},
 	{"download", SV_BeginDownload_f},
 	{"nextdl", SV_NextDownload_f},
 	{"stopdl", SV_StopDownload_f},
@@ -1995,10 +1791,8 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, client_t *enc
 		return;
 	}
 
-	// use the checksum feed in the key
-	key = sv.checksumFeed;
-	// also use the message acknowledge
-	key ^= encoder->messageAcknowledge;
+	// use the message acknowledge in the key
+	key = encoder->messageAcknowledge;
 	// also use the last acknowledged server command in the key
 	key ^= MSG_HashKey(encoder->reliableCommands[ encoder->reliableAcknowledge & (MAX_RELIABLE_COMMANDS-1) ], 32);
 
@@ -2013,31 +1807,11 @@ static void SV_UserMove( client_t *cl, msg_t *msg, qboolean delta, client_t *enc
 	// save time for ping calculation
 	cl->frames[ cl->messageAcknowledge & PACKET_MASK ].messageAcked = svs.time;
 
-	// TTimo
-	// catch the no-cp-yet situation before SV_ClientEnterWorld
-	// if CS_ACTIVE, then it's time to trigger a new gamestate emission
-	// if not, then we are getting remaining parasite usermove commands, which we should ignore
-	if (sv_pure->integer != 0 && cl->pureAuthentic == 0 && !cl->gotCP) {
-		if (cl->state == CS_ACTIVE)
-		{
-			// we didn't get a cp yet, don't assume anything and just send the gamestate all over again
-			Com_DPrintf( "%s: didn't get cp command, resending gamestate\n", cl->name);
-			SV_SendClientGameState( cl );
-		}
-		return;
-	}			
-	
 	// if this is the first usercmd we have received
 	// this gamestate, put the client into the world
 	if ( cl->state == CS_PRIMED ) {
 		SV_ClientEnterWorld( cl, &cmds[0] );
 		// the moves can be processed normaly
-	}
-	
-	// a bad cp command was sent, drop the client
-	if (sv_pure->integer != 0 && cl->pureAuthentic == 0) {		
-		SV_DropClient( cl, "Cannot validate pure client!");
-		return;
 	}
 
 	if ( cl->state != CS_ACTIVE ) {

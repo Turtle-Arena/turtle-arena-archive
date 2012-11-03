@@ -115,15 +115,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define TEAM_OVERLAY_MAXLOCATION_WIDTH	16
 
 #ifndef TA_PLAYERSYS // Moved to bg_misc.h
-#define	DEFAULT_MODEL			"sarge"
-#ifdef MISSIONPACK
-#define	DEFAULT_TEAM_MODEL		"james"
-#define	DEFAULT_TEAM_HEAD		"*james"
-#else
-#define	DEFAULT_TEAM_MODEL		"sarge"
-#define	DEFAULT_TEAM_HEAD		"sarge"
-#endif
-
 typedef enum {
 	FOOTSTEP_NORMAL,
 	FOOTSTEP_BOOT,

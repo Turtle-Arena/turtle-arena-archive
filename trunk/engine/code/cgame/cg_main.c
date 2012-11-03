@@ -526,6 +526,8 @@ void CG_RegisterCvars( void ) {
 			cv->defaultString, cv->cvarFlags );
 	}
 
+	BG_RegisterClientCvars(CG_MaxSplitView());
+
 	// see if we are also running the server on this machine
 	trap_Cvar_VariableStringBuffer( "sv_running", var, sizeof( var ) );
 	cgs.localServer = atoi( var );
@@ -536,14 +538,6 @@ void CG_RegisterCvars( void ) {
 #ifdef MISSIONPACK
 	redTeamNameModificationCount = cg_redTeamName.modificationCount;
 	blueTeamNameModificationCount = cg_blueTeamName.modificationCount;
-#endif
-
-#ifndef IOQ3ZTM
-	// ZTM: FIXME: Add extra local clients, or can this be safely removed?
-	trap_Cvar_Register(NULL, "model", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "headmodel", DEFAULT_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "team_model", DEFAULT_TEAM_MODEL, CVAR_USERINFO | CVAR_ARCHIVE );
-	trap_Cvar_Register(NULL, "team_headmodel", DEFAULT_TEAM_HEAD, CVAR_USERINFO | CVAR_ARCHIVE );
 #endif
 }
 

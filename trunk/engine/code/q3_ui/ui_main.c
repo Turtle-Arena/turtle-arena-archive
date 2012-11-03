@@ -325,6 +325,8 @@ void UI_RegisterCvars( void ) {
 	for ( i = 0, cv = cvarTable ; i < cvarTableSize ; i++, cv++ ) {
 		trap_Cvar_Register( cv->vmCvar, cv->cvarName, cv->defaultString, cv->cvarFlags );
 	}
+
+	BG_RegisterClientCvars(UI_MaxSplitView());
 }
 
 /*

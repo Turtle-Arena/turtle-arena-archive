@@ -614,8 +614,8 @@ qboolean FS_Initialized( void );
 void	FS_InitFilesystem ( void );
 void	FS_Shutdown( qboolean closemfp );
 
-qboolean FS_ConditionalRestart(int checksumFeed, qboolean disconnect);
-void	FS_Restart( int checksumFeed );
+qboolean FS_ConditionalRestart(qboolean disconnect);
+void	FS_Restart( void );
 // shutdown and restart the filesystem so changes to fs_gamedir can take effect
 
 void FS_AddGameDirectory( const char *path, const char *dir );
@@ -657,9 +657,6 @@ long		FS_FOpenFileRead( const char *qpath, fileHandle_t *file, qboolean uniqueFI
 // FS_FCloseFile instead of fclose, otherwise the pak FILE would be improperly closed
 // It is generally safe to always set uniqueFILE to true, because the majority of
 // file IO goes through FS_ReadFile, which Does The Right Thing already.
-
-int		FS_FileIsInPAK(const char *filename, int *pChecksum );
-// returns 1 if a file is in the PAK file, otherwise -1
 
 int		FS_Write( const void *buffer, int len, fileHandle_t f );
 
@@ -709,16 +706,13 @@ qboolean FS_FilenameCompare( const char *s1, const char *s2 );
 
 const char *FS_LoadedPakNames( void );
 const char *FS_LoadedPakChecksums( void );
-const char *FS_LoadedPakPureChecksums( void );
 // Returns a space separated string containing the checksums of all loaded pk3 files.
 // Servers with sv_pure set will get this string and pass it to clients.
 
 const char *FS_ReferencedPakNames( void );
 const char *FS_ReferencedPakChecksums( void );
-const char *FS_ReferencedPakPureChecksums( void );
-// Returns a space separated string containing the checksums of all loaded 
-// AND referenced pk3 files. Servers with sv_pure set will get this string 
-// back from clients for pure validation 
+// Returns a space separated string containing the checksums of all referenced pk3 files.
+// The server will send this to the clients so they can check which files should be auto-downloaded.
 
 void FS_ClearPakReferences( int flags );
 // clears referenced booleans on loaded pk3s
@@ -828,7 +822,7 @@ void 		QDECL Com_Printf( const char *fmt, ... ) __attribute__ ((format (printf, 
 void 		QDECL Com_DPrintf( const char *fmt, ... ) __attribute__ ((format (printf, 1, 2)));
 void 		QDECL Com_Error( int code, const char *fmt, ... ) __attribute__ ((noreturn, format(printf, 2, 3)));
 void 		Com_Quit_f( void ) __attribute__ ((noreturn));
-void		Com_GameRestart(int checksumFeed, qboolean disconnect);
+void		Com_GameRestart(qboolean disconnect);
 
 int			Com_Milliseconds( void );	// will be journaled properly
 unsigned	Com_BlockChecksum( const void *buffer, int length );
