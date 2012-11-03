@@ -305,7 +305,9 @@ static int QDECL SV_QsortEntityNumbers( const void *a, const void *b ) {
 SV_AddEntToSnapshot
 ===============
 */
-static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapshotEntityNumbers_t *eNums ) {
+static void SV_AddEntToSnapshot( clientSnapshot_t *frame, svEntity_t *svEnt, sharedEntity_t *gEnt, snapshotEntityNumbers_t *eNums ) {
+	int i;
+
 	// if we have already added this entity to this snapshot, don't add again
 	if ( svEnt->snapshotCounter == sv.snapshotCounter ) {
 		return;
@@ -314,6 +316,17 @@ static void SV_AddEntToSnapshot( svEntity_t *svEnt, sharedEntity_t *gEnt, snapsh
 
 	// if we are full, silently discard entities
 	if ( eNums->numSnapshotEntities == MAX_SNAPSHOT_ENTITIES ) {
+		return;
+	}
+
+	// check if game wants to send entity to one of these clients
+	for (i = 0; i < frame->numPSs; i++) {
+		if ( (qboolean)VM_Call( gvm, GAME_SNAPSHOT_CALLBACK, gEnt->s.number, frame->pss[i].clientNum ) ) {
+			break;
+		}
+	}
+
+	if (i == frame->numPSs) {
 		return;
 	}
 
@@ -418,7 +431,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 
 		// broadcast entities are always sent
 		if ( ent->r.svFlags & SVF_BROADCAST ) {
-			SV_AddEntToSnapshot( svEnt, ent, eNums );
+			SV_AddEntToSnapshot( frame, svEnt, ent, eNums );
 			continue;
 		}
 
@@ -464,7 +477,7 @@ static void SV_AddEntitiesVisibleFromPoint( vec3_t origin, clientSnapshot_t *fra
 		}
 
 		// add it
-		SV_AddEntToSnapshot( svEnt, ent, eNums );
+		SV_AddEntToSnapshot( frame, svEnt, ent, eNums );
 
 		// if it's a portal entity, add everything visible from its camera position
 		if ( ent->r.svFlags & SVF_PORTAL ) {

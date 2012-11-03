@@ -86,6 +86,12 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
+	case CG_WANTSBINDKEYS:
+#ifdef MISSIONPACK
+		return Display_WantsBindKeys();
+#else
+		return qfalse;
+#endif
 	default:
 		CG_Error( "vmMain: unknown command %i", command );
 		break;

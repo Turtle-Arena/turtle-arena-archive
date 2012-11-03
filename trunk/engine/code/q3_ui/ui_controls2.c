@@ -309,7 +309,6 @@ typedef struct
 	menutext_s			selectjoy;
 	menuslider_s		joythreshold;
 	int					section;
-	qboolean			waitingforkey;
 	char				playerModel[64];
 	vec3_t				playerViewangles;
 	vec3_t				playerMoveangles;
@@ -329,6 +328,8 @@ typedef struct
 } controls_t; 	
 
 static controls_t s_controls;
+
+static qboolean waitingforkey = qfalse;
 
 #ifndef IOQ3ZTM
 static vec4_t controls_binding_color  = {1.00f, 0.43f, 0.00f, 1.00f};
@@ -1136,7 +1137,7 @@ static void Controls_Update( void ) {
 		control->bottom = y + SMALLCHAR_HEIGHT;
 	}
 
-	if( s_controls.waitingforkey ) {
+	if( waitingforkey ) {
 		// disable everybody
 		for( i = 0; i < s_controls.menu.nitems; i++ ) {
 			((menucommon_s*)(s_controls.menu.items[i]))->flags |= QMF_GRAYED;
@@ -1259,7 +1260,7 @@ static void Controls_DrawKeyBinding( void *self )
 		UI_DrawString( x - SMALLCHAR_WIDTH, y, g_bindings[a->generic.id].label, UI_RIGHT|UI_SMALLFONT, text_color_highlight );
 		UI_DrawString( x + SMALLCHAR_WIDTH, y, name, UI_LEFT|UI_SMALLFONT|UI_PULSE, text_color_highlight );
 
-		if (s_controls.waitingforkey)
+		if (waitingforkey)
 		{
 			UI_DrawChar( x, y, '=', UI_CENTER|UI_BLINK|UI_SMALLFONT, text_color_highlight);
 			UI_DrawString(SCREEN_WIDTH * 0.50, SCREEN_HEIGHT * 0.80, "Waiting for new key ... ESCAPE to cancel", UI_SMALLFONT|UI_CENTER|UI_PULSE, colorWhite );
@@ -1572,7 +1573,7 @@ static sfxHandle_t Controls_MenuKey( int key )
 	bind_t*		bindptr;
 	found = qfalse;
 
-	if (!s_controls.waitingforkey)
+	if (!waitingforkey)
 	{
 		switch (key)
 		{
@@ -1607,7 +1608,7 @@ static sfxHandle_t Controls_MenuKey( int key )
 		switch (key)
 		{
 			case K_ESCAPE:
-				s_controls.waitingforkey = qfalse;
+				waitingforkey = qfalse;
 				Controls_Update();
 				return (menu_out_sound);
 	
@@ -1682,7 +1683,7 @@ static sfxHandle_t Controls_MenuKey( int key )
 		}
 	}				
 		
-	s_controls.waitingforkey = qfalse;
+	waitingforkey = qfalse;
 
 	if (found)
 	{	
@@ -1845,9 +1846,9 @@ static void Controls_ActionEvent( void* ptr, int event )
 	}
 	else
 #endif
-	if ((event == QM_ACTIVATED) && !s_controls.waitingforkey)
+	if ((event == QM_ACTIVATED) && !waitingforkey)
 	{
-		s_controls.waitingforkey = 1;
+		waitingforkey = qtrue;
 		Controls_Update();
 	}
 }
@@ -2608,6 +2609,15 @@ static void Controls_MenuInit( int localClient )
 	Controls_Update();
 }
 
+
+/*
+=================
+Controls_WantsBindKeys
+=================
+*/
+qboolean Controls_WantsBindKeys( void ) {
+	return waitingforkey;
+}
 
 /*
 =================

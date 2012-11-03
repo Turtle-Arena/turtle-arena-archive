@@ -263,6 +263,7 @@ static int gameCvarTableSize = ARRAY_LEN( gameCvarTable );
 void G_InitGame( int levelTime, int randomSeed, int restart );
 void G_RunFrame( int levelTime );
 void G_ShutdownGame( int restart );
+qboolean G_SnapshotCallback( int entityNum, int clientNum );
 void CheckExitRules( void );
 
 
@@ -306,6 +307,8 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return 0;
 	case GAME_CONSOLE_COMMAND:
 		return ConsoleCommand();
+	case GAME_SNAPSHOT_CALLBACK:
+		return G_SnapshotCallback( arg0, arg1 );
 	case BOTAI_START_FRAME:
 		return BotAIStartFrame( arg0 );
 	}
@@ -716,6 +719,22 @@ void G_ShutdownGame( int restart ) {
 }
 
 
+/*
+=================
+G_SnapshotCallback
+=================
+*/
+qboolean G_SnapshotCallback( int entityNum, int clientNum ) {
+	gentity_t *ent;
+
+	ent = &g_entities[ entityNum ];
+
+	if ( ent->snapshotCallback ) {
+		return ent->snapshotCallback( ent, &g_entities[ clientNum ] );
+	}
+
+	return qtrue;
+}
 
 //===================================================================
 

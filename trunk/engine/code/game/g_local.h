@@ -179,6 +179,7 @@ struct gentity_s {
 	void		(*use)(gentity_t *self, gentity_t *other, gentity_t *activator);
 	void		(*pain)(gentity_t *self, gentity_t *attacker, int damage);
 	void		(*die)(gentity_t *self, gentity_t *inflictor, gentity_t *attacker, int damage, int mod);
+	qboolean	(*snapshotCallback)(gentity_t *self, gentity_t *client);
 
 	int			pain_debounce_time;
 	int			fly_sound_debounce_time;	// wind tunnel
