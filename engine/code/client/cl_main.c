@@ -835,8 +835,6 @@ void CL_Record_f( void ) {
 	for ( i = 0; i < MAX_SPLITVIEW; i++ ) {
 		MSG_WriteLong(&buf, clc.clientNums[i]);
 	}
-	// write the checksum feed
-	MSG_WriteLong(&buf, clc.checksumFeed);
 
 	// finished writing the client packet
 	MSG_WriteByte( &buf, svc_EOF );
@@ -1411,7 +1409,7 @@ static void CL_OldGame(void)
 		// change back to previous fs_game
 		cls.oldGameSet = qfalse;
 		Cvar_Set2("fs_game", cls.oldGame, qtrue);
-		FS_ConditionalRestart(clc.checksumFeed, qfalse);
+		FS_ConditionalRestart(qfalse);
 	}
 }
 
@@ -1887,29 +1885,6 @@ void CL_Rcon_f( void ) {
 
 /*
 =================
-CL_SendPureChecksums
-=================
-*/
-void CL_SendPureChecksums( void ) {
-	char cMsg[MAX_INFO_VALUE];
-
-	// if we are pure we need to send back a command with our referenced pk3 checksums
-	Com_sprintf(cMsg, sizeof(cMsg), "cp %d %s", cl.serverId, FS_ReferencedPakPureChecksums());
-
-	CL_AddReliableCommand(cMsg, qfalse);
-}
-
-/*
-=================
-CL_ResetPureClientAtServer
-=================
-*/
-void CL_ResetPureClientAtServer( void ) {
-	CL_AddReliableCommand("vdr", qfalse);
-}
-
-/*
-=================
 CL_Vid_Restart_f
 
 Restart the video subsystem
@@ -1931,7 +1906,7 @@ void CL_Vid_Restart_f( void ) {
 	// don't let them loop during the restart
 	S_StopAllSounds();
 
-	if(!FS_ConditionalRestart(clc.checksumFeed, qtrue))
+	if(!FS_ConditionalRestart(qtrue))
 	{
 		// if not running a server clear the whole hunk
 		if(com_sv_running->integer)
@@ -1951,11 +1926,9 @@ void CL_Vid_Restart_f( void ) {
 		CL_ShutdownCGame();
 		// shutdown the renderer and clear the renderer interface
 		CL_ShutdownRef();
-		// client is no longer pure untill new checksums are sent
-		CL_ResetPureClientAtServer();
 		// clear pak references
 		FS_ClearPakReferences( FS_UI_REF | FS_CGAME_REF );
-		// reinitialize the filesystem if the game directory or checksum has changed
+		// reinitialize the filesystem if the game directory has changed
 
 		cls.rendererStarted = qfalse;
 		cls.uiStarted = qfalse;
@@ -1976,8 +1949,6 @@ void CL_Vid_Restart_f( void ) {
 		{
 			cls.cgameStarted = qtrue;
 			CL_InitCGame();
-			// send pure checksums
-			CL_SendPureChecksums();
 		}
 	}
 }
@@ -2086,7 +2057,7 @@ void CL_DownloadsComplete( void ) {
 		CL_cURL_Shutdown();
 		if( clc.cURLDisconnected ) {
 			if(clc.downloadRestart) {
-				FS_Restart(clc.checksumFeed);
+				FS_Restart();
 				clc.downloadRestart = qfalse;
 			}
 			clc.cURLDisconnected = qfalse;
@@ -2100,7 +2071,7 @@ void CL_DownloadsComplete( void ) {
 	if (clc.downloadRestart) {
 		clc.downloadRestart = qfalse;
 
-		FS_Restart(clc.checksumFeed); // We possibly downloaded a pak, restart the file system to load it
+		FS_Restart(); // We possibly downloaded a pak, restart the file system to load it
 
 		// inform the server so we get new gamestate info
 		CL_AddReliableCommand("donedl", qfalse);
@@ -2134,9 +2105,6 @@ void CL_DownloadsComplete( void ) {
 	// initialize the CGame
 	cls.cgameStarted = qtrue;
 	CL_InitCGame();
-
-	// set pure checksums
-	CL_SendPureChecksums();
 
 	CL_WritePacket();
 	CL_WritePacket();
@@ -3434,7 +3402,6 @@ void CL_InitRef( void ) {
 	ri.FS_WriteFile = FS_WriteFile;
 	ri.FS_FreeFileList = FS_FreeFileList;
 	ri.FS_ListFiles = FS_ListFiles;
-	ri.FS_FileIsInPAK = FS_FileIsInPAK;
 	ri.FS_FileExists = FS_FileExists;
 	ri.Cvar_Get = Cvar_Get;
 	ri.Cvar_Set = Cvar_Set;
@@ -3744,13 +3711,6 @@ void CL_Init( void ) {
 
 	cl_serverStatusResendTime = Cvar_Get ("cl_serverStatusResendTime", "750", 0);
 
-#ifndef TA_WEAPSYS_EX
-	// init autoswitch so the ui will have it correctly even
-	// if the cgame hasn't been started
-	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
-		Cvar_Get (Com_LocalClientCvarName(i, "cg_autoswitch"), "1", CVAR_ARCHIVE);
-	}
-#endif
 
 	m_pitch = Cvar_Get ("m_pitch", "0.022", CVAR_ARCHIVE);
 	m_yaw = Cvar_Get ("m_yaw", "0.022", CVAR_ARCHIVE);
@@ -3815,138 +3775,6 @@ void CL_Init( void ) {
 	Cvar_Get ("snaps", "20", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 	Cvar_Get ("cl_anonymous", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
 	Cvar_Get ("password", "", CVAR_USERINFO_ALL);
-	Cvar_Get ("cg_predictItems", "1", CVAR_USERINFO_ALL | CVAR_ARCHIVE );
-
-	// Main local client userinfo
-	Cvar_Get ("name", "UnnamedPlayer", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifdef TURTLEARENA // DEFAULT_PLAYER
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("spmodel", "leo", CVAR_USERINFO | CVAR_ROM );
-	Cvar_Get ("spheadmodel", "", CVAR_USERINFO | CVAR_ROM );
-#endif
-	Cvar_Get ("model", "leo", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("team_model", "leo", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
-#endif
-#else
-	Cvar_Get ("model", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("headmodel", "", CVAR_USERINFO | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("headmodel", "sarge", CVAR_USERINFO | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("team_model", "james", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("team_headmodel", "*james", CVAR_USERINFO | CVAR_ARCHIVE );
-#endif
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("color1",  "5", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("color2", "4", CVAR_USERINFO | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("color1",  "4", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("color2", "5", CVAR_USERINFO | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("handicap", "100", CVAR_USERINFO | CVAR_ARCHIVE );
-	Cvar_Get ("teamtask", "0", CVAR_USERINFO );
-
-#if CL_MAX_SPLITVIEW > 1
-	// Second local client userinfo
-	Cvar_Get ("2name", "UnnamedPlayer2", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("2spmodel", "don", CVAR_USERINFO2 | CVAR_ROM );
-	Cvar_Get ("2spheadmodel", "", CVAR_USERINFO2 | CVAR_ROM );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("2model", "don", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("2model", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("2headmodel", "", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("2headmodel", "grunt", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("2team_model", "james", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2team_headmodel", "*james", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("2color1", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2color2", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("2color1", "4", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2color2", "5", CVAR_USERINFO2 | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("2handicap", "100", CVAR_USERINFO2 | CVAR_ARCHIVE );
-	Cvar_Get ("2teamtask", "0", CVAR_USERINFO2 );
-#endif
-
-#if CL_MAX_SPLITVIEW > 2
-	// Third local client userinfo
-	Cvar_Get ("3name", "UnnamedPlayer3", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("3spmodel", "raph", CVAR_USERINFO3 | CVAR_ROM );
-	Cvar_Get ("3spheadmodel", "", CVAR_USERINFO3 | CVAR_ROM );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("3model", "raph", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("3model", "major", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("3headmodel", "", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("3headmodel", "major", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("3team_model", "janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3team_headmodel", "*janet", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("3color1", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3color2", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("3color1", "4", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3color2", "5", CVAR_USERINFO3 | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("3handicap", "100", CVAR_USERINFO3 | CVAR_ARCHIVE );
-	Cvar_Get ("3teamtask", "0", CVAR_USERINFO3 );
-#endif
-
-#if CL_MAX_SPLITVIEW > 3
-	// Fourth local client userinfo
-	Cvar_Get ("4name", "UnnamedPlayer4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#ifdef TA_SP // SPMODEL
-	Cvar_Get ("4spmodel", "mike", CVAR_USERINFO4 | CVAR_ROM );
-	Cvar_Get ("4spheadmodel", "", CVAR_USERINFO4 | CVAR_ROM );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("4model", "mike", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("4model", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-#ifdef IOQ3ZTM // BLANK_HEADMODEL
-	Cvar_Get ("4headmodel", "", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("4headmodel", "visor", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-#ifndef IOQ3ZTM_NO_TEAM_MODEL
-	Cvar_Get ("4team_model", "janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4team_headmodel", "*janet", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-#ifdef TURTLEARENA
-	Cvar_Get ("4color1", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4color2", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#else
-	Cvar_Get ("4color1", "4", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4color2", "5", CVAR_USERINFO4 | CVAR_ARCHIVE );
-#endif
-	Cvar_Get ("4handicap", "100", CVAR_USERINFO4 | CVAR_ARCHIVE );
-	Cvar_Get ("4teamtask", "0", CVAR_USERINFO4 );
-#endif
 
 #ifdef USE_MUMBLE
 	cl_useMumble = Cvar_Get ("cl_useMumble", "0", CVAR_ARCHIVE | CVAR_LATCH);
@@ -3982,12 +3810,6 @@ void CL_Init( void ) {
 		Cvar_Set("cl_voip", "0");
 	}
 #endif
-
-
-	// cgame might not be initialized before menu is used
-	Cvar_Get ("cg_viewsize", "100", CVAR_ARCHIVE );
-	// Make sure cg_stereoSeparation is zero as that variable is deprecated and should not be used anymore.
-	Cvar_Get ("cg_stereoSeparation", "0", CVAR_ROM);
 
 	//
 	// register our commands

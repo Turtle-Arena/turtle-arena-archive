@@ -494,9 +494,8 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	// make sure we are not paused
 	Cvar_Set("cl_paused", "0");
 
-	// get a new checksum feed and restart the file system
-	sv.checksumFeed = ( ((int) rand() << 16) ^ rand() ) ^ Com_Milliseconds();
-	FS_Restart( sv.checksumFeed );
+	// restart the file system
+	FS_Restart();
 
 	CM_LoadMap( va("maps/%s.bsp", server), qfalse, &checksum );
 
@@ -508,7 +507,6 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 	// serverid should be different each time
 	sv.serverId = com_frameTime;
 	sv.restartedServerId = sv.serverId; // I suppose the init here is just to be safe
-	sv.checksumFeedServerId = sv.serverId;
 	Cvar_Set( "sv_serverid", va("%i", sv.serverId ) );
 
 	// clear physics interaction links

@@ -2370,7 +2370,7 @@ Change to a new mod properly with cleaning up cvars before switching.
 ==================
 */
 
-void Com_GameRestart(int checksumFeed, qboolean disconnect)
+void Com_GameRestart(qboolean disconnect)
 {
 	// make sure no recursion can be triggered
 	if(!com_gameRestarting && com_fullyInitialized)
@@ -2392,7 +2392,7 @@ void Com_GameRestart(int checksumFeed, qboolean disconnect)
 			CL_Shutdown("Game directory changed", disconnect, qfalse);
 		}
 
-		FS_Restart(checksumFeed);
+		FS_Restart();
 	
 		// Clean out any user and VM created cvars
 		Cvar_Restart(qtrue);
@@ -2437,7 +2437,7 @@ void Com_GameRestart_f(void)
 	else
 		Cvar_Set("fs_game", Cmd_Argv(1));
 
-	Com_GameRestart(0, qtrue);
+	Com_GameRestart(qtrue);
 }
 
 static void Com_DetectAltivec(void)

@@ -1205,10 +1205,8 @@ void CL_WritePacket( void ) {
 		// write the command count
 		MSG_WriteByte( &buf, count );
 
-		// use the checksum feed in the key
-		key = clc.checksumFeed;
-		// also use the message acknowledge
-		key ^= clc.serverMessageSequence;
+		// use the message acknowledge in the key
+		key = clc.serverMessageSequence;
 		// also use the last acknowledged server command in the key
 		key ^= MSG_HashKey(clc.serverCommands[ clc.serverCommandSequence & (MAX_RELIABLE_COMMANDS-1) ], 32);
 

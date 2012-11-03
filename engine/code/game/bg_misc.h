@@ -1382,27 +1382,109 @@ void BG_SwingAngles( float destination, float swingTolerance, float clampToleran
 					float speed, float *angle, qboolean *swinging, int frametime );
 #endif
 
-#ifdef TA_PLAYERSYS
+
+#define DEFAULT_CLIENT_NAME		"UnnamedPlayer"
+
 #ifdef TURTLEARENA // DEFAULT_PLAYER
-#define	DEFAULT_MODEL			"raph"
+#define DEFAULT_CLIENT_COLOR1	5
+#define DEFAULT_CLIENT_COLOR2	4
+
+// Default player model names for the splitscreen clients
+#define DEFAULT_MODEL			"leo"
+#define DEFAULT_HEAD			"leo"
+
+#define DEFAULT_MODEL2			"don"
+#define DEFAULT_HEAD2			"don"
+
+#define DEFAULT_MODEL3			"raph"
+#define DEFAULT_HEAD3			"raph"
+
+#define DEFAULT_MODEL4			"mike"
+#define DEFAULT_HEAD4			"mike"
+
+// For fallback sounds
+#define DEFAULT_MODEL_MALE		"raph" // ZTM: Only raph has sounds...
 #define DEFAULT_MODEL_FEMALE	"raph" // ZTM: TODO: Add female model/sounds
-#define	DEFAULT_TEAM_MODEL		"raph"
-#define	DEFAULT_TEAM_HEAD		"raph"
-#define DEFAULT_TEAM_MODEL_FEMALE	"raph" // ZTM: TODO: Add female model/sounds
+
+// Default team player model names
+#define DEFAULT_TEAM_MODEL		DEFAULT_MODEL
+#define DEFAULT_TEAM_HEAD		DEFAULT_HEAD
+
+#define DEFAULT_TEAM_MODEL2		DEFAULT_MODEL2
+#define DEFAULT_TEAM_HEAD2		DEFAULT_HEAD2
+
+#define DEFAULT_TEAM_MODEL3		DEFAULT_MODEL3
+#define DEFAULT_TEAM_HEAD3		DEFAULT_HEAD3
+
+#define DEFAULT_TEAM_MODEL4		DEFAULT_MODEL4
+#define DEFAULT_TEAM_HEAD4		DEFAULT_HEAD4
+
+// For team fallback sounds
+#define DEFAULT_TEAM_MODEL_MALE		DEFAULT_MODEL_MALE
+#define DEFAULT_TEAM_MODEL_FEMALE	DEFAULT_MODEL_FEMALE
+
 #else // Q3
-#define	DEFAULT_MODEL			"sarge"
-#define	DEFAULT_MODEL_FEMALE	"crash"
+
+#define DEFAULT_CLIENT_COLOR1	4
+#define DEFAULT_CLIENT_COLOR2	5
+
+// Default player model names for the splitscreen clients
+#define DEFAULT_MODEL			"sarge"
+#define DEFAULT_HEAD			"sarge"
+
+#define DEFAULT_MODEL2			"grunt"
+#define DEFAULT_HEAD2			"grunt"
+
+#define DEFAULT_MODEL3			"major"
+#define DEFAULT_HEAD3			"major"
+
+#define DEFAULT_MODEL4			"visor"
+#define DEFAULT_HEAD4			"visor"
+
+// For fallback sounds
+#define DEFAULT_MODEL_MALE		"sarge"
+#define DEFAULT_MODEL_FEMALE	"major"
+
 #ifdef MISSIONPACK
-#define	DEFAULT_TEAM_MODEL		"james"
-#define	DEFAULT_TEAM_HEAD		"*james"
-#define	DEFAULT_TEAM_MODEL_FEMALE	"janet"
+// Default team player model names
+#define DEFAULT_TEAM_MODEL		"james"
+#define DEFAULT_TEAM_HEAD		"*james"
+
+#define DEFAULT_TEAM_MODEL2		"james"
+#define DEFAULT_TEAM_HEAD2		"*james"
+
+#define DEFAULT_TEAM_MODEL3		"janet"
+#define DEFAULT_TEAM_HEAD3		"*janet"
+
+#define DEFAULT_TEAM_MODEL4		"janet"
+#define DEFAULT_TEAM_HEAD4		"*janet"
+
+// For team fallback sounds
+#define DEFAULT_TEAM_MODEL_MALE		"james"
+#define DEFAULT_TEAM_MODEL_FEMALE	"janet"
 #else
-#define	DEFAULT_TEAM_MODEL		"sarge"
-#define	DEFAULT_TEAM_HEAD		"sarge"
-#define	DEFAULT_TEAM_MODEL_FEMALE	"crash"
-#endif
+// Default team player model names
+#define DEFAULT_TEAM_MODEL		DEFAULT_MODEL
+#define DEFAULT_TEAM_HEAD		DEFAULT_HEAD
+
+#define DEFAULT_TEAM_MODEL2		DEFAULT_MODEL2
+#define DEFAULT_TEAM_HEAD2		DEFAULT_HEAD2
+
+#define DEFAULT_TEAM_MODEL3		DEFAULT_MODEL3
+#define DEFAULT_TEAM_HEAD3		DEFAULT_HEAD3
+
+#define DEFAULT_TEAM_MODEL4		DEFAULT_MODEL4
+#define DEFAULT_TEAM_HEAD4		DEFAULT_HEAD4
+
+// For team fallback sounds
+#define DEFAULT_TEAM_MODEL_MALE		DEFAULT_MODEL_MALE
+#define DEFAULT_TEAM_MODEL_FEMALE	DEFAULT_MODEL_FEMALE
+#endif // MISSIONPACK
+
 #endif // TURTLEARENA
 
+
+#ifdef TA_PLAYERSYS
 // Moved footstep_t to bg_misc.h from cg_local.h
 typedef enum {
 	FOOTSTEP_NORMAL,
@@ -1941,6 +2023,10 @@ typedef struct
   const char *name;
 } dummyCmd_t;
 int cmdcmp( const void *a, const void *b );
+
+#if defined CGAME || defined UI
+void BG_RegisterClientCvars(int maxSplitview);
+#endif
 
 #define MAX_MAP_SIZE 65536
 

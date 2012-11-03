@@ -432,9 +432,8 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 			}
 
 			if (Q_stricmpn(ext, "$image", 6) == 0) {
-				filename[strlen(filename)-strlen(ext)-1] = 0;
-				if (trap_R_RegisterShaderNoMip(filename))
-				{
+				COM_StripExtension(filename, filename, length);
+ 				if (trap_R_RegisterShaderNoMip(filename)) {
 					return qtrue;
 				}
 			} else if ( CG_FileExists( filename ) ) {
@@ -459,9 +458,8 @@ static qboolean	CG_FindClientHeadFile( char *filename, int length, clientInfo_t 
 			}
 
 			if (Q_stricmpn(ext, "$image", 6) == 0) {
-				filename[strlen(filename)-strlen(ext)-1] = 0;
-				if (trap_R_RegisterShaderNoMip(filename))
-				{
+				COM_StripExtension(filename, filename, length);
+ 				if (trap_R_RegisterShaderNoMip(filename)) {
 					return qtrue;
 				}
 			} else if ( CG_FileExists( filename ) ) {
@@ -736,6 +734,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	int			i, modelloaded;
 	const char	*s;
 	char		teamname[MAX_QPATH];
+	gender_t	gender;
 
 	teamname[0] = 0;
 #if defined MISSIONPACK || defined IOQ3ZTM // Support MissionPack players.
@@ -811,7 +810,7 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 				CG_Error( "DEFAULT_TEAM_MODEL / skin (%s/%s) failed to register", DEFAULT_TEAM_MODEL, ci->skinName );
 			}
 		} else {
-			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "default", DEFAULT_MODEL, "default", teamname ) ) {
+			if ( !CG_RegisterClientModelname( ci, DEFAULT_MODEL, "default", DEFAULT_HEAD, "default", teamname ) ) {
 				CG_Error( "DEFAULT_MODEL (%s) failed to register", DEFAULT_MODEL );
 			}
 		}
@@ -871,18 +870,16 @@ static void CG_LoadClientInfo( int clientNum, clientInfo_t *ci ) {
 	// sounds
 #ifdef TA_PLAYERSYS // SOUNDPATH
 	dir = ci->playercfg.soundpath;
+	gender = ci->playercfg.gender;
 #else
 	dir = ci->modelName;
+	gender = ci->gender;
 #endif
-#ifdef TA_PLAYERSYS // Have women default to female voice
-	if (ci->playercfg.gender == GENDER_FEMALE) {
-		fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL_FEMALE : DEFAULT_MODEL_FEMALE;
+	if (cgs.gametype >= GT_TEAM) {
+		fallback = (gender == GENDER_FEMALE) ? DEFAULT_TEAM_MODEL_FEMALE : DEFAULT_TEAM_MODEL_MALE;
 	} else {
-		fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
+		fallback = (gender == GENDER_FEMALE) ? DEFAULT_MODEL_FEMALE : DEFAULT_MODEL_MALE;
 	}
-#else
-	fallback = (cgs.gametype >= GT_TEAM) ? DEFAULT_TEAM_MODEL : DEFAULT_MODEL;
-#endif
 
 	for ( i = 0 ; i < MAX_CUSTOM_SOUNDS ; i++ ) {
 		s = cg_customSoundNames[i];
