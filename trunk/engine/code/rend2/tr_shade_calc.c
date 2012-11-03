@@ -1,22 +1,30 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2005 Id Software, Inc.
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
 
-This file is part of Quake III Arena source code.
+This file is part of Spearmint Source Code.
 
-Quake III Arena source code is free software; you can redistribute it
+Spearmint Source Code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2 of the License,
+published by the Free Software Foundation; either version 3 of the License,
 or (at your option) any later version.
 
-Quake III Arena source code is distributed in the hope that it will be
+Spearmint Source Code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Quake III Arena source code; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
+
+In addition, Spearmint Source Code is also subject to certain additional terms.
+You should have received a copy of these additional terms immediately following
+the terms and conditions of the GNU General Public License.  If not, please
+request a copy in writing from id Software at the address below.
+
+If you have questions concerning this license or the applicable additional
+terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
+Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 // tr_shade_calc.c
@@ -43,6 +51,8 @@ static float *TableForFunc( genFunc_t func )
 		return tr.sawToothTable;
 	case GF_INVERSE_SAWTOOTH:
 		return tr.inverseSawToothTable;
+	case GF_NOISE:
+		return tr.noiseTable;
 	case GF_NONE:
 	default:
 		break;
@@ -709,6 +719,8 @@ float RB_CalcWaveColorSingle( const waveForm_t *wf )
 
 	if ( wf->func == GF_NOISE ) {
 		glow = wf->base + R_NoiseGet4f( 0, 0, 0, ( tess.shaderTime + wf->phase ) * wf->frequency ) * wf->amplitude;
+	} else if ( wf->func == GF_RANDOM ) {
+		glow = wf->base + R_RandomOn( (tess.shaderTime + wf->phase) * wf->frequency ) * wf->amplitude;
 	} else {
 		glow = EvalWaveForm( wf ) * tr.identityLight;
 	}

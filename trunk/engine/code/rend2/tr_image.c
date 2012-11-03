@@ -1,22 +1,30 @@
 /*
 ===========================================================================
-Copyright (C) 1999-2005 Id Software, Inc.
+Copyright (C) 1999-2010 id Software LLC, a ZeniMax Media company.
 
-This file is part of Quake III Arena source code.
+This file is part of Spearmint Source Code.
 
-Quake III Arena source code is free software; you can redistribute it
+Spearmint Source Code is free software; you can redistribute it
 and/or modify it under the terms of the GNU General Public License as
-published by the Free Software Foundation; either version 2 of the License,
+published by the Free Software Foundation; either version 3 of the License,
 or (at your option) any later version.
 
-Quake III Arena source code is distributed in the hope that it will be
+Spearmint Source Code is distributed in the hope that it will be
 useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Quake III Arena source code; if not, write to the Free Software
-Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+along with Spearmint Source Code.  If not, see <http://www.gnu.org/licenses/>.
+
+In addition, Spearmint Source Code is also subject to certain additional terms.
+You should have received a copy of these additional terms immediately following
+the terms and conditions of the GNU General Public License.  If not, please
+request a copy in writing from id Software at the address below.
+
+If you have questions concerning this license or the applicable additional
+terms, you may contact in writing id Software LLC, c/o ZeniMax Media Inc.,
+Suite 120, Rockville, Maryland 20850 USA.
 ===========================================================================
 */
 // tr_image.c
@@ -2223,16 +2231,16 @@ done:
 
 	if (flags & IMGFLAG_MIPMAP)
 	{
-		if ( textureFilterAnisotropic )
+		if ( glConfig.textureFilterAnisotropic )
 			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-					(GLint)Com_Clamp( 1, maxAnisotropy, r_ext_max_anisotropy->integer ) );
+					(GLint)Com_Clamp( 1, glConfig.maxAnisotropy, r_ext_max_anisotropy->integer ) );
 
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
 	}
 	else
 	{
-		if ( textureFilterAnisotropic )
+		if ( glConfig.textureFilterAnisotropic )
 			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1 );
 
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -2262,16 +2270,16 @@ static void EmptyTexture( int width, int height, imgType_t type, imgFlags_t flag
 
 	if (flags & IMGFLAG_MIPMAP)
 	{
-		if ( textureFilterAnisotropic )
+		if ( glConfig.textureFilterAnisotropic )
 			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT,
-					(GLint)Com_Clamp( 1, maxAnisotropy, r_ext_max_anisotropy->integer ) );
+					(GLint)Com_Clamp( 1, glConfig.maxAnisotropy, r_ext_max_anisotropy->integer ) );
 
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gl_filter_min);
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, gl_filter_max);
 	}
 	else
 	{
-		if ( textureFilterAnisotropic )
+		if ( glConfig.textureFilterAnisotropic )
 			qglTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1 );
 
 		qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -3159,114 +3167,6 @@ SKINS
 */
 
 /*
-==================
-CommaParse
-
-This is unfortunate, but the skin files aren't
-compatable with our normal parsing rules.
-==================
-*/
-static char *CommaParse( char **data_p ) {
-	int c = 0, len;
-	char *data;
-	static	char	com_token[MAX_TOKEN_CHARS];
-
-	data = *data_p;
-	len = 0;
-	com_token[0] = 0;
-
-	// make sure incoming data is valid
-	if ( !data ) {
-		*data_p = NULL;
-		return com_token;
-	}
-
-	while ( 1 ) {
-		// skip whitespace
-		while( (c = *data) <= ' ') {
-			if( !c ) {
-				break;
-			}
-			data++;
-		}
-
-
-		c = *data;
-
-		// skip double slash comments
-		if ( c == '/' && data[1] == '/' )
-		{
-			while (*data && *data != '\n')
-				data++;
-		}
-		// skip /* */ comments
-		else if ( c=='/' && data[1] == '*' ) 
-		{
-			while ( *data && ( *data != '*' || data[1] != '/' ) ) 
-			{
-				data++;
-			}
-			if ( *data ) 
-			{
-				data += 2;
-			}
-		}
-		else
-		{
-			break;
-		}
-	}
-
-	if ( c == 0 ) {
-		return "";
-	}
-
-	// handle quoted strings
-	if (c == '\"')
-	{
-		data++;
-		while (1)
-		{
-			c = *data++;
-			if (c=='\"' || !c)
-			{
-				com_token[len] = 0;
-				*data_p = ( char * ) data;
-				return com_token;
-			}
-			if (len < MAX_TOKEN_CHARS)
-			{
-				com_token[len] = c;
-				len++;
-			}
-		}
-	}
-
-	// parse a regular word
-	do
-	{
-		if (len < MAX_TOKEN_CHARS)
-		{
-			com_token[len] = c;
-			len++;
-		}
-		data++;
-		c = *data;
-	} while (c>32 && c != ',' );
-
-	if (len == MAX_TOKEN_CHARS)
-	{
-//		ri.Printf (PRINT_DEVELOPER, "Token exceeded %i chars, discarded.\n", MAX_TOKEN_CHARS);
-		len = 0;
-	}
-	com_token[len] = 0;
-
-	*data_p = ( char * ) data;
-	return com_token;
-}
-
-
-/*
 ===============
 RE_RegisterSkin
 
@@ -3283,6 +3183,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	char		*text_p;
 	char		*token;
 	char		surfName[MAX_QPATH];
+	char		shaderName[MAX_QPATH];
 
 	if ( !name || !name[0] ) {
 		ri.Printf( PRINT_DEVELOPER, "Empty name passed to RE_RegisterSkin\n" );
@@ -3337,7 +3238,7 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 	text_p = text.c;
 	while ( text_p && *text_p ) {
 		// get surface name
-		token = CommaParse( &text_p );
+		token = COM_ParseExt2( &text_p, qtrue, ',' );
 		Q_strncpyz( surfName, token, sizeof( surfName ) );
 
 		if ( !token[0] ) {
@@ -3355,11 +3256,12 @@ qhandle_t RE_RegisterSkin( const char *name ) {
 		}
 		
 		// parse the shader name
-		token = CommaParse( &text_p );
+		token = COM_ParseExt2( &text_p, qfalse, ',' );
+		Q_strncpyz( shaderName, token, sizeof( shaderName ) );
 
 		surf = skin->surfaces[ skin->numSurfaces ] = ri.Hunk_Alloc( sizeof( *skin->surfaces[0] ), h_low );
 		Q_strncpyz( surf->name, surfName, sizeof( surf->name ) );
-		surf->shader = R_FindShader( token, LIGHTMAP_NONE, qtrue );
+		surf->shader = R_FindShader( shaderName, LIGHTMAP_NONE, qtrue );
 		skin->numSurfaces++;
 	}
 
