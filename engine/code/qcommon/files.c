@@ -1264,7 +1264,7 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 #ifdef TA_NPCSYS
 						   !FS_IsExt(filename, ".npc", len) &&
 #endif
-						   Q_stricmp(filename, "qagame.qvm") != 0 &&
+						   Q_stricmp(filename, "game.qvm") != 0 &&
 						   !strstr(filename, "levelshots"))
 						{
 							pak->referenced |= FS_GENERAL_REF;

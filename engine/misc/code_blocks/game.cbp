@@ -17,7 +17,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-DQAGAME" />
+					<Add option="-DGAME" />
 					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
 					<Add option="-D_WINDOWS" />
@@ -37,9 +37,10 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add option="-Wall" />
-					<Add option="-fPIC" />
-					<Add option="-DQAGAME" />
+					<Add option="-DGAME" />
+					<Add option="-DWIN32" />
 					<Add option="-DNDEBUG" />
+					<Add option="-D_WINDOWS" />
 					<Add option="-DGLOBALRANK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
 					<Add option="-DMISSIONPACK" />
@@ -57,7 +58,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-fPIC" />
-					<Add option="-DQAGAME" />
+					<Add option="-DGAME" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DGLOBALRANK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -77,7 +78,7 @@
 					<Add option="-fPIC" />
 					<Add option="-W" />
 					<Add option="-O0" />
-					<Add option="-DQAGAME" />
+					<Add option="-DGAME" />
 					<Add option="-D_DEBUG" />
 					<Add option="-DBUILDING_REF_GL" />
 					<Add option="-DDEBUG" />
@@ -98,7 +99,7 @@
 					<Add option="-O2" />
 					<Add option="-Wall" />
 					<Add option="-fPIC" />
-					<Add option="-DQAGAME" />
+					<Add option="-DGAME" />
 					<Add option="-DNDEBUG" />
 					<Add option="-DGLOBALRANK" />
 					<Add option="-D_CRT_SECURE_NO_DEPRECATE" />
@@ -118,7 +119,7 @@
 					<Add option="-fPIC" />
 					<Add option="-W" />
 					<Add option="-O0" />
-					<Add option="-DQAGAME" />
+					<Add option="-DGAME" />
 					<Add option="-D_DEBUG" />
 					<Add option="-DBUILDING_REF_GL" />
 					<Add option="-DDEBUG" />

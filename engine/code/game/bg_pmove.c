@@ -32,7 +32,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 // takes a playerstate and a usercmd as input and returns a modifed playerstate
 
 #include "../qcommon/q_shared.h"
-#ifdef QAGAME // TA_NPCSYS
+#ifdef GAME // TA_NPCSYS
 #include "g_local.h"
 #else
 //#include ../cgame/cg_local.h"
