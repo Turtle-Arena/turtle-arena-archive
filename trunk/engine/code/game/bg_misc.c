@@ -4909,7 +4909,7 @@ void BG_AddPredictableEventToPlayerstate( int newEvent, int eventParm, playerSta
 		char buf[256];
 		trap_Cvar_VariableStringBuffer("showevents", buf, sizeof(buf));
 		if ( atof(buf) != 0 ) {
-#ifdef QAGAME
+#ifdef GAME
 			Com_Printf(" game event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm);
 #else
 			Com_Printf("Cgame event svt %5d -> %5d: num = %20s parm %d\n", ps->pmove_framecount/*ps->commandTime*/, ps->eventSequence, eventnames[newEvent], eventParm);
@@ -6712,9 +6712,9 @@ qboolean BG_LoadPlayerCFGFile(bg_playercfg_t *playercfg, const char *model, cons
 		}
 	}
 
-#if defined IOQ3ZTM && defined TA_WEAPSYS && (defined QAGAME || defined CGAME) // LASERTAG
+#if defined IOQ3ZTM && defined TA_WEAPSYS && (defined GAME || defined CGAME) // LASERTAG
 	{
-#ifdef QAGAME
+#ifdef GAME
 		extern vmCvar_t g_laserTag;
 		if (g_laserTag.integer)
 #else //if defined CGAME
@@ -6821,7 +6821,7 @@ strAnimationDef_t objectAnimationDefs[] = {
 	{ 0, NULL }
 };
 
-#ifndef QAGAME
+#ifndef GAME
 sfxHandle_t	trap_S_RegisterSound( const char *sample, qboolean compressed );
 #endif
 
@@ -6835,7 +6835,7 @@ static qboolean Sounds_Parse(char **p, const char *name, bg_sounds_t *sounds, pr
 	bg_sounddef_t *sounddef;
 	char *token;
 	int i;
-#ifndef QAGAME
+#ifndef GAME
 	int j;
 #endif
 
@@ -6903,7 +6903,7 @@ static qboolean Sounds_Parse(char **p, const char *name, bg_sounds_t *sounds, pr
 					sounddef->end = sounddef->start + MAX_RAND_SOUNDS;
 				}
 
-#ifndef QAGAME
+#ifndef GAME
 				// Load sounds
 				for (j = sounddef->start; j < sounddef->end; j++) {
 					sounddef->sounds[j-sounddef->start] = trap_S_RegisterSound(va(token, j), qfalse);
