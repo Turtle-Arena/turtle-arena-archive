@@ -428,6 +428,7 @@ extern void UI_SelectPlayer_Cache( void );
 //
 extern void UI_ControlsMenu( int localClient );
 extern void Controls_Cache( void );
+extern qboolean Controls_WantsBindKeys( void );
 
 //
 // ui_joystick.c

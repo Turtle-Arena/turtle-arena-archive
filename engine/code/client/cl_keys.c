@@ -1381,7 +1381,7 @@ CL_KeyDownEvent
 Called by CL_KeyEvent to handle a keypress
 ===================
 */
-void CL_KeyDownEvent( int key, unsigned time )
+void CL_KeyDownEvent( int key, unsigned time, qboolean onlybinds )
 {
 	keys[key].down = qtrue;
 	keys[key].repeats++;
@@ -1447,19 +1447,25 @@ void CL_KeyDownEvent( int key, unsigned time )
 
 	// distribute the key down event to the apropriate handler
 	if ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) {
-		Console_Key( key );
+		if ( !onlybinds ) {
+			Console_Key( key );
+		}
 	} else if ( Key_GetCatcher( ) & KEYCATCH_UI ) {
-		if ( uivm ) {
+		if ( uivm && ( !onlybinds || VM_Call( uivm, UI_WANTSBINDKEYS ) ) ) {
 			VM_Call( uivm, UI_KEY_EVENT, key, qtrue );
 		} 
 	} else if ( Key_GetCatcher( ) & KEYCATCH_CGAME ) {
-		if ( cgvm ) {
+		if ( cgvm && ( !onlybinds || VM_Call( cgvm, CG_WANTSBINDKEYS ) ) ) {
 			VM_Call( cgvm, CG_KEY_EVENT, key, qtrue );
 		} 
 	} else if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE ) {
-		Message_Key( key );
+		if ( !onlybinds ) {
+			Message_Key( key );
+		}
 	} else if ( clc.state == CA_DISCONNECTED ) {
-		Console_Key( key );
+		if ( !onlybinds ) {
+			Console_Key( key );
+		}
 	} else {
 		// send the bound action
 		CL_ParseBinding( key, qtrue, time );
@@ -1474,7 +1480,7 @@ CL_KeyUpEvent
 Called by CL_KeyEvent to handle a keyrelease
 ===================
 */
-void CL_KeyUpEvent( int key, unsigned time )
+void CL_KeyUpEvent( int key, unsigned time, qboolean onlybinds )
 {
 	keys[key].repeats = 0;
 	keys[key].down = qfalse;
@@ -1499,9 +1505,13 @@ void CL_KeyUpEvent( int key, unsigned time )
 		CL_ParseBinding( key, qfalse, time );
 
 	if ( Key_GetCatcher( ) & KEYCATCH_UI && uivm ) {
-		VM_Call( uivm, UI_KEY_EVENT, key, qfalse );
+		if ( !onlybinds || VM_Call( uivm, UI_WANTSBINDKEYS ) ) {
+			VM_Call( uivm, UI_KEY_EVENT, key, qfalse );
+		}
 	} else if ( Key_GetCatcher( ) & KEYCATCH_CGAME && cgvm ) {
-		VM_Call( cgvm, CG_KEY_EVENT, key, qfalse );
+		if ( !onlybinds || VM_Call( cgvm, CG_WANTSBINDKEYS ) ) {
+			VM_Call( cgvm, CG_KEY_EVENT, key, qfalse );
+		}
 	}
 }
 
@@ -1513,10 +1523,31 @@ Called by the system for both key up and key down events
 ===================
 */
 void CL_KeyEvent (int key, qboolean down, unsigned time) {
+	qboolean onlybinds = qfalse;
+
+	switch ( key ) {
+	case K_KP_PGUP:
+	case K_KP_EQUALS:
+	case K_KP_5:
+	case K_KP_LEFTARROW:
+	case K_KP_UPARROW:
+	case K_KP_RIGHTARROW:
+	case K_KP_DOWNARROW:
+	case K_KP_END:
+	case K_KP_PGDN:
+	case K_KP_INS:
+	case K_KP_DEL:
+	case K_KP_HOME:
+		if ( keys[K_KP_NUMLOCK].down ) {
+			onlybinds = qtrue;
+		}
+		break;
+	}
+
 	if( down )
-		CL_KeyDownEvent( key, time );
+		CL_KeyDownEvent( key, time, onlybinds );
 	else
-		CL_KeyUpEvent( key, time );
+		CL_KeyUpEvent( key, time, onlybinds );
 }
 
 /*
