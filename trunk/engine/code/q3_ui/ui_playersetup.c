@@ -348,24 +348,14 @@ static sfxHandle_t Character_Key( menubitmap_s *s, int key )
 	switch (key)
 	{
 		case K_KP_RIGHTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
 			curvalue++;
 			if (curvalue >= numitems)
 				curvalue = 0;
 			sound = menu_move_sound;
 			break;
-		
+
 		case K_KP_LEFTARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_LEFTARROW:
 #ifdef TA_MISC // MENU: Right Mouse button = left arrow
 		case K_MOUSE2:

@@ -569,12 +569,7 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	int		len;
 
 	// shift-insert is paste
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	if ( ( ( key == K_INS ) || ( ( key == K_KP_INS && !keys[K_KP_NUMLOCK].down ) ) ) && keys[K_SHIFT].down )
-#else
-	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down )
-#endif
-	{
+	if ( ( ( key == K_INS ) || ( key == K_KP_INS ) ) && keys[K_SHIFT].down ) {
 		Field_Paste( edit );
 		return;
 	}
@@ -583,70 +578,40 @@ void Field_KeyDownEvent( field_t *edit, int key ) {
 	len = strlen( edit->buffer );
 
 	switch ( key ) {
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_DEL:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_DEL:
+		case K_KP_DEL:
 			if ( edit->cursor < len ) {
 				memmove( edit->buffer + edit->cursor, 
 					edit->buffer + edit->cursor + 1, len - edit->cursor );
 			}
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_RIGHTARROW:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_RIGHTARROW:
+		case K_KP_RIGHTARROW:
 			if ( edit->cursor < len ) {
 				edit->cursor++;
 			}
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_LEFTARROW:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_LEFTARROW:
+		case K_KP_LEFTARROW:
 			if ( edit->cursor > 0 ) {
 				edit->cursor--;
 			}
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_HOME:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_HOME:
+		case K_KP_HOME:
 			edit->cursor = 0;
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_END:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_END:
+		case K_KP_END:
 			edit->cursor = len;
 			break;
 
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		case K_KP_INS:
-			if (keys[K_KP_NUMLOCK].down) {
-				break;
-			}
-#endif
 		case K_INS:
+		case K_KP_INS:
 			key_overstrikeMode = !key_overstrikeMode;
 			break;
 
@@ -820,12 +785,7 @@ void Console_Key (int key) {
 
 	// command history (ctrl-p ctrl-n for unix style)
 
-	if ( (key == K_MWHEELUP && keys[K_SHIFT].down) || ( key == K_UPARROW ) ||
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		( key == K_KP_UPARROW && !keys[K_KP_NUMLOCK].down) ||
-#else
-		( key == K_KP_UPARROW ) ||
-#endif
+	if ( (key == K_MWHEELUP && keys[K_SHIFT].down) || ( key == K_UPARROW ) || ( key == K_KP_UPARROW ) ||
 		 ( ( tolower(key) == 'p' ) && keys[K_CTRL].down ) ) {
 		if ( nextHistoryLine - historyLine < COMMAND_HISTORY 
 			&& historyLine > 0 ) {
@@ -835,12 +795,7 @@ void Console_Key (int key) {
 		return;
 	}
 
-	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) ||
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		( key == K_KP_DOWNARROW && !keys[K_KP_NUMLOCK].down) ||
-#else
-		( key == K_KP_DOWNARROW ) ||
-#endif
+	if ( (key == K_MWHEELDOWN && keys[K_SHIFT].down) || ( key == K_DOWNARROW ) || ( key == K_KP_DOWNARROW ) ||
 		 ( ( tolower(key) == 'n' ) && keys[K_CTRL].down ) ) {
 		historyLine++;
 		if (historyLine >= nextHistoryLine) {
@@ -854,22 +809,12 @@ void Console_Key (int key) {
 	}
 
 	// console scrolling
-	if ( key == K_PGUP
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		|| ( key == K_KP_PGUP && !keys[K_KP_NUMLOCK].down)
-#endif
-		)
-	{
+	if ( key == K_PGUP || key == K_KP_PGUP ) {
 		Con_PageUp();
 		return;
 	}
 
-	if ( key == K_PGDN
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-		|| ( key == K_KP_PGDN && !keys[K_KP_NUMLOCK].down)
-#endif
-		)
-	{
+	if ( key == K_PGDN || key == K_KP_PGDN ) {
 		Con_PageDown();
 		return;
 	}
@@ -893,23 +838,13 @@ void Console_Key (int key) {
 	}
 
 	// ctrl-home = top of console
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	if ( ( key == K_HOME || ( key == K_KP_HOME && !keys[K_KP_NUMLOCK].down) ) &&  keys[K_CTRL].down )
-#else
-	if ( key == K_HOME && keys[K_CTRL].down )
-#endif
-	{
+	if ( ( key == K_HOME || key == K_KP_HOME ) && keys[K_CTRL].down ) {
 		Con_Top();
 		return;
 	}
 
 	// ctrl-end = bottom of console
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-	if ( ( key == K_END || ( key == K_KP_END && !keys[K_KP_NUMLOCK].down) ) &&  keys[K_CTRL].down )
-#else
-	if ( key == K_END && keys[K_CTRL].down )
-#endif
-	{
+	if ( ( key == K_END || key == K_KP_END ) && keys[K_CTRL].down ) {
 		Con_Bottom();
 		return;
 	}

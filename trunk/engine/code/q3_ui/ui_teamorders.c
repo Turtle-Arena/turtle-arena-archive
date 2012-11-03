@@ -230,11 +230,6 @@ sfxHandle_t UI_TeamOrdersMenu_Key( int key ) {
 			return menu_null_sound;
 
 		case K_KP_UPARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_UPARROW:
 			l->oldvalue = l->curvalue;
 
@@ -247,11 +242,6 @@ sfxHandle_t UI_TeamOrdersMenu_Key( int key ) {
 			return menu_move_sound;
 
 		case K_KP_DOWNARROW:
-#ifdef IOQ3ZTM // CHECK_NUMLOCK
-			if (trap_Key_IsDown(K_KP_NUMLOCK)) {
-				break;
-			}
-#endif
 		case K_DOWNARROW:
 			l->oldvalue = l->curvalue;
 
