@@ -1450,7 +1450,27 @@ char *Com_SkipTokens( char *s, int numTokens, char *sep )
 =====================================================================
 */
 
-float Com_FontCharWidth( font_t *font, int ch )
+float Com_FontScale( const font_t *font, float scale )
+{
+	float glyphScale;
+
+	if (scale <= 0) {
+		// Use native point scale
+		return 1.0f;
+	}
+
+	if (font && font->fontInfo.name[0]) {
+    	glyphScale = font->fontInfo.glyphScale;
+	} else if (font) {
+		glyphScale = (48.0f / font->pointSize);
+    } else {
+    	glyphScale = 1.0f;
+	}
+
+	return scale * glyphScale;
+}
+
+float Com_FontCharWidth( const font_t *font, int ch, float scale )
 {
     float width;
 
@@ -1466,10 +1486,23 @@ float Com_FontCharWidth( font_t *font, int ch )
 		 width += font->kerning;
 	}
 
-    return width;
+    return width * Com_FontScale( font, scale );
 }
 
-float Com_FontCharHeight( font_t *font )
+float Com_FontCharLeftOffset( const font_t *font, int ch, float scale )
+{
+    float left;
+
+	if (font && font->fontInfo.name[0]) {
+    	left = font->fontInfo.glyphs[ch & 0xff].left;
+    } else {
+    	left = 0;
+	}
+
+    return left * Com_FontScale( font, scale );
+}
+
+float Com_FontCharHeight( const font_t *font, float scale )
 {
     float height;
 
@@ -1483,10 +1516,10 @@ float Com_FontCharHeight( font_t *font )
 		height = SMALLCHAR_HEIGHT;
 	}
 
-    return height;
+    return height * Com_FontScale( font, scale );
 }
 
-float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean skipColors )
+float Com_FontStringWidthExt( const font_t *font, const char *s, float scale, int limit, qboolean skipColors )
 {
     float	width;
     int		len;
@@ -1505,12 +1538,12 @@ float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean s
 	width = 0;
     for (i = 0; i < len; i++) {
 		if ( skipColors && Q_IsColorString(&s[i]) ) {
-			i++;
+			i += 2;
 			continue;
 		}
 
 		ch = s[i] & 0xff;
-		width += Com_FontCharWidth(font, ch);
+		width += Com_FontCharWidth(font, ch, scale);
 	}
 
 	if (font && width > 0) {
@@ -1520,12 +1553,12 @@ float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean s
     return width;
 }
 
-float Com_FontStringWidth( font_t *font, const char *s, int limit )
+float Com_FontStringWidth( const font_t *font, const char *s, float scale )
 {
-	return Com_FontStringWidthExt(font, s, limit, qtrue);
+	return Com_FontStringWidthExt(font, s, scale, 0, qtrue);
 }
 
-float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean skipColors )
+float Com_FontStringHeightExt( const font_t *font, const char *s, float scale, int limit, qboolean skipColors )
 {
     float	height;
     float	max;
@@ -1534,7 +1567,7 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
     int		i;
 
 	if (!font || !font->fontInfo.name[0]) {
-		return Com_FontCharHeight(font);
+		return Com_FontCharHeight( font, scale );
 	}
 
 	len = strlen(s);
@@ -1545,7 +1578,7 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
 	max = 0;
     for (i = 0; i < len; i++) {
 		if ( skipColors && Q_IsColorString(&s[i]) ) {
-			i++;
+			i += 2;
 			continue;
 		}
 
@@ -1556,12 +1589,12 @@ float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean 
 		}
 	}
 
-    return max;
+    return max * Com_FontScale( font, scale );
 }
 
-float Com_FontStringHeight( font_t *font, const char *s, int limit )
+float Com_FontStringHeight( const font_t *font, const char *s, float scale )
 {
-	return Com_FontStringHeightExt(font, s, limit, qtrue);
+	return Com_FontStringHeightExt(font, s, scale, 0, qtrue);
 }
 #endif
 

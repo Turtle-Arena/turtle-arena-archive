@@ -1459,7 +1459,11 @@ typedef enum {
 typedef struct {
   int height;       // number of scan lines
   int top;          // top of glyph in buffer
+#ifdef IOQ3ZTM // FONT_REWRITE
+  int left;         // left of glyph in buffer
+#else
   int bottom;       // bottom of glyph in buffer
+#endif
   int pitch;        // width for copying
   int xSkip;        // x adjustment
   int imageWidth;   // width of actual image
@@ -1493,13 +1497,16 @@ typedef struct
 } font_t;
 
 // Drawing functions must be in each specific module
-float Com_FontCharWidth( font_t *font, int ch );
-float Com_FontCharHeight( font_t *font );
+float Com_FontScale( const font_t *font, float scale );
 
-float Com_FontStringWidthExt( font_t *font, const char *s, int limit, qboolean skipColors );
-float Com_FontStringWidth( font_t *font, const char *s, int limit );
-float Com_FontStringHeightExt( font_t *font, const char *s, int limit, qboolean skipColors );
-float Com_FontStringHeight( font_t *font, const char *s, int limit );
+float Com_FontCharWidth( const font_t *font, int ch, float scale );
+float Com_FontCharLeftOffset( const font_t *font, int ch, float scale );
+float Com_FontCharHeight( const font_t *font, float scale );
+
+float Com_FontStringWidthExt( const font_t *font, const char *s, float scale, int limit, qboolean skipColors );
+float Com_FontStringWidth( const font_t *font, const char *s, float scale );
+float Com_FontStringHeightExt( const font_t *font, const char *s, float scale, int limit, qboolean skipColors );
+float Com_FontStringHeight( const font_t *font, const char *s, float scale );
 #endif
 
 char *Com_LocalClientCvarName(int localClient, const char *in_cvarName);

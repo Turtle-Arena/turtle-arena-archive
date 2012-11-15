@@ -506,8 +506,10 @@ void Field_VariableSizeDraw( field_t *edit, int x, int y, int width, int size, q
 		float strWidth = 0;
 		int id;
 		for (id = 0; id < (edit->cursor - prestep - i); i++) {
-			strWidth += Com_FontCharWidth( font, str[i] );
+			strWidth += Com_FontCharWidth( font, str[i], 0 );
 		}
+		// ignore the cursor character's left offset
+		strWidth -= Com_FontCharLeftOffset( font, cursorChar, 0 );
 		SCR_DrawFontChar(font, x + strWidth, y, cursorChar, qfalse);
 #else
 		if ( size == SMALLCHAR_WIDTH ) {

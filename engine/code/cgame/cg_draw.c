@@ -73,29 +73,11 @@ font_t *CG_FontForScale(float scale) {
 }
 
 int CG_Text_Width(const char *text, float scale, int limit) {
-	float useScale;
-	font_t *font = CG_FontForScale(scale);
-
-	if (font->fontInfo.name[0]) {
-		useScale = scale * font->fontInfo.glyphScale;
-	} else {
-		useScale = scale * (48.0f / font->pointSize);
-	}
-
-	return Com_FontStringWidthExt(font, text, limit, qtrue) * useScale;
+	return Com_FontStringWidthExt(CG_FontForScale(scale), text, scale, limit, qtrue);
 }
 
 int CG_Text_Height(const char *text, float scale, int limit) {
-	float useScale;
-	font_t *font = CG_FontForScale(scale);
-
-	if (font->fontInfo.name[0]) {
-		useScale = scale * font->fontInfo.glyphScale;
-	} else {
-		useScale = scale * (48.0f / font->pointSize);
-	}
-
-	return Com_FontStringHeight(font, text, limit) * useScale;
+	return Com_FontStringHeightExt(CG_FontForScale(scale), text, scale, limit, qtrue);
 }
 
 void CG_Text_Paint(float x, float y, float scale, vec4_t color, const char *text, float adjust, int limit, int style) {

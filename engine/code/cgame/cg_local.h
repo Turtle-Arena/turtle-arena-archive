@@ -36,19 +36,19 @@ Suite 120, Rockville, Maryland 20850 USA.
 #ifdef IOQ3ZTM // FONT_REWRITE
 //#undef TINYCHAR_WIDTH
 #undef TINYCHAR_HEIGHT
-#define TINYCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontTiny))
+#define TINYCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontTiny, 0))
 
 //#undef SMALLCHAR_WIDTH
 #undef SMALLCHAR_HEIGHT
-#define SMALLCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontSmall))
+#define SMALLCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontSmall, 0))
 
 //#undef BIGCHAR_WIDTH
 #undef BIGCHAR_HEIGHT
-#define BIGCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontBig))
+#define BIGCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontBig, 0))
 
 //#undef GIANTCHAR_WIDTH
 #undef GIANTCHAR_HEIGHT
-#define GIANTCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontGiant))
+#define GIANTCHAR_HEIGHT (Com_FontCharHeight(&cgs.media.fontGiant, 0))
 #endif
 
 // The entire cgame module is unloaded and reloaded on each level change,

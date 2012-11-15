@@ -260,7 +260,7 @@ void Con_CheckResize (void)
 
 #ifdef IOQ3ZTM // FONT_REWRITE
 	if (cls.glconfig.vidWidth > 0)
-		width = (cls.glconfig.vidWidth / Com_FontCharWidth(&cls.fontSmall, '.')) - 2;
+		width = (cls.glconfig.vidWidth / Com_FontCharWidth(&cls.fontSmall, '.', 0)) - 2;
 	else
 #endif
 	width = (SCREEN_WIDTH / SMALLCHAR_WIDTH) - 2;
@@ -468,13 +468,13 @@ void CL_ConsolePrint( char *txt ) {
 		if (cls.glconfig.vidWidth && cl_conXOffset) {
 			int screenWidth = cls.glconfig.vidWidth;
 
-			lineWidth = con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']');
+			lineWidth = con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']', 0);
 
 			for (i = 0; i < con.x; i++) {
-				lineWidth += Com_FontCharWidth(&cls.fontSmall, con.text[(con.current%con.totallines)*con.linewidth+i]&255);
+				lineWidth += Com_FontCharWidth(&cls.fontSmall, con.text[(con.current%con.totallines)*con.linewidth+i]&255, 0);
 			}
 
-			wordWidth = Com_FontStringWidth(&cls.fontSmall, txt, l+1);
+			wordWidth = Com_FontStringWidthExt( &cls.fontSmall, txt, 0, l+1, qtrue );
 
 			if (l != con.linewidth && (con.x + l >= con.linewidth)) {
 				Con_Linefeed(skipnotify);
@@ -551,8 +551,8 @@ void Con_DrawInput (void) {
 	}
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	y = con.vislines - ( Com_FontCharHeight(&cls.fontSmall) * 2 );
-	x = con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']');
+	y = con.vislines - ( Com_FontCharHeight(&cls.fontSmall, 0) * 2 );
+	x = con.xadjust + cl_conXOffset->integer + Com_FontCharWidth(&cls.fontSmall, ']', 0);
 #else
 	y = con.vislines - ( SMALLCHAR_HEIGHT * 2 );
 	x = con.xadjust + 2 * SMALLCHAR_WIDTH;
@@ -564,7 +564,7 @@ void Con_DrawInput (void) {
 	SCR_DrawFontChar(&cls.fontSmall, con.xadjust + cl_conXOffset->integer, y, ']', qfalse);
 
 	Field_Draw( &g_consoleField, x, y,
-		SCREEN_WIDTH - x - Com_FontCharWidth(&cls.fontSmall, ' '), qtrue, qtrue );
+		SCREEN_WIDTH - x - Com_FontCharWidth(&cls.fontSmall, ' ', 0), qtrue, qtrue );
 #else
 	SCR_DrawSmallChar( con.xadjust + 1 * SMALLCHAR_WIDTH, y, ']' );
 
@@ -627,7 +627,7 @@ void Con_DrawNotify (void)
 #endif
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-			v += Com_FontCharHeight(&cls.fontBig);
+			v += Com_FontCharHeight(&cls.fontBig, 0);
 #else
 			v += BIGCHAR_HEIGHT;
 #endif
@@ -673,14 +673,14 @@ void Con_DrawNotify (void)
 			}
 #ifdef IOQ3ZTM // FONT_REWRITE
 			SCR_DrawFontChar(&cls.fontSmall, con.xadjust + currentWidthLocation, v, text[x] & 0xff, qfalse);
-			currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, text[x] );
+			currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, text[x], 0 );
 #else
 			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
 #endif
 		}
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-		v += Com_FontCharHeight(&cls.fontSmall);
+		v += Com_FontCharHeight(&cls.fontSmall, 0);
 #else
 		v += SMALLCHAR_HEIGHT;
 #endif
@@ -724,7 +724,7 @@ void Con_DrawNotify (void)
 #endif
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-		v += Com_FontCharHeight(&cls.fontBig);
+		v += Com_FontCharHeight(&cls.fontBig, 0);
 #else
 		v += BIGCHAR_HEIGHT;
 #endif
@@ -822,12 +822,12 @@ void Con_DrawSolidConsole( float frac ) {
 	i = strlen( Q3_VERSION );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	float totalwidth = Com_FontStringWidthExt( &cls.fontSmall, Q3_VERSION, i, qfalse ) + cl_conXOffset->integer;
+	float totalwidth = Com_FontStringWidthExt( &cls.fontSmall, Q3_VERSION, 0, 0, qfalse ) + cl_conXOffset->integer;
 	float currentWidthLocation = 0;
  	for (x=0 ; x<i ; x++) {
          SCR_DrawFontChar( &cls.fontSmall, cls.glconfig.vidWidth - totalwidth + currentWidthLocation,
-				lines - Com_FontCharHeight(&cls.fontSmall), Q3_VERSION[x], qfalse );
-        currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, Q3_VERSION[x] );
+				lines - Com_FontCharHeight(&cls.fontSmall, 0), Q3_VERSION[x], qfalse );
+        currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, Q3_VERSION[x], 0 );
  	}
 #else
 	for (x=0 ; x<i ; x++) {
@@ -840,9 +840,9 @@ void Con_DrawSolidConsole( float frac ) {
 	// draw the text
 	con.vislines = lines;
 #ifdef IOQ3ZTM // FONT_REWRITE
-	rows = lines/Com_FontCharHeight(&cls.fontSmall);		// rows of text to draw
+	rows = lines/Com_FontCharHeight(&cls.fontSmall, 0);		// rows of text to draw
 
-	y = lines - (Com_FontCharHeight(&cls.fontSmall)*3);
+	y = lines - (Com_FontCharHeight(&cls.fontSmall, 0)*3);
 #else
 	rows = (lines-SMALLCHAR_WIDTH)/SMALLCHAR_WIDTH;		// rows of text to draw
 
@@ -854,11 +854,14 @@ void Con_DrawSolidConsole( float frac ) {
 	{
 	// draw arrows to show the buffer is backscrolled
 		re.SetColor( g_color_table[ColorIndex(COLOR_RED)] );
-		for (x=0 ; x<con.linewidth ; x+=4)
+
 #ifdef IOQ3ZTM // FONT_REWRITE
-			SCR_DrawFontChar( &cls.fontSmall, con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^', qfalse );
-		y -= Com_FontCharHeight(&cls.fontSmall);
+		int characterWidth = Com_FontCharWidth(&cls.fontSmall, '^', 0);
+		for (x=con.xadjust+characterWidth ; x<cls.glconfig.vidWidth ; x+=4*characterWidth)
+			SCR_DrawFontChar( &cls.fontSmall, x, y, '^', qfalse );
+		y -= Com_FontCharHeight(&cls.fontSmall, 0);
 #else
+		for (x=0 ; x<con.linewidth ; x+=4)
 			SCR_DrawSmallChar( con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, '^' );
 		y -= SMALLCHAR_HEIGHT;
 #endif
@@ -875,7 +878,7 @@ void Con_DrawSolidConsole( float frac ) {
 	re.SetColor( g_color_table[currentColor] );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	for (i=0 ; i<rows ; i++, y -= Com_FontCharHeight(&cls.fontSmall), row--)
+	for (i=0 ; i<rows ; i++, y -= Com_FontCharHeight(&cls.fontSmall, 0), row--)
 #else
 	for (i=0 ; i<rows ; i++, y -= SMALLCHAR_HEIGHT, row--)
 #endif
@@ -905,7 +908,7 @@ void Con_DrawSolidConsole( float frac ) {
 			}
 #ifdef IOQ3ZTM // FONT_REWRITE
 			SCR_DrawFontChar(&cls.fontSmall, con.xadjust + currentWidthLocation, y, text[x] & 0xff, qfalse);
-			currentWidthLocation += Com_FontCharWidth(&cls.fontSmall, text[x]);
+			currentWidthLocation += Com_FontCharWidth(&cls.fontSmall, text[x], 0);
 #else
 			SCR_DrawSmallChar(  con.xadjust + (x+1)*SMALLCHAR_WIDTH, y, text[x] & 0xff );
 #endif

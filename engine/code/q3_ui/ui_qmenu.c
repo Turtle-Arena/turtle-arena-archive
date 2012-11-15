@@ -205,10 +205,7 @@ static void PText_Init( menutext_s *t )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (t->style & UI_SMALLFONT)
-		font = &uis.fontPropSmall;
-	else
-		font = &uis.fontPropBig;
+	font = UI_ProportionalFontForStyle( t->style );
 #endif
 	sizeScale = UI_ProportionalSizeScale( t->style );
 
@@ -216,7 +213,7 @@ static void PText_Init( menutext_s *t )
 	y = t->generic.y;
 	w = UI_ProportionalStringWidth( t->string, t->style );
 #ifdef IOQ3ZTM // FONT_REWRITE
-	h =	Com_FontCharHeight(font);
+	h =	Com_FontCharHeight(font, 0);
 #else
 	h =	PROP_HEIGHT * sizeScale;
 #endif
@@ -404,10 +401,7 @@ static void Action_Init( menuaction_s *a )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (a->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( a->generic.flags );
 #else
 	int	len;
 
@@ -427,7 +421,7 @@ static void Action_Init( menuaction_s *a )
 #endif
 	a->generic.top    = a->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
-	a->generic.bottom = a->generic.y + Com_FontCharHeight(font);
+	a->generic.bottom = a->generic.y + Com_FontCharHeight(font, 0);
 #else
 	a->generic.bottom = a->generic.y + BIGCHAR_HEIGHT;
 #endif
@@ -487,10 +481,7 @@ static void RadioButton_Init( menuradiobutton_s *rb )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (rb->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( rb->generic.flags );
 #else
 	int	len;
 
@@ -525,7 +516,7 @@ static void RadioButton_Init( menuradiobutton_s *rb )
 
 	rb->generic.top    = rb->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
-	rb->generic.bottom = rb->generic.y + Com_FontCharHeight(font);
+	rb->generic.bottom = rb->generic.y + Com_FontCharHeight(font, 0);
 #else
 	rb->generic.bottom = rb->generic.y + SMALLCHAR_HEIGHT;
 #endif
@@ -646,10 +637,7 @@ static void Slider_Init( menuslider_s *s )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (s->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( s->generic.flags );
 #else
 	int len;
 
@@ -668,7 +656,7 @@ static void Slider_Init( menuslider_s *s )
 	s->generic.right  = s->generic.x + (SLIDER_RANGE+2+1)*SMALLCHAR_WIDTH;
 	s->generic.top    = s->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
-	s->generic.bottom = s->generic.y + Com_FontCharHeight(font);
+	s->generic.bottom = s->generic.y + Com_FontCharHeight(font, 0);
 #else
 	s->generic.bottom = s->generic.y + SMALLCHAR_HEIGHT;
 #endif
@@ -885,10 +873,7 @@ static void SpinControl_Init( menulist_s *s ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (s->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( s->generic.flags );
 
 	if (s->generic.flags & QMF_LEFT_JUSTIFY) {
 		s->generic.left	= s->generic.x;
@@ -930,7 +915,7 @@ static void SpinControl_Init( menulist_s *s ) {
 	s->generic.top	  =	s->generic.y;
 #ifdef IOQ3ZTM // FONT_REWRITE
 	s->generic.right  =	s->generic.x + len + SMALLCHAR_WIDTH;
-	s->generic.bottom =	s->generic.y + Com_FontCharHeight(font);
+	s->generic.bottom =	s->generic.y + Com_FontCharHeight(font, 0);
 #else
 	s->generic.right  =	s->generic.x + (len+1)*SMALLCHAR_WIDTH;
 	s->generic.bottom =	s->generic.y + SMALLCHAR_HEIGHT;
@@ -1070,10 +1055,7 @@ static void ScrollList_Init( menulist_s *l )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (l->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( l->generic.flags );
 #endif
 
 	l->oldvalue = 0;
@@ -1094,7 +1076,7 @@ static void ScrollList_Init( menulist_s *l )
 	l->generic.top    = l->generic.y;	
 	l->generic.right  =	l->generic.x + w;
 #ifdef IOQ3ZTM // FONT_REWRITE
-	l->generic.bottom =	l->generic.y + l->height * Com_FontCharHeight(font);
+	l->generic.bottom =	l->generic.y + l->height * Com_FontCharHeight(font, 0);
 #else
 	l->generic.bottom =	l->generic.y + l->height * SMALLCHAR_HEIGHT;
 #endif
@@ -1408,10 +1390,7 @@ void ScrollList_Draw( menulist_s *l )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (l->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( l->generic.flags );
 #endif
 
 	hasfocus = (l->generic.parent->cursor == l->generic.menuPosition);
@@ -1456,7 +1435,7 @@ void ScrollList_Draw( menulist_s *l )
 				color);
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-			y += Com_FontCharHeight(font);
+			y += Com_FontCharHeight(font, 0);
 #else
 			y += SMALLCHAR_HEIGHT;
 #endif
