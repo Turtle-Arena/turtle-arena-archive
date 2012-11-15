@@ -242,12 +242,12 @@ void UI_DrawFontBannerString( font_t *font, int x, int y, const char* str, int s
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width / 2;
 			break;
 
 		case UI_RIGHT:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width;
 			break;
 
@@ -281,12 +281,12 @@ void UI_DrawFontProportionalString( font_t *font,
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width / 2;
 			break;
 
 		case UI_RIGHT:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width;
 			break;
 
@@ -359,12 +359,7 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 	if ((style & UI_BLINK) && ((uis.realtime/BLINK_DIVISOR) & 1))
 		return;
 
-	if (style & UI_SMALLFONT)
-		font = &uis.fontSmall;
-	else if (style & UI_GIANTFONT)
-		font = &uis.fontGiant;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( style );
 
 	if (style & UI_PULSE)
 	{
@@ -380,12 +375,12 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 
 	switch( style & UI_FORMATMASK ) {
 		case UI_CENTER:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width / 2;
 			break;
 
 		case UI_RIGHT:
-			width = Com_FontStringWidth(font, str, strlen(str));
+			width = Com_FontStringWidth(font, str, 0);
 			x -= width;
 			break;
 
@@ -404,6 +399,65 @@ void UI_DrawString( int x, int y, const char* str, int style, vec4_t color )
 	UI_DrawFontStringColor( font, x, y, str, drawcolor );
 }
 
+/*
+==================
+UI_FontForStyle
+==================
+*/
+font_t *UI_FontForStyle( int style ) {
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontSmall;
+	else if (style & UI_GIANTFONT)
+		font = &uis.fontGiant;
+	else
+		font = &uis.fontBig;
+	
+	return font;
+}
+
+/*
+==================
+UI_ProportionalFontForStyle
+==================
+*/
+font_t *UI_ProportionalFontForStyle( int style ) {
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontPropSmall;
+	else
+		font = &uis.fontPropBig;
+	
+	return font;
+}
+
+/*
+==================
+UI_ProportionalGlowFontForStyle
+==================
+*/
+font_t *UI_ProportionalGlowFontForStyle( int style ) {
+#ifdef TA_DATA
+	return UI_ProportionalFontForStyle( style );
+#else
+	font_t *font;
+
+	if (style & UI_SMALLFONT)
+		font = &uis.fontPropGlowSmall;
+	else
+		font = &uis.fontPropGlowBig;
+
+	return font;
+#endif
+}
+
+/*
+==================
+UI_LoadFont
+==================
+*/
 qboolean UI_LoadFont(font_t *font, const char *ttfName, const char *shaderName, int pointSize,
 			int shaderCharWidth, float fontKerning)
 {
@@ -440,6 +494,7 @@ qboolean UI_LoadFont(font_t *font, const char *ttfName, const char *shaderName, 
 void UI_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFrom640 )
 {
 	float	ax, ay, aw, ah;
+	float	useScale;
 
 	if (!font) {
 		return;
@@ -457,22 +512,24 @@ void UI_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFro
 	}
 #endif
 
+	useScale = Com_FontScale( font, 0 );
+
     if (font->fontInfo.name[0]) {
 		glyphInfo_t *glyph;
 		float yadj;
 		float xadj;
 
-		y += Com_FontCharHeight(font);
+		y += Com_FontCharHeight( font, 0 );
 
 		glyph = &font->fontInfo.glyphs[ch];
 
-		yadj = glyph->top;
-		xadj = (Com_FontCharWidth( font, ch ) - glyph->xSkip) / 2.0;
+		yadj = useScale * glyph->top;
+		xadj = useScale * glyph->left;
 
 		ax = x+xadj;
 		ay = y-yadj;
-		aw = glyph->imageWidth;
-		ah = glyph->imageHeight;
+		aw = useScale * glyph->imageWidth;
+		ah = useScale * glyph->imageHeight;
 
 		if (adjustFrom640) {
 			UI_AdjustFrom640( &ax, &ay, &aw, &ah );
@@ -493,7 +550,7 @@ void UI_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFro
 		}
 #endif
 
-		size = font->pointSize;
+		size = useScale * font->pointSize;
 
 		ax = x;
 		ay = y;
@@ -551,7 +608,7 @@ void UI_DrawFontStringExt( font_t *font, float x, float y, const char *string, c
 				continue;
 			}
 			UI_DrawFontChar( font, xx+2, y+2, *s, adjustFrom640 );
-			xx += Com_FontCharWidth( font, *s );
+			xx += Com_FontCharWidth( font, *s, 0 );
 			s++;
 		}
 	}
@@ -586,7 +643,7 @@ void UI_DrawFontStringExt( font_t *font, float x, float y, const char *string, c
 		}
 #endif
         UI_DrawFontChar( font, xx, y, *s, adjustFrom640 );
-        xx += Com_FontCharWidth( font, *s );
+        xx += Com_FontCharWidth( font, *s, 0 );
         cnt++;
 		s++;
 	}
@@ -893,10 +950,7 @@ int UI_ProportionalStringWidth( const char* str, int style ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (style & UI_SMALLFONT)
-		font = &uis.fontPropSmall;
-	else
-		font = &uis.fontPropBig;
+	font = UI_ProportionalFontForStyle( style );
 
 	if (font->fontInfo.name[0]) {
 		return Com_FontStringWidth(font, str, 0);
@@ -978,17 +1032,10 @@ void UI_DrawProportionalString( int x, int y, const char* str, int style, vec4_t
 	font_t *fontGlow;
 #endif
 
-	if (style & UI_SMALLFONT) {
-		font = &uis.fontPropSmall;
+	font = UI_ProportionalFontForStyle( style );
 #ifndef TA_DATA
-		fontGlow = &uis.fontPropGlowSmall;
+	fontGlow = UI_ProportionalGlowFontForStyle( style );
 #endif
-	} else {
-		font = &uis.fontPropBig;
-#ifndef TA_DATA
-		fontGlow = &uis.fontPropGlowBig;
-#endif
-	}
 
 	if (font->fontInfo.name[0]) {
 		UI_DrawFontProportionalString(font,
@@ -1281,12 +1328,7 @@ int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (style & UI_SMALLFONT)
-		font = &uis.fontSmall;
-	else if (style & UI_GIANTFONT)
-		font = &uis.fontGiant;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( style );
 
 	// Remap bitmap font symbols
 	if (font->fontInfo.name[0])
@@ -1324,7 +1366,7 @@ int UI_DrawChar( int x, int y, int ch, int style, vec4_t color )
 	UI_DrawString( x, y, buff, style, color );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	return Com_FontStringWidth(font, buff, strlen(buff));
+	return Com_FontStringWidth(font, buff, 0);
 #else
 	if (style & UI_SMALLFONT)
 		return SMALLCHAR_WIDTH;

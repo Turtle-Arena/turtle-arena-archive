@@ -114,8 +114,9 @@ FT_Bitmap *R_RenderGlyph(FT_GlyphSlot glyph, glyphInfo_t* glyphOut) {
 
 		glyphOut->height = height;
 		glyphOut->pitch = pitch;
-		glyphOut->top = _TRUNC(glyph->metrics.horiBearingY) + 1;
-		glyphOut->bottom = bottom;
+
+		glyphOut->top = _TRUNC(glyph->metrics.horiBearingY);// + 1;
+		glyphOut->left = _TRUNC(glyph->metrics.horiBearingX);// + 1;
 
 		return bit2;
 	} else {
@@ -185,7 +186,7 @@ static glyphInfo_t *RE_ConstructGlyphInfo(int imageSize, unsigned char *imageOut
 		FT_Load_Glyph(face, FT_Get_Char_Index( face, c), FT_LOAD_DEFAULT );
 		bitmap = R_RenderGlyph(face->glyph, &glyph);
 		if (bitmap) {
-			glyph.xSkip = (face->glyph->metrics.horiAdvance >> 6) + 1;
+			glyph.xSkip = (face->glyph->metrics.horiAdvance >> 6); // + 1;
 		} else {
 			return &glyph;
 		}
@@ -321,9 +322,9 @@ Get already registered font or load pre-rendered font.
 ==================
 */
 static qboolean R_GetCachedFont(const char *name, fontInfo_t *font) {
-	int		i;
-	int		len;
-	void	*faceData;
+	int			i;
+	int			len;
+	void		*faceData;
 
 	for (i = 0; i < registeredFontCount; i++) {
 		if (Q_stricmp(name, registeredFont[i].name) == 0) {
@@ -344,7 +345,7 @@ static qboolean R_GetCachedFont(const char *name, fontInfo_t *font) {
 		for(i=0; i<GLYPHS_PER_FONT; i++) {
 			font->glyphs[i].height		= readInt();
 			font->glyphs[i].top			= readInt();
-			font->glyphs[i].bottom		= readInt();
+			readInt(); // read bottom. It wasn't used and was replaced with left.
 			font->glyphs[i].pitch		= readInt();
 			font->glyphs[i].xSkip		= readInt();
 			font->glyphs[i].imageWidth	= readInt();
@@ -356,6 +357,8 @@ static qboolean R_GetCachedFont(const char *name, fontInfo_t *font) {
 			font->glyphs[i].glyph		= readInt();
 			Q_strncpyz(font->glyphs[i].shaderName, (const char *)&fdFile[fdOffset], sizeof(font->glyphs[i].shaderName));
 			fdOffset += sizeof(font->glyphs[i].shaderName);
+
+			font->glyphs[i].left		= (font->glyphs[i].xSkip - font->glyphs[i].pitch) / 2.0f; // left isn't saved in legacy fonts.
 		}
 		font->glyphScale = readFloat();
 		Com_Memcpy(font->name, &fdFile[fdOffset], MAX_QPATH);
@@ -383,7 +386,7 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	float		max;
 	int			imageSize;
 	float		dpi;
-#ifdef TURTLEARENA
+#ifdef IOQ3ZTM // FONT_REWRITE
 	float		dpiScale;
 #endif
 	float		glyphScale;
@@ -488,21 +491,21 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 	lastStart = i;
 	imageNumber = 0;
 
-#ifdef TURTLEARENA
+#ifdef IOQ3ZTM // FONT_REWRITE
 	// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 	dpiScale = 72.0f / dpi;
-
-	// we also need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
-	glyphScale = 48.0f / pointSize;
 #endif
 
 	while ( i <= GLYPH_END ) {
 
 		glyph = RE_ConstructGlyphInfo(imageSize, out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
 
-#ifdef TURTLEARENA // ZTM: FIXME: My font code in client and q3_ui requires this, but should use glyphScale instead.
+#ifdef IOQ3ZTM // FONT_REWRITE
 		// Scale to compensate for DPI
+		glyph->height *= dpiScale;
 		glyph->top *= dpiScale;
+		glyph->left *= dpiScale;
+		glyph->pitch *= dpiScale;
 		glyph->xSkip *= dpiScale;
 		glyph->imageHeight *= dpiScale;
 		glyph->imageWidth *= dpiScale;
@@ -572,7 +575,10 @@ void RE_RegisterFont(const char *_fontName, int pointSize, fontInfo_t *font) {
 		}
 	}
 
-#ifndef TURTLEARENA
+#ifdef IOQ3ZTM // FONT_REWRITE
+	// we need to adjust the scale based on point size relative to 48 points as the ui scaling is based on a 48 point font
+	glyphScale = 48.0f / pointSize;
+#else
 	// change the scale to be relative to 1 based on 72 dpi ( so dpi of 144 means a scale of .5 )
 	glyphScale = 72.0f / dpi;
 

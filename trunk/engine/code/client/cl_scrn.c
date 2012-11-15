@@ -165,6 +165,7 @@ qboolean SCR_LoadFont(font_t *font, const char *ttfName, const char *shaderName,
 void SCR_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFrom640 )
 {
 	float	ax, ay, aw, ah;
+	float	useScale;
 
 	if (!font) {
 		return;
@@ -182,22 +183,24 @@ void SCR_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFr
 	}
 #endif
 
+	useScale = Com_FontScale( font, 0 );
+
     if (font->fontInfo.name[0]) {
 		glyphInfo_t *glyph;
 		float yadj;
 		float xadj;
 
-		y += Com_FontCharHeight(font);
+		y += Com_FontCharHeight( font, 0 );
 
 		glyph = &font->fontInfo.glyphs[ch];
 
-		yadj = glyph->top;
-		xadj = (Com_FontCharWidth( font, ch ) - glyph->xSkip) / 2.0;
+		yadj = useScale * glyph->top;
+		xadj = useScale * glyph->left;
 
 		ax = x+xadj;
 		ay = y-yadj;
-		aw = glyph->imageWidth;
-		ah = glyph->imageHeight;
+		aw = useScale * glyph->imageWidth;
+		ah = useScale * glyph->imageHeight;
 
 		if (adjustFrom640) {
 			SCR_AdjustFrom640( &ax, &ay, &aw, &ah );
@@ -218,7 +221,7 @@ void SCR_DrawFontChar( font_t *font, float x, float y, int ch, qboolean adjustFr
 		}
 #endif
 
-		size = font->pointSize;
+		size = useScale * font->pointSize;
 
 		ax = x;
 		ay = y;
@@ -276,7 +279,7 @@ void SCR_DrawFontStringExt( font_t *font, float x, float y, const char *string, 
 				continue;
 			}
 			SCR_DrawFontChar( font, xx+2, y+2, *s, adjustFrom640 );
-			xx += Com_FontCharWidth( font, *s );
+			xx += Com_FontCharWidth( font, *s, 0 );
 			s++;
 		}
 	}
@@ -311,7 +314,7 @@ void SCR_DrawFontStringExt( font_t *font, float x, float y, const char *string, 
 		}
 #endif
         SCR_DrawFontChar( font, xx, y, *s, adjustFrom640 );
-        xx += Com_FontCharWidth( font, *s );
+        xx += Com_FontCharWidth( font, *s, 0 );
         cnt++;
 		s++;
 	}
@@ -596,7 +599,7 @@ void SCR_DrawDemoRecording( void ) {
 	sprintf( string, "RECORDING %s: %ik", clc.demoName, pos / 1024 );
 
 #ifdef IOQ3ZTM // FONT_REWRITE
-	SCR_DrawFontStringColor(&cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, 0) * 0.5f,
+	SCR_DrawFontStringColor( &cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, 0 ) * 0.5f,
 			20, string, g_color_table[7]);
 #else
 	SCR_DrawStringExt( 320 - strlen( string ) * 4, 20, 8, string, g_color_table[7], qtrue, qfalse );
@@ -640,7 +643,7 @@ void SCR_DrawVoipMeter( void ) {
 
 	sprintf( string, "VoIP: [%s]", buffer );
 #ifdef IOQ3ZTM // FONT_REWRITE
-	SCR_DrawFontStringColor(&cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, 0) * 0.5f,
+	SCR_DrawFontStringColor( &cls.fontTiny, 320 - Com_FontStringWidth(&cls.fontTiny, string, 0 ) * 0.5f,
 			10, string, g_color_table[7]);
 #else
 	SCR_DrawStringExt( 320 - strlen( string ) * 4, 10, 8, string, g_color_table[7], qtrue, qfalse );

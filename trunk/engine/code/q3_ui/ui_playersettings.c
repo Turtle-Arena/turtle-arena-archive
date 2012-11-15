@@ -204,7 +204,7 @@ static void PlayerSettings_DrawName( void *self ) {
 				c = 10;
 			}
 
-			UI_DrawChar( basex, y, c, (style & ~UI_PULSE) | UI_BLINK, color_white );
+			UI_DrawChar( basex - Com_FontCharLeftOffset( UI_FontForStyle(style), c, 0 ), y, c, (style & ~UI_PULSE) | UI_BLINK, color_white );
 		}
 		basex = x;
 #endif

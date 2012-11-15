@@ -372,9 +372,10 @@ qboolean CG_LoadFont(font_t *font, const char *ttfName, const char *shaderName, 
 ** CG_DrawFontChar
 ** Characters are drawn at native screen resolution, unless adjustFrom640 is set to qtrue
 */
-void CG_DrawFontChar( font_t *font, float useScale, float x, float y, int ch, qboolean adjustFrom640 )
+void CG_DrawFontChar( font_t *font, float scale, float x, float y, int ch, qboolean adjustFrom640 )
 {
 	float	ax, ay, aw, ah;
+	float	useScale;
 
 	if (!font) {
 		return;
@@ -392,17 +393,19 @@ void CG_DrawFontChar( font_t *font, float useScale, float x, float y, int ch, qb
 	}
 #endif
 
+	useScale = Com_FontScale( font, scale );
+
     if (font->fontInfo.name[0]) {
 		glyphInfo_t *glyph;
 		float yadj;
 		float xadj;
 
-		y += Com_FontCharHeight(font);
+		y += Com_FontCharHeight( font, scale );
 
 		glyph = &font->fontInfo.glyphs[ch];
 
 		yadj = useScale * glyph->top;
-		xadj = (Com_FontCharWidth( font, ch ) - glyph->xSkip) / 2.0;
+		xadj = useScale * glyph->left;
 
 		ax = x+xadj;
 		ay = y-yadj;
@@ -470,7 +473,6 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 	float		xx;
 	int			cnt;
 	int			maxChars;
-	float		useScale;
 	float		max;
 
 	if (!font || !string || !*string) {
@@ -487,9 +489,6 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 		adjust = 0;
 	}
 
-	// Add pre-font kerning to adjust.
-	adjust += font->kerning;
-
 	maxChars = strlen(string);
 	if (limit > 0 && maxChars > limit) {
 		maxChars = limit;
@@ -500,23 +499,17 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 		scale = font->pointSize / 48.0f;
 	}
 
-	if (font->fontInfo.name[0]) {
-		useScale = scale * font->fontInfo.glyphScale;
-	} else {
-		useScale = scale * (48.0f / font->pointSize);
-	}
-
 	if (x == CENTER_X) {
 		// center aligned
 		float w;
 
-		w = Com_FontStringWidthExt(font, string, limit, qtrue) * useScale;
+		w = Com_FontStringWidthExt(font, string, scale, limit, qtrue);
 		x = (SCREEN_WIDTH - w) * 0.5f;
 	} else if (x < 0) {
 		// right aligned, offset by x
 		float w;
 
-		w = Com_FontStringWidthExt(font, string, limit, qtrue) * useScale;
+		w = Com_FontStringWidthExt(font, string, scale, limit, qtrue);
 		x = SCREEN_WIDTH + x - w;
 	}
 
@@ -551,7 +544,7 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 		}
 #endif
 
-		if (maxX && x + Com_FontStringWidth(font, s, 1) > max) {
+		if (maxX && x + Com_FontCharWidth(font, *s, 0 ) > max) {
 			*maxX = 0;
 			break;
 		}
@@ -565,13 +558,13 @@ void CG_DrawFontStringExt( font_t *font, float scale, float x, float y, const ch
 			black[3] = color[3];
 			trap_R_SetColor( black );
 
-			CG_DrawFontChar( font, useScale, xx+offset, y+offset, *s, adjustFrom640 );
+			CG_DrawFontChar( font, scale, xx+offset, y+offset, *s, adjustFrom640 );
 
 			trap_R_SetColor( color );
 		}
 
-        CG_DrawFontChar( font, useScale, xx, y, *s, adjustFrom640 );
-        xx += (Com_FontCharWidth( font, *s ) + adjust) * useScale;
+        CG_DrawFontChar( font, scale, xx, y, *s, adjustFrom640 );
+        xx += Com_FontCharWidth( font, *s, scale ) + adjust * scale;
         if (maxX) {
 			*maxX = xx;
         }

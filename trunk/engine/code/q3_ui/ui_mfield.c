@@ -95,7 +95,7 @@ void MField_Draw( mfield_t *edit, int x, int y, int style, vec4_t color ) {
 				cursorChar = 10;
 			}
 
-			UI_DrawChar( basex, y, cursorChar, (style & ~(UI_PULSE|UI_CENTER|UI_RIGHT))|UI_BLINK, color );
+			UI_DrawChar( basex - Com_FontCharLeftOffset( UI_FontForStyle(style), cursorChar, 0 ), y, cursorChar, (style & ~(UI_PULSE|UI_CENTER|UI_RIGHT))|UI_BLINK, color );
 		}
 		basex = x;
 	}
@@ -336,14 +336,11 @@ void MenuField_Init( menufield_s* m ) {
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (m->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( m->generic.flags );
 
 	w = font->shaderCharWidth;
-	h = Com_FontCharHeight(font);
-	l = Com_FontStringWidth(font, m->generic.name, 0 ) + w;
+	h = Com_FontCharHeight(font, 0);
+	l = Com_FontStringWidth(font, m->generic.name, 0) + w;
 #endif
 
 	MField_Clear( &m->field );
@@ -396,10 +393,7 @@ void MenuField_Draw( menufield_s *f )
 #ifdef IOQ3ZTM // FONT_REWRITE
 	font_t *font;
 
-	if (f->generic.flags & QMF_SMALLFONT)
-		font = &uis.fontSmall;
-	else
-		font = &uis.fontBig;
+	font = UI_FontForStyle( f->generic.flags );
 #endif
 
 	x =	f->generic.x;
