@@ -178,22 +178,35 @@ SV_AddExtraLocalClient
 Add extra local client, either at connect or mid-game.
 ==================
 */
-void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
+void SV_AddExtraLocalClient(client_t *owner, int lc, const char *infoString) {
+	char		userinfo[MAX_INFO_STRING];
 	int			i;
 	client_t	*cl, *newcl;
-	client_t	temp;
+	//client_t	temp;
 	int			clientNum;
+	char		*ip;
 	char		*password;
 	int			startIndex;
 	intptr_t		denied;
 
-	if ( strlen(userinfo) <= 0 ) {
+	if ( strlen(infoString) <= 0 ) {
 		// Ignore dummy userinfo string.
 		return;
 	}
 
-	newcl = &temp;
-	Com_Memset (newcl, 0, sizeof(client_t));
+	Q_strncpyz( userinfo, infoString, sizeof(userinfo) );
+
+	// don't let "ip" overflow userinfo string
+	if ( NET_IsLocalAddress ( owner->netchan.remoteAddress ) )
+		ip = "localhost";
+	else
+		ip = (char *)NET_AdrToString( owner->netchan.remoteAddress );
+	if( ( strlen( ip ) + strlen( userinfo ) + 4 ) >= MAX_INFO_STRING ) {
+		SV_SendServerCommand( owner, "print \"Userinfo string length exceeded.  "
+			"Try removing setu%d cvars from your config.\n\"", lc+1 );
+		return;
+	}
+	Info_SetValueForKey( userinfo, "ip", ip );
 
 	// find a client slot
 	// if "sv_privateClients" is set > 0, then that number
@@ -231,6 +244,7 @@ void SV_AddExtraLocalClient(client_t *owner, int lc, const char *userinfo) {
 	// build a new connection
 	// accept the new client
 	// this is the only place a client_t is ever initialized
+	//Com_Memset (&temp, 0, sizeof(client_t));
 	//*newcl = temp;
 	*newcl = *owner;
 	clientNum = newcl - svs.clients;
