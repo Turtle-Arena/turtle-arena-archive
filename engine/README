@@ -295,6 +295,11 @@ New cvars
   r_zfar							- sets z far for testing global fog
                                       distances, requires cheats to be enabled
 
+
+  cg_teamDmLeadAnnouncements        - set to 0 to disable the team lead change
+                                      announcements in Team Deathmatch.
+
+
 New commands
   video [filename]        - start video capture (use with demo command)
   stopvideo               - stop video capture
