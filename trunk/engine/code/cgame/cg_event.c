@@ -1632,6 +1632,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 
 			// ZTM: NOTE: Some of these sounds don't really work with local clients on different teams.
 			//     New games might want to replace you/enemy sounds with red/blue.
+			//     See http://code.google.com/p/ioq3ztm/wiki/NewSounds
 
 			switch( es->eventParm ) {
 				case GTS_RED_CAPTURE: // CTF: red team captured the blue flag, 1FCTF: red team captured the neutral flag
@@ -1684,6 +1685,8 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
  							CG_AddBufferedSound( cgs.media.yourTeamTookEnemyFlagSound );
 						}
+					} else {
+						// ZTM: NOTE: There are local players on both teams, so have no correct sound to play. New games should fix this.
 					}
 					break;
 				case GTS_BLUE_TAKEN: // CTF: blue team took the red flag, 1FCTF red team took the neutral flag
@@ -1707,16 +1710,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 #endif
 							CG_AddBufferedSound( cgs.media.yourTeamTookEnemyFlagSound );
 						}
+					} else {
+						// ZTM: NOTE: There are local players on both teams, so have no correct sound to play. New games should fix this.
 					}
 					break;
 #ifdef MISSIONPACK
+				// ZTM: NOTE: These are confusing when there are players on both teams (players don't know which base is attacked). New games should fix this.
 				case GTS_REDOBELISK_ATTACKED: // Overload: red obelisk is being attacked
-					if (redTeam && !blueTeam) {
+					if (redTeam) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
 					}
 					break;
 				case GTS_BLUEOBELISK_ATTACKED: // Overload: blue obelisk is being attacked
-					if (blueTeam && !redTeam) {
+					if (blueTeam) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
 					}
 					break;
