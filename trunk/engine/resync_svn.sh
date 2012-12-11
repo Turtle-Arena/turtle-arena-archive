@@ -59,9 +59,9 @@ SAVE_LOG=1
 #DEFAULT_MAINSVN="IOQ3_SVN"
 
 #
-# ioq3ztm resync specfic
+# Spearmint resync specfic
 #
-DEFAULT_MAINNAME="ioq3ztm"
+DEFAULT_MAINNAME="Spearmint"
 # Default SVN path
 DEFAULT_SVN_PATH="http://ioq3ztm.googlecode.com/svn/trunk/"
 # Magic tokens
