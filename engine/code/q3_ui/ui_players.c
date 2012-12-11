@@ -154,8 +154,11 @@ tryagain:
 		goto tryagain;
 	}
 
-	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG )
-	{
+	if ( weaponNum == WP_MACHINEGUN || weaponNum == WP_GAUNTLET || weaponNum == WP_BFG
+#ifdef MISSIONPACK
+		|| weaponNum == WP_CHAINGUN
+#endif
+		) {
 		strcpy( path, item->world_model[0] );
 		COM_StripExtension( path, path, sizeof(path) );
 		strcat( path, "_barrel.md3" );
@@ -207,6 +210,20 @@ tryagain:
 	case WP_GRAPPLING_HOOK:
 		MAKERGB( pi->flashDlightColor, 0.6f, 0.6f, 1 );
 		break;
+
+#ifdef MISSIONPACK
+	case WP_NAILGUN:
+		MAKERGB( pi->flashDlightColor, 1, 0.75f, 0 );
+		break;
+
+	case WP_PROX_LAUNCHER:
+		MAKERGB( pi->flashDlightColor, 1, 0.70f, 0 );
+		break;
+
+	case WP_CHAINGUN:
+		MAKERGB( pi->flashDlightColor, 1, 1, 0 );
+		break;
+#endif
 
 	default:
 		MAKERGB( pi->flashDlightColor, 1, 1, 1 );
@@ -1205,7 +1222,11 @@ void UI_DrawPlayer( float x, float y, float w, float h, playerInfo_t *pi, int ti
 #ifdef TA_WEAPSYS
 	for (i = 0; i < MAX_HANDS; i++)
 #else
-	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG )
+	if ( pi->realWeapon == WP_MACHINEGUN || pi->realWeapon == WP_GAUNTLET || pi->realWeapon == WP_BFG
+#ifdef MISSIONPACK
+		|| pi->realWeapon == WP_CHAINGUN
+#endif
+		)
 #endif
 	{
 #ifdef TA_WEAPSYS
