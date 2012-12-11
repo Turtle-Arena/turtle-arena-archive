@@ -337,6 +337,17 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 				}
 			}
 
+			// farplane culling
+			if ( planeBits & 16 ) {
+				r = BoxOnPlaneSide( node->mins, node->maxs, &tr.viewParms.frustum[4] );
+				if ( r == 2 ) {
+					return;                     // culled
+				}
+				if ( r == 1 ) {
+					planeBits &= ~8;            // all descendants will also be in front
+				}
+			}
+
 		}
 
 		if ( node->contents != -1 ) {

@@ -246,7 +246,7 @@ void trap_UpdateScreen( void ) {
 	syscall( UI_UPDATESCREEN );
 }
 
-int trap_CM_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName ) {
+int trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName ) {
 	return syscall( UI_R_LERPTAG, tag, mod, startFrame, endFrame, PASSFLOAT(frac), tagName );
 }
 
