@@ -1803,6 +1803,31 @@ static qboolean ParseShader( char **text )
 			}
 			continue;
 		}
+		// distancecull <opaque distance> <transparent distance> <alpha threshold>
+		else if ( !Q_stricmp( token, "distancecull" ) ) {
+			int i;
+
+			for ( i = 0; i < 3; i++ )
+			{
+				token = COM_ParseExt( text, qfalse );
+				if ( token[ 0 ] == 0 ) {
+					ri.Printf( PRINT_WARNING, "WARNING: missing distancecull parms in shader '%s'\n", shader.name );
+				} else {
+					shader.distanceCull[ i ] = atof( token );
+				}
+			}
+
+			if ( shader.distanceCull[ 1 ] - shader.distanceCull[ 0 ] > 0 ) {
+				// distanceCull[ 3 ] is an optimization
+				shader.distanceCull[ 3 ] = 1.0 / ( shader.distanceCull[ 1 ] - shader.distanceCull[ 0 ] );
+			} else {
+				shader.distanceCull[ 0 ] = 0;
+				shader.distanceCull[ 1 ] = 0;
+				shader.distanceCull[ 2 ] = 0;
+				shader.distanceCull[ 3 ] = 0;
+			}
+			continue;
+		}
 		// sort
 		else if ( !Q_stricmp( token, "sort" ) )
 		{
