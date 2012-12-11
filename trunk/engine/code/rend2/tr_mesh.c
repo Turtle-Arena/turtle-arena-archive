@@ -283,7 +283,7 @@ int R_ComputeFogNum( mdvModel_t *model, trRefEntity_t *ent ) {
 		}
 	}
 
-	return 0;
+	return R_DefaultFogNum();
 }
 
 /*

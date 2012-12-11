@@ -204,16 +204,16 @@ static int R_DlightSurface( msurface_t *surface, int dlightBits ) {
 R_AddWorldSurface
 ======================
 */
-static void R_AddWorldSurface( msurface_t *surf, int dlightBits ) {
+static void R_AddWorldSurface( msurface_t *surf, shader_t *shader, int fogNum, int dlightBits ) {
 	if ( surf->viewCount == tr.viewCount ) {
 		return;		// already in this view
 	}
 
 	surf->viewCount = tr.viewCount;
-	// FIXME: bmodel fog?
+	surf->fogIndex = fogNum;
 
 	// try to cull before dlighting or adding
-	if ( R_CullSurface( surf->data, surf->shader ) ) {
+	if ( R_CullSurface( surf->data, shader ) ) {
 		return;
 	}
 
@@ -224,9 +224,9 @@ static void R_AddWorldSurface( msurface_t *surf, int dlightBits ) {
 	}
 
 #ifdef IOQ3ZTM // RENDERFLAGS RF_FORCE_ENT_ALPHA
-	R_AddDrawSurf( surf->data, surf->shader, surf->fogIndex, dlightBits, SS_BAD );
+	R_AddDrawSurf( surf->data, shader, surf->fogIndex, dlightBits, SS_BAD );
 #else
-	R_AddDrawSurf( surf->data, surf->shader, surf->fogIndex, dlightBits );
+	R_AddDrawSurf( surf->data, shader, surf->fogIndex, dlightBits );
 #endif
 }
 
@@ -240,14 +240,48 @@ static void R_AddWorldSurface( msurface_t *surf, int dlightBits ) {
 
 /*
 =================
+R_BmodelFogNum
+
+See if a sprite is inside a fog volume
+Return positive with /any part/ of the brush falling within a fog volume
+=================
+*/
+int R_BmodelFogNum( trRefEntity_t *re, bmodel_t *bmodel ) {
+	int i, j;
+	fog_t *fog;
+
+	for ( i = 1; i < tr.world->numfogs; i++ )
+	{
+		fog = &tr.world->fogs[ i ];
+		for ( j = 0; j < 3; j++ )
+		{
+			if ( re->e.origin[ j ] + bmodel->bounds[ 0 ][ j ] >= fog->bounds[ 1 ][ j ] ) {
+				break;
+			}
+			if ( re->e.origin[ j ] + bmodel->bounds[ 1 ][ j ] <= fog->bounds[ 0 ][ j ] ) {
+				break;
+			}
+		}
+		if ( j == 3 ) {
+			return i;
+		}
+	}
+
+	return R_DefaultFogNum();
+}
+
+/*
+=================
 R_AddBrushModelSurfaces
 =================
 */
 void R_AddBrushModelSurfaces ( trRefEntity_t *ent ) {
 	bmodel_t	*bmodel;
 	int			clip;
-	model_t             *pModel;
+	model_t		*pModel;
 	int			i;
+	int			fognum;
+	msurface_t	*surf;
 
 	pModel = R_GetModelByHandle( ent->e.hModel );
 
@@ -258,12 +292,37 @@ void R_AddBrushModelSurfaces ( trRefEntity_t *ent ) {
 		return;
 	}
 
+	// set current brush model to world
+	tr.currentBModel = bmodel;
+
+	// set model state for decals and dynamic fog
+	VectorCopy( ent->e.origin, bmodel->orientation[ tr.smpFrame ].origin );
+	VectorCopy( ent->e.axis[ 0 ], bmodel->orientation[ tr.smpFrame ].axis[ 0 ] );
+	VectorCopy( ent->e.axis[ 1 ], bmodel->orientation[ tr.smpFrame ].axis[ 1 ] );
+	VectorCopy( ent->e.axis[ 2 ], bmodel->orientation[ tr.smpFrame ].axis[ 2 ] );
+	bmodel->visible[ tr.smpFrame ] = qtrue;
+	bmodel->entityNum[ tr.smpFrame ] = tr.currentEntityNum;
+
 	R_SetupEntityLighting( &tr.refdef, ent );
 	R_DlightBmodel( bmodel );
 
-	for ( i = 0 ; i < bmodel->numSurfaces ; i++ ) {
-		R_AddWorldSurface( bmodel->firstSurface + i, tr.currentEntity->needDlights );
+	// determine if in fog
+	fognum = R_BmodelFogNum( ent, bmodel );
+
+	// add model surfaces
+	for ( i = 0; i < bmodel->numSurfaces; i++ ) {
+		surf = ( msurface_t * )( bmodel->firstSurface + i );
+
+		// custom shader support for brushmodels
+		if ( ent->e.customShader ) {
+			R_AddWorldSurface( surf, R_GetShaderByHandle( ent->e.customShader ), fognum, tr.currentEntity->needDlights );
+		} else {
+			R_AddWorldSurface( surf, surf->shader, fognum, tr.currentEntity->needDlights );
+		}
 	}
+
+	// clear current brush model
+	tr.currentBModel = NULL;
 }
 
 
@@ -274,6 +333,87 @@ void R_AddBrushModelSurfaces ( trRefEntity_t *ent ) {
 
 =============================================================
 */
+
+/*
+=================
+R_LeafFogNum
+
+See if leaf is inside a fog volume
+Return positive with /any part/ of the leaf falling within a fog volume
+=================
+*/
+int R_LeafFogNum( mnode_t *node ) {
+	int i, j;
+	fog_t *fog;
+
+	for ( i = 1; i < tr.world->numfogs; i++ )
+	{
+		fog = &tr.world->fogs[ i ];
+		for ( j = 0; j < 3; j++ )
+		{
+			if ( node->mins[ j ] >= fog->bounds[ 1 ][ j ] ) {
+				break;
+			}
+			if ( node->maxs[ j ] <= fog->bounds[ 0 ][ j ] ) {
+				break;
+			}
+		}
+		if ( j == 3 ) {
+			return i;
+		}
+	}
+
+	return R_DefaultFogNum();
+}
+
+/*
+================
+R_AddLeafSurfaces
+
+Adds a leaf's drawsurfaces
+================
+*/
+static void R_AddLeafSurfaces( mnode_t *node, int dlightBits ) {
+	int c, fogNum;
+	msurface_t  *surf, **mark;
+
+	// add to count
+	tr.pc.c_leafs++;
+
+	// add to z buffer bounds
+	if ( node->mins[0] < tr.viewParms.visBounds[0][0] ) {
+		tr.viewParms.visBounds[0][0] = node->mins[0];
+	}
+	if ( node->mins[1] < tr.viewParms.visBounds[0][1] ) {
+		tr.viewParms.visBounds[0][1] = node->mins[1];
+	}
+	if ( node->mins[2] < tr.viewParms.visBounds[0][2] ) {
+		tr.viewParms.visBounds[0][2] = node->mins[2];
+	}
+
+	if ( node->maxs[0] > tr.viewParms.visBounds[1][0] ) {
+		tr.viewParms.visBounds[1][0] = node->maxs[0];
+	}
+	if ( node->maxs[1] > tr.viewParms.visBounds[1][1] ) {
+		tr.viewParms.visBounds[1][1] = node->maxs[1];
+	}
+	if ( node->maxs[2] > tr.viewParms.visBounds[1][2] ) {
+		tr.viewParms.visBounds[1][2] = node->maxs[2];
+	}
+
+	fogNum = R_LeafFogNum( node );
+
+	// add the individual surfaces
+	mark = node->firstmarksurface;
+	c = node->nummarksurfaces;
+	while ( c-- ) {
+		// the surface may have already been added if it
+		// spans multiple leafs
+		surf = *mark;
+		R_AddWorldSurface( surf, surf->shader, fogNum, dlightBits );
+		mark++;
+	}
+}
 
 
 /*
@@ -389,46 +529,12 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 		dlightBits = newDlights[1];
 	} while ( 1 );
 
-	{
-		// leaf node, so add mark surfaces
-		int			c;
-		msurface_t	*surf, **mark;
-
-		tr.pc.c_leafs++;
-
-		// add to z buffer bounds
-		if ( node->mins[0] < tr.viewParms.visBounds[0][0] ) {
-			tr.viewParms.visBounds[0][0] = node->mins[0];
-		}
-		if ( node->mins[1] < tr.viewParms.visBounds[0][1] ) {
-			tr.viewParms.visBounds[0][1] = node->mins[1];
-		}
-		if ( node->mins[2] < tr.viewParms.visBounds[0][2] ) {
-			tr.viewParms.visBounds[0][2] = node->mins[2];
-		}
-
-		if ( node->maxs[0] > tr.viewParms.visBounds[1][0] ) {
-			tr.viewParms.visBounds[1][0] = node->maxs[0];
-		}
-		if ( node->maxs[1] > tr.viewParms.visBounds[1][1] ) {
-			tr.viewParms.visBounds[1][1] = node->maxs[1];
-		}
-		if ( node->maxs[2] > tr.viewParms.visBounds[1][2] ) {
-			tr.viewParms.visBounds[1][2] = node->maxs[2];
-		}
-
-		// add the individual surfaces
-		mark = node->firstmarksurface;
-		c = node->nummarksurfaces;
-		while (c--) {
-			// the surface may have already been added if it
-			// spans multiple leafs
-			surf = *mark;
-			R_AddWorldSurface( surf, dlightBits );
-			mark++;
-		}
+	// short circuit
+	if ( node->nummarksurfaces == 0 ) {
+		return;
 	}
 
+	R_AddLeafSurfaces( node, dlightBits );
 }
 
 
@@ -593,6 +699,9 @@ void R_AddWorldSurfaces (void) {
 	tr.currentEntityNum = REFENTITYNUM_WORLD;
 	tr.shiftedEntityNum = tr.currentEntityNum << QSORT_REFENTITYNUM_SHIFT;
 
+	// set current brush model to world
+	tr.currentBModel = &tr.world->bmodels[ 0 ];
+
 	// determine which leaves are in the PVS / areamask
 	R_MarkLeaves ();
 
@@ -603,5 +712,8 @@ void R_AddWorldSurfaces (void) {
 	if ( tr.refdef.num_dlights > 32 ) {
 		tr.refdef.num_dlights = 32 ;
 	}
-	R_RecursiveWorldNode( tr.world->nodes, 15, ( 1 << tr.refdef.num_dlights ) - 1 );
+	R_RecursiveWorldNode( tr.world->nodes, 255, ( 1 << tr.refdef.num_dlights ) - 1 );
+
+	// clear brush model
+	tr.currentBModel = NULL;
 }

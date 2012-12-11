@@ -854,6 +854,21 @@ static qboolean ParseStage( shaderStage_t *stage, char **text )
 			stage->isDetail = qtrue;
 		}
 		//
+		// fog
+		//
+		else if ( !Q_stricmp( token, "fog" ) ) {
+			token = COM_ParseExt( text, qfalse );
+			if ( token[0] == 0 ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing parm for fog in shader '%s'\n", shader.name );
+				continue;
+			}
+			if ( !Q_stricmp( token, "on" ) ) {
+				stage->isFogged = qtrue;
+			} else {
+				stage->isFogged = qfalse;
+			}
+		}
+		//
 		// blendfunc <srcFactor> <dstFactor>
 		// or blendfunc <add|filter|blend>
 		//
@@ -1741,20 +1756,57 @@ static qboolean ParseShader( char **text )
 			shader.entityMergable = qtrue;
 			continue;
 		}
-		// fogParms
-		else if ( !Q_stricmp( token, "fogParms" ) ) 
+		// ZTM: TODO: Use shader name set here instead of always "sun"
+		else if ( !Q_stricmp( token, "sunshader" ) ) {
+			token = COM_ParseExt( text, qfalse );
+			if ( !token[0] ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing shader name for 'sunshader'\n" );
+				continue;
+			}
+
+			ri.Printf( PRINT_WARNING, "Sunshader = %s\n", token );
+			//tr.sunShaderName = CopyString( token );
+			continue;
+		}
+		// fogParms ( <red> <green> <blue> ) <depthForOpaque>
+		else if ( !Q_stricmp( token, "fogParms" ) )
 		{
+			shader.fogParms.fogType = FT_EXP;
+
 			if ( !ParseVector( text, 3, shader.fogParms.color ) ) {
 				return qfalse;
 			}
 
 			token = COM_ParseExt( text, qfalse );
-			if ( !token[0] ) 
-			{
+			if ( !token[0] ) {
 				ri.Printf( PRINT_WARNING, "WARNING: missing parm for 'fogParms' keyword in shader '%s'\n", shader.name );
 				continue;
 			}
 			shader.fogParms.depthForOpaque = atof( token );
+
+			shader.fogParms.density = DEFAULT_FOG_EXP_DENSITY;
+
+			// skip any old gradient directions
+			SkipRestOfLine( text );
+			continue;
+		}
+		// linearFogParms ( <red> <green> <blue> ) <depthForOpaque>
+		else if ( !Q_stricmp( token, "linearFogParms" ) )
+		{
+			shader.fogParms.fogType = FT_LINEAR;
+
+			if ( !ParseVector( text, 3, shader.fogParms.color ) ) {
+				return qfalse;
+			}
+
+			token = COM_ParseExt( text, qfalse );
+			if ( !token[0] ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing parm for 'linearFogParms' keyword in shader '%s'\n", shader.name );
+				continue;
+			}
+			shader.fogParms.depthForOpaque = atof( token );
+
+			shader.fogParms.density = DEFAULT_FOG_LINEAR_DENSITY;
 
 			// skip any old gradient directions
 			SkipRestOfLine( text );
@@ -1771,6 +1823,127 @@ static qboolean ParseShader( char **text )
 		else if ( !Q_stricmp( token, "skyparms" ) )
 		{
 			ParseSkyParms( text );
+			continue;
+		}
+		// skyfogvars ( <red> <green> <blue> ) <density>
+		else if ( !Q_stricmp( token, "skyfogvars" ) ) {
+			vec3_t fogColor;
+			float fogDensity;
+
+			if ( !ParseVector( text, 3, fogColor ) ) {
+				return qfalse;
+			}
+			token = COM_ParseExt( text, qfalse );
+
+			if ( !token[0] ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing density value for skyfogvars\n" );
+				continue;
+			}
+
+			fogDensity = atof( token );
+
+			if ( fogDensity > 1 ) {
+				ri.Printf( PRINT_WARNING, "WARNING: last value for skyfogvars is 'density' which needs to be 0.0-1.0\n" );
+				continue;
+			}
+
+			tr.skyFogType = FT_EXP;
+
+			//tr.skyFogDepthForOpaque = 5; // ZTM: FIXME: Um, what? this doesn't seems like it would work using Q3 fogging.
+			tr.skyFogDepthForOpaque = 2048;
+
+			tr.skyFogDensity = fogDensity;
+			VectorCopy( fogColor, tr.skyFogColor);
+			continue;
+		}
+		// waterfogvars ( <red> <green> <blue> ) [density <= 1 or depthForOpaque > 1]
+		else if ( !Q_stricmp( token, "waterfogvars" ) ) {
+			vec3_t watercolor;
+			float fogvar;
+
+			if ( !ParseVector( text, 3, watercolor ) ) {
+				return qfalse;
+			}
+			token = COM_ParseExt( text, qfalse );
+
+			if ( !token[0] ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing density/distance value for waterfogvars\n" );
+				continue;
+			}
+
+			fogvar = atof( token );
+
+			//----(SA)	right now allow one water color per map.  I'm sure this will need
+			//			to change at some point, but I'm not sure how to track fog parameters
+			//			on a "per-water volume" basis yet.
+
+			if ( fogvar == 0 ) {
+				// Specifies "use the map values for everything except the fog color"
+				tr.waterFogType = FT_NONE;
+
+				if ( watercolor[0] == 0 && watercolor[1] == 0 && watercolor[2] == 0 ) {
+					// Color must be non-zero.
+					watercolor[0] = watercolor[1] = watercolor[2] = 0.00001;
+				}
+			} else if ( fogvar > 1 ) {
+				tr.waterFogType = FT_LINEAR;
+				tr.waterFogDepthForOpaque = fogvar;
+				tr.waterFogDensity = DEFAULT_FOG_LINEAR_DENSITY;
+			} else {
+				tr.waterFogType = FT_EXP;
+				tr.waterFogDensity = fogvar;
+				//tr.waterFogDepthForOpaque = 5; // ZTM: FIXME: Um, what? this doesn't seems like it would work using Q3 fogging.
+				tr.waterFogDepthForOpaque = 2048;
+			}
+
+			VectorCopy( watercolor, tr.waterFogColor );
+			continue;
+		}
+		// fogvars ( <red> <green> <blue> ) [density <= 1 or depthForOpaque > 1]
+		else if ( !Q_stricmp( token, "fogvars" ) ) {
+			vec3_t fogColor;
+			float fogvar;
+
+			if ( !ParseVector( text, 3, fogColor ) ) {
+				return qfalse;
+			}
+
+			token = COM_ParseExt( text, qfalse );
+			if ( !token[0] ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing density value for the fog\n" );
+				continue;
+			}
+
+			// fogFar > 1 means the shader is setting the farclip, < 1 means setting
+			// density (so old maps or maps that just need softening fog don't have to care about farclip)
+			fogvar = atof( token );
+
+			if ( fogvar > 1 ) {
+				tr.globalFogType = FT_LINEAR;
+				tr.globalFogDepthForOpaque = fogvar;
+				tr.globalFogDensity = DEFAULT_FOG_LINEAR_DENSITY;
+			} else {
+				tr.globalFogType = FT_EXP;
+				tr.globalFogDensity = fogvar;
+				tr.globalFogDepthForOpaque = 5; // ZTM: FIXME: Um, what? this doesn't seems like it would work using Q3 fogging.
+				//tr.globalFogDepthForOpaque = 2048;
+			}
+
+			VectorCopy( fogColor, tr.globalFogColor );
+			continue;
+		}
+		// nofog, allow disabling fog for some shaders
+		else if ( !Q_stricmp( token, "nofog" ) ) {
+			shader.noFog = qtrue;
+			continue;
+		}
+		// RF, allow each shader to permit compression if available
+		// ZTM: Just ignore them for now.
+		else if ( !Q_stricmp( token, "allowcompress" ) ) {
+			//tr.allowCompress = qtrue;
+			continue;
+		} else if ( !Q_stricmp( token, "nocompress" ) )   {
+			//tr.allowCompress = -1;
 			continue;
 		}
 		// light <value> determines flaring in q3map, not needed here

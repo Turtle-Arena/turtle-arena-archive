@@ -1507,7 +1507,7 @@ static	void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 	R_MovePatchSurfacesToHunk();
 #endif
 
-	ri.Printf(PRINT_DEVELOPER, "...loaded %d faces, %i meshes, %i trisurfs, %i flares,  %i foliage\n", 
+	ri.Printf(PRINT_DEVELOPER, "...loaded %d faces, %i meshes, %i trisurfs, %i flares, %i foliage\n", 
 		numFaces, numMeshes, numTriSurfs, numFlares, numFoliage );
 }
 
@@ -1528,6 +1528,7 @@ static	void R_LoadSubmodels( lump_t *l ) {
 		ri.Error (ERR_DROP, "LoadMap: funny lump size in %s",s_worldData.name);
 	count = l->filelen / sizeof(*in);
 
+	s_worldData.numBModels = count;
 	s_worldData.bmodels = out = ri.Hunk_Alloc( count * sizeof(*out), h_low );
 
 	for ( i=0 ; i<count ; i++, in++, out++ ) {
@@ -1551,6 +1552,10 @@ static	void R_LoadSubmodels( lump_t *l ) {
 
 		out->firstSurface = s_worldData.surfaces + LittleLong( in->firstSurface );
 		out->numSurfaces = LittleLong( in->numSurfaces );
+
+		// for attaching fog brushes to models
+		out->firstBrush = LittleLong( in->firstBrush );
+		out->numBrushes = LittleLong( in->numBrushes );
 	}
 }
 
@@ -1792,7 +1797,7 @@ R_LoadFogs
 =================
 */
 static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
-	int			i;
+	int			i, j;
 	fog_t		*out;
 	dfog_t		*fogs;
 	dbrush_t 	*brushes, *brush;
@@ -1811,11 +1816,15 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
 	count = l->filelen / sizeof(*fogs);
 
 	// create fog strucutres for them
-	s_worldData.numfogs = count + 1;
+	s_worldData.numfogs = count + 2;
 	s_worldData.fogs = ri.Hunk_Alloc ( s_worldData.numfogs*sizeof(*out), h_low);
 	out = s_worldData.fogs + 1;
 
+	// reset global fog
+	s_worldData.globalFog = -1;
+
 	if ( !count ) {
+		goto forceGlobalFogSetup;
 		return;
 	}
 
@@ -1834,76 +1843,111 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
 	for ( i=0 ; i<count ; i++, fogs++) {
 		out->originalBrushNumber = LittleLong( fogs->brushNum );
 
-		// ZTM: Global fog support will be added later.
-		if (out->originalBrushNumber == -1) {
-			ri.Printf(PRINT_WARNING, "Global fog not supported yet.\n");
-			continue;
+		// global fog has a brush number of -1, and no visible side
+		if ( out->originalBrushNumber == -1 ) {
+			VectorSet( out->bounds[ 0 ], MIN_WORLD_COORD, MIN_WORLD_COORD, MIN_WORLD_COORD );
+			VectorSet( out->bounds[ 1 ], MAX_WORLD_COORD, MAX_WORLD_COORD, MAX_WORLD_COORD );
+
+			firstSide = 0;
+		} else {
+			if ( (unsigned)out->originalBrushNumber >= brushesCount ) {
+				ri.Error( ERR_DROP, "fog brushNumber out of range" );
+			}
+
+			// find which bsp submodel the fog volume belongs to
+			for ( j = 0; j < s_worldData.numBModels; j++ )
+			{
+				if ( out->originalBrushNumber >= s_worldData.bmodels[ j ].firstBrush &&
+					 out->originalBrushNumber < ( s_worldData.bmodels[ j ].firstBrush + s_worldData.bmodels[ j ].numBrushes ) ) {
+					out->modelNum = j;
+					break;
+				}
+			}
+
+			brush = brushes + out->originalBrushNumber;
+
+			firstSide = LittleLong( brush->firstSide );
+
+			if ( (unsigned)firstSide > sidesCount - 6 ) {
+				ri.Error( ERR_DROP, "fog brush sideNumber out of range" );
+			}
+
+			// brushes are always sorted with the axial sides first
+			sideNum = firstSide + 0;
+			planeNum = LittleLong( sides[ sideNum ].planeNum );
+			out->bounds[0][0] = -s_worldData.planes[ planeNum ].dist;
+
+			sideNum = firstSide + 1;
+			planeNum = LittleLong( sides[ sideNum ].planeNum );
+			out->bounds[1][0] = s_worldData.planes[ planeNum ].dist;
+
+			sideNum = firstSide + 2;
+			planeNum = LittleLong( sides[ sideNum ].planeNum );
+			out->bounds[0][1] = -s_worldData.planes[ planeNum ].dist;
+
+			sideNum = firstSide + 3;
+			planeNum = LittleLong( sides[ sideNum ].planeNum );
+			out->bounds[1][1] = s_worldData.planes[ planeNum ].dist;
+
+			sideNum = firstSide + 4;
+			planeNum = LittleLong( sides[ sideNum ].planeNum );
+			out->bounds[0][2] = -s_worldData.planes[ planeNum ].dist;
+
+			sideNum = firstSide + 5;
+			planeNum = LittleLong( sides[ sideNum ].planeNum );
+			out->bounds[1][2] = s_worldData.planes[ planeNum ].dist;
 		}
-
-		if ( (unsigned)out->originalBrushNumber >= brushesCount ) {
-			ri.Error( ERR_DROP, "fog brushNumber out of range" );
-		}
-		brush = brushes + out->originalBrushNumber;
-
-		firstSide = LittleLong( brush->firstSide );
-
-		if ( (unsigned)firstSide > sidesCount - 6 ) {
-			ri.Error( ERR_DROP, "fog brush sideNumber out of range" );
-		}
-
-		// brushes are always sorted with the axial sides first
-		sideNum = firstSide + 0;
-		planeNum = LittleLong( sides[ sideNum ].planeNum );
-		out->bounds[0][0] = -s_worldData.planes[ planeNum ].dist;
-
-		sideNum = firstSide + 1;
-		planeNum = LittleLong( sides[ sideNum ].planeNum );
-		out->bounds[1][0] = s_worldData.planes[ planeNum ].dist;
-
-		sideNum = firstSide + 2;
-		planeNum = LittleLong( sides[ sideNum ].planeNum );
-		out->bounds[0][1] = -s_worldData.planes[ planeNum ].dist;
-
-		sideNum = firstSide + 3;
-		planeNum = LittleLong( sides[ sideNum ].planeNum );
-		out->bounds[1][1] = s_worldData.planes[ planeNum ].dist;
-
-		sideNum = firstSide + 4;
-		planeNum = LittleLong( sides[ sideNum ].planeNum );
-		out->bounds[0][2] = -s_worldData.planes[ planeNum ].dist;
-
-		sideNum = firstSide + 5;
-		planeNum = LittleLong( sides[ sideNum ].planeNum );
-		out->bounds[1][2] = s_worldData.planes[ planeNum ].dist;
 
 		// get information from the shader for fog parameters
 		shader = R_FindShader( fogs->shader, LIGHTMAP_NONE, qtrue );
 
-		out->parms = shader->fogParms;
+		out->shader = shader;
 
 		out->colorInt = ColorBytes4 ( shader->fogParms.color[0] * tr.identityLight, 
 			                          shader->fogParms.color[1] * tr.identityLight, 
 			                          shader->fogParms.color[2] * tr.identityLight, 1.0 );
 
 		d = shader->fogParms.depthForOpaque < 1 ? 1 : shader->fogParms.depthForOpaque;
-		out->tcScale = 1.0f / ( d * 8 );
+		out->tcScale = R_FogTcScale( shader->fogParms.fogType, d, shader->fogParms.density );
 
-		// set the gradient vector
-		sideNum = LittleLong( fogs->visibleSide );
-
-		// ydnar: made this check a little more strenuous (was sideNum == -1)
-		if ( sideNum < 0 || sideNum >= sidesCount ) {
-			out->hasSurface = qfalse;
+		if ( out->originalBrushNumber == -1 ) {
+			s_worldData.globalFog = i + 1;
 		} else {
-			out->hasSurface = qtrue;
-			planeNum = LittleLong( sides[ firstSide + sideNum ].planeNum );
-			VectorSubtract( vec3_origin, s_worldData.planes[ planeNum ].normal, out->surface );
-			out->surface[3] = -s_worldData.planes[ planeNum ].dist;
+			// set the gradient vector
+			sideNum = LittleLong( fogs->visibleSide );
+
+			if ( sideNum < 0 || sideNum >= sidesCount ) {
+				out->hasSurface = qfalse;
+			} else {
+				out->hasSurface = qtrue;
+				planeNum = LittleLong( sides[ firstSide + sideNum ].planeNum );
+				VectorSubtract( vec3_origin, s_worldData.planes[ planeNum ].normal, out->surface );
+				out->surface[3] = -s_worldData.planes[ planeNum ].dist;
+			}
 		}
 
 		out++;
 	}
 
+forceGlobalFogSetup:
+
+	// Add global fog if not present in bsp.
+	if ( s_worldData.globalFog == -1 ) {
+		s_worldData.globalFog = s_worldData.numfogs - 1;
+
+		out = s_worldData.fogs + s_worldData.globalFog;
+
+		out->originalBrushNumber = -1;
+
+		VectorSet( out->bounds[ 0 ], 0, 0, 0 );
+		VectorSet( out->bounds[ 1 ], 0, 0, 0 );
+
+		// Don't check bounds of global fog.
+		//s_worldData.numfogs--;
+	} else {
+		// Ignore internal global fog.
+		s_worldData.numfogs--;
+	}
 }
 
 
@@ -2122,11 +2166,11 @@ void RE_LoadWorldMap( const char *name ) {
 	R_LoadShaders( &header->lumps[LUMP_SHADERS] );
 	R_LoadLightmaps( &header->lumps[LUMP_LIGHTMAPS] );
 	R_LoadPlanes (&header->lumps[LUMP_PLANES]);
-	R_LoadFogs( &header->lumps[LUMP_FOGS], &header->lumps[LUMP_BRUSHES], &header->lumps[LUMP_BRUSHSIDES] );
 	R_LoadSurfaces( &header->lumps[LUMP_SURFACES], &header->lumps[LUMP_DRAWVERTS], &header->lumps[LUMP_DRAWINDEXES] );
 	R_LoadMarksurfaces (&header->lumps[LUMP_LEAFSURFACES]);
 	R_LoadNodesAndLeafs (&header->lumps[LUMP_NODES], &header->lumps[LUMP_LEAFS]);
 	R_LoadSubmodels (&header->lumps[LUMP_MODELS]);
+	R_LoadFogs( &header->lumps[LUMP_FOGS], &header->lumps[LUMP_BRUSHES], &header->lumps[LUMP_BRUSHSIDES] );
 	R_LoadVisibility( &header->lumps[LUMP_VISIBILITY] );
 	R_LoadEntities( &header->lumps[LUMP_ENTITIES] );
 	R_LoadLightGrid( &header->lumps[LUMP_LIGHTGRID] );
@@ -2135,6 +2179,15 @@ void RE_LoadWorldMap( const char *name ) {
 
 	// only set tr.world now that we know the entire level has loaded properly
 	tr.world = &s_worldData;
+
+	// If global fog was found in BSP and hasn't been set by a shader, use it
+	if ( tr.world->globalFog != -1 && tr.world->fogs[tr.world->globalFog].shader  && !tr.globalFogType ) {
+		// Set default global fog
+		tr.globalFogType = tr.world->fogs[tr.world->globalFog].shader->fogParms.fogType;
+		VectorCopy( tr.world->fogs[tr.world->globalFog].shader->fogParms.color, tr.globalFogColor );
+		tr.globalFogDepthForOpaque = tr.world->fogs[tr.world->globalFog].shader->fogParms.depthForOpaque;
+		tr.globalFogDensity = tr.world->fogs[tr.world->globalFog].shader->fogParms.density;
+	}
 
     ri.FS_FreeFile( buffer.v );
 }

@@ -335,6 +335,9 @@ void CG_ShaderStateChanged(void) {
 			break;
 		}
 	}
+
+	// Only need to do this once, unless a shader is remapped to new shader with fogvars.
+	trap_R_GetGlobalFog( &cgs.globalFogType, cgs.globalFogColor, &cgs.globalFogDepthForOpaque, &cgs.globalFogDensity );
 }
 
 /*

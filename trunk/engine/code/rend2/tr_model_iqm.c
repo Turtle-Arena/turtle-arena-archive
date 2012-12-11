@@ -752,7 +752,7 @@ int R_ComputeIQMFogNum( iqmData_t *data, trRefEntity_t *ent ) {
 		}
 	}
 
-	return 0;
+	return R_DefaultFogNum();
 }
 
 /*

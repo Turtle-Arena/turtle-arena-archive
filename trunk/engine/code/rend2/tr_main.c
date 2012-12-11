@@ -591,6 +591,169 @@ void R_CalcSurfaceTrianglePlanes(int numTriangles, srfTriangle_t * triangles, sr
 }
 
 
+// fog stuff
+qboolean fogIsOn = qfalse;
+
+/*
+=================
+RB_Fog
+=================
+*/
+void RB_Fog( int fogNum ) {
+	//static int			lastFogMode = 0;
+	//static vec3_t		lastColor = { -1, -1, -1 };
+	//static float		lastDensity = -1;
+	//static int			lastHint = -1;
+	//static float		lastStart = -1, lastEnd = -1;
+
+	int					fogMode;
+	vec3_t				color;
+	float				density;
+	int					hint;
+	float				start, end;
+
+	if ( !r_useGlFog->integer ) {
+		R_FogOff();
+		return;
+	}
+
+	if ( tr.world && fogNum == tr.world->globalFog ) {
+		switch ( backEnd.refdef.fogType ) {
+			case FT_LINEAR:
+				fogMode = GL_LINEAR;
+				end = backEnd.refdef.fogDepthForOpaque;
+				break;
+
+			case FT_EXP:
+				fogMode = GL_EXP;
+				end = 5; // ZTM: ???
+				break;
+
+			default:
+				R_FogOff();
+				return;
+		}
+
+		VectorCopy( backEnd.refdef.fogColor, color );
+
+		density = backEnd.refdef.fogDensity;
+
+	} else {
+		fog_t *fog;
+
+		fog = tr.world->fogs + fogNum;
+
+		if ( !fog->shader ) {
+			R_FogOff();
+			return;
+		}
+
+		switch ( fog->shader->fogParms.fogType ) {
+			case FT_LINEAR:
+				fogMode = GL_LINEAR;
+				end = backEnd.refdef.fogDepthForOpaque;
+				break;
+
+			case FT_EXP:
+				fogMode = GL_EXP;
+				end = 5; // ZTM: ???
+				break;
+
+			default:
+				R_FogOff();
+				return;
+		}
+
+		VectorCopy( fog->shader->fogParms.color, color );
+
+		end = fog->shader->fogParms.depthForOpaque;
+		density = fog->shader->fogParms.density;
+	}
+
+	hint = GL_DONT_CARE;
+	start = 0;
+
+	RB_FogOn();
+
+	// only send changes if necessary
+
+	//if ( fogMode != lastFogMode ) {
+		qglFogi( GL_FOG_MODE, fogMode );
+	//	lastFogMode = fogMode;
+	//}
+	//if ( color[0] != lastColor[0] || color[1] != lastColor[1] || color[2] != lastColor[2] || !lastFogMode ) {
+		qglFogfv( GL_FOG_COLOR, color );
+	//	VectorCopy( lastColor, color );
+	//}
+	//if ( density != lastDensity || !lastFogMode ) {
+		qglFogf( GL_FOG_DENSITY, density );
+	//	lastDensity = density;
+	//}
+	//if ( hint != lastHint || !lastFogMode ) {
+		qglHint( GL_FOG_HINT, hint );
+	//	lastHint = hint;
+	//}
+	//if ( start != lastStart || !lastFogMode ) {
+		qglFogf( GL_FOG_START, start );
+	//	lastStart = start;
+	//}
+	//if ( end != lastEnd || !lastFogMode ) {
+		qglFogf( GL_FOG_END, end );
+	//	lastEnd = end;
+	//}
+
+#if 0 // ZTM: TODO: Add NVidia fog code?
+// TTimo - from SP NV fog code
+	// NV fog mode
+	if ( glConfig.NVFogAvailable ) {
+		qglFogi( GL_FOG_DISTANCE_MODE_NV, glConfig.NVFogMode );
+	}
+// end
+#endif
+
+	//qglClearColor( color[0], color[1], color[2], 1.0f );
+}
+
+void R_FogOff( void ) {
+	if ( !fogIsOn ) {
+		return;
+	}
+	qglDisable( GL_FOG );
+	fogIsOn = qfalse;
+}
+
+void RB_FogOn( void ) {
+	if ( fogIsOn ) {
+		return;
+	}
+
+//	if(r_uiFullScreen->integer) {	// don't fog in the menu
+//		R_FogOff();
+//		return;
+//	}
+
+	if ( !r_useGlFog->integer ) {
+		return;
+	}
+
+	// ZTM: FIXME:
+	//if ( backEnd.refdef.fogType == FT_NONE ) {
+	//	return;
+	//}
+
+	qglEnable( GL_FOG );
+	fogIsOn = qtrue;
+}
+
+/*
+=================
+R_DefaultFogNum
+=================
+*/
+int R_DefaultFogNum( void ) {
+	return ( tr.world && tr.refdef.fogType != FT_NONE ) ? tr.world->globalFog : 0;
+}
+
 /*
 =================
 R_CullLocalBox
@@ -1019,6 +1182,12 @@ static void R_SetFarClip( void )
 		return;
 	}
 
+	// set r_zfar to experiment with different distances
+	if ( r_zfar->value ) {
+		tr.viewParms.zFar = r_zfar->integer;
+		return;
+	}
+
 	//
 	// set far clipping planes dynamically
 	//
@@ -1066,6 +1235,11 @@ static void R_SetFarClip( void )
 		}
 	}
 	tr.viewParms.zFar = sqrt( farthestCornerDistance );
+
+	// global fog
+	if ( tr.refdef.fogType == FT_LINEAR && tr.refdef.fogDepthForOpaque > 1 && tr.refdef.fogDepthForOpaque < tr.viewParms.zFar ) {
+		tr.viewParms.zFar = tr.refdef.fogDepthForOpaque;
+	}
 }
 
 /*
@@ -1209,7 +1383,12 @@ void R_SetupProjectionZ(viewParms_t *dest)
 	float zNear, zFar, depth;
 	
 	zNear = r_znear->value;
-	zFar	= dest->zFar;
+
+	if ( r_zfar->integer ) {
+		zFar = r_zfar->integer; // (SA) allow override for helping level designers test fog distances
+	} else {
+		zFar = dest->zFar;
+	}
 
 	depth	= zFar - zNear;
 
@@ -2210,7 +2389,9 @@ void R_RenderView (viewParms_t *parms) {
 	R_SortDrawSurfs( tr.refdef.drawSurfs + firstDrawSurf, tr.refdef.numDrawSurfs - firstDrawSurf );
 
 	// draw main system development information (surface outlines, etc)
+	R_FogOff();
 	R_DebugGraphics();
+	//RB_FogOn();
 }
 
 

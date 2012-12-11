@@ -1594,6 +1594,12 @@ typedef struct {
 	int acceptLeader;
 	char acceptVoice[MAX_NAME_LENGTH];
 
+	// default global fog from bsp or fogvars in a shader
+	fogType_t	globalFogType;
+	vec3_t		globalFogColor;
+	float		globalFogDepthForOpaque;
+	float		globalFogDensity;
+
 	// media
 	cgMedia_t		media;
 
@@ -2468,6 +2474,8 @@ int			trap_R_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int 
 					   float frac, const char *tagName );
 void		trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset );
 qboolean	trap_R_inPVS( const vec3_t p1, const vec3_t p2 );
+void		trap_R_GetGlobalFog( fogType_t *type, vec3_t color, float *depthForOpaque, float *density );
+void		trap_R_GetWaterFog( const vec3_t origin, fogType_t *type, vec3_t color, float *depthForOpaque, float *density );
 
 // normal sounds will have their volume dynamically changed as their entity
 // moves and the listener moves
