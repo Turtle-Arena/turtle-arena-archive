@@ -95,23 +95,6 @@ static void CG_Viewpos_f (void) {
 
 /*
 =============
-CG_AnyScoreboardShowing
-=============
-*/
-static qboolean CG_AnyScoreboardShowing(void) {
-	int i;
-
-	for (i = 0; i < CG_MaxSplitView(); i++) {
-		if (cg.snap->lcIndex[i] != -1 && cg.localClients[i].scoreBoardShowing) {
-			return qtrue;
-		}
-	}
-
-	return qfalse;
-}
-
-/*
-=============
 CG_ScoresDown
 =============
 */

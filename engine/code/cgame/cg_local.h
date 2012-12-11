@@ -2027,6 +2027,7 @@ const char *CG_GameTypeString( void );
 qboolean CG_YourTeamHasFlag( void );
 qboolean CG_OtherTeamHasFlag( void );
 qhandle_t CG_StatusHandle(int task);
+qboolean CG_AnyScoreboardShowing( void );
 
 
 

@@ -767,6 +767,11 @@ void SetTeam( gentity_t *ent, char *s ) {
 	// get and distribute relevent paramters
 	ClientUserinfoChanged( clientNum );
 
+	// client sent an early team command, they haven't spawned yet.
+	if ( client->pers.connected != CON_CONNECTED ) {
+		return;
+	}
+
 	ClientBegin( clientNum );
 }
 
@@ -2007,7 +2012,7 @@ void ClientCommand( int clientNum ) {
 	char	buf[MAX_TOKEN_CHARS];
 
 	ent = g_entities + clientNum;
-	if (!ent->client || ent->client->pers.connected != CON_CONNECTED) {
+	if ( !ent->client ) {
 		return;		// not fully in game yet
 	}
 
@@ -2033,6 +2038,15 @@ void ClientCommand( int clientNum ) {
 		if ( !ent->client ) {
 			return;		// not fully in game yet
 		}
+	}
+
+	if ( ent->client->pers.connected != CON_CONNECTED ) {
+		// Allow local clients to use team command before game finishes starting up,
+		// so team can be set by UI when starting a local game (without trying to have a wait command delay them).
+		if (ent->client->pers.localClient && !level.intermissiontime && Q_stricmp (cmd, "team") == 0) {
+			Cmd_Team_f (ent);
+		}
+		return;
 	}
 
 	if (Q_stricmp (cmd, "say") == 0) {

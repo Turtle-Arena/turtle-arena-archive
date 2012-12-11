@@ -1949,6 +1949,13 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		CG_DrawActive( stereoView );
 	}
 
+	// load any models that have been deferred if a scoreboard is shown
+	if ( !CG_AnyScoreboardShowing() ) {
+		cg.deferredPlayerLoading = 0;
+	} else if ( ++cg.deferredPlayerLoading > 10 ) {
+		CG_LoadDeferredPlayers();
+	}
+
 	if (cg.numViewports != 1) {
 		// Setup single viewport
 		cg.numViewports = 1;

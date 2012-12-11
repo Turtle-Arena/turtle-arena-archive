@@ -3241,6 +3241,22 @@ static void CG_DrawTeamVote(void) {
 	CG_DrawSmallString( 0, y, s, 1.0F );
 }
 
+/*
+=============
+CG_AnyScoreboardShowing
+=============
+*/
+qboolean CG_AnyScoreboardShowing( void ) {
+	int i;
+
+	for ( i = 0; i < CG_MaxSplitView(); i++ ) {
+		if ( cg.snap->lcIndex[i] != -1 && cg.localClients[i].scoreBoardShowing ) {
+			return qtrue;
+		}
+	}
+
+	return qfalse;
+}
 
 static qboolean CG_DrawScoreboard( void ) {
 #ifdef MISSIONPACK_HUD
@@ -3252,7 +3268,6 @@ static qboolean CG_DrawScoreboard( void ) {
 		menuScoreboard->window.flags &= ~WINDOW_FORCED;
 	}
 	if (cg_paused.integer) {
-		cg.deferredPlayerLoading = 0;
 		if (cg.cur_lc) {
 			firstTime[cg.cur_localClientNum] = qtrue;
 		}
@@ -3261,7 +3276,6 @@ static qboolean CG_DrawScoreboard( void ) {
 
 	// should never happen in Team Arena
 	if (cgs.gametype == GT_SINGLE_PLAYER && cg.cur_lc && cg.cur_lc->predictedPlayerState.pm_type == PM_INTERMISSION ) {
-		cg.deferredPlayerLoading = 0;
 		firstTime[cg.cur_localClientNum] = qtrue;
 		return qfalse;
 	}
@@ -3276,7 +3290,6 @@ static qboolean CG_DrawScoreboard( void ) {
 	} else {
 		if ( !CG_FadeColor( cg.cur_lc->scoreFadeTime, FADE_TIME ) ) {
 			// next time scoreboard comes up, don't print killer
-			cg.deferredPlayerLoading = 0;
 			cg.cur_lc->killerName[0] = 0;
 			firstTime[cg.cur_localClientNum] = qtrue;
 			return qfalse;
@@ -3300,11 +3313,6 @@ static qboolean CG_DrawScoreboard( void ) {
 			cg.spectatorTime = trap_Milliseconds();
 		}
 		Menu_Paint(menuScoreboard, qtrue);
-	}
-
-	// load any models that have been deferred
-	if ( ++cg.deferredPlayerLoading > 10 ) {
-		CG_LoadDeferredPlayers();
 	}
 
 	return qtrue;
