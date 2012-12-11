@@ -522,6 +522,8 @@ typedef struct shader_s {
 	float		portalRange;			// distance to fog out at
 	qboolean	isPortal;
 
+	vec4_t distanceCull;				// opaque alpha range for foliage (inner, outer, alpha threshold, 1/(outer-inner))
+
 	int			multitextureEnv;		// 0, GL_MODULATE, GL_ADD (FIXME: put in stage)
 
 	cullType_t	cullType;				// CT_FRONT_SIDED, CT_BACK_SIDED, or CT_TWO_SIDED
