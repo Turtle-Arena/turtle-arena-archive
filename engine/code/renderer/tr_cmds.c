@@ -489,6 +489,56 @@ void RE_2DPolyies( polyVert_t* verts, int numverts, qhandle_t hShader ) {
 	r_numpolyverts += numverts;
 }
 
+/*
+====================
+RE_GetGlobalFog
+====================
+*/
+void RE_GetGlobalFog( fogType_t *type, vec3_t color, float *depthForOpaque, float *density ) {
+	if (type) {
+		*type = tr.globalFogType;
+	}
+
+	if (color) {
+		VectorCopy( tr.globalFogColor, color );
+	}
+
+	if (depthForOpaque) {
+		*depthForOpaque = tr.globalFogDepthForOpaque;
+	}
+
+	if (density) {
+		*density = tr.globalFogDensity;
+	}
+}
+
+/*
+====================
+RE_GetWaterFog
+====================
+*/
+void RE_GetWaterFog( const vec3_t origin, fogType_t *type, vec3_t color, float *depthForOpaque, float *density ) {
+	// ZTM: TODO: Use origin to get water fog.
+	// Idea: For each bmodel containing point `origin', check shader on each side for waterfogvars
+	(void)origin;
+
+	if (type) {
+		*type = tr.waterFogType;
+	}
+
+	if (color) {
+		VectorCopy( tr.waterFogColor, color );
+	}
+
+	if (depthForOpaque) {
+		*depthForOpaque = tr.waterFogDepthForOpaque;
+	}
+
+	if (density) {
+		*density = tr.waterFogDensity;
+	}
+}
+
 #define MODE_RED_CYAN	1
 #define MODE_RED_BLUE	2
 #define MODE_RED_GREEN	3

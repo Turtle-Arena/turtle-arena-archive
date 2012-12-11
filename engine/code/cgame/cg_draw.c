@@ -3885,6 +3885,31 @@ static void CG_DrawTourneyScoreboard( void ) {
 
 /*
 =====================
+CG_FogView
+=====================
+*/
+void CG_FogView( void ) {
+	if ( cg.refdef.rdflags & RDF_UNDERWATER ) {
+		trap_R_GetWaterFog( cg.refdef.vieworg, &cg.refdef.fogType, cg.refdef.fogColor, &cg.refdef.fogDepthForOpaque, &cg.refdef.fogDensity );
+
+		// Check if using global fog for everything except color.
+		if ( cg.refdef.fogType == FT_NONE && ( cg.refdef.fogColor[0] || cg.refdef.fogColor[1] || cg.refdef.fogColor[2] ) ) {
+			cg.refdef.fogType = cgs.globalFogType;
+			cg.refdef.fogDepthForOpaque = cgs.globalFogDepthForOpaque;
+			cg.refdef.fogDensity = cgs.globalFogDensity;
+		}
+		return;
+	}
+
+	// Use global fog from bsp or fogvars in shader.
+	cg.refdef.fogType = cgs.globalFogType;
+	VectorCopy( cgs.globalFogColor, cg.refdef.fogColor );
+	cg.refdef.fogDepthForOpaque = cgs.globalFogDepthForOpaque;
+	cg.refdef.fogDensity = cgs.globalFogDensity;
+}
+
+/*
+=====================
 CG_DrawActive
 
 Perform all drawing needed to completely fill the viewport
@@ -3911,6 +3936,8 @@ void CG_DrawActive( stereoFrame_t stereoView ) {
 		CG_DrawCrosshair3D();
 
 	CG_PB_RenderPolyBuffers();
+
+	CG_FogView();
 
 	// draw 3D view
 	trap_R_RenderScene( &cg.refdef );

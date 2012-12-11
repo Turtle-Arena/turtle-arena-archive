@@ -722,6 +722,12 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return 0;
 	case CG_R_LERPTAG:
 		return re.LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
+	case CG_R_GET_GLOBAL_FOG:
+		re.GetGlobalFog( VMA(1), VMA(2), VMA(3), VMA(4) );
+		return 0;
+	case CG_R_GET_WATER_FOG:
+		re.GetWaterFog( VMA(1), VMA(2), VMA(3), VMA(4), VMA(5) );
+		return 0;
 	case CG_GETCLIPBOARDDATA:
 		CL_GetClipboardData( VMA(1), args[2] );
 		return 0;

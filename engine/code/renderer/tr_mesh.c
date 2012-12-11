@@ -282,7 +282,7 @@ int R_ComputeFogNum( md3Header_t *header, trRefEntity_t *ent ) {
 		}
 	}
 
-	return 0;
+	return R_DefaultFogNum();
 }
 
 /*

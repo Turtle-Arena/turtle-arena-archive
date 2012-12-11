@@ -73,6 +73,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 // refdef flags
 #define RDF_NOWORLDMODEL	0x0001		// used for player configuration screen
 #define RDF_HYPERSPACE		0x0004		// teleportation effect
+#define RDF_UNDERWATER		0x0008		// underwater
 
 typedef struct {
 	vec3_t		xyz;
@@ -180,6 +181,14 @@ typedef struct {
 #define	MAX_RENDER_STRINGS			8
 #define	MAX_RENDER_STRING_LENGTH	32
 
+typedef enum {
+	FT_NONE,
+	FT_EXP,
+	FT_LINEAR,
+
+	FT_MAX_FOG_TYPE
+} fogType_t;
+
 typedef struct {
 	int			x, y, width, height;
 	float		fov_x, fov_y;
@@ -196,6 +205,12 @@ typedef struct {
 
 	// text messages for deform text shaders
 	char		text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
+
+	// fog
+	fogType_t	fogType;
+	vec3_t		fogColor;
+	float		fogDepthForOpaque;
+	float		fogDensity;
 } refdef_t;
 
 

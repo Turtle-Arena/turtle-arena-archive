@@ -207,7 +207,7 @@ void RE_AddPolyToScene( qhandle_t hShader, int numVerts, const polyVert_t *verts
 				}
 			}
 			if ( fogIndex == tr.world->numfogs ) {
-				fogIndex = 0;
+				fogIndex = R_DefaultFogNum();
 			}
 		}
 		poly->fogIndex = fogIndex;
@@ -277,7 +277,7 @@ void RE_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer ) {
 		}
 	}
 	if ( fogIndex == tr.world->numfogs ) {
-		fogIndex = 0;
+		fogIndex = R_DefaultFogNum();
 	}
 
 	pPolySurf->fogIndex = fogIndex;
@@ -427,6 +427,28 @@ void RE_RenderScene( const refdef_t *fd ) {
 
 	tr.refdef.time = fd->time;
 	tr.refdef.rdflags = fd->rdflags;
+
+	tr.refdef.fogType = fd->fogType;
+	if ( tr.refdef.fogType < FT_NONE || tr.refdef.fogType >= FT_MAX_FOG_TYPE ) {
+		tr.refdef.fogType = FT_NONE;
+	}
+
+	tr.refdef.fogColor[0] = fd->fogColor[0] * tr.identityLight;
+	tr.refdef.fogColor[1] = fd->fogColor[1] * tr.identityLight;
+	tr.refdef.fogColor[2] = fd->fogColor[2] * tr.identityLight;
+
+	tr.refdef.fogColorInt = ColorBytes4( tr.refdef.fogColor[0],
+									  tr.refdef.fogColor[1],
+									  tr.refdef.fogColor[2], 1.0 );
+
+	tr.refdef.fogDensity = fd->fogDensity;
+
+	if ( r_zfar->value ) {
+		tr.refdef.fogDepthForOpaque = r_zfar->value < 1 ? 1 : r_zfar->value;
+	} else {
+		tr.refdef.fogDepthForOpaque = fd->fogDepthForOpaque < 1 ? 1 : fd->fogDepthForOpaque;
+	}
+	tr.refdef.fogTcScale = R_FogTcScale( tr.refdef.fogType, tr.refdef.fogDepthForOpaque, tr.refdef.fogDensity );
 
 	// copy the areamask data over and note if it has changed, which
 	// will force a reset of the visible leafs even if the view hasn't moved

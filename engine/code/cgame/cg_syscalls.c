@@ -401,6 +401,14 @@ qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( CG_R_INPVS, p1, p2 );
 }
 
+void trap_R_GetGlobalFog( fogType_t *type, vec3_t color, float *depthForOpaque, float *density ) {
+	syscall( CG_R_GET_GLOBAL_FOG, type, color, depthForOpaque, density );
+}
+
+void trap_R_GetWaterFog( const vec3_t origin, fogType_t *type, vec3_t color, float *depthForOpaque, float *density ) {
+	syscall( CG_R_GET_WATER_FOG, origin, type, color, depthForOpaque, density );
+}
+
 void		trap_GetClipboardData( char *buf, int bufsize ) {
 	syscall( CG_GETCLIPBOARDDATA, buf, bufsize );
 }

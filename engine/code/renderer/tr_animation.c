@@ -314,7 +314,7 @@ int R_MDRComputeFogNum( mdrHeader_t *header, trRefEntity_t *ent ) {
 		}
 	}
 
-	return 0;
+	return R_DefaultFogNum();
 }
 
 

@@ -522,14 +522,13 @@ void RB_BeginDrawingView (void) {
 	{
 		clearBits |= GL_STENCIL_BUFFER_BIT;
 	}
-	if ( r_fastsky->integer && !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) )
-	{
-		clearBits |= GL_COLOR_BUFFER_BIT;	// FIXME: only if sky shaders have been used
-#ifdef _DEBUG
-		qglClearColor( 0.8f, 0.7f, 0.4f, 1.0f );	// FIXME: get color of sky
-#else
-		qglClearColor( 0.0f, 0.0f, 0.0f, 1.0f );	// FIXME: get color of sky
-#endif
+	if ( ( backEnd.refdef.fogType == FT_LINEAR || r_fastsky->integer )
+		&& !( backEnd.refdef.rdflags & RDF_NOWORLDMODEL ) ) {
+		clearBits |= GL_COLOR_BUFFER_BIT;
+
+		qglClearColor( backEnd.refdef.fogColor[ 0 ],
+					   backEnd.refdef.fogColor[ 1 ],
+					   backEnd.refdef.fogColor[ 2 ], 1.0 );
 	}
 
 	// clear to white for shadow maps
@@ -578,6 +577,19 @@ void RB_BeginDrawingView (void) {
 #endif
 		GL_SetModelviewMatrix( s_flipMatrix );
 	}
+}
+
+/*
+=================
+RB_EndDrawingView
+=================
+*/
+void RB_EndDrawingView( void ) {
+	// ZTM: Disable fog?
+	//R_FogOff();
+
+	// ZTM: Reset portal clipping?
+	//qglDisable (GL_CLIP_PLANE0);
 }
 
 
@@ -1688,6 +1700,8 @@ const void	*RB_DrawSurfs( const void *data ) {
 
 	//if (glRefConfig.framebufferObject)
 		//FBO_Bind(NULL);
+
+	RB_EndDrawingView();
 
 	return (const void *)(cmd + 1);
 }

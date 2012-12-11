@@ -341,6 +341,7 @@ typedef struct {
 	acff_t			adjustColorsForFog;
 
 	qboolean		isDetail;
+	qboolean		isFogged;					// used only for shaders that have fog disabled, so we can enable it for individual stages
 } shaderStage_t;
 
 struct shaderCommands_s;
@@ -370,8 +371,10 @@ typedef struct {
 } skyParms_t;
 
 typedef struct {
-	vec3_t	color;
-	float	depthForOpaque;
+	fogType_t	fogType;
+	vec3_t		color;
+	float		depthForOpaque;
+	float		density;
 } fogParms_t;
 
 #ifdef IOQ3ZTM // CELSHADING
@@ -440,6 +443,8 @@ typedef struct shader_s {
 	qboolean	needsST2;
 	qboolean	needsColor;
 
+	qboolean	noFog;
+
 	int			numDeforms;
 	deformStage_t	deforms[MAX_SHADER_DEFORMS];
 
@@ -495,6 +500,14 @@ typedef struct {
 	// text messages for deform text shaders
 	char		text[MAX_RENDER_STRINGS][MAX_RENDER_STRING_LENGTH];
 
+	// fog
+	fogType_t	fogType;
+	vec3_t		fogColor;
+	unsigned	fogColorInt;
+	float		fogDepthForOpaque;
+	float		fogDensity;
+	float		fogTcScale;
+
 	int			num_entities;
 	trRefEntity_t	*entities;
 
@@ -543,12 +556,13 @@ typedef struct skin_s {
 
 
 typedef struct {
+	int			modelNum;				// bsp model the fog belongs to
 	int			originalBrushNumber;
 	vec3_t		bounds[2];
 
+	shader_t	*shader;				// fog shader to get fogParms from
 	unsigned	colorInt;				// in packed byte format
 	float		tcScale;				// texture coordinate vector scales
-	fogParms_t	parms;
 
 	// for clipping distance in fog when outside
 	qboolean	hasSurface;
@@ -866,6 +880,13 @@ typedef struct {
 	vec3_t		bounds[2];		// for culling
 	msurface_t	*firstSurface;
 	int			numSurfaces;
+
+	// ydnar: for fog volumes
+	int firstBrush;
+	int numBrushes;
+	orientation_t orientation[ SMP_FRAMES ];
+	qboolean visible[ SMP_FRAMES ];
+	int entityNum[ SMP_FRAMES ];
 } bmodel_t;
 
 typedef struct {
@@ -877,6 +898,7 @@ typedef struct {
 	int			numShaders;
 	dshader_t	*shaders;
 
+	int			numBModels;
 	bmodel_t	*bmodels;
 
 	int			numplanes;
@@ -894,6 +916,8 @@ typedef struct {
 
 	int			numfogs;
 	fog_t		*fogs;
+
+	int			globalFog;				// index of global fog in bsp
 
 	vec3_t		lightGridOrigin;
 	vec3_t		lightGridSize;
@@ -1101,6 +1125,7 @@ typedef struct {
 	image_t					*defaultImage;
 	image_t					*scratchImage[32];
 	image_t					*fogImage;
+	image_t					*linearFogImage;
 	image_t					*dlightImage;	// inverse-quare highlight for projective adding
 	image_t					*flareImage;
 	image_t					*whiteImage;			// full of 0xff
@@ -1122,6 +1147,7 @@ typedef struct {
 	int						currentEntityNum;
 	int						shiftedEntityNum;	// currentEntityNum << QSORT_REFENTITYNUM_SHIFT
 	model_t					*currentModel;
+	bmodel_t				*currentBModel;     // only valid when rendering brush models
 
 	viewParms_t				viewParms;
 
@@ -1142,6 +1168,24 @@ typedef struct {
 	int						frontEndMsec;		// not in pc due to clearing issue
 
 	vec4_t					clipRegion;			// 2D clipping region
+
+	// set by BSP or fogvars in a shader
+	fogType_t	globalFogType;
+	vec3_t		globalFogColor;
+	float		globalFogDepthForOpaque;
+	float		globalFogDensity;
+
+	// set by skyfogvars in a shader
+	fogType_t	skyFogType;
+	vec3_t		skyFogColor;
+	float		skyFogDepthForOpaque;
+	float		skyFogDensity;
+
+	// set by waterfogvars in a shader
+	fogType_t	waterFogType;
+	vec3_t		waterFogColor;
+	float		waterFogDepthForOpaque;
+	float		waterFogDensity;
 
 	//
 	// put large tables at the end, so most elements will be
@@ -1198,6 +1242,7 @@ extern cvar_t	*r_ignore;				// used for debugging anything
 extern cvar_t	*r_verbose;				// used for verbose debug spew
 extern cvar_t	*r_ignoreFastPath;		// allows us to ignore our Tess fast paths
 
+extern cvar_t	*r_zfar;
 extern cvar_t	*r_znear;				// near Z clip plane
 extern cvar_t	*r_zproj;				// z distance of projection plane
 extern cvar_t	*r_stereoSeparation;			// separation of cameras for stereo rendering
@@ -1317,6 +1362,8 @@ extern	cvar_t	*r_printShaders;
 extern	cvar_t	*r_saveFontData;
 
 extern cvar_t	*r_marksOnTriangleMeshes;
+
+extern cvar_t	*r_useGlFog;
 
 //====================================================================
 
@@ -1443,8 +1490,12 @@ void	R_SkinList_f( void );
 const void *RB_TakeScreenshotCmd( const void *data );
 void	R_ScreenShot_f( void );
 
+#define DEFAULT_FOG_EXP_DENSITY			0.5f
+#define DEFAULT_FOG_LINEAR_DENSITY		1.1f
+
 void	R_InitFogTable( void );
 float	R_FogFactor( float s, float t );
+float	R_FogTcScale( fogType_t fogType, float depthForOpaque, float density );
 void	R_InitImages( void );
 void	R_DeleteTextures( void );
 int		R_SumOfUsedImages( void );
@@ -1982,16 +2033,25 @@ size_t RE_SaveJPGToBuffer(byte *buffer, size_t bufSize, int quality,
 		          int image_width, int image_height, byte *image_buffer, int padding);
 void RE_TakeVideoFrame( int width, int height,
 		byte *captureBuffer, byte *encodeBuffer, qboolean motionJpeg );
+void RE_GetGlobalFog( fogType_t *type, vec3_t color, float *depthForOpaque, float *density );
+void RE_GetWaterFog( const vec3_t origin, fogType_t *type, vec3_t color, float *depthForOpaque, float *density );
 
 // font stuff
 void R_InitFreeType( void );
 void R_DoneFreeType( void );
 void RE_RegisterFont(const char *fontName, int pointSize, fontInfo_t *font);
 
+// fog stuff
+int R_DefaultFogNum( void );
+void R_FogOff( void );
+void RB_FogOn( void );
+void RB_Fog( int fogNum );
+
 #ifdef TA_BLOOM
 // bloom stuff
 void R_BloomInit( void );
 void R_BloomScreen( int x, int y, int w, int h );
 #endif
+
 
 #endif //TR_LOCAL_H

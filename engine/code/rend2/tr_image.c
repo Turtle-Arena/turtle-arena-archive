@@ -2760,12 +2760,9 @@ R_InitFogTable
 void R_InitFogTable( void ) {
 	int		i;
 	float	d;
-	float	exp;
-	
-	exp = 0.5;
 
 	for ( i = 0 ; i < FOG_TABLE_SIZE ; i++ ) {
-		d = pow ( (float)i/(FOG_TABLE_SIZE-1), exp );
+		d = pow ( (float)i/(FOG_TABLE_SIZE-1), DEFAULT_FOG_EXP_DENSITY );
 
 		tr.fogTable[i] = d;
 	}
@@ -2808,36 +2805,105 @@ float	R_FogFactor( float s, float t ) {
 
 /*
 ================
-R_CreateFogImage
+R_FogTcScale
 ================
 */
-#define	FOG_S	256
-#define	FOG_T	32
-static void R_CreateFogImage( void ) {
-	int		x,y;
+float R_FogTcScale( fogType_t fogType, float depthForOpaque, float density ) {
+	float scale;
+
+	if ( fogType == FT_LINEAR ) {
+		scale = DEFAULT_FOG_LINEAR_DENSITY / density;
+		return ( 1.0f / ( depthForOpaque * scale ) );
+	}
+
+	// exponential fog
+	scale = DEFAULT_FOG_EXP_DENSITY / density;
+	return ( 1.0f / ( depthForOpaque * 8 * scale ) );
+}
+
+/*
+================
+R_CreateFogImages
+
+Create fog images for exponential and linear fog.
+================
+*/
+static void R_CreateFogImages( void ) {
+	int		x, y, alpha;
 	byte	*data;
 	float	d;
 	float	borderColor[4];
+	int		fog_s, fog_t;
 
-	data = ri.Hunk_AllocateTempMemory( FOG_S * FOG_T * 4 );
+	// Create exponential fog image
+	fog_s = 256;
+	fog_t = 32;
+	data = ri.Hunk_AllocateTempMemory( fog_s * fog_t * 4 );
 
 	// S is distance, T is depth
-	for (x=0 ; x<FOG_S ; x++) {
-		for (y=0 ; y<FOG_T ; y++) {
-			d = R_FogFactor( ( x + 0.5f ) / FOG_S, ( y + 0.5f ) / FOG_T );
+	for (x=0 ; x<fog_s ; x++) {
+		for (y=0 ; y<fog_t ; y++) {
+			d = R_FogFactor( ( x + 0.5f ) / fog_s, ( y + 0.5f ) / fog_t );
 
-			data[(y*FOG_S+x)*4+0] = 
-			data[(y*FOG_S+x)*4+1] = 
-			data[(y*FOG_S+x)*4+2] = 255;
-			data[(y*FOG_S+x)*4+3] = 255*d;
+			data[(y*fog_s+x)*4+0] = 
+			data[(y*fog_s+x)*4+1] = 
+			data[(y*fog_s+x)*4+2] = 255;
+			data[(y*fog_s+x)*4+3] = 255*d;
 		}
 	}
+
 	// standard openGL clamping doesn't really do what we want -- it includes
 	// the border color at the edges.  OpenGL 1.2 has clamp-to-edge, which does
 	// what we want.
-	tr.fogImage = R_CreateImage("*fog", (byte *)data, FOG_S, FOG_T, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
+	tr.fogImage = R_CreateImage("*fog", (byte *)data, fog_s, fog_t, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
 	ri.Hunk_FreeTempMemory( data );
 
+	borderColor[0] = 1.0;
+	borderColor[1] = 1.0;
+	borderColor[2] = 1.0;
+	borderColor[3] = 1;
+
+	qglTexParameterfv( GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor );
+
+
+	// Create linear fog image
+	fog_s = 16;
+	fog_t = 16;
+	data = ri.Hunk_AllocateTempMemory( fog_s * fog_t * 4 );
+
+	// ydnar: new, linear fog texture generating algo for GL_CLAMP_TO_EDGE (OpenGL 1.2+)
+
+	// S is distance, T is depth
+	for ( x = 0 ; x < fog_s ; x++ ) {
+		for ( y = 0 ; y < fog_t ; y++ ) {
+			alpha = 270 * ( (float) x / fog_s ) * ( (float) y / fog_t );    // need slop room for fp round to 0
+			if ( alpha < 0 ) {
+				alpha = 0;
+			} else if ( alpha > 255 ) {
+				alpha = 255;
+			}
+
+			// ensure edge/corner cases are fully transparent (at 0,0) or fully opaque (at 1,N where N is 0-1.0)
+			if ( x == 0 ) {
+				alpha = 0;
+			} else if ( x == ( fog_s - 1 ) ) {
+				alpha = 255;
+			}
+
+			data[( y * fog_s + x ) * 4 + 0] =
+			data[( y * fog_s + x ) * 4 + 1] =
+			data[( y * fog_s + x ) * 4 + 2] = 255;
+			data[( y * fog_s + x ) * 4 + 3] = alpha;
+		}
+	}
+
+	// standard openGL clamping doesn't really do what we want -- it includes
+	// the border color at the edges.  OpenGL 1.2 has clamp-to-edge, which does
+	// what we want.
+	tr.linearFogImage = R_CreateImage("*linearfog", (byte *)data, fog_s, fog_t, IMGTYPE_COLORALPHA, IMGFLAG_CLAMPTOEDGE, 0 );
+	ri.Hunk_FreeTempMemory( data );
+
+	// ydnar: the following lines are unecessary for new GL_CLAMP_TO_EDGE fog
 	borderColor[0] = 1.0;
 	borderColor[1] = 1.0;
 	borderColor[2] = 1.0;
@@ -2925,7 +2991,7 @@ void R_CreateBuiltinImages( void ) {
 	}
 
 	R_CreateDlightImage();
-	R_CreateFogImage();
+	R_CreateFogImages();
 
 	if (glRefConfig.framebufferObject)
 	{
