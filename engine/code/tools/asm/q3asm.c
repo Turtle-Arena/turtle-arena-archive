@@ -184,6 +184,7 @@ int		errorCount;
 typedef struct options_s {
 	qboolean verbose;
 	qboolean writeMapFile;
+	qboolean ioquake3Compatibility;
 	qboolean vanillaQ3Compatibility;
 } options_t;
 
@@ -1378,7 +1379,10 @@ static void WriteVmFile( void ) {
 		return;
 	}
 
-	if( !options.vanillaQ3Compatibility ) {
+	if( !options.ioquake3Compatibility && !options.vanillaQ3Compatibility ) {
+		header.vmMagic = VM_MAGIC_VER2_NEO;
+		headerSize = sizeof( header );
+	} else if ( !options.vanillaQ3Compatibility ) {
 		header.vmMagic = VM_MAGIC_VER2;
 		headerSize = sizeof( header );
 	} else {
@@ -1420,7 +1424,7 @@ static void WriteVmFile( void ) {
 	SafeWrite( f, &segment[DATASEG].image, segment[DATASEG].imageUsed );
 	SafeWrite( f, &segment[LITSEG].image, segment[LITSEG].imageUsed );
 
-	if( !options.vanillaQ3Compatibility ) {
+	if( header.vmMagic != VM_MAGIC ) {
 		SafeWrite( f, &segment[JTRGSEG].image, segment[JTRGSEG].imageUsed );
 	}
 
@@ -1617,6 +1621,11 @@ Motivation: not wanting to scrollback for pages to find asm error.
 
 		if( !strcmp( argv[ i ], "-vq3" ) ) {
 			options.vanillaQ3Compatibility = qtrue;
+			continue;
+		}
+
+		if( !strcmp( argv[ i ], "-ioq3" ) ) {
+			options.ioquake3Compatibility = qtrue;
 			continue;
 		}
 

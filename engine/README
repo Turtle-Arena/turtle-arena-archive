@@ -339,16 +339,16 @@ Removed commands
 --------------------------------------------------------- README for Users -----
 
 Using shared libraries instead of qvm
-  To force Q3 to use shared libraries instead of qvms run it with the following
-  parameters: +set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0
+  To force Spearmint to use shared libraries instead of qvms run it with the
+  following parameters:
+
+    +set sv_pure 0 +set vm_cgame 0 +set vm_game 0 +set vm_ui 0
 
 Using Quake III Arena Demo Data Files
   Copy demoq3/pak0.pk3 from the demo installer to your baseq3 directory. The
-  qvm files in this pak0.pk3 will not work, so you have to use the native
-  shared libraries or qvms from this project. To use the new qvms, they must be
-  put into a pk3 file. A pk3 file is just a zip file, so any compression tool
-  that can create such files will work. The shared libraries should already be
-  in the correct place. Use the instructions above to use them.
+  qvm files in this pak0.pk3 are not supported, so you have to use the native
+  shared libraries or qvms from this project. They should already be in the
+  correct place and automatically used.
 
   Please bear in mind that you will not be able to play online using the demo
   data, nor is it something that we like to spend much time maintaining or
@@ -606,55 +606,22 @@ Building with MinGW for pre Windows XP
 
 ------------------------------------------------------------- Contributing -----
 
-Please send all patches to bugzilla (https://bugzilla.icculus.org), or join the
-mailing list (http://lists.ioquake.org/listinfo.cgi/ioquake3-ioquake.org) and 
+Please submit all patches to the issue tracker (http://ioq3ztm.googlecode.com),
+or join the mailing list (edit: Spearmint doesn't have a mailing list yet) and 
 submit your patch there.  The best case scenario is that you submit your patch 
-to bugzilla, and then post the URL to the mailing list.
+to the issue tracker, and then post the URL to the mailing list.
 
-The focus for ioq3 is to develop a stable base suitable for further development
-and provide players with the same Quake 3 experience they've had for years. As
-such ioq3 does not have any significant graphical enhancements and none are
-planned at this time. However, improved graphics and sound patches will be
-accepted as long as they are entirely optional, do not require new media and
-are off by default.
+The focus for Spearmint is to develop a stable base suitable for further
+development and provide players with the same Quake 3 game play experience
+they've had for years.
 
-
---------------------------------------------- Building Official Installers -----
-
-We need help getting automated installers on all the platforms that ioquake3
-supports. We don't necessarily care about all the installers being identical,
-but we have some general guidelines:
-
-  * Please include the id patch pk3s in your installer, which are available
-    from http://ioquake3.org/patch-data/ subject to agreement to the id
-    EULA. Your installer shall also ask the user to agree to this EULA (which
-    is in the /web/include directory for your convenience) and subsequently
-    refuse to continue the installation of the patch pk3s and pak0.pk3 if they
-    do not.
-
-  * Please don't require pak0.pk3, since not everyone using the engine
-    plans on playing Quake 3 Arena on it. It's fine to (optionally) assist the
-    user in copying the file or tell them how.
-
-  * It is fine to just install the binaries without requiring id EULA agreement,
-    providing pak0.pk3 and the patch pk3s are not referred to or included in the
-    installer.
-
-  * Please include at least an SDL so/dylib/dll on every platform.
-
-  * Please include an OpenAL so/dylib/dll, since every platform should be using
-    it by now.
-
-  * Please contact the mailing list when you've made your installer.
-
-  * Please be prepared to alter your installer on the whim of the maintainers.
-
-  * Your installer will be mirrored to an "official" directory, thus making it
-    a done deal.
 
 ------------------------------------------------------------------ Credits -----
 
-Maintainers
+Spearmint Maintainers
+  Zack Middleton <zturtleman@gmail.com>
+
+ioquake3 Maintainers
   James Canete <use.less01@gmail.com>
   Ludwig Nussel <ludwig.nussel@suse.de>
   Thilo Schulz <arny@ats.s.bawue.de>
@@ -663,7 +630,7 @@ Maintainers
   Zachary J. Slater <zachary@ioquake.org>
   Zack Middleton <zturtleman@gmail.com>
 
-Significant contributions from
+Significant contributions to ioquake3 from
   Ryan C. Gordon <icculus@icculus.org>
   Andreas Kohn <andreas@syndrom23.de>
   Joerg Dietrich <Dietrich_Joerg@t-online.de>

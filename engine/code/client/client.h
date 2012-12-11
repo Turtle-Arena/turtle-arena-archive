@@ -557,7 +557,6 @@ char *Key_KeynumToString (int keynum);
 //
 // cl_parse.c
 //
-extern int cl_connectedToPureServer;
 extern int cl_connectedToCheatServer;
 
 #ifdef USE_VOIP
