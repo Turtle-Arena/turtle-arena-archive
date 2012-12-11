@@ -1729,13 +1729,19 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 					CG_AddBufferedSound(cgs.media.blueScoredSound);
 					break;
 				case GTS_REDTEAM_TOOK_LEAD:
-					CG_AddBufferedSound(cgs.media.redLeadsSound);
+					if ( cgs.gametype != GT_TEAM || cg_teamDmLeadAnnouncements.integer ) {
+						CG_AddBufferedSound(cgs.media.redLeadsSound);
+					}
 					break;
 				case GTS_BLUETEAM_TOOK_LEAD:
-					CG_AddBufferedSound(cgs.media.blueLeadsSound);
+					if ( cgs.gametype != GT_TEAM || cg_teamDmLeadAnnouncements.integer ) {
+						CG_AddBufferedSound(cgs.media.blueLeadsSound);
+					}
 					break;
 				case GTS_TEAMS_ARE_TIED:
-					CG_AddBufferedSound( cgs.media.teamsTiedSound );
+					if ( cgs.gametype != GT_TEAM || cg_teamDmLeadAnnouncements.integer ) {
+						CG_AddBufferedSound( cgs.media.teamsTiedSound );
+					}
 					break;
 #if defined MISSIONPACK && !defined TURTLEARENA // NO_KAMIKAZE_ITEM
 				case GTS_KAMIKAZE:

@@ -1856,6 +1856,9 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		renderClientViewport[0] = qtrue;
 	}
 
+	// play lead change annoucement and time/frag limit warnings
+	CG_CheckGameSounds();
+
 	for (i = 0, cg.viewport = -1; i < CG_MaxSplitView(); i++) {
 		if (!renderClientViewport[i]) {
 			continue;

@@ -366,7 +366,7 @@ CG_CheckLocalSounds
 ==================
 */
 void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
-	int			highScore, reward;
+	int			reward;
 #if defined MISSIONPACK && !defined TURTLEARENA // NOARMOR
 	int			health, armor;
 #endif
@@ -518,45 +518,78 @@ void CG_CheckLocalSounds( playerState_t *ps, playerState_t *ops ) {
 		}
 	}
 
-	// lead changes
-	if (!reward
+	if (reward
 #ifdef TA_SP // Don't talk about lead changes in single player/co-op
-		&& cgs.gametype != GT_SINGLE_PLAYER
+		|| cgs.gametype == GT_SINGLE_PLAYER
 #endif
-		) {
+	) {
+		// ignore lead changes this frame because a reward sound was played.
+		cg.bestLeadChange = LEAD_IGNORE;
+	} else {
 		//
 		if ( !cg.warmup ) {
 			// never play lead changes during warmup
 			if ( ps->persistant[PERS_RANK] != ops->persistant[PERS_RANK] ) {
 				if ( cgs.gametype < GT_TEAM) {
-					if (  ps->persistant[PERS_RANK] == 0 ) {
-#ifdef TA_MISC // COMIC_ANNOUNCER
-						CG_AddAnnouncement(ANNOUNCE_YOUHAVETAKENTHELEAD, cg.cur_lc-cg.localClients);
-#else
-						CG_AddBufferedSound(cgs.media.takenLeadSound);
-#endif
-					} else if (cg.snap->numPSs <= 1) {
-						// ZTM: Don't play tied or lost lead when there are multiple local clients
-						//      multiple sounds play and it's annoying.
+					leadChange_t leadChange = LEAD_NONE;
 
-						if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
-#ifdef TA_MISC // COMIC_ANNOUNCER
-							CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD, cg.cur_lc-cg.localClients);
-#else
-							CG_AddBufferedSound(cgs.media.tiedLeadSound);
-#endif
-						} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
-#ifdef TA_MISC // COMIC_ANNOUNCER
-							CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD, cg.cur_lc-cg.localClients);
-#else
-							CG_AddBufferedSound(cgs.media.lostLeadSound);
-#endif
-						}
+					if ( ps->persistant[PERS_RANK] == 0 ) {
+						leadChange = LEAD_TAKEN;
+					} else if ( ps->persistant[PERS_RANK] == RANK_TIED_FLAG ) {
+						leadChange = LEAD_TIED;
+					} else if ( ( ops->persistant[PERS_RANK] & ~RANK_TIED_FLAG ) == 0 ) {
+						leadChange = LEAD_LOST;
+					}
+
+					if ( leadChange > cg.bestLeadChange ) {
+						cg.bestLeadChange = leadChange;
 					}
 				}
 			}
 		}
 	}
+}
+
+/*
+===============
+CG_CheckGameSounds
+
+Sounds that use to be played in CG_CheckLocalSounds, but with splitscreen we only want these done once.
+===============
+*/
+void CG_CheckGameSounds( void ) {
+	int		highScore;
+
+	// lead changes
+	switch ( cg.bestLeadChange ) {
+		case LEAD_TAKEN:
+#if 0 //#ifdef TA_MISC // COMIC_ANNOUNCER
+			// ZTM: FIXME: cg.cur_lc isn't valid here, sounds use to be added in CG_CheckLocalSounds (should these be moved back?)
+			CG_AddAnnouncement(ANNOUNCE_YOUHAVETAKENTHELEAD, cg.cur_lc-cg.localClients);
+#else
+			CG_AddBufferedSound(cgs.media.takenLeadSound);
+#endif
+			break;
+		case LEAD_TIED:
+#if 0 //#ifdef TA_MISC // COMIC_ANNOUNCER
+			CG_AddAnnouncement(ANNOUNCE_YOURTIEDFORTHELEAD, cg.cur_lc-cg.localClients);
+#else
+			CG_AddBufferedSound(cgs.media.tiedLeadSound);
+#endif
+			break;
+		case LEAD_LOST:
+#if 0 //#ifdef TA_MISC // COMIC_ANNOUNCER
+			CG_AddAnnouncement(ANNOUNCE_YOULOSTTHELEAD, cg.cur_lc-cg.localClients);
+#else
+			CG_AddBufferedSound(cgs.media.lostLeadSound);
+#endif
+			break;
+		default:
+			break;
+	}
+
+	// reset lead change
+	cg.bestLeadChange = LEAD_NONE;
 
 	// timelimit warnings
 	if ( cgs.timelimit > 0 ) {

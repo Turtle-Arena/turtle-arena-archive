@@ -234,6 +234,7 @@ vmCvar_t	cg_oldRocket;
 vmCvar_t	cg_oldPlasma;
 vmCvar_t	cg_trueLightning;
 vmCvar_t	cg_atmosphericEffects;
+vmCvar_t	cg_teamDmLeadAnnouncements;
 
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 vmCvar_t 	cg_redTeamName;
@@ -494,7 +495,8 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_oldPlasma, "cg_oldPlasma", "1", CVAR_ARCHIVE},
 #endif
 	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
-	{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE }
+	{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE },
+	{ &cg_teamDmLeadAnnouncements, "cg_teamDmLeadAnnouncements", "1", CVAR_ARCHIVE }
 //	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}

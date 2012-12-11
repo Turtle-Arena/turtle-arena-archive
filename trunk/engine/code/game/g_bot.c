@@ -317,6 +317,13 @@ int G_SelectRandomBotForAdd( int team ) {
 	char	*value;
 	gclient_t	*cl;
 
+	// To improve random bot selection when there are few bot types, duplicate bots are
+	// allowed on separate teams to try to keep each team from having duplicate bots.
+	// If there are enough bot types to fill the server, avoid duplicating bots on any team.
+	if ( g_numBots >= level.maxclients ) {
+		team = -1;
+	}
+
 	num = 0;
 	for ( n = 0; n < g_numBots ; n++ ) {
 		value = Info_ValueForKey( g_botInfos[n], "name" );
