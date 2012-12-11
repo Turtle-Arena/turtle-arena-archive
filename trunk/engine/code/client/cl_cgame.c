@@ -63,6 +63,26 @@ void CL_GetGlconfig( glconfig_t *glconfig ) {
 	*glconfig = cls.glconfig;
 }
 
+/*
+====================
+CL_GetClipboardData
+====================
+*/
+static void CL_GetClipboardData( char *buf, int buflen ) {
+	char	*cbd;
+
+	cbd = Sys_GetClipboardData();
+
+	if ( !cbd ) {
+		*buf = 0;
+		return;
+	}
+
+	Q_strncpyz( buf, cbd, buflen );
+
+	Z_Free( cbd );
+}
+
 
 /*
 ====================
@@ -442,6 +462,42 @@ The cgame module is making a system call
 */
 intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	switch( args[0] ) {
+	case TRAP_MEMSET:
+		Com_Memset( VMA(1), args[2], args[3] );
+		return 0;
+
+	case TRAP_MEMCPY:
+		Com_Memcpy( VMA(1), VMA(2), args[3] );
+		return 0;
+
+	case TRAP_STRNCPY:
+		strncpy( VMA(1), VMA(2), args[3] );
+		return args[1];
+
+	case TRAP_SIN:
+		return FloatAsInt( sin( VMF(1) ) );
+
+	case TRAP_COS:
+		return FloatAsInt( cos( VMF(1) ) );
+
+	case TRAP_ATAN2:
+		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
+
+	case TRAP_SQRT:
+		return FloatAsInt( sqrt( VMF(1) ) );
+
+	case TRAP_FLOOR:
+		return FloatAsInt( floor( VMF(1) ) );
+
+	case TRAP_CEIL:
+		return FloatAsInt( ceil( VMF(1) ) );
+
+	case TRAP_ACOS:
+		return FloatAsInt( Q_acos( VMF(1) ) );
+
+	case TRAP_ASIN:
+		return FloatAsInt( Q_asin( VMF(1) ) );
+
 	case CG_PRINT:
 		Com_Printf( "%s", (const char*)VMA(1) );
 		return 0;
@@ -459,8 +515,24 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_CVAR_SET:
 		Cvar_SetSafe( VMA(1), VMA(2) );
 		return 0;
-	case CG_CVAR_VARIABLESTRINGBUFFER:
+	case CG_CVAR_SET_VALUE:
+		Cvar_SetValueSafe( VMA(1), VMF(2) );
+		return 0;
+	case CG_CVAR_RESET:
+		Cvar_Reset( VMA(1) );
+		return 0;
+	case CG_CVAR_VARIABLE_VALUE:
+		return FloatAsInt( Cvar_VariableValue( VMA(1) ) );
+	case CG_CVAR_VARIABLE_INTEGER_VALUE:
+		return Cvar_VariableIntegerValue( VMA(1) );
+	case CG_CVAR_VARIABLE_STRING_BUFFER:
 		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
+		return 0;
+	case CG_CVAR_LATCHED_VARIABLE_STRING_BUFFER:
+		Cvar_LatchedVariableStringBuffer( VMA( 1 ), VMA( 2 ), args[3] );
+		return 0;
+	case CG_CVAR_INFO_STRING_BUFFER:
+		Cvar_InfoStringBuffer( args[1], VMA(2), args[3] );
 		return 0;
 	case CG_ARGC:
 		return Cmd_Argc();
@@ -478,15 +550,19 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_FS_WRITE:
 		FS_Write( VMA(1), args[2], args[3] );
 		return 0;
+	case CG_FS_SEEK:
+		return FS_Seek( args[1], args[2], args[3] );
 	case CG_FS_FCLOSEFILE:
 		FS_FCloseFile( args[1] );
 		return 0;
 	case CG_FS_GETFILELIST:
 		return FS_GetFileList( VMA(1), VMA(2), VMA(3), args[4] );
-	case CG_FS_SEEK:
-		return FS_Seek( args[1], args[2], args[3] );
-	case CG_SENDCONSOLECOMMAND:
-		Cbuf_AddText( VMA(1) );
+	case CG_FS_DELETE:
+		return FS_Delete( VMA(1) );
+	case CG_FS_RENAME:
+		return FS_Rename( VMA(1), VMA(2) );
+	case CG_CMD_EXECUTETEXT:
+		Cbuf_ExecuteTextSafe( args[1], VMA(2) );
 		return 0;
 	case CG_ADDCOMMAND:
 		CL_AddCgameCommand( VMA(1) );
@@ -637,6 +713,9 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		return 0;
 	case CG_R_LERPTAG:
 		return re.LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
+	case CG_GETCLIPBOARDDATA:
+		CL_GetClipboardData( VMA(1), args[2] );
+		return 0;
 	case CG_GETGLCONFIG:
 		CL_GetGlconfig( VMA(1) );
 		return 0;
@@ -672,7 +751,7 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 		Key_SetCatcher( args[1] | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
     return 0;
   case CG_KEY_GETKEY:
-		return Key_GetKey( VMA(1) );
+		return Key_GetKey( VMA(1), args[2] );
 
 #ifdef IOQ3ZTM // BONES
   case CG_R_JOINTINDEXFORNAME:
@@ -704,50 +783,24 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_KEY_GETOVERSTRIKEMODE:
 		return Key_GetOverstrikeMode( );
 
-	case TRAP_MEMSET:
-		Com_Memset( VMA(1), args[2], args[3] );
+	case CG_KEY_CLEARSTATES:
+		Key_ClearStates();
 		return 0;
-
-	case TRAP_MEMCPY:
-		Com_Memcpy( VMA(1), VMA(2), args[3] );
-		return 0;
-
-	case TRAP_STRNCPY:
-		strncpy( VMA(1), VMA(2), args[3] );
-		return args[1];
-
-	case TRAP_SIN:
-		return FloatAsInt( sin( VMF(1) ) );
-
-	case TRAP_COS:
-		return FloatAsInt( cos( VMF(1) ) );
-
-	case TRAP_ATAN2:
-		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
-
-	case TRAP_SQRT:
-		return FloatAsInt( sqrt( VMF(1) ) );
-
-	case TRAP_FLOOR:
-		return FloatAsInt( floor( VMF(1) ) );
-
-	case TRAP_CEIL:
-		return FloatAsInt( ceil( VMF(1) ) );
-
-	case TRAP_ACOS:
-		return FloatAsInt( Q_acos( VMF(1) ) );
-
-	case TRAP_ASIN:
-		return FloatAsInt( Q_asin( VMF(1) ) );
 
 	case CG_PC_ADD_GLOBAL_DEFINE:
 		return botlib_export->PC_AddGlobalDefine( VMA(1) );
+	case CG_PC_REMOVE_ALL_GLOBAL_DEFINES:
+		botlib_export->PC_RemoveAllGlobalDefines();
+		return 0;
 	case CG_PC_LOAD_SOURCE:
 		return botlib_export->PC_LoadSourceHandle( VMA(1) );
 	case CG_PC_FREE_SOURCE:
 		return botlib_export->PC_FreeSourceHandle( args[1] );
 	case CG_PC_READ_TOKEN:
 		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
+	case CG_PC_UNREAD_TOKEN:
+		botlib_export->PC_UnreadLastTokenHandle( args[1] );
+		return 0;
 	case CG_PC_SOURCE_FILE_AND_LINE:
 		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
 
@@ -818,7 +871,7 @@ void CL_InitCGame( void ) {
 	const char			*mapname;
 	int					t1, t2;
 	vmInterpret_t		interpret;
-	int					v;
+	unsigned int		version, major, minor;
 
 	t1 = Sys_Milliseconds();
 
@@ -845,13 +898,16 @@ void CL_InitCGame( void ) {
 	}
 
 	// sanity check
-	v = VM_SafeCall( cgvm, CG_GETAPIVERSION );
-	if (v != CG_API_VERSION) {
+	version = VM_SafeCall( cgvm, CG_GETAPIVERSION );
+	major = (version >> 16) & 0xFFFF;
+	minor = version & 0xFFFF;
+	Com_DPrintf("Loading cgame with version %x.%x\n", major, minor);
+	if ( major != CG_API_MAJOR_VERSION || minor > CG_API_MINOR_VERSION ) {
 		// Free cgvm now, so CG_SHUTDOWN doesn't get called later.
 		VM_Free( cgvm );
 		cgvm = NULL;
 
-		Com_Error(ERR_DROP, "CGame is version %d, expected %d", v, CG_API_VERSION );
+		Com_Error( ERR_DROP, "CGame is version %x.%x, expected %x.%x", major, minor, CG_API_MAJOR_VERSION, CG_API_MINOR_VERSION );
 	}
 
 	clc.state = CA_LOADING;

@@ -54,8 +54,7 @@ void	trap_Print( const char *fmt ) {
 	syscall( CG_PRINT, fmt );
 }
 
-void trap_Error(const char *fmt)
-{
+void	trap_Error(const char *fmt) {
 	syscall(CG_ERROR, fmt);
 	// shut up GCC warning about returning functions, because we know better
 	exit(1);
@@ -77,8 +76,34 @@ void	trap_Cvar_Set( const char *var_name, const char *value ) {
 	syscall( CG_CVAR_SET, var_name, value );
 }
 
-void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
-	syscall( CG_CVAR_VARIABLESTRINGBUFFER, var_name, buffer, bufsize );
+void	trap_Cvar_SetValue( const char *var_name, float value ) {
+	syscall( CG_CVAR_SET_VALUE, var_name, PASSFLOAT( value ) );
+}
+
+void	trap_Cvar_Reset( const char *name ) {
+	syscall( CG_CVAR_RESET, name );
+}
+
+float	trap_Cvar_VariableValue( const char *var_name ) {
+	floatint_t fi;
+	fi.i = syscall( CG_CVAR_VARIABLE_VALUE, var_name );
+	return fi.f;
+}
+
+int		trap_Cvar_VariableIntegerValue( const char *var_name ) {
+	return syscall( CG_CVAR_VARIABLE_INTEGER_VALUE, var_name );
+}
+
+void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+	syscall( CG_CVAR_VARIABLE_STRING_BUFFER, var_name, buffer, bufsize );
+}
+
+void trap_Cvar_LatchedVariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+	syscall( CG_CVAR_LATCHED_VARIABLE_STRING_BUFFER, var_name, buffer, bufsize );
+}
+
+void	trap_Cvar_InfoStringBuffer( int bit, char *buffer, int bufsize ) {
+	syscall( CG_CVAR_INFO_STRING_BUFFER, bit, buffer, bufsize );
 }
 
 int		trap_Argc( void ) {
@@ -105,6 +130,10 @@ void	trap_FS_Write( const void *buffer, int len, fileHandle_t f ) {
 	syscall( CG_FS_WRITE, buffer, len, f );
 }
 
+int		trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
+	return syscall( CG_FS_SEEK, f, offset, origin );
+}
+
 void	trap_FS_FCloseFile( fileHandle_t f ) {
 	syscall( CG_FS_FCLOSEFILE, f );
 }
@@ -113,12 +142,16 @@ int trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf
 	return syscall( CG_FS_GETFILELIST, path, extension, listbuf, bufsize );
 }
 
-int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
-	return syscall( CG_FS_SEEK, f, offset, origin );
+int trap_FS_Delete( const char *path ) {
+	return syscall( CG_FS_DELETE, path );
 }
 
-void	trap_SendConsoleCommand( const char *text ) {
-	syscall( CG_SENDCONSOLECOMMAND, text );
+int trap_FS_Rename( const char *from, const char *to ) {
+	return syscall( CG_FS_RENAME, from, to );
+}
+
+void	trap_Cmd_ExecuteText( int exec_when, const char *text ) {
+	syscall( CG_CMD_EXECUTETEXT, exec_when, text );
 }
 
 void	trap_AddCommand( const char *cmdName ) {
@@ -355,6 +388,10 @@ qboolean trap_R_inPVS( const vec3_t p1, const vec3_t p2 ) {
 	return syscall( CG_R_INPVS, p1, p2 );
 }
 
+void		trap_GetClipboardData( char *buf, int bufsize ) {
+	syscall( CG_GETCLIPBOARDDATA, buf, bufsize );
+}
+
 void		trap_GetGlconfig( glconfig_t *glconfig ) {
 	syscall( CG_GETGLCONFIG, glconfig );
 }
@@ -401,6 +438,10 @@ qboolean trap_Key_IsDown( int keynum ) {
 	return syscall( CG_KEY_ISDOWN, keynum );
 }
 
+void trap_Key_ClearStates( void ) {
+	syscall( CG_KEY_CLEARSTATES );
+}
+
 int trap_Key_GetCatcher( void ) {
 	return syscall( CG_KEY_GETCATCHER );
 }
@@ -409,8 +450,8 @@ void trap_Key_SetCatcher( int catcher ) {
 	syscall( CG_KEY_SETCATCHER, catcher );
 }
 
-int trap_Key_GetKey( const char *binding ) {
-	return syscall( CG_KEY_GETKEY, binding );
+int trap_Key_GetKey( const char *binding, int startKey ) {
+	return syscall( CG_KEY_GETKEY, binding, startKey );
 }
 
 void trap_Key_KeynumToStringBuf( int keynum, char *buf, int buflen ) {
@@ -437,6 +478,10 @@ int trap_PC_AddGlobalDefine( char *define ) {
 	return syscall( CG_PC_ADD_GLOBAL_DEFINE, define );
 }
 
+void trap_PC_RemoveAllGlobalDefines( void ) {
+	syscall( CG_PC_REMOVE_ALL_GLOBAL_DEFINES );
+}
+
 int trap_PC_LoadSource( const char *filename ) {
 	return syscall( CG_PC_LOAD_SOURCE, filename );
 }
@@ -447,6 +492,10 @@ int trap_PC_FreeSource( int handle ) {
 
 int trap_PC_ReadToken( int handle, pc_token_t *pc_token ) {
 	return syscall( CG_PC_READ_TOKEN, handle, pc_token );
+}
+
+void trap_PC_UnreadToken( int handle ) {
+	syscall( CG_PC_UNREAD_TOKEN, handle );
 }
 
 int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) {

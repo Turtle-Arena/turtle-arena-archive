@@ -61,7 +61,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 
 	switch ( command ) {
 	case CG_GETAPIVERSION:
-		return CG_API_VERSION;
+		return ( CG_API_MAJOR_VERSION << 16) | ( CG_API_MINOR_VERSION & 0xFFFF );
 	case CG_INIT:
 		CG_Init( arg0, arg1, arg2, arg3, arg4, arg5, arg6 );
 		return 0;
@@ -2389,18 +2389,19 @@ void CG_LoadHudMenu( void ) {
 	cgDC.getCVarString = trap_Cvar_VariableStringBuffer;
 	cgDC.getCVarValue = CG_Cvar_Get;
 	cgDC.drawTextWithCursor = &CG_Text_PaintWithCursor;
-	//cgDC.setOverstrikeMode = &trap_Key_SetOverstrikeMode;
-	//cgDC.getOverstrikeMode = &trap_Key_GetOverstrikeMode;
+	cgDC.setOverstrikeMode = &trap_Key_SetOverstrikeMode;
+	cgDC.getOverstrikeMode = &trap_Key_GetOverstrikeMode;
 	cgDC.startLocalSound = &trap_S_StartLocalSound;
 	cgDC.ownerDrawHandleKey = &CG_OwnerDrawHandleKey;
 	cgDC.feederCount = &CG_FeederCount;
 	cgDC.feederItemImage = &CG_FeederItemImage;
 	cgDC.feederItemText = &CG_FeederItemText;
 	cgDC.feederSelection = &CG_FeederSelection;
-	//cgDC.setBinding = &trap_Key_SetBinding;
-	//cgDC.getBindingBuf = &trap_Key_GetBindingBuf;
-	//cgDC.keynumToStringBuf = &trap_Key_KeynumToStringBuf;
-	//cgDC.executeText = &trap_Cmd_ExecuteText;
+	cgDC.setBinding = &trap_Key_SetBinding;
+	cgDC.getBindingBuf = &trap_Key_GetBindingBuf;
+	cgDC.keynumToStringBuf = &trap_Key_KeynumToStringBuf;
+	cgDC.getKey = &trap_Key_GetKey;
+	cgDC.executeText = &trap_Cmd_ExecuteText;
 	cgDC.Error = &Com_Error; 
 	cgDC.Print = &Com_Printf; 
 	cgDC.ownerDrawWidth = &CG_OwnerDrawWidth;

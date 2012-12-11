@@ -152,7 +152,7 @@ void UpdateTournamentInfo( void ) {
 		}
 		strcat( msg, buf );
 	}
-	trap_SendConsoleCommand( EXEC_APPEND, msg );
+	trap_Cmd_ExecuteText( EXEC_APPEND, msg );
 }
 
 #ifndef TA_SP

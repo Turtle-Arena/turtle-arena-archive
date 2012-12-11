@@ -119,20 +119,20 @@ void CG_CheckOrderPending(void) {
 
 		if (cg_currentSelectedPlayer.integer == numSortedTeamPlayers[team]) {
 			// to everyone
-			trap_SendConsoleCommand(va("cmd vsay_team %s\n", p2));
+			trap_Cmd_ExecuteText(EXEC_APPEND, va("cmd vsay_team %s\n", p2));
 		} else {
 			// for the player self
 			if (sortedTeamPlayers[team][cg_currentSelectedPlayer.integer] == clientNum && p1) {
-				trap_SendConsoleCommand(va("teamtask %i\n", cgs.currentOrder));
-				//trap_SendConsoleCommand(va("cmd say_team %s\n", p2));
-				trap_SendConsoleCommand(va("cmd vsay_team %s\n", p1));
+				trap_Cmd_ExecuteText(EXEC_APPEND, va("teamtask %i\n", cgs.currentOrder));
+				//trap_Cmd_ExecuteText(EXEC_APPEND, va("cmd say_team %s\n", p2));
+				trap_Cmd_ExecuteText(EXEC_APPEND, va("cmd vsay_team %s\n", p1));
 			} else if (p2) {
-				//trap_SendConsoleCommand(va("cmd say_team %s, %s\n", ci->name,p));
-				trap_SendConsoleCommand(va("cmd vtell %d %s\n", sortedTeamPlayers[team][cg_currentSelectedPlayer.integer], p2));
+				//trap_Cmd_ExecuteText(EXEC_APPEND, va("cmd say_team %s, %s\n", ci->name,p));
+				trap_Cmd_ExecuteText(EXEC_APPEND, va("cmd vtell %d %s\n", sortedTeamPlayers[team][cg_currentSelectedPlayer.integer], p2));
 			}
 		}
 		if (b) {
-			trap_SendConsoleCommand(b);
+			trap_Cmd_ExecuteText(EXEC_APPEND, b);
 		}
 		cgs.orderPending = qfalse;
 	}
@@ -2004,7 +2004,7 @@ void CG_KeyEvent(int key, qboolean down) {
 		return;
 	}
 
-  //if (key == trap_Key_GetKey("teamMenu") || !Display_CaptureItem(cgs.cursorX, cgs.cursorY)) {
+  //if (key == trap_Key_GetKey("teamMenu", 0) || !Display_CaptureItem(cgs.cursorX, cgs.cursorY)) {
     // if we see this then we should always be visible
   //  CG_EventHandling(CGAME_EVENT_NONE);
   //  trap_Key_SetCatcher(0);

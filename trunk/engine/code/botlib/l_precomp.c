@@ -3193,6 +3193,22 @@ int PC_ReadTokenHandle(int handle, pc_token_t *pc_token)
 } //end of the function PC_ReadTokenHandle
 //============================================================================
 //
+// Parameter:				-
+// Returns:					-
+// Changes Globals:		-
+//============================================================================
+void PC_UnreadLastTokenHandle( int handle ) {
+	if ( handle < 1 || handle >= MAX_SOURCEFILES ) {
+		return;
+	}
+	if ( !sourceFiles[handle] ) {
+		return;
+	}
+
+	PC_UnreadSourceToken( sourceFiles[handle], &sourceFiles[handle]->token );
+} //end of the function PC_UnreadLastTokenHandle
+//============================================================================
+//
 // Parameter:			-
 // Returns:				-
 // Changes Globals:		-

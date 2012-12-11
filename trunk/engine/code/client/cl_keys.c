@@ -1060,11 +1060,11 @@ Key_GetKey
 ===================
 */
 
-int Key_GetKey(const char *binding) {
+int Key_GetKey(const char *binding, int startKey) {
   int i;
 
   if (binding) {
-  	for (i=0 ; i < MAX_KEYS ; i++) {
+  	for (i=startKey ; i < MAX_KEYS ; i++) {
       if (keys[i].binding && Q_stricmp(binding, keys[i].binding) == 0) {
         return i;
       }

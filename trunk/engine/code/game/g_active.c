@@ -1737,7 +1737,7 @@ void ClientThink_real( gentity_t *ent ) {
 				pm.cmd.rightmove = 0;
 				pm.cmd.upmove = 0;
 				if ( level.time - level.intermissionQueued >= 2000 && level.time - level.intermissionQueued <= 2500 ) {
-					trap_SendConsoleCommand( EXEC_APPEND, "centerview\n");
+					trap_Cmd_ExecuteText( EXEC_APPEND, "centerview\n");
 				}
 				ent->client->ps.pm_type = PM_SPINTERMISSION;
 			}

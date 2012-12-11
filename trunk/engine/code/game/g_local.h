@@ -1081,26 +1081,8 @@ extern	vmCvar_t	g_laserTag;
 extern	vmCvar_t	g_2dmode;
 #endif
 
-void	trap_Print( const char *text );
-void	trap_Error( const char *text ) __attribute__((noreturn));
-int		trap_Milliseconds( void );
-int	trap_RealTime( qtime_t *qtime );
-int		trap_Argc( void );
-void	trap_Argv( int n, char *buffer, int bufferLength );
-void	trap_Args( char *buffer, int bufferLength );
-int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode );
-void	trap_FS_Read( void *buffer, int len, fileHandle_t f );
-void	trap_FS_Write( const void *buffer, int len, fileHandle_t f );
-void	trap_FS_FCloseFile( fileHandle_t f );
-int		trap_FS_GetFileList( const char *path, const char *extension, char *listbuf, int bufsize );
-int		trap_FS_Seek( fileHandle_t f, long offset, int origin ); // fsOrigin_t
-void	trap_SendConsoleCommand( int exec_when, const char *text );
-void	trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags );
-void	trap_Cvar_Update( vmCvar_t *cvar );
-void	trap_Cvar_Set( const char *var_name, const char *value );
-int		trap_Cvar_VariableIntegerValue( const char *var_name );
-float	trap_Cvar_VariableValue( const char *var_name );
-void	trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize );
+// Additional shared traps in bg_misc.h
+
 void	trap_LocateGameData( gentity_t *gEnts, int numGEntities, int sizeofGEntity_t, playerState_t *gameClients, int sizeofGameClient );
 void	trap_DropClient( int clientNum, const char *reason );
 void	trap_SendServerCommand( int clientNum, const char *text );
@@ -1149,7 +1131,6 @@ int		trap_BotLibSetup( void );
 int		trap_BotLibShutdown( void );
 int		trap_BotLibVarSet(char *var_name, char *value);
 int		trap_BotLibVarGet(char *var_name, char *value, int size);
-int		trap_BotLibDefine(char *string);
 int		trap_BotLibStartFrame(float time);
 #ifdef TA_WEAPSYS // BOT_ITEM_INFOS
 int		trap_BotLibLoadMap(const char *mapname, void /* bot_shareditem_t */ *itemInfos);
@@ -1317,8 +1298,3 @@ void	trap_BotResetWeaponState(int weaponstate);
 #endif
 
 int		trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *parent1, int *parent2, int *child);
-
-void	trap_SnapVector( float *v );
-
-void	trap_AddCommand( const char *cmdName );
-void	trap_RemoveCommand( const char *cmdName );

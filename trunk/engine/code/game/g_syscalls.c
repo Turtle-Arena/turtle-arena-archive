@@ -71,6 +71,10 @@ void	trap_Argv( int n, char *buffer, int bufferLength ) {
 	syscall( G_ARGV, n, buffer, bufferLength );
 }
 
+void	trap_Args( char *buffer, int bufferLength ) {
+	syscall( G_ARGS, buffer, bufferLength );
+}
+
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode ) {
 	return syscall( G_FS_FOPEN_FILE, qpath, f, mode );
 }
@@ -83,6 +87,10 @@ void	trap_FS_Write( const void *buffer, int len, fileHandle_t f ) {
 	syscall( G_FS_WRITE, buffer, len, f );
 }
 
+int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
+	return syscall( G_FS_SEEK, f, offset, origin );
+}
+
 void	trap_FS_FCloseFile( fileHandle_t f ) {
 	syscall( G_FS_FCLOSE_FILE, f );
 }
@@ -91,12 +99,16 @@ int trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf
 	return syscall( G_FS_GETFILELIST, path, extension, listbuf, bufsize );
 }
 
-int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
-	return syscall( G_FS_SEEK, f, offset, origin );
+int trap_FS_Delete( const char *path ) {
+	return syscall( G_FS_DELETE, path );
 }
 
-void	trap_SendConsoleCommand( int exec_when, const char *text ) {
-	syscall( G_SEND_CONSOLE_COMMAND, exec_when, text );
+int trap_FS_Rename( const char *from, const char *to ) {
+	return syscall( G_FS_RENAME, from, to );
+}
+
+void	trap_Cmd_ExecuteText( int exec_when, const char *text ) {
+	syscall( G_CMD_EXECUTETEXT, exec_when, text );
 }
 
 void	trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags ) {
@@ -111,12 +123,30 @@ void trap_Cvar_Set( const char *var_name, const char *value ) {
 	syscall( G_CVAR_SET, var_name, value );
 }
 
+void trap_Cvar_SetValue( const char *var_name, float value ) {
+	syscall( G_CVAR_SET_VALUE, var_name, PASSFLOAT( value ) );
+}
+
+float trap_Cvar_VariableValue( const char *var_name ) {
+	floatint_t fi;
+	fi.i = syscall( G_CVAR_VARIABLE_VALUE, var_name );
+	return fi.f;
+}
+
 int trap_Cvar_VariableIntegerValue( const char *var_name ) {
 	return syscall( G_CVAR_VARIABLE_INTEGER_VALUE, var_name );
 }
 
 void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
 	syscall( G_CVAR_VARIABLE_STRING_BUFFER, var_name, buffer, bufsize );
+}
+
+void trap_Cvar_LatchedVariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+	syscall( G_CVAR_LATCHED_VARIABLE_STRING_BUFFER, var_name, buffer, bufsize );
+}
+
+void trap_Cvar_InfoStringBuffer( int bit, char *buffer, int bufsize ) {
+	syscall( G_CVAR_INFO_STRING_BUFFER, bit, buffer, bufsize );
 }
 
 
@@ -299,10 +329,6 @@ int trap_BotLibVarSet(char *var_name, char *value) {
 
 int trap_BotLibVarGet(char *var_name, char *value, int size) {
 	return syscall( BOTLIB_LIBVAR_GET, var_name, value, size );
-}
-
-int trap_BotLibDefine(char *string) {
-	return syscall( BOTLIB_PC_ADD_GLOBAL_DEFINE, string );
 }
 
 int trap_BotLibStartFrame(float time) {
@@ -855,18 +881,30 @@ int trap_GeneticParentsAndChildSelection(int numranks, float *ranks, int *parent
 	return syscall( BOTLIB_AI_GENETIC_PARENTS_AND_CHILD_SELECTION, numranks, ranks, parent1, parent2, child );
 }
 
+int trap_PC_AddGlobalDefine(char *string) {
+	return syscall( G_PC_ADD_GLOBAL_DEFINE, string );
+}
+
+void trap_PC_RemoveAllGlobalDefines( void ) {
+	syscall( G_PC_REMOVE_ALL_GLOBAL_DEFINES );
+}
+
 int trap_PC_LoadSource( const char *filename ) {
-	return syscall( BOTLIB_PC_LOAD_SOURCE, filename );
+	return syscall( G_PC_LOAD_SOURCE, filename );
 }
 
 int trap_PC_FreeSource( int handle ) {
-	return syscall( BOTLIB_PC_FREE_SOURCE, handle );
+	return syscall( G_PC_FREE_SOURCE, handle );
 }
 
 int trap_PC_ReadToken( int handle, pc_token_t *pc_token ) {
-	return syscall( BOTLIB_PC_READ_TOKEN, handle, pc_token );
+	return syscall( G_PC_READ_TOKEN, handle, pc_token );
+}
+
+void trap_PC_UnreadToken( int handle ) {
+	syscall( G_PC_UNREAD_TOKEN, handle );
 }
 
 int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) {
-	return syscall( BOTLIB_PC_SOURCE_FILE_AND_LINE, handle, filename, line );
+	return syscall( G_PC_SOURCE_FILE_AND_LINE, handle, filename, line );
 }
