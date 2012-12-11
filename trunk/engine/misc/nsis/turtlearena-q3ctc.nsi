@@ -7,6 +7,8 @@
 !define MODDIR "q3ctc"
 !define PUBLISHER "The Turtle Arena Team"
 !define URL "http://turtlearena.googlecode.com/"
+; uncomment if the mod works without base
+;!define STANDALONE
 
 !define MUI_ICON "../quake3.ico"
 
@@ -28,21 +30,16 @@
 !define GAMENAME "Turtle Arena"
 !define CLIENT "turtlearena.x86.exe"
 !define GAMEDIR "Turtle Arena"
-!define GAME_FSNAME "turtlearena"
-
-; !define GAMENAME "ioquake3" ; "Quake III Arena"
-; !define CLIENT "ioquake3.x86.exe"
-; !define GAMEDIR "ioquake3"
-; !define GAME_FSNAME "ioquake3"
+!define GAMEKEY "turtlearena"
 
 SetCompressor lzma
 
 !define MULTIUSER_MUI
 !define MULTIUSER_EXECUTIONLEVEL Highest
 !define MULTIUSER_INSTALLMODE_COMMANDLINE
-!define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_KEY "Software\${GAME_FSNAME}"
+!define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_KEY "Software\${GAMEKEY}"
 !define MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_VALUENAME "Install_Mode"
-!define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_KEY "Software\${GAME_FSNAME}"
+!define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_KEY "Software\${GAMEKEY}"
 !define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME "Install_Dir"
 !define MULTIUSER_INSTALLMODE_INSTDIR "${GAMEDIR}"
 !include MultiUser.nsh
@@ -85,7 +82,7 @@ OutFile "${FSNAME}-${VERSION}-${RELEASE}.x86.exe"
 ;Multiuser stuff
 Function .onInit
   !insertmacro MULTIUSER_INIT
-  ReadRegStr $0 SHCTX "Software\${GAME_FSNAME}" ${MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME}
+  ReadRegStr $0 SHCTX "Software\${GAMEKEY}" ${MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_VALUENAME}
   IfErrors 0 oninitdone
     MessageBox MB_OK "You need to install ${GAMENAME} first"
     Abort
@@ -118,7 +115,12 @@ Section "${NAME}" sec_base
 
   WriteUninstaller "uninstall-${FSNAME}.exe"
 
-  CreateShortCut "$SMPROGRAMS\${GAMENAME}\${NAME}.lnk" "$INSTDIR\${CLIENT}" "+set fs_game ${MODDIR}" "$INSTDIR\${CLIENT}" 0 "" "" "${NAME}"
+!ifdef STANDALONE
+!define ARGS "+set com_basegame ${MODDIR}"
+!else
+!define ARGS "+set fs_game ${MODDIR}"
+!endif
+  CreateShortCut "$SMPROGRAMS\${GAMENAME}\${NAME}.lnk" "$INSTDIR\${CLIENT}" "${ARGS}" "$INSTDIR\${CLIENT}" 0 "" "" "${NAME}"
 
 SectionEnd
 

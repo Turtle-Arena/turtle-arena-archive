@@ -1,5 +1,8 @@
 COMPILE_PLATFORM=$(shell uname|sed -e s/_.*//|tr '[:upper:]' '[:lower:]'|sed -e 's/\//_/g')
 
+ifndef FSNAME
+FSNAME=turtlearena
+endif
 ifndef VERSION
 VERSION=0.7
 endif
@@ -56,13 +59,14 @@ ifeq ($(USE_INTERNAL_JPEG),1)
 	DEFINES+= -DUSE_INTERNAL_JPEG
 endif
 
+NSISFILENAME=${FSNAME}-${VERSION}-${RELEASE}.$(ARCH).exe
 
-all: turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe
+all: $(NSISFILENAME)
 
 turtlearena.$(ARCH).nsi: turtlearena.nsi.in
-	sed 's|XXXVERSIONXXX|$(VERSION)|;s|XXXRELEASEXXX|$(RELEASE)|;s|x86|$(ARCH)|g;s|XXXASSETPATHXXX|$(ASSETPATH)|;s|SDL.dll|$(SDLDLL)|' < $< > $@
+	sed 's|XXXFILENAMEXXX|$(NSISFILENAME)|;s|XXXVERSIONXXX|$(VERSION)|;s|XXXRELEASEXXX|$(RELEASE)|;s|x86|$(ARCH)|g;s|XXXASSETPATHXXX|$(ASSETPATH)|;s|SDL.dll|$(SDLDLL)|' < $< > $@
 
-turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe: turtlearena.$(ARCH).nsi
+$(NSISFILENAME): turtlearena.$(ARCH).nsi
 	cp "../../../GPL-2.txt" .
 	cp "../../../CC-BY-SA-3.0.txt" .
 	cp "../../../COPYRIGHTS.txt" .
@@ -82,7 +86,7 @@ clean:
 
 install:
 	mkdir -p $(INSTALLDIR)
-	mv turtlearena-$(VERSION)-$(RELEASE).$(ARCH).exe $(INSTALLDIR)
+	mv $(NSISFILENAME) $(INSTALLDIR)
 
 .PHONY: all clean
 
