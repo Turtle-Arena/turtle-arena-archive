@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Release Win32">
 				<Option platforms="Windows;" />
-				<Option output="../../build/game_release/qagamex86.dll" prefix_auto="0" extension_auto="0" />
+				<Option output="../../build/game_release/gamex86.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/game_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -28,7 +28,7 @@
 			</Target>
 			<Target title="Debug Win32">
 				<Option platforms="Windows;" />
-				<Option output="../../build/game_debug/qagamex86.dll" prefix_auto="0" extension_auto="0" />
+				<Option output="../../build/game_debug/gamex86.dll" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/game_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -48,7 +48,7 @@
 			</Target>
 			<Target title="Release Linux i386">
 				<Option platforms="Unix;" />
-				<Option output="../../build/game_release/qagamei386.so" prefix_auto="0" extension_auto="0" />
+				<Option output="../../build/game_release/gamei386.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/game_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -67,7 +67,7 @@
 			</Target>
 			<Target title="Debug Linux i386">
 				<Option platforms="Unix;" />
-				<Option output="../../build/game_debug/qagamei386.so" prefix_auto="0" extension_auto="0" />
+				<Option output="../../build/game_debug/gamei386.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/game_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -89,7 +89,7 @@
 			</Target>
 			<Target title="Release Linux x86_64">
 				<Option platforms="Unix;" />
-				<Option output="../../build/game_release/qagamex86_64.so" prefix_auto="0" extension_auto="0" />
+				<Option output="../../build/game_release/gamex86_64.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/game_release" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -108,7 +108,7 @@
 			</Target>
 			<Target title="Debug Linux x86_64">
 				<Option platforms="Unix;" />
-				<Option output="../../build/game_debug/qagamex86_64.so" prefix_auto="0" extension_auto="0" />
+				<Option output="../../build/game_debug/gamex86_64.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="../../build/game_debug" />
 				<Option type="3" />
 				<Option compiler="gcc" />
