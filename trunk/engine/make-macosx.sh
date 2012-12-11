@@ -3,7 +3,7 @@ CC=gcc-4.0
 APPBUNDLE=turtlearena.app
 BINARY=turtlearena.x86_64
 DEDBIN=turtlearena-server.x86_64
-PKGINFO=APPLTURTLEARENA
+PKGINFO=APPLTUAR
 ICNS=misc/quake3.icns
 DESTDIR=build/release-darwin-x86_64
 BASEDIR=base
@@ -17,7 +17,7 @@ BIN_DEDOBJ="
 BASE_OBJ="
 	build/release-darwin-x86_64/$BASEDIR/cgamex86_64.dylib
 	build/release-darwin-x86_64/$BASEDIR/uix86_64.dylib
-	build/release-darwin-x86_64/$BASEDIR/qagamex86_64.dylib
+	build/release-darwin-x86_64/$BASEDIR/gamex86_64.dylib
 	../install/$BASEDIR/assets0.pk3
 	../install/$BASEDIR/assets1-qvms.pk3
 	../install/$BASEDIR/assets2-music.pk3
@@ -25,7 +25,7 @@ BASE_OBJ="
 
 cd `dirname $0`
 if [ ! -f Makefile ]; then
-	echo "This script must be run from the ioquake3 build directory"
+	echo "This script must be run from the Turtle Arena build directory"
 	exit 1
 fi
 
@@ -99,7 +99,7 @@ echo "
 		<key>CFBundleIconFile</key>
 		<string>turtlearena.icns</string>
 		<key>CFBundleIdentifier</key>
-		<string>org.ioquake.ioquake3</string>
+		<string>org.turtlearena.turtlearena</string>
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>

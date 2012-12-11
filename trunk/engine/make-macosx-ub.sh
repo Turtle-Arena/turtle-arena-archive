@@ -3,7 +3,7 @@ CC=gcc4.0
 APPBUNDLE=turtlearena.app
 BINARY=turtlearena.ub
 DEDBIN=turtlearena-server.ub
-PKGINFO=APPLTURTLEARENA
+PKGINFO=APPLTUAR
 ICNS=misc/quake3.icns
 DESTDIR=build/release-darwin-ub
 BASEDIR=base
@@ -21,8 +21,8 @@ BASE_OBJ="
 	build/release-darwin-i386/$BASEDIR/cgamei386.dylib
 	build/release-darwin-ppc/$BASEDIR/uippc.dylib
 	build/release-darwin-i386/$BASEDIR/uii386.dylib
-	build/release-darwin-ppc/$BASEDIR/qagameppc.dylib
-	build/release-darwin-i386/$BASEDIR/qagamei386.dylib
+	build/release-darwin-ppc/$BASEDIR/gameppc.dylib
+	build/release-darwin-i386/$BASEDIR/gamei386.dylib
 	../install/$BASEDIR/assets0.pk3
 	../install/$BASEDIR/assets1-qvms.pk3
 	../install/$BASEDIR/assets2-music.pk3
