@@ -52,7 +52,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define SVF_NOSERVERINFO		0x00000200	// don't send CS_SERVERINFO updates to this client
 											// so that it can be updated for ping tools without
 											// lagging clients
-#define SVF_CAPSULE				0x00000400	// use capsule for collision detection instead of bbox
 #define SVF_NOTSINGLECLIENT		0x00000800	// send entity to everyone but one client
 											// (entityShared_t->singleClient)
 

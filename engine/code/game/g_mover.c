@@ -58,6 +58,8 @@ G_TestEntityPosition
 */
 gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 	trace_t	tr;
+	qboolean	capsule;
+	vec3_t	origin;
 	int		mask;
 
 #ifdef IOQ3ZTM
@@ -73,6 +75,14 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 	}
 #endif
 
+	if ( ent->client ) {
+		VectorCopy( ent->client->ps.origin, origin );
+		capsule = ent->client->ps.capsule;
+	} else {
+		VectorCopy( ent->s.pos.trBase, origin );
+		capsule = ent->s.capsule;
+	}
+
 	if ( ent->clipmask ) {
 		mask = ent->clipmask;
 	} else {
@@ -82,10 +92,11 @@ gentity_t	*G_TestEntityPosition( gentity_t *ent ) {
 		mask = MASK_SOLID;
 #endif
 	}
-	if ( ent->client ) {
-		trap_Trace( &tr, ent->client->ps.origin, ent->s.mins, ent->s.maxs, ent->client->ps.origin, ent->s.number, mask );
+
+	if ( capsule ) {
+		trap_TraceCapsule( &tr, origin, ent->s.mins, ent->s.maxs, origin, ent->s.number, mask );
 	} else {
-		trap_Trace( &tr, ent->s.pos.trBase, ent->s.mins, ent->s.maxs, ent->s.pos.trBase, ent->s.number, mask );
+		trap_Trace( &tr, origin, ent->s.mins, ent->s.maxs, origin, ent->s.number, mask );
 	}
 	
 #ifdef IOQ3ZTM

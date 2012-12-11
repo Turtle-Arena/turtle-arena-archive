@@ -5041,6 +5041,7 @@ void BG_PlayerStateToEntityState( playerState_t *ps, entityState_t *s, qboolean 
 	s->generic1 = ps->generic1;
 
 	s->bmodel = qfalse;
+	s->capsule = ps->capsule;
 
 	VectorCopy( ps->mins, s->mins );
 	VectorCopy( ps->maxs, s->maxs );
@@ -5150,6 +5151,7 @@ void BG_PlayerStateToEntityStateExtraPolate( playerState_t *ps, entityState_t *s
 	s->generic1 = ps->generic1;
 
 	s->bmodel = qfalse;
+	s->capsule = ps->capsule;
 
 	VectorCopy( ps->mins, s->mins );
 	VectorCopy( ps->maxs, s->maxs );

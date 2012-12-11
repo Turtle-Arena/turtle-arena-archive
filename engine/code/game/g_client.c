@@ -1705,6 +1705,7 @@ void ClientSpawn(gentity_t *ent, qboolean firstTime) {
 	client->ps.stats[STAT_MAX_HEALTH] = client->pers.maxHealth;
 	client->ps.eFlags = flags;
 	client->ps.contents = CONTENTS_BODY;
+	client->ps.capsule = qtrue;
 
 	ent->s.groundEntityNum = ENTITYNUM_NONE;
 	ent->client = &level.clients[index];
