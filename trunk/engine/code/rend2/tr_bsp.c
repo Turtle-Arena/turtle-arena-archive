@@ -2598,6 +2598,17 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
 			if ( (unsigned)out->originalBrushNumber >= brushesCount ) {
 				ri.Error( ERR_DROP, "fog brushNumber out of range" );
 			}
+
+			// find which bsp submodel the fog volume belongs to
+			for ( j = 0; j < s_worldData.numBModels; j++ )
+			{
+				if ( out->originalBrushNumber >= s_worldData.bmodels[ j ].firstBrush &&
+					 out->originalBrushNumber < ( s_worldData.bmodels[ j ].firstBrush + s_worldData.bmodels[ j ].numBrushes ) ) {
+					out->modelNum = j;
+					break;
+				}
+			}
+
 			brush = brushes + out->originalBrushNumber;
 
 			firstSide = LittleLong( brush->firstSide );

@@ -70,8 +70,9 @@ static qboolean R_CullSurface( surfaceType_t *surface, shader_t *shader/*, int *
 		}
 		break;
 
+	case SF_FLARE:
 	default:
-		return qtrue;
+		return qfalse;
 	}
 
 	// get generic surface
@@ -484,7 +485,7 @@ static void R_RecursiveWorldNode( mnode_t *node, int planeBits, int dlightBits )
 					return;                     // culled
 				}
 				if ( r == 1 ) {
-					planeBits &= ~8;            // all descendants will also be in front
+					planeBits &= ~16;            // all descendants will also be in front
 				}
 			}
 
