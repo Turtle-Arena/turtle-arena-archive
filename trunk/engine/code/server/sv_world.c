@@ -37,7 +37,7 @@ SV_ClipHandleForEntity
 
 Returns a headnode that can be used for testing or clipping to a
 given entity.  If the entity is a bsp model, the headnode will
-be returned, otherwise a custom box tree will be constructed.
+be returned, otherwise a custom box tree or capsule will be constructed.
 ================
 */
 clipHandle_t SV_ClipHandleForEntity( const sharedEntity_t *ent ) {
@@ -45,13 +45,9 @@ clipHandle_t SV_ClipHandleForEntity( const sharedEntity_t *ent ) {
 		// explicit hulls in the BSP model
 		return CM_InlineModel( ent->s.modelindex );
 	}
-	if ( ent->r.svFlags & SVF_CAPSULE ) {
-		// create a temp capsule from bounding box sizes
-		return CM_TempBoxModel( ent->s.mins, ent->s.maxs, qtrue, ent->s.contents );
-	}
 
-	// create a temp tree from bounding box sizes
-	return CM_TempBoxModel( ent->s.mins, ent->s.maxs, qfalse, ent->s.contents );
+	// create a temp tree or capsule from bounding box sizes
+	return CM_TempBoxModel( ent->s.mins, ent->s.maxs, ent->s.capsule, ent->s.contents );
 }
 
 
@@ -376,6 +372,10 @@ static void SV_AreaEntities_r( worldSector_t *node, areaParms_t *ap ) {
 
 		gcheck = SV_GEntityForSvEntity( check );
 
+		if ( !gcheck->r.linked ) {
+			continue;
+		}
+
 		if ( gcheck->r.absmin[0] > ap->maxs[0]
 		|| gcheck->r.absmin[1] > ap->maxs[1]
 		|| gcheck->r.absmin[2] > ap->maxs[2]
@@ -440,7 +440,7 @@ typedef struct {
 	trace_t		trace;
 	int			passEntityNum;
 	int			contentmask;
-	int			capsule;
+	traceType_t	collisionType;
 } moveclip_t;
 
 
@@ -450,7 +450,7 @@ SV_ClipToEntity
 
 ====================
 */
-void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, int capsule ) {
+void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int entityNum, int contentmask, traceType_t type ) {
 	sharedEntity_t	*touch;
 	clipHandle_t	clipHandle;
 	float			*origin, *angles;
@@ -476,9 +476,9 @@ void SV_ClipToEntity( trace_t *trace, const vec3_t start, const vec3_t mins, con
 		angles = vec3_origin;	// boxes don't rotate
 	}
 
-	CM_TransformedBoxTrace ( trace, (float *)start, (float *)end,
-		(float *)mins, (float *)maxs, clipHandle,  contentmask,
-		origin, angles, capsule);
+	CM_TransformedBoxTrace ( trace, start, end,
+		mins, maxs, clipHandle,  contentmask,
+		origin, angles, type);
 
 	if ( trace->fraction < 1 ) {
 		trace->entityNum = touch->s.number;
@@ -540,6 +540,11 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 		// might intersect, so do an exact clip
 		clipHandle = SV_ClipHandleForEntity (touch);
 
+		// non-worldspawn entities must not use world as clip model!
+		if ( clipHandle == 0 ) {
+			continue;
+		}
+
 		origin = touch->r.currentOrigin;
 		angles = touch->r.currentAngles;
 
@@ -550,7 +555,7 @@ static void SV_ClipMoveToEntities( moveclip_t *clip ) {
 
 		CM_TransformedBoxTrace ( &trace, (float *)clip->start, (float *)clip->end,
 			(float *)clip->mins, (float *)clip->maxs, clipHandle,  clip->contentmask,
-			origin, angles, clip->capsule);
+			origin, angles, clip->collisionType);
 
 		if ( trace.allsolid ) {
 			clip->trace.allsolid = qtrue;
@@ -582,7 +587,7 @@ Moves the given mins/maxs volume through the world from start to end.
 passEntityNum and entities owned by passEntityNum are explicitly not checked.
 ==================
 */
-void SV_Trace( trace_t *results, const vec3_t start, vec3_t mins, vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, int capsule ) {
+void SV_Trace( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask, traceType_t type ) {
 	moveclip_t	clip;
 	int			i;
 
@@ -596,7 +601,7 @@ void SV_Trace( trace_t *results, const vec3_t start, vec3_t mins, vec3_t maxs, c
 	Com_Memset ( &clip, 0, sizeof ( moveclip_t ) );
 
 	// clip to world
-	CM_BoxTrace( &clip.trace, start, end, mins, maxs, 0, contentmask, capsule );
+	CM_BoxTrace( &clip.trace, start, end, mins, maxs, 0, contentmask, type );
 	clip.trace.entityNum = clip.trace.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	if ( clip.trace.fraction == 0 ) {
 		*results = clip.trace;
@@ -610,7 +615,7 @@ void SV_Trace( trace_t *results, const vec3_t start, vec3_t mins, vec3_t maxs, c
 	clip.mins = mins;
 	clip.maxs = maxs;
 	clip.passEntityNum = passEntityNum;
-	clip.capsule = capsule;
+	clip.collisionType = type;
 
 	// create the bounding box of the entire move
 	// we can limit it to the part of the move not
@@ -660,6 +665,12 @@ int SV_PointContents( const vec3_t p, int passEntityNum ) {
 		hit = SV_GentityNum( touch[i] );
 		// might intersect, so do an exact clip
 		clipHandle = SV_ClipHandleForEntity( hit );
+
+		// non-worldspawn entities must not use world as clip model!
+		if ( clipHandle == 0 ) {
+			continue;
+		}
+
 		angles = hit->r.currentAngles;
 		if ( !hit->s.bmodel ) {
 			angles = vec3_origin;	// boxes don't rotate

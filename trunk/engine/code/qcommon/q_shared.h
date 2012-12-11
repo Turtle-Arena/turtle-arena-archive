@@ -604,6 +604,22 @@ static ID_INLINE int VectorCompare( const vec3_t v1, const vec3_t v2 ) {
 	return 1;
 }
 
+static ID_INLINE int VectorCompareEpsilon(
+		const vec3_t v1, const vec3_t v2, float epsilon )
+{
+	vec3_t d;
+
+	VectorSubtract( v1, v2, d );
+	d[ 0 ] = fabs( d[ 0 ] );
+	d[ 1 ] = fabs( d[ 1 ] );
+	d[ 2 ] = fabs( d[ 2 ] );
+
+	if( d[ 0 ] > epsilon || d[ 1 ] > epsilon || d[ 2 ] > epsilon )
+		return 0;
+
+	return 1;
+}
+
 static ID_INLINE vec_t VectorLength( const vec3_t v ) {
 	return (vec_t)sqrt (v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
 }
@@ -653,6 +669,8 @@ static ID_INLINE void CrossProduct( const vec3_t v1, const vec3_t v2, vec3_t cro
 
 #else
 int VectorCompare( const vec3_t v1, const vec3_t v2 );
+
+// VectorCompareEpsilon
 
 vec_t VectorLength( const vec3_t v );
 
@@ -727,6 +745,11 @@ void MakeNormalVectors( const vec3_t forward, vec3_t right, vec3_t up );
 void MatrixMultiply(float in1[3][3], float in2[3][3], float out[3][3]);
 void AngleVectors( const vec3_t angles, vec3_t forward, vec3_t right, vec3_t up);
 void PerpendicularVector( vec3_t dst, const vec3_t src );
+
+vec_t DistanceBetweenLineSegmentsSquared(
+	const vec3_t sP0, const vec3_t sP1,
+	const vec3_t tP0, const vec3_t tP1,
+	float *s, float *t );
 
 #ifndef MAX
 #define MAX(x,y) ((x)>(y)?(x):(y))
@@ -1031,6 +1054,15 @@ typedef struct cplane_s {
 	byte	pad[2];
 } cplane_t;
 
+typedef enum {
+	TT_NONE,
+
+	TT_AABB,
+	TT_CAPSULE,
+	TT_BISPHERE,
+
+	TT_NUM_TRACE_TYPES
+} traceType_t;
 
 // a trace is returned when a box is swept through the world
 typedef struct {
@@ -1042,6 +1074,7 @@ typedef struct {
 	int			surfaceFlags;	// surface hit
 	int			contents;	// contents on other side of surface hit
 	int			entityNum;	// entity the contacted sirface is a part of
+	float		lateralFraction; // fraction of collision tangetially to the trace direction
 } trace_t;
 
 // trace->entityNum can also be 0 to (MAX_GENTITIES-1)
@@ -1212,6 +1245,7 @@ typedef struct playerState_s {
 
 	int			eFlags;			// copied to entityState_t->eFlags
 	int			contents;		// copied to entityState_t->contents
+	qboolean	capsule;		// copied to entityState_t->capsule
 
 	qboolean	linked;			// set by server
 
@@ -1416,6 +1450,8 @@ typedef struct entityState_s {
 	qboolean	bmodel;		// if true, modelindex is an inline model number
 							// if false, assume an explicit mins / maxs bounding box
 							// only set by trap_SetBrushModel
+
+	qboolean	capsule;	// if true, use capsule instead of bbox for clipping against this ent
 
 	vec3_t		mins, maxs;	// bounding box size
 

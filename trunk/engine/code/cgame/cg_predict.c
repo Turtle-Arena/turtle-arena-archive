@@ -101,8 +101,10 @@ CG_ClipMoveToEntities
 
 ====================
 */
-static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
-							int skipNumber, int mask, trace_t *tr ) {
+static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins,
+		const vec3_t maxs, const vec3_t end, int skipNumber,
+		int mask, trace_t *tr, traceType_t collisionType )
+{
 	int			i;
 	trace_t		trace;
 	entityState_t	*ent;
@@ -128,6 +130,10 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 			cmodel = trap_CM_InlineModel( ent->modelindex );
 			VectorCopy( cent->lerpAngles, angles );
 			BG_EvaluateTrajectory( &cent->currentState.pos, cg.physicsTime, origin );
+		} else if ( ent->capsule ) {
+			cmodel = trap_CM_TempCapsuleModel( ent->mins, ent->maxs, ent->contents );
+			VectorCopy( vec3_origin, angles );
+			VectorCopy( cent->lerpOrigin, origin );
 		} else {
 			cmodel = trap_CM_TempBoxModel( ent->mins, ent->maxs, ent->contents );
 			VectorCopy( vec3_origin, angles );
@@ -135,12 +141,32 @@ static void CG_ClipMoveToEntities ( const vec3_t start, const vec3_t mins, const
 		}
 
 
-		trap_CM_TransformedBoxTrace ( &trace, start, end,
-			mins, maxs, cmodel,  mask, origin, angles);
+		if( collisionType == TT_CAPSULE )
+		{
+			trap_CM_TransformedCapsuleTrace ( &trace, start, end,
+					mins, maxs, cmodel,  mask, origin, angles );
+		}
+		else if( collisionType == TT_AABB )
+		{
+			trap_CM_TransformedBoxTrace ( &trace, start, end,
+					mins, maxs, cmodel,  mask, origin, angles );
+		}
+		else if( collisionType == TT_BISPHERE )
+		{
+			trap_CM_TransformedBiSphereTrace( &trace, start, end,
+					mins[ 0 ], maxs[ 0 ], cmodel, mask, origin );
+		}
 
 		if (trace.allsolid || trace.fraction < tr->fraction) {
 			trace.entityNum = ent->number;
-			*tr = trace;
+			if( tr->lateralFraction < trace.lateralFraction )
+			{
+				float oldLateralFraction = tr->lateralFraction;
+				*tr = trace;
+				tr->lateralFraction = oldLateralFraction;
+			} else {
+				*tr = trace;
+			}
 		} else if (trace.startsolid) {
 			tr->startsolid = qtrue;
 			tr->entityNum = ent->number;
@@ -163,7 +189,47 @@ void	CG_Trace( trace_t *result, const vec3_t start, const vec3_t mins, const vec
 	trap_CM_BoxTrace ( &t, start, end, mins, maxs, 0, mask);
 	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
 	// check all other solid models
-	CG_ClipMoveToEntities (start, mins, maxs, end, skipNumber, mask, &t);
+	CG_ClipMoveToEntities( start, mins, maxs, end, skipNumber, mask, &t, TT_AABB );
+
+	*result = t;
+}
+
+/*
+================
+CG_TraceCapsule
+================
+*/
+void	CG_TraceCapsule( trace_t *result, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end,
+					int skipNumber, int mask )
+{
+	trace_t t;
+
+	trap_CM_CapsuleTrace( &t, start, end, mins, maxs, 0, mask );
+	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
+	// check all other solid models
+	CG_ClipMoveToEntities( start, mins, maxs, end, skipNumber, mask, &t, TT_CAPSULE );
+
+	*result = t;
+}
+
+/*
+================
+CG_BiSphereTrace
+================
+*/
+void CG_BiSphereTrace( trace_t *result, const vec3_t start, const vec3_t end,
+    const float startRadius, const float endRadius, int skipNumber, int mask )
+{
+	trace_t t;
+	vec3_t  mins, maxs;
+
+	mins[ 0 ] = startRadius;
+	maxs[ 0 ] = endRadius;
+
+	trap_CM_BiSphereTrace( &t, start, end, startRadius, endRadius, 0, mask );
+	t.entityNum = t.fraction != 1.0 ? ENTITYNUM_WORLD : ENTITYNUM_NONE;
+	// check all other solid models
+	CG_ClipMoveToEntities( start, mins, maxs, end, skipNumber, mask, &t, TT_BISPHERE );
 
 	*result = t;
 }
@@ -394,8 +460,13 @@ static void CG_TouchTriggerPrediction( void ) {
 			continue;
 		}
 
-		trap_CM_BoxTrace( &trace, cg.cur_lc->predictedPlayerState.origin, cg.cur_lc->predictedPlayerState.origin, 
-			cg.cur_lc->predictedPlayerState.mins, cg.cur_lc->predictedPlayerState.maxs, cmodel, -1 );
+		if ( cg.cur_lc->predictedPlayerState.capsule ) {
+			trap_CM_CapsuleTrace( &trace, cg.cur_lc->predictedPlayerState.origin, cg.cur_lc->predictedPlayerState.origin,
+					cg.cur_lc->predictedPlayerState.mins, cg.cur_lc->predictedPlayerState.maxs, cmodel, -1 );
+		} else {
+			trap_CM_BoxTrace( &trace, cg.cur_lc->predictedPlayerState.origin, cg.cur_lc->predictedPlayerState.origin,
+					cg.cur_lc->predictedPlayerState.mins, cg.cur_lc->predictedPlayerState.maxs, cmodel, -1 );
+		}
 
 		if ( !trace.startsolid ) {
 			continue;
@@ -478,7 +549,11 @@ void CG_PredictPlayerState( void ) {
 #ifdef TA_PLAYERSYS // Pmove
 	cg_pmove.playercfg = &cgs.clientinfo[ cg.cur_lc->predictedPlayerState.clientNum ].playercfg;
 #endif
-	cg_pmove.trace = CG_Trace;
+	if (cg.cur_lc->predictedPlayerState.capsule) {
+		cg_pmove.trace = CG_TraceCapsule;
+	} else {
+		cg_pmove.trace = CG_Trace;
+	}
 	cg_pmove.pointcontents = CG_PointContents;
 #ifdef TURTLEARENA // NO_BODY_TRACE
 	cg_pmove.tracemask = MASK_PLAYERSOLID;

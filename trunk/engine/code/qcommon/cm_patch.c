@@ -817,7 +817,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 
 	int i, j, k, l;
 	int axis, dir, order, flipped;
-	float plane[4], d, newplane[4];
+	float plane[4], d, minBack, newplane[4];
 	winding_t *w, *w2;
 	vec3_t mins, maxs, vec, vec2;
 
@@ -861,8 +861,15 @@ void CM_AddFacetBevels( facet_t *facet ) {
 			}
 			// see if the plane is allready present
 			for ( i = 0 ; i < facet->numBorders ; i++ ) {
-				if (CM_PlaneEqual(&planes[facet->borderPlanes[i]], plane, &flipped))
-					break;
+				if ( dir > 0 ) {
+					if ( planes[facet->borderPlanes[i]].plane[axis] >= 0.9999f ) {
+						break;
+					}
+				} else {
+					if ( planes[facet->borderPlanes[i]].plane[axis] <= -0.9999f ) {
+						break;
+					}
+				}
 			}
 
 			if ( i == facet->numBorders ) {
@@ -887,7 +894,7 @@ void CM_AddFacetBevels( facet_t *facet ) {
 			continue;
 		CM_SnapVector(vec);
 		for ( k = 0; k < 3 ; k++ )
-			if ( vec[k] == -1 || vec[k] == 1 )
+			if ( vec[k] == -1.0f || vec[k] == 1.0f || ( vec[k] == 0.0f && vec[( k + 1 ) % 3] == 0.0f ) )
 				break;	// axial
 		if ( k < 3 )
 			continue;	// only test non-axial edges
@@ -907,14 +914,23 @@ void CM_AddFacetBevels( facet_t *facet ) {
 
 				// if all the points of the facet winding are
 				// behind this plane, it is a proper edge bevel
+				minBack = 0.0f;
 				for ( l = 0 ; l < w->numpoints ; l++ )
 				{
 					d = DotProduct (w->p[l], plane) - plane[3];
 					if (d > 0.1)
 						break;	// point in front
+					if ( d < minBack ) {
+						minBack = d;
+					}
 				}
 				if ( l < w->numpoints )
 					continue;
+
+				// if no points at the back then the winding is on the bevel plane
+				if ( minBack > -0.1f ) {
+					break;
+				}
 
 				//if it's the surface plane
 				if (CM_PlaneEqual(&planes[facet->surfacePlane], plane, &flipped)) {
@@ -1413,7 +1429,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 		planes = &pc->planes[ facet->surfacePlane ];
 		VectorCopy(planes->plane, plane);
 		plane[3] = planes->plane[3];
-		if ( tw->sphere.use ) {
+		if ( tw->type == TT_CAPSULE ) {
 			// adjust the plane distance apropriately for radius
 			plane[3] += tw->sphere.radius;
 
@@ -1452,7 +1468,7 @@ void CM_TraceThroughPatchCollide( traceWork_t *tw, const struct patchCollide_s *
 				VectorCopy(planes->plane, plane);
 				plane[3] = planes->plane[3];
 			}
-			if ( tw->sphere.use ) {
+			if ( tw->type == TT_CAPSULE ) {
 				// adjust the plane distance apropriately for radius
 				plane[3] += tw->sphere.radius;
 
@@ -1541,7 +1557,7 @@ qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchColli
 		planes = &pc->planes[ facet->surfacePlane ];
 		VectorCopy(planes->plane, plane);
 		plane[3] = planes->plane[3];
-		if ( tw->sphere.use ) {
+		if ( tw->type == TT_CAPSULE ) {
 			// adjust the plane distance apropriately for radius
 			plane[3] += tw->sphere.radius;
 
@@ -1574,7 +1590,7 @@ qboolean CM_PositionTestInPatchCollide( traceWork_t *tw, const struct patchColli
 				VectorCopy(planes->plane, plane);
 				plane[3] = planes->plane[3];
 			}
-			if ( tw->sphere.use ) {
+			if ( tw->type == TT_CAPSULE ) {
 				// adjust the plane distance apropriately for radius
 				plane[3] += tw->sphere.radius;
 

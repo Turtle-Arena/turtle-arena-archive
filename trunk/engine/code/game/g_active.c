@@ -424,7 +424,11 @@ void SpectatorThink( gentity_t *ent, usercmd_t *ucmd ) {
 #else
 		pm.tracemask = MASK_PLAYERSOLID & ~CONTENTS_BODY;	// spectators can fly through bodies
 #endif
-		pm.trace = trap_Trace;
+		if (client->ps.capsule) {
+			pm.trace = trap_TraceCapsule;
+		} else {
+			pm.trace = trap_Trace;
+		}
 		pm.pointcontents = trap_PointContents;
 
 		// perform a pmove
@@ -1688,11 +1692,11 @@ void ClientThink_real( gentity_t *ent ) {
 	else {
 		pm.tracemask = MASK_PLAYERSOLID;
 	}
-#if 0 // #ifdef IOQ3ZTM // ZTM: TEST: Its shaky on slopes.
-	pm.trace = trap_TraceCapsule;
-#else
-	pm.trace = trap_Trace;
-#endif
+	if (client->ps.capsule) {
+		pm.trace = trap_TraceCapsule;
+	} else {
+		pm.trace = trap_Trace;
+	}
 	pm.pointcontents = trap_PointContents;
 	pm.debugLevel = g_debugMove.integer;
 	pm.noFootsteps = ( g_dmflags.integer & DF_NO_FOOTSTEPS ) > 0;

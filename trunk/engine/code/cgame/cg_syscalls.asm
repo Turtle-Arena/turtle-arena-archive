@@ -120,3 +120,6 @@ equ trap_R_SetupPlayerSkeleton			-204
 equ trap_R_MakeSkeletonAbsolute			-205
 
 
+equ trap_CM_BiSphereTrace				-131
+equ trap_CM_TransformedBiSphereTrace	-132
+

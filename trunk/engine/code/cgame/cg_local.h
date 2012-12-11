@@ -2410,6 +2410,13 @@ void		trap_CM_TransformedCapsuleTrace( trace_t *results, const vec3_t start, con
 					  const vec3_t mins, const vec3_t maxs,
 					  clipHandle_t model, int brushmask,
 					  const vec3_t origin, const vec3_t angles );
+void          trap_CM_BiSphereTrace( trace_t *results, const vec3_t start,
+                const vec3_t end, float startRad, float endRad,
+                clipHandle_t model, int mask );
+void          trap_CM_TransformedBiSphereTrace( trace_t *results, const vec3_t start,
+                const vec3_t end, float startRad, float endRad,
+                clipHandle_t model, int mask,
+                const vec3_t origin );
 
 // Returns the projection of a polygon onto the solid brushes in the world
 int			trap_CM_MarkFragments( int numPoints, const vec3_t *points, 

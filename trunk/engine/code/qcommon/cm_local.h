@@ -32,9 +32,9 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include "qcommon.h"
 #include "cm_polylib.h"
 
-#define	MAX_SUBMODELS			256
-#define	BOX_MODEL_HANDLE		255
-#define CAPSULE_MODEL_HANDLE	254
+#define	MAX_SUBMODELS			512
+#define	BOX_MODEL_HANDLE		511
+#define CAPSULE_MODEL_HANDLE	510
 
 
 typedef struct {
@@ -58,10 +58,18 @@ typedef struct cmodel_s {
 	cLeaf_t		leaf;			// submodels don't reference the main tree
 } cmodel_t;
 
+typedef struct cbrushedge_s
+{
+	vec3_t	p0;
+	vec3_t	p1;
+} cbrushedge_t;
+
 typedef struct {
 	cplane_t	*plane;
+	int						planeNum;
 	int			surfaceFlags;
 	int			shaderNum;
+	winding_t			*winding;
 } cbrushside_t;
 
 typedef struct {
@@ -71,6 +79,9 @@ typedef struct {
 	int			numsides;
 	cbrushside_t	*sides;
 	int			checkcount;		// to avoid repeated testings
+	qboolean	collided; // marker for optimisation
+	cbrushedge_t	*edges;
+	int						numEdges;
 } cbrush_t;
 
 
@@ -152,16 +163,22 @@ extern 	int			capsule_contents;
 
 // cm_test.c
 
+typedef struct
+{
+	float		startRadius;
+	float		endRadius;
+} biSphere_t;
+
 // Used for oriented capsule collision detection
 typedef struct
 {
-	qboolean	use;
 	float		radius;
 	float		halfheight;
 	vec3_t		offset;
 } sphere_t;
 
 typedef struct {
+	traceType_t	type;
 	vec3_t		start;
 	vec3_t		end;
 	vec3_t		size[2];	// size of the box being swept through the model
@@ -174,6 +191,8 @@ typedef struct {
 	qboolean	isPoint;	// optimized case
 	trace_t		trace;		// returned from trace call
 	sphere_t	sphere;		// sphere for oriendted capsule collision
+	biSphere_t	biSphere;
+	qboolean	testLateralCollision; // whether or not to test for lateral collision
 } traceWork_t;
 
 typedef struct leafList_s {
