@@ -176,40 +176,49 @@ Returns a player number for either a number or name string
 Returns -1 if invalid
 ==================
 */
-int ClientNumberFromString( gentity_t *to, char *s ) {
+int ClientNumberFromString( gentity_t *to, char *s, qboolean checkNums, qboolean checkNames ) {
 	gclient_t	*cl;
 	int			idnum;
 	char		cleanName[MAX_STRING_CHARS];
 
-	// numeric values are just slot numbers
-	if (s[0] >= '0' && s[0] <= '9') {
-		idnum = atoi( s );
-		if ( idnum < 0 || idnum >= level.maxclients ) {
-			trap_SendServerCommand( to-g_entities, va("print \"Bad client slot: %i\n\"", idnum));
-			return -1;
-		}
+	if ( checkNums ) {
+		// numeric values are just slot numbers
+		if (s[0] >= '0' && s[0] <= '9') {
+			idnum = atoi( s );
+			if ( idnum < 0 || idnum >= level.maxclients ) {
+				trap_SendServerCommand( to-g_entities, va("print \"Bad client slot: %i\n\"", idnum));
+				return -1;
+			}
 
-		cl = &level.clients[idnum];
-		if ( cl->pers.connected != CON_CONNECTED ) {
-			trap_SendServerCommand( to-g_entities, va("print \"Client %i is not active\n\"", idnum));
-			return -1;
-		}
-		return idnum;
-	}
-
-	// check for a name match
-	for ( idnum=0,cl=level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
-		if ( cl->pers.connected != CON_CONNECTED ) {
-			continue;
-		}
-		Q_strncpyz(cleanName, cl->pers.netname, sizeof(cleanName));
-		Q_CleanStr(cleanName);
-		if ( !Q_stricmp( cleanName, s ) ) {
+			cl = &level.clients[idnum];
+			if ( cl->pers.connected != CON_CONNECTED ) {
+				trap_SendServerCommand( to-g_entities, va("print \"Client %i is not active\n\"", idnum));
+				return -1;
+			}
 			return idnum;
 		}
+
+		if ( !checkNames ) {
+			trap_SendServerCommand( to-g_entities, va("print \"%s is not a client number on the server\n\"", s));
+		}
 	}
 
-	trap_SendServerCommand( to-g_entities, va("print \"User %s is not on the server\n\"", s));
+	if ( checkNames ) {
+		// check for a name match
+		for ( idnum=0,cl=level.clients ; idnum < level.maxclients ; idnum++,cl++ ) {
+			if ( cl->pers.connected != CON_CONNECTED ) {
+				continue;
+			}
+			Q_strncpyz(cleanName, cl->pers.netname, sizeof(cleanName));
+			Q_CleanStr(cleanName);
+			if ( !Q_stricmp( cleanName, s ) ) {
+				return idnum;
+			}
+		}
+
+		trap_SendServerCommand( to-g_entities, va("print \"User %s is not on the server\n\"", s));
+	}
+
 	return -1;
 }
 
@@ -862,7 +871,7 @@ void Cmd_Follow_f( gentity_t *ent ) {
 	}
 
 	trap_Argv( 1, arg, sizeof( arg ) );
-	i = ClientNumberFromString( ent, arg );
+	i = ClientNumberFromString( ent, arg, qtrue, qtrue );
 	if ( i == -1 ) {
 		return;
 	}
@@ -1622,6 +1631,19 @@ void Cmd_CallVote_f( gentity_t *ent ) {
 		}
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "vstr nextmap");
 		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );
+	} else if ( !Q_stricmp( arg1, "kicknum" ) || !Q_stricmp( arg1, "kick" ) ) {
+		i = ClientNumberFromString( ent, arg2, !Q_stricmp( arg1, "kicknum" ), !Q_stricmp( arg1, "kick" ) );
+		if ( i == -1 ) {
+			return;
+		}
+
+		if ( level.clients[i].pers.localClient ) {
+			trap_SendServerCommand( ent-g_entities, "print \"Cannot kick host client.\n\"" );
+			return;
+		}
+
+		Com_sprintf( level.voteString, sizeof( level.voteString ), "kicknum %d", i );
+		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "kick %s" , level.clients[i].pers.netname );
 	} else {
 		Com_sprintf( level.voteString, sizeof( level.voteString ), "%s \"%s\"", arg1, arg2 );
 		Com_sprintf( level.voteDisplayString, sizeof( level.voteDisplayString ), "%s", level.voteString );

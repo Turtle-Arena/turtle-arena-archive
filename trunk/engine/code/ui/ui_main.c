@@ -1926,6 +1926,7 @@ static void UI_BuildPlayerList( void ) {
 		if (info[0]) {
 			Q_strncpyz( uiInfo.playerNames[uiInfo.playerCount], Info_ValueForKey( info, "n" ), MAX_NAME_LENGTH );
 			Q_CleanStr( uiInfo.playerNames[uiInfo.playerCount] );
+			uiInfo.playerClientNums[uiInfo.playerCount] = n;
 			uiInfo.playerCount++;
 			team2 = atoi(Info_ValueForKey(info, "t"));
 			if (team2 == team) {
@@ -3479,7 +3480,7 @@ static void UI_RunMenuScript(char **args) {
 			}
 		} else if (Q_stricmp(name, "voteKick") == 0) {
 			if (uiInfo.playerIndex >= 0 && uiInfo.playerIndex < uiInfo.playerCount) {
-				trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote kick %s\n",uiInfo.playerNames[uiInfo.playerIndex]) );
+				trap_Cmd_ExecuteText( EXEC_APPEND, va("callvote kicknum %i\n",uiInfo.playerClientNums[uiInfo.playerIndex]) );
 			}
 		} else if (Q_stricmp(name, "voteGame") == 0) {
 			if (ui_netGameType.integer >= 0 && ui_netGameType.integer < uiInfo.numGameTypes) {
