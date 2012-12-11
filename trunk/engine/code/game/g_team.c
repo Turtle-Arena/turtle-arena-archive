@@ -156,39 +156,30 @@ AddTeamScore
 */
 void AddTeamScore(vec3_t origin, int team, int score) {
 	int			eventParm;
+	int			otherTeam;
 	gentity_t	*te;
 
-	eventParm = -1;
-
-	if ( team == TEAM_RED ) {
-		if ( level.teamScores[ TEAM_RED ] + score == level.teamScores[ TEAM_BLUE ] ) {
-			//teams are tied sound
-			eventParm = GTS_TEAMS_ARE_TIED;
-		}
-		else if ( level.teamScores[ TEAM_RED ] <= level.teamScores[ TEAM_BLUE ] &&
-					level.teamScores[ TEAM_RED ] + score > level.teamScores[ TEAM_BLUE ]) {
-			// red took the lead sound
-			eventParm = GTS_REDTEAM_TOOK_LEAD;
-		}
-		else if ( score > 0 && g_gametype.integer != GT_TEAM ) {
-			// red scored sound
-			eventParm = GTS_REDTEAM_SCORED;
-		}
+	if ( score == 0 ) {
+		return;
 	}
-	else {
-		if ( level.teamScores[ TEAM_BLUE ] + score == level.teamScores[ TEAM_RED ] ) {
-			//teams are tied sound
-			eventParm = GTS_TEAMS_ARE_TIED;
-		}
-		else if ( level.teamScores[ TEAM_BLUE ] <= level.teamScores[ TEAM_RED ] &&
-					level.teamScores[ TEAM_BLUE ] + score > level.teamScores[ TEAM_RED ]) {
-			// blue took the lead sound
-			eventParm = GTS_BLUETEAM_TOOK_LEAD;
-		}
-		else if ( score > 0 && g_gametype.integer != GT_TEAM ) {
-			// blue scored sound
-			eventParm = GTS_BLUETEAM_SCORED;
-		}
+
+	eventParm = -1;
+	otherTeam = OtherTeam( team );
+
+	if ( level.teamScores[ team ] + score == level.teamScores[ otherTeam ] ) {
+		//teams are tied sound
+		eventParm = GTS_TEAMS_ARE_TIED;
+	} else if ( level.teamScores[ team ] >= level.teamScores[ otherTeam ] &&
+				level.teamScores[ team ] + score < level.teamScores[ otherTeam ] ) {
+		// other team took the lead sound (negative score)
+		eventParm = ( otherTeam == TEAM_RED ) ? GTS_REDTEAM_TOOK_LEAD : GTS_BLUETEAM_TOOK_LEAD;
+	} else if ( level.teamScores[ team ] <= level.teamScores[ otherTeam ] &&
+				level.teamScores[ team ] + score > level.teamScores[ otherTeam ] ) {
+		// this team took the lead sound
+		eventParm = ( team == TEAM_RED ) ? GTS_REDTEAM_TOOK_LEAD : GTS_BLUETEAM_TOOK_LEAD;
+	} else if ( score > 0 && g_gametype.integer != GT_TEAM ) {
+		// team scored sound
+		eventParm = ( team == TEAM_RED ) ? GTS_REDTEAM_SCORED : GTS_BLUETEAM_SCORED;
 	}
 
 	if ( eventParm != -1 ) {
