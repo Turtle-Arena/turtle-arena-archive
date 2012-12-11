@@ -1948,11 +1948,16 @@ static void R_CreateWorldVBO(void)
 			{
 				srfTriangle_t  *tri;
 
+				srf->minIndex = numVerts + srf->triangles->indexes[0];
+				srf->maxIndex = numVerts + srf->triangles->indexes[0];
+
 				for(i = 0, tri = srf->triangles; i < srf->numTriangles; i++, tri++)
 				{
 					for(j = 0; j < 3; j++)
 					{
 						triangles[numTriangles + i].indexes[j] = numVerts + tri->indexes[j];
+						srf->minIndex = MIN(srf->minIndex, numVerts + tri->indexes[j]);
+						srf->maxIndex = MAX(srf->maxIndex, numVerts + tri->indexes[j]);
 					}
 				}
 
@@ -1972,11 +1977,16 @@ static void R_CreateWorldVBO(void)
 			{
 				srfTriangle_t  *tri;
 
+				srf->minIndex = numVerts + srf->triangles->indexes[0];
+				srf->maxIndex = numVerts + srf->triangles->indexes[0];
+
 				for(i = 0, tri = srf->triangles; i < srf->numTriangles; i++, tri++)
 				{
 					for(j = 0; j < 3; j++)
 					{
 						triangles[numTriangles + i].indexes[j] = numVerts + tri->indexes[j];
+						srf->minIndex = MIN(srf->minIndex, numVerts + tri->indexes[j]);
+						srf->maxIndex = MAX(srf->maxIndex, numVerts + tri->indexes[j]);
 					}
 				}
 
@@ -1996,11 +2006,16 @@ static void R_CreateWorldVBO(void)
 			{
 				srfTriangle_t  *tri;
 
+				srf->minIndex = numVerts + srf->triangles->indexes[0];
+				srf->maxIndex = numVerts + srf->triangles->indexes[0];
+
 				for(i = 0, tri = srf->triangles; i < srf->numTriangles; i++, tri++)
 				{
 					for(j = 0; j < 3; j++)
 					{
 						triangles[numTriangles + i].indexes[j] = numVerts + tri->indexes[j];
+						srf->minIndex = MIN(srf->minIndex, numVerts + tri->indexes[j]);
+						srf->maxIndex = MAX(srf->maxIndex, numVerts + tri->indexes[j]);
 					}
 				}
 
@@ -2928,6 +2943,30 @@ void R_MergeLeafSurfaces(void)
 		}
 	}
 
+	// don't add surfaces that don't merge to any others to the merged list
+	for (i = 0; i < numWorldSurfaces; i++)
+	{
+		qboolean merges = qfalse;
+
+		if (s_worldData.surfacesViewCount[i] != i)
+			continue;
+
+		for (j = 0; j < numWorldSurfaces; j++)
+		{
+			if (j == i)
+				continue;
+
+			if (s_worldData.surfacesViewCount[j] == i)
+			{
+				merges = qtrue;
+				break;
+			}
+		}
+
+		if (!merges)
+			s_worldData.surfacesViewCount[i] = -1;
+	}	
+
 	// count merged/unmerged surfaces
 	numMergedSurfaces = 0;
 	numUnmergedSurfaces = 0;
@@ -2947,6 +2986,7 @@ void R_MergeLeafSurfaces(void)
 	s_worldData.mergedSurfaces = ri.Hunk_Alloc(sizeof(*s_worldData.mergedSurfaces) * numMergedSurfaces, h_low);
 	s_worldData.mergedSurfacesViewCount = ri.Hunk_Alloc(sizeof(*s_worldData.mergedSurfacesViewCount) * numMergedSurfaces, h_low);
 	s_worldData.mergedSurfacesDlightBits = ri.Hunk_Alloc(sizeof(*s_worldData.mergedSurfacesDlightBits) * numMergedSurfaces, h_low);
+	s_worldData.mergedSurfacesPshadowBits = ri.Hunk_Alloc(sizeof(*s_worldData.mergedSurfacesPshadowBits) * numMergedSurfaces, h_low);
 	s_worldData.numMergedSurfaces = numMergedSurfaces;
 	
 	// view surfaces are like mark surfaces, except negative ones represent merged surfaces
@@ -2985,7 +3025,7 @@ void R_MergeLeafSurfaces(void)
 		numSurfsToMerge = 0;
 		numTriangles = 0;
 		numVerts = 0;
-		for (j = i; j < numWorldSurfaces; j++)
+		for (j = 0; j < numWorldSurfaces; j++)
 		{
 			msurface_t *surf2;
 
@@ -3041,7 +3081,7 @@ void R_MergeLeafSurfaces(void)
 		// Merge surfaces (indexes) and calculate bounds
 		ClearBounds(bounds[0], bounds[1]);
 		firstIndex = numIboIndexes;
-		for (j = i; j < numWorldSurfaces; j++)
+		for (j = 0; j < numWorldSurfaces; j++)
 		{
 			msurface_t *surf2;
 
@@ -3120,6 +3160,15 @@ void R_MergeLeafSurfaces(void)
 		vboSurf->numVerts = numVerts;
 		vboSurf->firstIndex = firstIndex;
 
+		vboSurf->minIndex = *(iboIndexes + firstIndex);
+		vboSurf->maxIndex = *(iboIndexes + firstIndex);
+
+		for (j = 1; j < numTriangles * 3; j++)
+		{
+			vboSurf->minIndex = MIN(vboSurf->minIndex, *(iboIndexes + firstIndex + j));
+			vboSurf->maxIndex = MAX(vboSurf->maxIndex, *(iboIndexes + firstIndex + j));
+		}
+
 		vboSurf->shader = surf1->shader;
 		vboSurf->fogIndex = surf1->fogIndex;
 
@@ -3135,7 +3184,7 @@ void R_MergeLeafSurfaces(void)
 		mergedSurf->shader        = surf1->shader;
 
 		// redirect view surfaces to this surf
-		for (j = i; j < numWorldSurfaces; j++)
+		for (j = 0; j < numWorldSurfaces; j++)
 		{
 			if (s_worldData.surfacesViewCount[j] != i)
 				continue;
