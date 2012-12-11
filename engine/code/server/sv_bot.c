@@ -227,7 +227,7 @@ BotImport_EntityTrace
 static void BotImport_EntityTrace(bsp_trace_t *bsptrace, vec3_t start, vec3_t mins, vec3_t maxs, vec3_t end, int entnum, int contentmask) {
 	trace_t trace;
 
-	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, qfalse);
+	SV_ClipToEntity(&trace, start, mins, maxs, end, entnum, contentmask, TT_AABB);
 	//copy the trace information
 	bsptrace->allsolid = trace.allsolid;
 	bsptrace->startsolid = trace.startsolid;
