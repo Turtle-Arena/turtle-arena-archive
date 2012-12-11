@@ -365,7 +365,7 @@ void G_WriteCoopSessionData( qboolean restart ) {
 	if (g_singlePlayer.integer && connected && *s) {
 		trap_Cvar_VariableStringBuffer("g_saveFilename", s, sizeof(s) );
 
-		trap_SendConsoleCommand( EXEC_NOW, va("savegame %s\n", s) );
+		trap_Cmd_ExecuteText( EXEC_NOW, va("savegame %s\n", s) );
 	}
 }
 #endif

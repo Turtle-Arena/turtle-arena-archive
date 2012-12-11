@@ -423,7 +423,7 @@ static qboolean UI_PositionEntityOnTag( refEntity_t *entity, const refEntity_t *
 	} else {
 #endif
 	// lerp the tag
-	returnValue = trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	returnValue = trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
 #ifdef IOQ3ZTM // BONES
 	}
@@ -477,7 +477,7 @@ static qboolean UI_PositionRotatedEntityOnTag( refEntity_t *entity, const refEnt
 	} else {
 #endif
 	// lerp the tag
-	returnValue = trap_CM_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
+	returnValue = trap_R_LerpTag( &lerped, parentModel, parent->oldframe, parent->frame,
 		1.0 - parent->backlerp, tagName );
 #ifdef IOQ3ZTM // BONES
 	}

@@ -319,6 +319,33 @@ The module is making a system call
 */
 intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	switch( args[0] ) {
+
+	case TRAP_MEMSET:
+		Com_Memset( VMA(1), args[2], args[3] );
+		return 0;
+	case TRAP_MEMCPY:
+		Com_Memcpy( VMA(1), VMA(2), args[3] );
+		return 0;
+	case TRAP_STRNCPY:
+		strncpy( VMA(1), VMA(2), args[3] );
+		return args[1];
+	case TRAP_SIN:
+		return FloatAsInt( sin( VMF(1) ) );
+	case TRAP_COS:
+		return FloatAsInt( cos( VMF(1) ) );
+	case TRAP_ATAN2:
+		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
+	case TRAP_SQRT:
+		return FloatAsInt( sqrt( VMF(1) ) );
+	case TRAP_FLOOR:
+		return FloatAsInt( floor( VMF(1) ) );
+	case TRAP_CEIL:
+		return FloatAsInt( ceil( VMF(1) ) );
+	case TRAP_ACOS:
+		return FloatAsInt( Q_acos( VMF(1) ) );
+	case TRAP_ASIN:
+		return FloatAsInt( Q_asin( VMF(1) ) );
+
 	case G_PRINT:
 		Com_Printf( "%s", (const char*)VMA(1) );
 		return 0;
@@ -327,6 +354,22 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return 0;
 	case G_MILLISECONDS:
 		return Sys_Milliseconds();
+	case G_REAL_TIME:
+		return Com_RealTime( VMA(1) );
+	case G_SNAPVECTOR:
+		Q_SnapVector(VMA(1));
+		return 0;
+
+	case G_ADDCOMMAND:
+		Cmd_AddCommand( VMA(1), NULL );
+		return 0;
+	case G_REMOVECOMMAND:
+		Cmd_RemoveCommandSafe( VMA(1) );
+		return 0;
+	case G_CMD_EXECUTETEXT:
+		Cbuf_ExecuteTextSafe( args[1], VMA(2) );
+		return 0;
+
 	case G_CVAR_REGISTER:
 		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] ); 
 		return 0;
@@ -336,18 +379,33 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_CVAR_SET:
 		Cvar_SetSafe( (const char *)VMA(1), (const char *)VMA(2) );
 		return 0;
+	case G_CVAR_SET_VALUE:
+		Cvar_SetValueSafe( VMA(1), VMF(2) );
+		return 0;
+	case G_CVAR_RESET:
+		Cvar_Reset( VMA(1) );
+		return 0;
+	case G_CVAR_VARIABLE_VALUE:
+		return FloatAsInt( Cvar_VariableValue( VMA(1) ) );
 	case G_CVAR_VARIABLE_INTEGER_VALUE:
 		return Cvar_VariableIntegerValue( (const char *)VMA(1) );
 	case G_CVAR_VARIABLE_STRING_BUFFER:
 		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
 		return 0;
+	case G_CVAR_LATCHED_VARIABLE_STRING_BUFFER:
+		Cvar_LatchedVariableStringBuffer( VMA( 1 ), VMA( 2 ), args[3] );
+		return 0;
+	case G_CVAR_INFO_STRING_BUFFER:
+		Cvar_InfoStringBuffer( args[1], VMA(2), args[3] );
+		return 0;
+
 	case G_ARGC:
 		return Cmd_Argc();
 	case G_ARGV:
 		Cmd_ArgvBuffer( args[1], VMA(2), args[3] );
 		return 0;
-	case G_SEND_CONSOLE_COMMAND:
-		Cbuf_ExecuteText( args[1], VMA(2) );
+	case G_ARGS:
+		Cmd_ArgsBuffer( VMA(1), args[2] );
 		return 0;
 
 	case G_FS_FOPEN_FILE:
@@ -358,13 +416,36 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_FS_WRITE:
 		FS_Write( VMA(1), args[2], args[3] );
 		return 0;
+	case G_FS_SEEK:
+		return FS_Seek( args[1], args[2], args[3] );
 	case G_FS_FCLOSE_FILE:
 		FS_FCloseFile( args[1] );
 		return 0;
 	case G_FS_GETFILELIST:
 		return FS_GetFileList( VMA(1), VMA(2), VMA(3), args[4] );
-	case G_FS_SEEK:
-		return FS_Seek( args[1], args[2], args[3] );
+	case G_FS_DELETE:
+		return FS_Delete( VMA(1) );
+	case G_FS_RENAME:
+		return FS_Rename( VMA(1), VMA(2) );
+
+	case G_PC_ADD_GLOBAL_DEFINE:
+		return botlib_export->PC_AddGlobalDefine( VMA(1) );
+	case G_PC_REMOVE_ALL_GLOBAL_DEFINES:
+		botlib_export->PC_RemoveAllGlobalDefines();
+		return 0;
+	case G_PC_LOAD_SOURCE:
+		return botlib_export->PC_LoadSourceHandle( VMA(1) );
+	case G_PC_FREE_SOURCE:
+		return botlib_export->PC_FreeSourceHandle( args[1] );
+	case G_PC_READ_TOKEN:
+		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
+	case G_PC_UNREAD_TOKEN:
+		botlib_export->PC_UnreadLastTokenHandle( args[1] );
+		return 0;
+	case G_PC_SOURCE_FILE_AND_LINE:
+		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
+
+		//====================================
 
 	case G_LOCATE_GAME_DATA:
 		SV_LocateGameData( VMA(1), args[2], args[3], VMA(4), args[5] );
@@ -451,11 +532,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_DEBUG_POLYGON_DELETE:
 		BotImport_DebugPolygonDelete( args[1] );
 		return 0;
-	case G_REAL_TIME:
-		return Com_RealTime( VMA(1) );
-	case G_SNAPVECTOR:
-		Q_SnapVector(VMA(1));
-		return 0;
+
 #ifdef TA_GAME_MODELS
 	case G_REGISTERMODEL:
 		return RE_RegisterModel( VMA(1) );
@@ -477,13 +554,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 #endif
 #endif
 
-	case G_ADDCOMMAND:
-		Cmd_AddCommand( VMA(1), NULL );
-		return 0;
-	case G_REMOVECOMMAND:
-		Cmd_RemoveCommandSafe( VMA(1) );
-		return 0;
-
 		//====================================
 
 	case BOTLIB_SETUP:
@@ -494,17 +564,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		return botlib_export->BotLibVarSet( VMA(1), VMA(2) );
 	case BOTLIB_LIBVAR_GET:
 		return botlib_export->BotLibVarGet( VMA(1), VMA(2), args[3] );
-
-	case BOTLIB_PC_ADD_GLOBAL_DEFINE:
-		return botlib_export->PC_AddGlobalDefine( VMA(1) );
-	case BOTLIB_PC_LOAD_SOURCE:
-		return botlib_export->PC_LoadSourceHandle( VMA(1) );
-	case BOTLIB_PC_FREE_SOURCE:
-		return botlib_export->PC_FreeSourceHandle( args[1] );
-	case BOTLIB_PC_READ_TOKEN:
-		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
-	case BOTLIB_PC_SOURCE_FILE_AND_LINE:
-		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
 
 	case BOTLIB_START_FRAME:
 		return botlib_export->BotLibStartFrame( VMF(1) );
@@ -871,42 +930,6 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case BOTLIB_AI_GENETIC_PARENTS_AND_CHILD_SELECTION:
 		return botlib_export->ai.GeneticParentsAndChildSelection(args[1], VMA(2), VMA(3), VMA(4), VMA(5));
 
-	case TRAP_MEMSET:
-		Com_Memset( VMA(1), args[2], args[3] );
-		return 0;
-
-	case TRAP_MEMCPY:
-		Com_Memcpy( VMA(1), VMA(2), args[3] );
-		return 0;
-
-	case TRAP_STRNCPY:
-		strncpy( VMA(1), VMA(2), args[3] );
-		return args[1];
-
-	case TRAP_SIN:
-		return FloatAsInt( sin( VMF(1) ) );
-
-	case TRAP_COS:
-		return FloatAsInt( cos( VMF(1) ) );
-
-	case TRAP_ATAN2:
-		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
-
-	case TRAP_SQRT:
-		return FloatAsInt( sqrt( VMF(1) ) );
-
-	case TRAP_FLOOR:
-		return FloatAsInt( floor( VMF(1) ) );
-
-	case TRAP_CEIL:
-		return FloatAsInt( ceil( VMF(1) ) );
-
-	case TRAP_ACOS:
-		return FloatAsInt( Q_acos( VMF(1) ) );
-
-	case TRAP_ASIN:
-		return FloatAsInt( Q_asin( VMF(1) ) );
-
 
 	default:
 		Com_Error( ERR_DROP, "Bad game system trap: %ld", (long int) args[0] );
@@ -938,17 +961,20 @@ Called for both a full init and a restart
 ==================
 */
 static void SV_InitGameVM( qboolean restart ) {
-	int		i;
-	int		v;
+	unsigned int	version, major, minor;
+	int				i;
 
 	// sanity check
-	v = VM_SafeCall( gvm, GAME_GETAPIVERSION );
-	if (v != GAME_API_VERSION) {
+	version = VM_SafeCall( gvm, GAME_GETAPIVERSION );
+	major = (version >> 16) & 0xFFFF;
+	minor = version & 0xFFFF;
+	Com_DPrintf("Loading game with version %x.%x\n", major, minor);
+	if (major != GAME_API_MAJOR_VERSION || minor > GAME_API_MINOR_VERSION) {
 		// Free gvm now, so GAME_SHUTDOWN doesn't get called later.
 		VM_Free( gvm );
 		gvm = NULL;
 
-		Com_Error(ERR_DROP, "Game is version %d, expected %d", v, GAME_API_VERSION );
+		Com_Error(ERR_DROP, "Game is version %x.%x, expected %x.%x", major, minor, GAME_API_MAJOR_VERSION, GAME_API_MINOR_VERSION );
 	}
 
 	// start the entity parsing at the beginning

@@ -61,14 +61,6 @@ extern gentity_t	*podium2;
 extern gentity_t	*podium3;
 #endif
 
-float trap_Cvar_VariableValue( const char *var_name ) {
-	char buf[128];
-
-	trap_Cvar_VariableStringBuffer(var_name, buf, sizeof(buf));
-	return atof(buf);
-}
-
-
 
 /*
 ===============
@@ -311,7 +303,7 @@ static void PlayerIntroSound( const char *modelAndSkin ) {
 		skin = model;
 	}
 
-	trap_SendConsoleCommand( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
+	trap_Cmd_ExecuteText( EXEC_APPEND, va( "play sound/player/announce/%s.wav\n", skin ) );
 }
 #endif
 
@@ -401,7 +393,7 @@ void G_AddRandomBot( int team ) {
 	strncpy(netname, value, sizeof(netname)-1);
 	netname[sizeof(netname)-1] = '\0';
 	Q_CleanStr(netname);
-	trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
+	trap_Cmd_ExecuteText( EXEC_INSERT, va("addbot %s %f %s %i\n", netname, skill, teamstr, 0) );
 }
 
 /*
@@ -424,7 +416,7 @@ int G_RemoveRandomBot( int team ) {
 		if ( team >= 0 && cl->sess.sessionTeam != team ) {
 			continue;
 		}
-		trap_SendConsoleCommand( EXEC_INSERT, va("kicknum %d\n", cl->ps.clientNum) );
+		trap_Cmd_ExecuteText( EXEC_INSERT, va("kicknum %d\n", cl->ps.clientNum) );
 		return qtrue;
 	}
 	return qfalse;
@@ -995,9 +987,9 @@ static void G_SpawnBots( char *botList, int baseDelay )
 		// we must add the bot this way, calling G_AddBot directly at this stage
 		// does "Bad Things"
 #ifdef TA_SP // SP_BOSS
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f %s %i\n", bot, skill, team, delay) );
+		trap_Cmd_ExecuteText( EXEC_INSERT, va("addbot %s %f %s %i\n", bot, skill, team, delay) );
 #else
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s %f free %i\n", bot, skill, delay) );
+		trap_Cmd_ExecuteText( EXEC_INSERT, va("addbot %s %f free %i\n", bot, skill, delay) );
 #endif
 
 		delay += BOT_BEGIN_DELAY_INCREMENT;

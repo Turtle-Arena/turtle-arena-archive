@@ -278,7 +278,7 @@ This must be the very first function compiled into the .q3vm file
 Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, int arg4, int arg5, int arg6, int arg7, int arg8, int arg9, int arg10, int arg11  ) {
 	switch ( command ) {
 	case GAME_GETAPIVERSION:
-		return GAME_API_VERSION;
+		return ( GAME_API_MAJOR_VERSION << 16) | ( GAME_API_MINOR_VERSION & 0xFFFF );
 	case GAME_INIT:
 		G_InitGame( arg0, arg1, arg2 );
 		return 0;
@@ -1286,7 +1286,7 @@ void ExitLevel (void) {
 	if ( g_gametype.integer == GT_TOURNAMENT  ) {
 		if ( !level.restarted ) {
 			RemoveTournamentLoser();
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = qtrue;
 			level.changemap = NULL;
 			level.intermissiontime = 0;
@@ -1303,9 +1303,9 @@ void ExitLevel (void) {
 
 	if( !Q_stricmp( nextmap, "map_restart 0" ) && Q_stricmp( d1, "" ) ) {
 		trap_Cvar_Set( "nextmap", "vstr d2" );
-		trap_SendConsoleCommand( EXEC_APPEND, "vstr d1\n" );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "vstr d1\n" );
 	} else {
-		trap_SendConsoleCommand( EXEC_APPEND, "vstr nextmap\n" );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "vstr nextmap\n" );
 	}
 
 	level.changemap = NULL;
@@ -1451,7 +1451,7 @@ void LogExit( const char *string ) {
 			else
 				won = level.teamScores[TEAM_RED] > level.teamScores[TEAM_BLUE];
 		}
-		trap_SendConsoleCommand( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
+		trap_Cmd_ExecuteText( EXEC_APPEND, (won) ? "spWin\n" : "spLose\n" );
 	}
 #endif
 #endif
@@ -1883,7 +1883,7 @@ void CheckTournament( void ) {
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap_Cvar_Set( "g_restarted", "1" );
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = qtrue;
 			return;
 		}
@@ -1938,7 +1938,7 @@ void CheckTournament( void ) {
 		if ( level.time > level.warmupTime ) {
 			level.warmupTime += 10000;
 			trap_Cvar_Set( "g_restarted", "1" );
-			trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+			trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 			level.restarted = qtrue;
 			return;
 		}
@@ -1954,7 +1954,7 @@ CheckVote
 void CheckVote( void ) {
 	if ( level.voteExecuteTime && level.voteExecuteTime < level.time ) {
 		level.voteExecuteTime = 0;
-		trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.voteString ) );
+		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.voteString ) );
 	}
 	if ( !level.voteTime ) {
 		return;
@@ -2086,7 +2086,7 @@ void CheckTeamVote( int team ) {
 				SetLeader(team, atoi(level.teamVoteString[cs_offset] + 7));
 			}
 			else {
-				trap_SendConsoleCommand( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
+				trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", level.teamVoteString[cs_offset] ) );
 			}
 		} else if ( level.teamVoteNo[cs_offset] >= level.numteamVotingClients[cs_offset]/2 ) {
 			// same behavior as a timeout

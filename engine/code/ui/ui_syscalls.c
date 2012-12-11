@@ -63,6 +63,18 @@ int trap_Milliseconds( void ) {
 	return syscall( UI_MILLISECONDS ); 
 }
 
+void trap_SnapVector( float *v ) {
+	syscall( UI_SNAPVECTOR, v );
+}
+
+void trap_AddCommand( const char *cmdName ) {
+	syscall( UI_ADDCOMMAND, cmdName );
+}
+
+void trap_RemoveCommand( const char *cmdName ) {
+	syscall( UI_REMOVECOMMAND, cmdName );
+}
+
 void trap_Cvar_Register( vmCvar_t *cvar, const char *var_name, const char *value, int flags ) {
 	syscall( UI_CVAR_REGISTER, cvar, var_name, value, flags );
 }
@@ -75,30 +87,34 @@ void trap_Cvar_Set( const char *var_name, const char *value ) {
 	syscall( UI_CVAR_SET, var_name, value );
 }
 
-float trap_Cvar_VariableValue( const char *var_name ) {
-	floatint_t fi;
-	fi.i = syscall( UI_CVAR_VARIABLEVALUE, var_name );
-	return fi.f;
-}
-
-void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
-	syscall( UI_CVAR_VARIABLESTRINGBUFFER, var_name, buffer, bufsize );
-}
-
 void trap_Cvar_SetValue( const char *var_name, float value ) {
-	syscall( UI_CVAR_SETVALUE, var_name, PASSFLOAT( value ) );
+	syscall( UI_CVAR_SET_VALUE, var_name, PASSFLOAT( value ) );
 }
 
 void trap_Cvar_Reset( const char *name ) {
-	syscall( UI_CVAR_RESET, name ); 
+	syscall( UI_CVAR_RESET, name );
 }
 
-void trap_Cvar_Create( const char *var_name, const char *var_value, int flags ) {
-	syscall( UI_CVAR_CREATE, var_name, var_value, flags );
+float trap_Cvar_VariableValue( const char *var_name ) {
+	floatint_t fi;
+	fi.i = syscall( UI_CVAR_VARIABLE_VALUE, var_name );
+	return fi.f;
+}
+
+int trap_Cvar_VariableIntegerValue( const char *var_name ) {
+	return syscall( UI_CVAR_VARIABLE_INTEGER_VALUE, var_name );
+}
+
+void trap_Cvar_VariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+	syscall( UI_CVAR_VARIABLE_STRING_BUFFER, var_name, buffer, bufsize );
+}
+
+void trap_Cvar_LatchedVariableStringBuffer( const char *var_name, char *buffer, int bufsize ) {
+	syscall( UI_CVAR_LATCHED_VARIABLE_STRING_BUFFER, var_name, buffer, bufsize );
 }
 
 void trap_Cvar_InfoStringBuffer( int bit, char *buffer, int bufsize ) {
-	syscall( UI_CVAR_INFOSTRINGBUFFER, bit, buffer, bufsize );
+	syscall( UI_CVAR_INFO_STRING_BUFFER, bit, buffer, bufsize );
 }
 
 int trap_Argc( void ) {
@@ -107,6 +123,10 @@ int trap_Argc( void ) {
 
 void trap_Argv( int n, char *buffer, int bufferLength ) {
 	syscall( UI_ARGV, n, buffer, bufferLength );
+}
+
+void trap_Args( char *buffer, int bufferLength ) {
+	syscall( UI_ARGS, buffer, bufferLength );
 }
 
 void trap_Cmd_ExecuteText( int exec_when, const char *text ) {
@@ -125,6 +145,10 @@ void trap_FS_Write( const void *buffer, int len, fileHandle_t f ) {
 	syscall( UI_FS_WRITE, buffer, len, f );
 }
 
+int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
+	return syscall( UI_FS_SEEK, f, offset, origin );
+}
+
 void trap_FS_FCloseFile( fileHandle_t f ) {
 	syscall( UI_FS_FCLOSEFILE, f );
 }
@@ -133,8 +157,12 @@ int trap_FS_GetFileList(  const char *path, const char *extension, char *listbuf
 	return syscall( UI_FS_GETFILELIST, path, extension, listbuf, bufsize );
 }
 
-int trap_FS_Seek( fileHandle_t f, long offset, int origin ) {
-	return syscall( UI_FS_SEEK, f, offset, origin );
+int trap_FS_Delete( const char *path ) {
+	return syscall( UI_FS_DELETE, path );
+}
+
+int trap_FS_Rename( const char *from, const char *to ) {
+	return syscall( UI_FS_RENAME, from, to );
 }
 
 qhandle_t trap_R_RegisterModel( const char *name ) {
@@ -143,6 +171,10 @@ qhandle_t trap_R_RegisterModel( const char *name ) {
 
 qhandle_t trap_R_RegisterSkin( const char *name ) {
 	return syscall( UI_R_REGISTERSKIN, name );
+}
+
+qhandle_t trap_R_RegisterShader( const char *name ) {
+	return syscall( UI_R_REGISTERSHADER, name );
 }
 
 qhandle_t trap_R_RegisterShaderNoMip( const char *name ) {
@@ -194,7 +226,7 @@ void trap_UpdateScreen( void ) {
 }
 
 int trap_CM_LerpTag( orientation_t *tag, clipHandle_t mod, int startFrame, int endFrame, float frac, const char *tagName ) {
-	return syscall( UI_CM_LERPTAG, tag, mod, startFrame, endFrame, PASSFLOAT(frac), tagName );
+	return syscall( UI_R_LERPTAG, tag, mod, startFrame, endFrame, PASSFLOAT(frac), tagName );
 }
 
 void	trap_R_RemapShader( const char *oldShader, const char *newShader, const char *timeOffset ) {
@@ -247,6 +279,10 @@ int trap_Key_GetCatcher( void ) {
 
 void trap_Key_SetCatcher( int catcher ) {
 	syscall( UI_KEY_SETCATCHER, catcher );
+}
+
+int trap_Key_GetKey( const char *binding, int startKey ) {
+	return syscall( UI_KEY_GETKEY, binding, startKey );
 }
 
 void trap_GetClipboardData( char *buf, int bufsize ) {
@@ -345,6 +381,10 @@ int trap_PC_AddGlobalDefine( char *define ) {
 	return syscall( UI_PC_ADD_GLOBAL_DEFINE, define );
 }
 
+void trap_PC_RemoveAllGlobalDefines( void ) {
+	syscall( UI_PC_REMOVE_ALL_GLOBAL_DEFINES );
+}
+
 int trap_PC_LoadSource( const char *filename ) {
 	return syscall( UI_PC_LOAD_SOURCE, filename );
 }
@@ -355,6 +395,10 @@ int trap_PC_FreeSource( int handle ) {
 
 int trap_PC_ReadToken( int handle, pc_token_t *pc_token ) {
 	return syscall( UI_PC_READ_TOKEN, handle, pc_token );
+}
+
+void trap_PC_UnreadToken( int handle ) {
+	syscall( UI_PC_UNREAD_TOKEN, handle );
 }
 
 int trap_PC_SourceFileAndLine( int handle, char *filename, int *line ) {

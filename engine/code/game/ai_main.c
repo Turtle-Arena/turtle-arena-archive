@@ -686,7 +686,7 @@ void BotInterbreeding(void) {
 	trap_BotLibVarSet("bot_reloadcharacters", "1");
 	//add a number of bots using the desired bot character
 	for (i = 0; i < bot_interbreedbots.integer; i++) {
-		trap_SendConsoleCommand( EXEC_INSERT, va("addbot %s 4 free %i %s%d\n",
+		trap_Cmd_ExecuteText( EXEC_INSERT, va("addbot %s 4 free %i %s%d\n",
 						bot_interbreedchar.string, i * 50, bot_interbreedchar.string, i) );
 	}
 	//
@@ -1820,10 +1820,10 @@ int BotInitLibrary(void) {
 	trap_BotLibVarSet("weapindex_grapple", va("%i", WP_GRAPPLING_HOOK));
 #endif
 #ifdef TURTLEARENA
-	trap_BotLibDefine("TURTLEARENA");
+	trap_PC_AddGlobalDefine("TURTLEARENA");
 #endif
 #ifdef MISSIONPACK
-	trap_BotLibDefine("MISSIONPACK");
+	trap_PC_AddGlobalDefine("MISSIONPACK");
 #endif
 	//setup the bot library
 	return trap_BotLibSetup();

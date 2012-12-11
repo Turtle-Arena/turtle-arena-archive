@@ -31,7 +31,8 @@ Suite 120, Rockville, Maryland 20850 USA.
 
 // g_public.h -- game module information visible to server
 
-#define	GAME_API_VERSION	101
+#define	GAME_API_MAJOR_VERSION	0xdead
+#define	GAME_API_MINOR_VERSION	0xbeef
 
 // entity->svFlags
 // the server does not know how to interpret most of the values
@@ -109,7 +110,9 @@ typedef struct {
 typedef enum {
 	//============== general Quake services ==================
 
-	G_PRINT,		// ( const char *string );
+	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=0, etc
+
+	G_PRINT = 20,	// ( const char *string );
 	// print message on the local console
 
 	G_ERROR,		// ( const char *string );
@@ -120,32 +123,54 @@ typedef enum {
 	// this should NOT be used for any game related tasks,
 	// because it is not journaled
 
-	// console variable interaction
-	G_CVAR_REGISTER,	// ( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
-	G_CVAR_UPDATE,	// ( vmCvar_t *vmCvar );
-	G_CVAR_SET,		// ( const char *var_name, const char *value );
-	G_CVAR_VARIABLE_INTEGER_VALUE,	// ( const char *var_name );
+	G_REAL_TIME,	// ( qtime_t *qtime );
 
-	G_CVAR_VARIABLE_STRING_BUFFER,	// ( const char *var_name, char *buffer, int bufsize );
+	G_SNAPVECTOR,	// ( float *v );
 
-	G_ARGC,			// ( void );
 	// ClientCommand and ServerCommand parameter access
-
+	G_ARGC,			// ( void );
 	G_ARGV,			// ( int n, char *buffer, int bufferLength );
+	G_ARGS,			// ( char *buffer, int bufferLength );
 
-	G_FS_FOPEN_FILE,	// ( const char *qpath, fileHandle_t *file, fsMode_t mode );
-	G_FS_READ,		// ( void *buffer, int len, fileHandle_t f );
-	G_FS_WRITE,		// ( const void *buffer, int len, fileHandle_t f );
-	G_FS_FCLOSE_FILE,		// ( fileHandle_t f );
+	G_ADDCOMMAND,	// ( const char *cmdName );
+	G_REMOVECOMMAND,// ( const char *cmdName );
 
-	G_SEND_CONSOLE_COMMAND,	// ( const char *text );
+	G_CMD_EXECUTETEXT,	// ( int exec_when, const char *text );
 	// add commands to the console as if they were typed in
 	// for map changing, etc
 
+	// console variable interaction
+	G_CVAR_REGISTER,	// ( vmCvar_t *vmCvar, const char *varName, const char *defaultValue, int flags );
+	G_CVAR_UPDATE,		// ( vmCvar_t *vmCvar );
+	G_CVAR_SET,			// ( const char *var_name, const char *value );
+	G_CVAR_SET_VALUE,	// ( const char *var_name, float value );
+	G_CVAR_RESET,		// ( const char *var_name );
+	G_CVAR_VARIABLE_VALUE,					// ( const char *var_name );
+	G_CVAR_VARIABLE_INTEGER_VALUE,			// ( const char *var_name );
+	G_CVAR_VARIABLE_STRING_BUFFER,			// ( const char *var_name, char *buffer, int bufsize );
+	G_CVAR_LATCHED_VARIABLE_STRING_BUFFER,	// ( const char *var_name, char *buffer, int bufsize );
+	G_CVAR_INFO_STRING_BUFFER,				// ( int bit, char *buffer, int bufsize );
+
+	G_FS_FOPEN_FILE,	// ( const char *qpath, fileHandle_t *file, fsMode_t mode );
+	G_FS_READ,			// ( void *buffer, int len, fileHandle_t f );
+	G_FS_WRITE,			// ( const void *buffer, int len, fileHandle_t f );
+	G_FS_SEEK,
+	G_FS_FCLOSE_FILE,	// ( fileHandle_t f );
+	G_FS_GETFILELIST,
+	G_FS_DELETE,		// ( const void *path );
+	G_FS_RENAME,		// ( const void *from, const void *to );
+
+	G_PC_ADD_GLOBAL_DEFINE,
+	G_PC_REMOVE_ALL_GLOBAL_DEFINES,
+	G_PC_LOAD_SOURCE,
+	G_PC_FREE_SOURCE,
+	G_PC_READ_TOKEN,
+	G_PC_UNREAD_TOKEN,
+	G_PC_SOURCE_FILE_AND_LINE,
 
 	//=========== server specific functionality =============
 
-	G_LOCATE_GAME_DATA,		// ( gentity_t *gEnts, int numGEntities, int sizeofGEntity_t,
+	G_LOCATE_GAME_DATA = 100,		// ( gentity_t *gEnts, int numGEntities, int sizeofGEntity_t,
 	//							playerState_t *clients, int sizeofGameClient );
 	// the game needs to let the server system know where and how big the gentities
 	// are, so it can look at them directly without going through an interface
@@ -220,40 +245,16 @@ typedef enum {
 	// false when all tokens have been parsed.
 	// This should only be done at GAME_INIT time.
 
-	G_FS_GETFILELIST,
 	G_DEBUG_POLYGON_CREATE,
 	G_DEBUG_POLYGON_DELETE,
-	G_REAL_TIME,
-	G_SNAPVECTOR,
 
 	G_TRACECAPSULE,	// ( trace_t *results, const vec3_t start, const vec3_t mins, const vec3_t maxs, const vec3_t end, int passEntityNum, int contentmask );
 	G_ENTITY_CONTACTCAPSULE,	// ( const vec3_t mins, const vec3_t maxs, const gentity_t *ent );
-	
-	// 1.32
-	G_FS_SEEK,
-
-	G_ADDCOMMAND,
-	G_REMOVECOMMAND,
-
-#ifdef TA_GAME_MODELS
-	G_REGISTERMODEL, // CG_R_REGISTERMODEL
-	G_LERPTAG,		// CG_R_LERPTAG
-
-#ifdef IOQ3ZTM // BONES
-	G_JOINTINDEXFORNAME,
-	G_SETUPSKELETON,
-	G_SETUPPLAYERSKELETON,
-	G_MAKESKELETONABSOLUTE,
-#endif
-#endif
-
-	// See sharedTraps_t in qcommon.h for TRAP_MEMSET=100, etc
 
 	BOTLIB_SETUP = 200,				// ( void );
 	BOTLIB_SHUTDOWN,				// ( void );
 	BOTLIB_LIBVAR_SET,
 	BOTLIB_LIBVAR_GET,
-	BOTLIB_PC_ADD_GLOBAL_DEFINE,
 	BOTLIB_START_FRAME,
 	BOTLIB_LOAD_MAP,
 	BOTLIB_UPDATENTITY,
@@ -414,10 +415,17 @@ typedef enum {
 	BOTLIB_AAS_PREDICT_ROUTE,
 	BOTLIB_AAS_POINT_REACHABILITY_AREA_INDEX,
 
-	BOTLIB_PC_LOAD_SOURCE,
-	BOTLIB_PC_FREE_SOURCE,
-	BOTLIB_PC_READ_TOKEN,
-	BOTLIB_PC_SOURCE_FILE_AND_LINE
+#ifdef TA_GAME_MODELS
+	G_REGISTERMODEL = 600,	// CG_R_REGISTERMODEL
+	G_LERPTAG,				// CG_R_LERPTAG
+
+#ifdef IOQ3ZTM // BONES
+	G_JOINTINDEXFORNAME,
+	G_SETUPSKELETON,
+	G_SETUPPLAYERSKELETON,
+	G_MAKESKELETONABSOLUTE,
+#endif
+#endif
 
 } gameImport_t;
 

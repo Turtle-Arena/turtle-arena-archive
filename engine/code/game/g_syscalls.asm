@@ -1,90 +1,101 @@
 code
 
-equ	trap_Print				-1
-equ	trap_Error				-2
-equ	trap_Milliseconds		-3
-equ	trap_Cvar_Register		-4
-equ	trap_Cvar_Update		-5
-equ	trap_Cvar_Set			-6
-equ	trap_Cvar_VariableIntegerValue	-7
-equ	trap_Cvar_VariableStringBuffer	-8
-equ	trap_Argc				-9
-equ	trap_Argv				-10
-equ	trap_FS_FOpenFile		-11
-equ	trap_FS_Read			-12
-equ	trap_FS_Write			-13
-equ	trap_FS_FCloseFile		-14
-equ	trap_SendConsoleCommand	-15
-equ	trap_LocateGameData		-16
-equ	trap_DropClient			-17
-equ	trap_SendServerCommand	-18
-equ	trap_SetConfigstring	-19
-equ	trap_GetConfigstring	-20
-equ	trap_GetUserinfo		-21
-equ	trap_SetUserinfo		-22
-equ	trap_GetServerinfo		-23
-equ	trap_SetBrushModel		-24
-equ	trap_Trace				-25
-equ	trap_PointContents		-26
-equ trap_InPVS				-27
-equ	trap_InPVSIgnorePortals	-28
-equ	trap_AdjustAreaPortalState	-29
-equ	trap_AreasConnected		-30
-equ	trap_LinkEntity			-31
-equ	trap_UnlinkEntity		-32
-equ	trap_EntitiesInBox		-33
-equ	trap_EntityContact		-34
-equ	trap_BotAllocateClient	-35
-equ	trap_BotFreeClient		-36
-equ	trap_GetUsercmd			-37
-equ	trap_GetEntityToken		-38
-equ	trap_FS_GetFileList		-39
-equ trap_DebugPolygonCreate	-40
-equ trap_DebugPolygonDelete	-41
-equ trap_RealTime			-42
-equ trap_SnapVector			-43
-equ trap_TraceCapsule		-44
-equ trap_EntityContactCapsule	-45
-equ trap_FS_Seek -46
-equ trap_AddCommand			-47
-equ trap_RemoveCommand		-48
+equ memset						-1
+equ memcpy						-2
+equ strncpy						-3
+equ sin							-4
+equ cos							-5
+equ atan2						-6
+equ sqrt						-7
+equ floor						-8
+equ ceil						-9
+equ Q_acos						-10
+equ Q_asin						-11
 
-;; ZTM: For TA_GAME_MODELS
-equ trap_R_RegisterModel		-49
-equ trap_R_LerpTag				-50
-;; IOQ3ZTM // BONES
-equ trap_R_JointIndexForName	-51
-equ trap_R_SetupSkeleton		-52
-equ trap_R_SetupPlayerSkeleton	-53
-equ trap_R_MakeSkeletonAbsolute	-54
+equ trap_Print							-21
+equ trap_Error							-22
+equ trap_Milliseconds					-23
+equ trap_RealTime						-24
+equ trap_SnapVector						-25
 
-equ	memset					-101
-equ	memcpy					-102
-equ	strncpy					-103
-equ	sin						-104
-equ	cos						-105
-equ	atan2					-106
-equ	sqrt					-107
-equ floor					-108
-equ	ceil					-109
-equ	Q_acos					-110
-equ	Q_asin					-111
+equ trap_Argc							-26
+equ trap_Argv							-27
+equ trap_Args							-28
 
+equ trap_AddCommand						-29
+equ trap_RemoveCommand					-30
+equ trap_Cmd_ExecuteText				-31
+
+equ trap_Cvar_Register						-32
+equ trap_Cvar_Update						-33
+equ trap_Cvar_Set							-34
+equ trap_Cvar_SetValue						-35
+equ trap_Cvar_Reset							-36
+equ trap_Cvar_VariableValue					-37
+equ trap_Cvar_VariableIntegerValue			-38
+equ trap_Cvar_VariableStringBuffer			-39
+equ trap_Cvar_LatchedVariableStringBuffer	-40
+equ trap_Cvar_InfoStringBuffer				-41
+
+equ trap_FS_FOpenFile					-42
+equ trap_FS_Read						-43
+equ trap_FS_Write						-44
+equ trap_FS_Seek						-45
+equ trap_FS_FCloseFile					-46
+equ trap_FS_GetFileList					-47
+equ trap_FS_Delete						-48
+equ trap_FS_Rename						-49
+
+equ trap_PC_AddGlobalDefine				-50
+equ trap_PC_RemoveAllGlobalDefines		-51
+equ trap_PC_LoadSource					-52
+equ trap_PC_FreeSource					-53
+equ trap_PC_ReadToken					-54
+equ trap_PC_UnreadToken					-55
+equ trap_PC_SourceFileAndLine			-56
+
+
+equ	trap_LocateGameData					-101
+equ	trap_DropClient						-102
+equ	trap_SendServerCommand				-103
+equ	trap_SetConfigstring				-104
+equ	trap_GetConfigstring				-105
+equ	trap_GetUserinfo					-106
+equ	trap_SetUserinfo					-107
+equ	trap_GetServerinfo					-108
+equ	trap_SetBrushModel					-109
+equ	trap_Trace							-110
+equ	trap_PointContents					-111
+equ trap_InPVS							-112
+equ	trap_InPVSIgnorePortals				-113
+equ	trap_AdjustAreaPortalState			-114
+equ	trap_AreasConnected					-115
+equ	trap_LinkEntity						-116
+equ	trap_UnlinkEntity					-117
+equ	trap_EntitiesInBox					-118
+equ	trap_EntityContact					-119
+equ	trap_BotAllocateClient				-120
+equ	trap_BotFreeClient					-121
+equ	trap_GetUsercmd						-122
+equ	trap_GetEntityToken					-123
+equ trap_DebugPolygonCreate				-124
+equ trap_DebugPolygonDelete				-125
+equ trap_TraceCapsule					-126
+equ trap_EntityContactCapsule			-127
 
 
 equ trap_BotLibSetup					-201
 equ trap_BotLibShutdown					-202
 equ trap_BotLibVarSet					-203
 equ trap_BotLibVarGet					-204
-equ trap_BotLibDefine					-205
-equ trap_BotLibStartFrame				-206
-equ trap_BotLibLoadMap					-207
-equ trap_BotLibUpdateEntity				-208
-equ trap_BotLibTest						-209
+equ trap_BotLibStartFrame				-205
+equ trap_BotLibLoadMap					-206
+equ trap_BotLibUpdateEntity				-207
+equ trap_BotLibTest						-208
 
-equ trap_BotGetSnapshotEntity			-210
-equ trap_BotGetServerCommand		-211
-equ trap_BotUserCommand					-212
+equ trap_BotGetSnapshotEntity			-209
+equ trap_BotGetServerCommand			-210
+equ trap_BotUserCommand					-211
 
 
 
@@ -136,8 +147,10 @@ equ trap_EA_MoveBack					-414
 equ trap_EA_MoveLeft					-415
 equ trap_EA_MoveRight					-416
 
+;; ZTM: TA_WEAPSYS_EX
+equ trap_EA_DropWeapon					-417
+
 equ trap_EA_SelectWeapon				-417
-equ trap_EA_DropWeapon				-417
 equ trap_EA_Jump						-418
 equ trap_EA_DelayedJump					-419
 equ trap_EA_Move						-420
@@ -232,8 +245,13 @@ equ trap_AAS_AlternativeRouteGoals		-576
 equ trap_AAS_PredictRoute				-577
 equ trap_AAS_PointReachabilityAreaIndex	-578
 
-equ trap_BotLibLoadSource				-579
-equ trap_BotLibFreeSource				-580
-equ trap_BotLibReadToken				-581
-equ trap_BotLibSourceFileAndLine		-582
- 
+
+;; ZTM: For TA_GAME_MODELS
+equ trap_R_RegisterModel		-601
+equ trap_R_LerpTag				-602
+;; IOQ3ZTM // BONES
+equ trap_R_JointIndexForName	-603
+equ trap_R_SetupSkeleton		-604
+equ trap_R_SetupPlayerSkeleton	-605
+equ trap_R_MakeSkeletonAbsolute	-606
+

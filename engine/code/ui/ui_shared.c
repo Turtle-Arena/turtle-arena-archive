@@ -31,6 +31,8 @@ Suite 120, Rockville, Maryland 20850 USA.
 // string allocation/managment
 // ZTM: NOTE: Shared by ui and cgame
 
+#include "../qcommon/q_shared.h"
+#include "../game/bg_misc.h"
 #include "ui_shared.h"
 
 #define SCROLL_TIME_START					500
@@ -73,13 +75,6 @@ static qboolean debugMode = qfalse;
 
 #define DOUBLE_CLICK_DELAY 300
 static int lastListBoxClickTime = 0;
-
-// Shared by cgame and ui.
-int			trap_PC_AddGlobalDefine( char *define );
-int			trap_PC_LoadSource( const char *filename );
-int			trap_PC_FreeSource( int handle );
-int			trap_PC_ReadToken( int handle, pc_token_t *pc_token );
-int			trap_PC_SourceFileAndLine( int handle, char *filename, int *line );
 
 void Item_RunScript(itemDef_t *item, const char *s);
 void Item_SetupKeywordHash(void);
@@ -257,7 +252,7 @@ void String_Init(void) {
 	UI_InitMemory();
 	Item_SetupKeywordHash();
 	Menu_SetupKeywordHash();
-	if (DC && DC->getBindingBuf) {
+	if (DC && DC->getKey) {
 		Controls_GetConfig();
 	}
 }
@@ -3337,26 +3332,21 @@ Controls_GetKeyAssignment
 */
 static void Controls_GetKeyAssignment (char *command, int *twokeys)
 {
-	int		count;
-	int		j;
-	char	b[256];
+	int		key;
+	int		i;
 
 	twokeys[0] = twokeys[1] = -1;
-	count = 0;
+	key = 0;
 
-	for ( j = 0; j < 256; j++ )
+	for ( i = 0; i < 2; i++ )
 	{
-		DC->getBindingBuf( j, b, 256 );
-		if ( *b == 0 ) {
-			continue;
+		key = DC->getKey( command, key );
+		if ( key == -1 ) {
+			break;
 		}
-		if ( !Q_stricmp( b, command ) ) {
-			twokeys[count] = j;
-			count++;
-			if (count == 2) {
-				break;
-			}
-		}
+
+		twokeys[i] = key;
+		key++;
 	}
 }
 

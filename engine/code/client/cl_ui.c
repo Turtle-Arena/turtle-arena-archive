@@ -668,6 +668,15 @@ static int GetConfigString(int index, char *buf, int size)
 }
 
 /*
+=====================
+CL_AddUICommand
+=====================
+*/
+void CL_AddUICommand( const char *cmdName ) {
+	Cmd_AddCommand( cmdName, NULL );
+}
+
+/*
 ====================
 FloatAsInt
 ====================
@@ -687,6 +696,42 @@ The ui module is making a system call
 */
 intptr_t CL_UISystemCalls( intptr_t *args ) {
 	switch( args[0] ) {
+	case TRAP_MEMSET:
+		Com_Memset( VMA(1), args[2], args[3] );
+		return 0;
+
+	case TRAP_MEMCPY:
+		Com_Memcpy( VMA(1), VMA(2), args[3] );
+		return 0;
+
+	case TRAP_STRNCPY:
+		strncpy( VMA(1), VMA(2), args[3] );
+		return args[1];
+
+	case TRAP_SIN:
+		return FloatAsInt( sin( VMF(1) ) );
+
+	case TRAP_COS:
+		return FloatAsInt( cos( VMF(1) ) );
+
+	case TRAP_ATAN2:
+		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
+
+	case TRAP_SQRT:
+		return FloatAsInt( sqrt( VMF(1) ) );
+
+	case TRAP_FLOOR:
+		return FloatAsInt( floor( VMF(1) ) );
+
+	case TRAP_CEIL:
+		return FloatAsInt( ceil( VMF(1) ) );
+
+	case TRAP_ACOS:
+		return FloatAsInt( Q_acos( VMF(1) ) );
+
+	case TRAP_ASIN:
+		return FloatAsInt( Q_asin( VMF(1) ) );
+
 	case UI_ERROR:
 		Com_Error( ERR_DROP, "%s", (const char*)VMA(1) );
 		return 0;
@@ -697,6 +742,35 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 
 	case UI_MILLISECONDS:
 		return Sys_Milliseconds();
+
+	case UI_REAL_TIME:
+		return Com_RealTime( VMA(1) );
+
+	case UI_SNAPVECTOR:
+		Q_SnapVector(VMA(1));
+		return 0;
+
+	case UI_ARGC:
+		return Cmd_Argc();
+
+	case UI_ARGV:
+		Cmd_ArgvBuffer( args[1], VMA(2), args[3] );
+		return 0;
+
+	case UI_ARGS:
+		Cmd_ArgsBuffer( VMA(1), args[2] );
+		return 0;
+
+	case UI_ADDCOMMAND:
+		CL_AddUICommand( VMA(1) );
+		return 0;
+	case UI_REMOVECOMMAND:
+		Cmd_RemoveCommandSafe( VMA(1) );
+		return 0;
+
+	case UI_CMD_EXECUTETEXT:
+		Cbuf_ExecuteTextSafe( args[1], VMA(2) );
+		return 0;
 
 	case UI_CVAR_REGISTER:
 		Cvar_Register( VMA(1), VMA(2), VMA(3), args[4] ); 
@@ -710,14 +784,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		Cvar_SetSafe( VMA(1), VMA(2) );
 		return 0;
 
-	case UI_CVAR_VARIABLEVALUE:
-		return FloatAsInt( Cvar_VariableValue( VMA(1) ) );
-
-	case UI_CVAR_VARIABLESTRINGBUFFER:
-		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
-		return 0;
-
-	case UI_CVAR_SETVALUE:
+	case UI_CVAR_SET_VALUE:
 		Cvar_SetValueSafe( VMA(1), VMF(2) );
 		return 0;
 
@@ -725,31 +792,22 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		Cvar_Reset( VMA(1) );
 		return 0;
 
-	case UI_CVAR_CREATE:
-		Cvar_Get( VMA(1), VMA(2), args[3] );
+	case UI_CVAR_VARIABLE_VALUE:
+		return FloatAsInt( Cvar_VariableValue( VMA(1) ) );
+
+	case UI_CVAR_VARIABLE_INTEGER_VALUE:
+		return Cvar_VariableIntegerValue( VMA(1) );
+
+	case UI_CVAR_VARIABLE_STRING_BUFFER:
+		Cvar_VariableStringBuffer( VMA(1), VMA(2), args[3] );
 		return 0;
 
-	case UI_CVAR_INFOSTRINGBUFFER:
+	case UI_CVAR_LATCHED_VARIABLE_STRING_BUFFER:
+		Cvar_LatchedVariableStringBuffer( VMA( 1 ), VMA( 2 ), args[3] );
+		return 0;
+
+	case UI_CVAR_INFO_STRING_BUFFER:
 		Cvar_InfoStringBuffer( args[1], VMA(2), args[3] );
-		return 0;
-
-	case UI_ARGC:
-		return Cmd_Argc();
-
-	case UI_ARGV:
-		Cmd_ArgvBuffer( args[1], VMA(2), args[3] );
-		return 0;
-
-	case UI_CMD_EXECUTETEXT:
-		if(args[1] == EXEC_NOW
-		&& (!strncmp(VMA(2), "snd_restart", 11)
-		|| !strncmp(VMA(2), "vid_restart", 11)
-		|| !strncmp(VMA(2), "quit", 5)))
-		{
-			Com_Printf (S_COLOR_YELLOW "turning EXEC_NOW '%.11s' into EXEC_INSERT\n", (const char*)VMA(2));
-			args[1] = EXEC_INSERT;
-		}
-		Cbuf_ExecuteText( args[1], VMA(2) );
 		return 0;
 
 	case UI_FS_FOPENFILE:
@@ -763,6 +821,9 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		FS_Write( VMA(1), args[2], args[3] );
 		return 0;
 
+	case UI_FS_SEEK:
+		return FS_Seek( args[1], args[2], args[3] );
+
 	case UI_FS_FCLOSEFILE:
 		FS_FCloseFile( args[1] );
 		return 0;
@@ -770,17 +831,46 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_FS_GETFILELIST:
 		return FS_GetFileList( VMA(1), VMA(2), VMA(3), args[4] );
 
-	case UI_FS_SEEK:
-		return FS_Seek( args[1], args[2], args[3] );
-	
+	case UI_FS_DELETE:
+		return FS_Delete( VMA(1) );
+
+	case UI_FS_RENAME:
+		return FS_Rename( VMA(1), VMA(2) );
+
+	case UI_PC_ADD_GLOBAL_DEFINE:
+		return botlib_export->PC_AddGlobalDefine( VMA(1) );
+	case UI_PC_REMOVE_ALL_GLOBAL_DEFINES:
+		botlib_export->PC_RemoveAllGlobalDefines();
+		return 0;
+	case UI_PC_LOAD_SOURCE:
+		return botlib_export->PC_LoadSourceHandle( VMA(1) );
+	case UI_PC_FREE_SOURCE:
+		return botlib_export->PC_FreeSourceHandle( args[1] );
+	case UI_PC_READ_TOKEN:
+		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
+	case UI_PC_UNREAD_TOKEN:
+		botlib_export->PC_UnreadLastTokenHandle( args[1] );
+		return 0;
+	case UI_PC_SOURCE_FILE_AND_LINE:
+		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
+
+		//====================================
+
 	case UI_R_REGISTERMODEL:
 		return re.RegisterModel( VMA(1) );
 
 	case UI_R_REGISTERSKIN:
 		return re.RegisterSkin( VMA(1) );
 
+	case UI_R_REGISTERSHADER:
+		return re.RegisterShader( VMA(1) );
+
 	case UI_R_REGISTERSHADERNOMIP:
 		return re.RegisterShaderNoMip( VMA(1) );
+
+	case UI_R_REGISTERFONT:
+		re.RegisterFont( VMA(1), args[2], VMA(3));
+		return 0;
 
 	case UI_R_CLEARSCENE:
 		re.ClearScene();
@@ -824,7 +914,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		re.DrawStretchPic( VMF(1), VMF(2), VMF(3), VMF(4), VMF(5), VMF(6), VMF(7), VMF(8), args[9] );
 		return 0;
 
-  case UI_R_MODELBOUNDS:
+	case UI_R_MODELBOUNDS:
 		re.ModelBounds( args[1], VMA(2), VMA(3) );
 		return 0;
 
@@ -832,7 +922,7 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		SCR_UpdateScreen();
 		return 0;
 
-	case UI_CM_LERPTAG:
+	case UI_R_LERPTAG:
 		return re.LerpTag( VMA(1), args[2], args[3], args[4], VMF(5), VMA(6) );
 
 	case UI_S_REGISTERSOUND:
@@ -878,6 +968,9 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		// Don't allow the ui module to close the console
 		Key_SetCatcher( args[1] | ( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) );
 		return 0;
+
+	case UI_KEY_GETKEY:
+		return Key_GetKey( VMA(1), args[2] );
 
 	case UI_GETCLIPBOARDDATA:
 		CL_GetClipboardData( VMA(1), args[2] );
@@ -961,10 +1054,6 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 	case UI_MEMORY_REMAINING:
 		return Hunk_MemoryRemaining();
 
-	case UI_R_REGISTERFONT:
-		re.RegisterFont( VMA(1), args[2], VMA(3));
-		return 0;
-
 #ifdef IOQ3ZTM // BONES
 	case UI_R_JOINTINDEXFORNAME:
 		return re.JointIndexForName(args[1], VMA(2));
@@ -979,62 +1068,12 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		return 0;
 #endif
 
-	case TRAP_MEMSET:
-		Com_Memset( VMA(1), args[2], args[3] );
-		return 0;
-
-	case TRAP_MEMCPY:
-		Com_Memcpy( VMA(1), VMA(2), args[3] );
-		return 0;
-
-	case TRAP_STRNCPY:
-		strncpy( VMA(1), VMA(2), args[3] );
-		return args[1];
-
-	case TRAP_SIN:
-		return FloatAsInt( sin( VMF(1) ) );
-
-	case TRAP_COS:
-		return FloatAsInt( cos( VMF(1) ) );
-
-	case TRAP_ATAN2:
-		return FloatAsInt( atan2( VMF(1), VMF(2) ) );
-
-	case TRAP_SQRT:
-		return FloatAsInt( sqrt( VMF(1) ) );
-
-	case TRAP_FLOOR:
-		return FloatAsInt( floor( VMF(1) ) );
-
-	case TRAP_CEIL:
-		return FloatAsInt( ceil( VMF(1) ) );
-
-	case TRAP_ACOS:
-		return FloatAsInt( Q_acos( VMF(1) ) );
-
-	case TRAP_ASIN:
-		return FloatAsInt( Q_asin( VMF(1) ) );
-
-	case UI_PC_ADD_GLOBAL_DEFINE:
-		return botlib_export->PC_AddGlobalDefine( VMA(1) );
-	case UI_PC_LOAD_SOURCE:
-		return botlib_export->PC_LoadSourceHandle( VMA(1) );
-	case UI_PC_FREE_SOURCE:
-		return botlib_export->PC_FreeSourceHandle( args[1] );
-	case UI_PC_READ_TOKEN:
-		return botlib_export->PC_ReadTokenHandle( args[1], VMA(2) );
-	case UI_PC_SOURCE_FILE_AND_LINE:
-		return botlib_export->PC_SourceFileAndLine( args[1], VMA(2), VMA(3) );
-
 	case UI_S_STOPBACKGROUNDTRACK:
 		S_StopBackgroundTrack();
 		return 0;
 	case UI_S_STARTBACKGROUNDTRACK:
 		S_StartBackgroundTrack( VMA(1), VMA(2));
 		return 0;
-
-	case UI_REAL_TIME:
-		return Com_RealTime( VMA(1) );
 
 	case UI_CIN_PLAYCINEMATIC:
 	  Com_DPrintf("UI_CIN_PlayCinematic\n");
@@ -1088,7 +1127,9 @@ CL_InitUI
 ====================
 */
 void CL_InitUI( void ) {
-	int		v;
+	unsigned int		version;
+	unsigned int		major;
+	unsigned int		minor;
 	vmInterpret_t		interpret;
 
 	// load the dll or bytecode
@@ -1106,13 +1147,16 @@ void CL_InitUI( void ) {
 	}
 
 	// sanity check
-	v = VM_SafeCall( uivm, UI_GETAPIVERSION );
-	if (v != UI_API_VERSION) {
+	version = VM_SafeCall( uivm, UI_GETAPIVERSION );
+	major = (version >> 16) & 0xFFFF;
+	minor = version & 0xFFFF;
+	Com_DPrintf("Loading UI with version %x.%x\n", major, minor);
+	if (major != UI_API_MAJOR_VERSION || minor > UI_API_MINOR_VERSION) {
 		// Free uivm now, so UI_SHUTDOWN doesn't get called later.
 		VM_Free( uivm );
 		uivm = NULL;
 
-		Com_Error( ERR_DROP, "User Interface is version %d, expected %d", v, UI_API_VERSION );
+		Com_Error( ERR_DROP, "User Interface is version %x.%x, expected %x.%x", major, minor, UI_API_MAJOR_VERSION, UI_API_MINOR_VERSION );
 		cls.uiStarted = qfalse;
 	}
 	else {

@@ -51,7 +51,7 @@ void CG_TargetCommand_f( void ) {
 	}
 
 	trap_Argv( 1, test, 4 );
-	trap_SendConsoleCommand( va( "gc %i %i", targetNum, atoi( test ) ) );
+	trap_Cmd_ExecuteText(EXEC_NOW, va( "gc %i %i", targetNum, atoi( test ) ) );
 }
 
 
@@ -413,8 +413,8 @@ static void CG_NextOrder_f( void ) {
 
 
 static void CG_ConfirmOrder_f (void ) {
-	trap_SendConsoleCommand(va("cmd vtell %d %s\n", cgs.acceptLeader, VOICECHAT_YES));
-	trap_SendConsoleCommand("+button5; wait; -button5");
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vtell %d %s\n", cgs.acceptLeader, VOICECHAT_YES));
+	trap_Cmd_ExecuteText(EXEC_NOW, "+button5; wait; -button5");
 	if (cg.time < cgs.acceptOrderTime) {
 		trap_SendClientCommand(va("teamtask %d\n", cgs.acceptTask));
 		cgs.acceptOrderTime = 0;
@@ -422,8 +422,8 @@ static void CG_ConfirmOrder_f (void ) {
 }
 
 static void CG_DenyOrder_f (void ) {
-	trap_SendConsoleCommand(va("cmd vtell %d %s\n", cgs.acceptLeader, VOICECHAT_NO));
-	trap_SendConsoleCommand("+button6; wait; -button6");
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vtell %d %s\n", cgs.acceptLeader, VOICECHAT_NO));
+	trap_Cmd_ExecuteText(EXEC_NOW, "+button6; wait; -button6");
 	if (cg.time < cgs.acceptOrderTime) {
 		cgs.acceptOrderTime = 0;
 	}
@@ -431,66 +431,66 @@ static void CG_DenyOrder_f (void ) {
 
 static void CG_TaskOffense_f (void ) {
 	if (cgs.gametype == GT_CTF || cgs.gametype == GT_1FCTF) {
-		trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONGETFLAG));
+		trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONGETFLAG));
 	} else {
-		trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONOFFENSE));
+		trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONOFFENSE));
 	}
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_OFFENSE));
 }
 
 static void CG_TaskDefense_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONDEFENSE));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONDEFENSE));
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_DEFENSE));
 }
 
 static void CG_TaskPatrol_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONPATROL));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONPATROL));
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_PATROL));
 }
 
 static void CG_TaskCamp_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONCAMPING));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONCAMPING));
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_CAMP));
 }
 
 static void CG_TaskFollow_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONFOLLOW));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONFOLLOW));
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_FOLLOW));
 }
 
 static void CG_TaskRetrieve_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONRETURNFLAG));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONRETURNFLAG));
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_RETRIEVE));
 }
 
 static void CG_TaskEscort_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_ONFOLLOWCARRIER));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_ONFOLLOWCARRIER));
 	trap_SendClientCommand(va("teamtask %d\n", TEAMTASK_ESCORT));
 }
 
 static void CG_TaskOwnFlag_f (void ) {
-	trap_SendConsoleCommand(va("cmd vsay_team %s\n", VOICECHAT_IHAVEFLAG));
+	trap_Cmd_ExecuteText(EXEC_NOW, va("cmd vsay_team %s\n", VOICECHAT_IHAVEFLAG));
 }
 
 static void CG_TauntKillInsult_f (void ) {
-	trap_SendConsoleCommand("cmd vsay kill_insult\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "cmd vsay kill_insult\n");
 }
 
 static void CG_TauntPraise_f (void ) {
-	trap_SendConsoleCommand("cmd vsay praise\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "cmd vsay praise\n");
 }
 
 static void CG_TauntTaunt_f (void ) {
-	trap_SendConsoleCommand("cmd vtaunt\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "cmd vtaunt\n");
 }
 
 static void CG_TauntDeathInsult_f (void ) {
-	trap_SendConsoleCommand("cmd vsay death_insult\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "cmd vsay death_insult\n");
 }
 
 #ifndef TURTLEARENA // WEAPONS
 static void CG_TauntGauntlet_f (void ) {
-	trap_SendConsoleCommand("cmd vsay kill_guantlet\n");
+	trap_Cmd_ExecuteText(EXEC_NOW, "cmd vsay kill_guantlet\n");
 }
 #endif
 

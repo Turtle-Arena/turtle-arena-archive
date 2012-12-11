@@ -2029,7 +2029,7 @@ void ClientDisconnect( int clientNum ) {
 		ent->client->sess.sessionTeam == TEAM_FREE &&
 		level.intermissiontime ) {
 
-		trap_SendConsoleCommand( EXEC_APPEND, "map_restart 0\n" );
+		trap_Cmd_ExecuteText( EXEC_APPEND, "map_restart 0\n" );
 		level.restarted = qtrue;
 		level.changemap = NULL;
 		level.intermissiontime = 0;

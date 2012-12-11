@@ -309,6 +309,19 @@ qboolean Sys_Mkdir( const char *path )
 
 /*
 ==================
+Sys_Rmdir
+==================
+*/
+qboolean Sys_Rmdir( const char *path )
+{
+	if( RemoveDirectory( path ) != 0 )
+		return qfalse;
+
+	return qtrue;
+}
+
+/*
+==================
 Sys_Mkfifo
 Noop on windows because named pipes do not function the same way
 ==================
@@ -316,6 +329,27 @@ Noop on windows because named pipes do not function the same way
 FILE *Sys_Mkfifo( const char *ospath )
 {
 	return NULL;
+}
+
+/*
+==============
+Sys_StatFile
+
+Test a file given OS path:
+returns -1 if not found
+returns 1 if directory
+returns 0 otherwise
+==============
+*/
+int Sys_StatFile( char *ospath ) {
+	struct _stat stat;
+	if ( _stat( ospath, &stat ) == -1 ) {
+		return -1;
+	}
+	if ( stat.st_mode & _S_IFDIR ) {
+		return 1;
+	}
+	return 0;
 }
 
 /*
