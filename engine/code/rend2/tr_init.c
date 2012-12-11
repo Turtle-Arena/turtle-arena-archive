@@ -1576,6 +1576,9 @@ refexport_t *GetRefAPI ( int apiVersion, refimport_t *rimp ) {
 	re.SetColor = RE_SetColor;
 	re.SetClipRegion = RE_SetClipRegion;
 	re.DrawStretchPic = RE_StretchPic;
+	re.DrawRotatedPic = RE_RotatedPic;
+	re.DrawStretchPicGradient = RE_StretchPicGradient;
+	re.Add2dPolys = RE_2DPolyies;
 	re.DrawStretchRaw = RE_StretchRaw;
 	re.UploadCinematic = RE_UploadCinematic;
 

@@ -281,6 +281,9 @@
 			<Add option="-DNIGHTSMODE" />
 			<Add option="-DTA_GAME_MODELS" />
 		</Compiler>
+		<Unit filename="../../code/cgame/cg_atmospheric.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="../../code/cgame/cg_consolecmds.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -358,6 +361,9 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/game/bg_slidemove.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../code/game/bg_tracemap.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../code/qcommon/q_math.c">
