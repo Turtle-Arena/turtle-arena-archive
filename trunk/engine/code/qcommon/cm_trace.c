@@ -315,7 +315,7 @@ void CM_TestCapsuleInCapsule( traceWork_t *tw, clipHandle_t model ) {
 	vec3_t top, bottom;
 	vec3_t p1, p2, tmp;
 	vec3_t offset, symetricSize[2];
-	float radius, halfwidth, halfheight, offs, r;
+	float radius, halfwidth, halfheight, offs, r, h;
 
 	CM_ModelBounds(model, mins, maxs);
 
@@ -365,9 +365,14 @@ void CM_TestCapsuleInCapsule( traceWork_t *tw, clipHandle_t model ) {
 		tw->trace.contents = capsule_contents;
 		return;
 	}
-	// if between cylinder up and lower bounds
-	if ( (top[2] >= p1[2] && top[2] <= p2[2]) ||
-		(bottom[2] >= p1[2] && bottom[2] <= p2[2]) ) {
+
+	// height of the expanded cylinder is the height of both cylinders minus the radius of both spheres
+	h = halfheight + tw->sphere.halfheight - tw->sphere.radius - radius;
+
+	// if there is horizontal movement
+	if ( (tw->start[0] != tw->end[0] || tw->start[1] != tw->end[1] )
+		&& h > 0 && tw->start[2] <= offset[2] + h &&
+				tw->start[2] >= offset[2] - h) {
 		// 2d coordinates
 		top[2] = p1[2] = 0;
 		// if the cylinders overlap
@@ -972,15 +977,15 @@ void CM_TraceThroughSphere( traceWork_t *tw, vec3_t origin, float radius, vec3_t
 	VectorSubtract(start, origin, dir);
 	l1 = VectorLengthSquared(dir);
 	if (l1 < Square(radius)) {
-		tw->trace.fraction = 0;
 		tw->trace.startsolid = qtrue;
-		tw->trace.contents = contents;
 
 		// test for allsolid
 		VectorSubtract(end, origin, dir);
 		l1 = VectorLengthSquared(dir);
 		if (l1 < Square(radius)) {
 			tw->trace.allsolid = qtrue;
+			tw->trace.fraction = 0;
+			tw->trace.contents = contents;
 		}
 		return;
 	}
@@ -1070,22 +1075,26 @@ void CM_TraceThroughVerticalCylinder( traceWork_t *tw, vec3_t origin, float radi
 	VectorSet(start2d, start[0], start[1], 0);
 	VectorSet(end2d, end[0], end[1], 0);
 	VectorSet(org2d, origin[0], origin[1], 0);
-	// if between lower and upper cylinder bounds
+	// if start is between lower and upper cylinder bounds
 	if (start[2] <= origin[2] + halfheight &&
 				start[2] >= origin[2] - halfheight) {
 		// if inside the cylinder
 		VectorSubtract(start2d, org2d, dir);
 		l1 = VectorLengthSquared(dir);
 		if (l1 < Square(radius)) {
-			tw->trace.fraction = 0;
 			tw->trace.startsolid = qtrue;
-			tw->trace.contents = contents;
 
-			// test for allsolid
-			VectorSubtract(end2d, org2d, dir);
-			l1 = VectorLengthSquared(dir);
-			if (l1 < Square(radius)) {
-				tw->trace.allsolid = qtrue;
+			// if end is between lower and upper cylinder bounds
+			if (end[2] <= origin[2] + halfheight &&
+						end[2] >= origin[2] - halfheight) {
+				// test for allsolid
+				VectorSubtract(end2d, org2d, dir);
+				l1 = VectorLengthSquared(dir);
+				if (l1 < Square(radius)) {
+					tw->trace.allsolid = qtrue;
+					tw->trace.fraction = 0;
+					tw->trace.contents = contents;
+				}
 			}
 			return;
 		}
@@ -1222,10 +1231,18 @@ void CM_TraceCapsuleThroughCapsule( traceWork_t *tw, clipHandle_t model ) {
 		if ( h > 0 ) {
 			// test for collisions between the cylinders
 			CM_TraceThroughVerticalCylinder(tw, offset, radius, h, tw->start, tw->end, capsule_contents);
+			if ( tw->trace.allsolid ) {
+				return;
+			}
 		}
 	}
+
 	// test for collision between the spheres
 	CM_TraceThroughSphere(tw, top, radius, startbottom, endbottom, capsule_contents);
+	if ( tw->trace.allsolid ) {
+		return;
+	}
+
 	CM_TraceThroughSphere(tw, bottom, radius, starttop, endtop, capsule_contents);
 }
 
@@ -1678,6 +1695,7 @@ void CM_TransformedBoxTrace( trace_t *results, const vec3_t start, const vec3_t 
 
 	// rotate start and end into the models frame of reference
 	if ( model != BOX_MODEL_HANDLE && 
+		model != CAPSULE_MODEL_HANDLE &&
 		(angles[0] || angles[1] || angles[2]) ) {
 		rotated = qtrue;
 	} else {
