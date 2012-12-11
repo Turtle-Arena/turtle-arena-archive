@@ -1028,10 +1028,11 @@ COLLISION DETECTION
 
 // plane types are used to speed some tests
 // 0-2 are axial planes
-#define	PLANE_X			0
-#define	PLANE_Y			1
-#define	PLANE_Z			2
-#define	PLANE_NON_AXIAL	3
+#define	PLANE_X				0
+#define	PLANE_Y				1
+#define	PLANE_Z				2
+#define	PLANE_NON_AXIAL		3
+#define PLANE_NON_PLANAR	4
 
 
 /*
@@ -1041,7 +1042,7 @@ PlaneTypeForNormal
 */
 
 #ifndef BSPC // ZTM: BSP2
-#define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
+#define PlaneTypeForNormal( x ) ( x[0] == 1.0 ? PLANE_X : ( x[1] == 1.0 ? PLANE_Y : ( x[2] == 1.0 ? PLANE_Z : ( x[0] == 0.f && x[1] == 0.f && x[2] == 0.f ? PLANE_NON_PLANAR : PLANE_NON_AXIAL ) ) ) )
 #endif
 
 // plane_t structure

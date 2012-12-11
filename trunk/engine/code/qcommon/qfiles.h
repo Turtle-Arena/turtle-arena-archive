@@ -411,24 +411,25 @@ typedef struct {
 #define BSP_IDENT	(('P'<<24)+('S'<<16)+('B'<<8)+'I')
 		// little-endian "IBSP"
 
-#define BSP_VERSION			46
+#define Q3_BSP_VERSION			46 // Quake III / Team Arena
+#define WOLF_BSP_VERSION		47 // RTCW / WolfET
 
 
 // there shouldn't be any problem with increasing these values at the
 // expense of more memory allocation in the utilities
 #define	MAX_MAP_MODELS		0x400
-#define	MAX_MAP_BRUSHES		0x8000
-#define	MAX_MAP_ENTITIES	0x800
+#define	MAX_MAP_BRUSHES		0x8000 // ZTM: NOTE: Using value from Quake3/RTCW-MP, it's only 0x4000 in WolfET.
+#define	MAX_MAP_ENTITIES	0x1000 // ZTM: NOTE: Using value from WolfET, it's only 0x800 in Quake3/RTCW-MP.
 #define	MAX_MAP_ENTSTRING	0x40000
 #define	MAX_MAP_SHADERS		0x400
 
 #define	MAX_MAP_AREAS		0x100	// MAX_MAP_AREA_BYTES in q_shared must match!
 #define	MAX_MAP_FOGS		0x100
 #ifndef IOQ3ZTM // ZTM: Unused.
-#define	MAX_MAP_PLANES		0x20000
+#define	MAX_MAP_PLANES		0x40000 // ZTM: NOTE: Using value from WolfET, it's only 0x20000 in Quake3/RTCW-MP.
 #endif
 #define	MAX_MAP_NODES		0x20000
-#define	MAX_MAP_BRUSHSIDES	0x20000
+#define	MAX_MAP_BRUSHSIDES	0x100000 // ZTM: NOTE: Using value from WolfET, it's only 0x20000 in Quake3/RTCW-MP.
 #define	MAX_MAP_LEAFS		0x20000
 #define	MAX_MAP_LEAFFACES	0x20000
 #define	MAX_MAP_LEAFBRUSHES 0x40000
@@ -562,7 +563,8 @@ typedef enum {
 	MST_PLANAR,
 	MST_PATCH,
 	MST_TRIANGLE_SOUP,
-	MST_FLARE
+	MST_FLARE,
+	MST_FOLIAGE
 } mapSurfaceType_t;
 
 typedef struct {
@@ -571,7 +573,7 @@ typedef struct {
 	int			surfaceType;
 
 	int			firstVert;
-	int			numVerts;
+	int			numVerts; // ydnar: num verts + foliage origins (for cleaner lighting code in q3map)
 
 	int			firstIndex;
 	int			numIndexes;
@@ -583,8 +585,8 @@ typedef struct {
 	vec3_t		lightmapOrigin;
 	vec3_t		lightmapVecs[3];	// for patches, [0] and [1] are lodbounds
 
-	int			patchWidth;
-	int			patchHeight;
+	int			patchWidth; // ydnar: num foliage instances
+	int			patchHeight; // ydnar: num foliage mesh verts
 } dsurface_t;
 
 
