@@ -78,9 +78,9 @@ VM_Init
 ==============
 */
 void VM_Init( void ) {
-	Cvar_Get( "vm_cgame", "2", CVAR_ARCHIVE );	// !@# SHIP WITH SET TO 2
-	Cvar_Get( "vm_game", "2", CVAR_ARCHIVE );	// !@# SHIP WITH SET TO 2
-	Cvar_Get( "vm_ui", "2", CVAR_ARCHIVE );		// !@# SHIP WITH SET TO 2
+	Cvar_Get( "vm_cgame", "0", CVAR_ARCHIVE );
+	Cvar_Get( "vm_game", "0", CVAR_ARCHIVE );
+	Cvar_Get( "vm_ui", "0", CVAR_ARCHIVE );
 
 	Cmd_AddCommand ("vmprofile", VM_VmProfile_f );
 	Cmd_AddCommand ("vminfo", VM_VmInfo_f );
@@ -401,9 +401,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc, qboolean unpure)
 		FS_Which(filename, vm->searchPath);
 	}
 
-	if( LittleLong( header.h->vmMagic ) == VM_MAGIC_VER2 ) {
-		Com_DPrintf( "...which has vmMagic VM_MAGIC_VER2\n" );
-
+	if( LittleLong( header.h->vmMagic ) == VM_MAGIC_VER2_NEO ) {
 		// byte swap the header
 		for ( i = 0 ; i < sizeof( vmHeader_t ) / 4 ; i++ ) {
 			((int *)header.h)[i] = LittleLong( ((int *)header.h)[i] );
@@ -422,25 +420,16 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc, qboolean unpure)
 			Com_Printf(S_COLOR_YELLOW "Warning: %s has bad header\n", filename);
 			return NULL;
 		}
-	} else if( LittleLong( header.h->vmMagic ) == VM_MAGIC ) {
-		// byte swap the header
-		// sizeof( vmHeader_t ) - sizeof( int ) is the 1.32b vm header size
-		for ( i = 0 ; i < ( sizeof( vmHeader_t ) - sizeof( int ) ) / 4 ; i++ ) {
-			((int *)header.h)[i] = LittleLong( ((int *)header.h)[i] );
-		}
+	} else if( LittleLong( header.h->vmMagic ) == VM_MAGIC || LittleLong( header.h->vmMagic ) == VM_MAGIC_VER2 ) {
+		Com_Printf( S_COLOR_YELLOW "Warning: Ignoring unsupported legacy qvm: " );
 
-		// validate
-		if ( header.h->bssLength < 0
-			|| header.h->dataLength < 0
-			|| header.h->litLength < 0
-			|| header.h->codeLength <= 0 )
-		{
-			VM_Free(vm);
-			FS_FreeFile(header.v);
+		// show where the qvm was loaded from
+		FS_Which(filename, vm->searchPath);
 
-			Com_Printf(S_COLOR_YELLOW "Warning: %s has bad header\n", filename);
-			return NULL;
-		}
+		VM_Free( vm );
+		FS_FreeFile( header.v );
+
+		return NULL;
 	} else {
 		VM_Free( vm );
 		FS_FreeFile(header.v);
@@ -489,7 +478,7 @@ vmHeader_t *VM_LoadQVM( vm_t *vm, qboolean alloc, qboolean unpure)
 		*(int *)(vm->dataBase + i) = LittleLong( *(int *)(vm->dataBase + i ) );
 	}
 
-	if(header.h->vmMagic == VM_MAGIC_VER2)
+	if(header.h->vmMagic == VM_MAGIC_VER2_NEO)
 	{
 		int previousNumJumpTableTargets = vm->numJumpTableTargets;
 
@@ -645,7 +634,7 @@ vm_t *VM_Create( const char *module, intptr_t (*systemCalls)(intptr_t *),
 		else if(retval == VMI_COMPILED)
 		{
 			vm->searchPath = startSearch;
-			if((header = VM_LoadQVM(vm, qtrue, qfalse)))
+			if((header = VM_LoadQVM(vm, qtrue, qtrue)))
 				break;
 
 			// VM_Free overwrites the name on failed load

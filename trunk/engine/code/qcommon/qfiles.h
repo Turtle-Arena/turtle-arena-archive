@@ -58,8 +58,13 @@ QVM files
 ========================================================================
 */
 
+// QVM magics not supported by Spearmint
 #define	VM_MAGIC			0x12721444
-#define	VM_MAGIC_VER2	0x12721445
+#define	VM_MAGIC_VER2		0x12721445
+
+// Spearmint QVM magic, it's the same as VM_MAGIC_VER2 but with a different magic number.
+#define	VM_MAGIC_VER2_NEO	0x12721443
+
 typedef struct {
 	int		vmMagic;
 

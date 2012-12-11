@@ -1442,7 +1442,7 @@ vmInterpret_t FS_FindVM(void **startSearch, char *found, int foundlen, const cha
         
 	while(search)
 	{
-		if(search->dir && !fs_numServerPaks)
+		if(search->dir)
 		{
 			dir = search->dir;
 
@@ -1459,7 +1459,7 @@ vmInterpret_t FS_FindVM(void **startSearch, char *found, int foundlen, const cha
 				}
 			}
 
-			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse, qfalse) > 0)
+			if(FS_FOpenFileReadDir(qvmName, search, NULL, qfalse, qtrue) > 0)
 			{
 				*startSearch = search;
 				return VMI_COMPILED;

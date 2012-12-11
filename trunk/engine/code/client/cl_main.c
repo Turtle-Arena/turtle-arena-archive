@@ -1488,9 +1488,6 @@ void CL_Disconnect( qboolean showMainMenu ) {
 	// allow cheats locally
 	Cvar_Set( "sv_cheats", "1" );
 
-	// not connected to a pure server anymore
-	cl_connectedToPureServer = qfalse;
-
 #ifdef USE_VOIP
 	// not connected to voip server anymore.
 	clc.voipEnabled = qfalse;
