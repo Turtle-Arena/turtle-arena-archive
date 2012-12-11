@@ -1423,10 +1423,12 @@ void		RE_Shutdown( qboolean destroyWindow );
 
 qboolean	R_GetEntityToken( char *buffer, int size );
 
+float       R_ProcessLightmap( byte **pic, int in_padding, int width, int height, byte **pic_out );
+
 model_t		*R_AllocModel( void );
 
 void    	R_Init( void );
-image_t		*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode );
+image_t		*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode, qboolean lightmap );
 
 image_t		*R_CreateImage( const char *name, const byte *pic, int width, int height, qboolean mipmap
 					, qboolean allowPicmip, int wrapClampMode );

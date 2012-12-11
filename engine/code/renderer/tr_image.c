@@ -1672,7 +1672,7 @@ Finds or loads the given image.
 Returns NULL if it fails, not a default image.
 ==============
 */
-image_t	*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode ) {
+image_t	*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmip, int glWrapClampMode, qboolean lightmap ) {
 	image_t	*image;
 	int		width, height;
 	byte	*pic;
@@ -1711,6 +1711,11 @@ image_t	*R_FindImageFile( const char *name, qboolean mipmap, qboolean allowPicmi
 	R_LoadImage( name, &pic, &width, &height );
 	if ( pic == NULL ) {
 		return NULL;
+	}
+
+	// apply lightmap coloring
+	if ( lightmap ) {
+		R_ProcessLightmap( &pic, 4, width, height, &pic );
 	}
 
 	image = R_CreateImage( ( char * ) name, pic, width, height, mipmap, allowPicmip, glWrapClampMode );

@@ -902,7 +902,7 @@ static void ParseMesh ( dsurface_t *ds, drawVert_t *verts, float *hdrVertColors,
 
 	// pre-tesseleate
 	grid = R_SubdividePatchToGrid( width, height, points );
-	surf->data = (surfaceType_t *)grid;
+	surf->data = (surfaceType_t*) grid;
 
 	// copy the level of detail origin, which is the center
 	// of the group of all curves that must subdivide the same
@@ -2205,6 +2205,9 @@ static	void R_LoadSurfaces( lump_t *surfs, lump_t *verts, lump_t *indexLump ) {
 			case MST_FLARE:
 				out->data = ri.Hunk_Alloc( sizeof(srfFlare_t), h_low);
 				break;
+			case MST_FOLIAGE:
+				ri.Printf( PRINT_ERROR, "Foliage not supported in Rend2.\n" );
+				break;
 			default:
 				break;
 		}
@@ -2368,7 +2371,7 @@ static	void R_LoadNodesAndLeafs (lump_t *nodeLump, lump_t *leafLump) {
 			out->mins[j] = LittleLong (in->mins[j]);
 			out->maxs[j] = LittleLong (in->maxs[j]);
 		}
-	
+
 		p = LittleLong(in->planeNum);
 		out->plane = s_worldData.planes + p;
 
@@ -2551,6 +2554,12 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
 	for ( i=0 ; i<count ; i++, fogs++) {
 		out->originalBrushNumber = LittleLong( fogs->brushNum );
 
+		// ZTM: TODO: Add global fog support.
+		if (out->originalBrushNumber == -1) {
+			ri.Printf(PRINT_ERROR, "Global fog not supported in Rend2.\n");
+			continue;
+		}
+
 		if ( (unsigned)out->originalBrushNumber >= brushesCount ) {
 			ri.Error( ERR_DROP, "fog brushNumber out of range" );
 		}
@@ -2558,7 +2567,7 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
 
 		firstSide = LittleLong( brush->firstSide );
 
-			if ( (unsigned)firstSide > sidesCount - 6 ) {
+		if ( (unsigned)firstSide > sidesCount - 6 ) {
 			ri.Error( ERR_DROP, "fog brush sideNumber out of range" );
 		}
 
@@ -2602,7 +2611,8 @@ static	void R_LoadFogs( lump_t *l, lump_t *brushesLump, lump_t *sidesLump ) {
 		// set the gradient vector
 		sideNum = LittleLong( fogs->visibleSide );
 
-		if ( sideNum == -1 ) {
+		// ydnar: made this check a little more strenuous (was sideNum == -1)
+		if ( sideNum < 0 || sideNum >= sidesCount ) {
 			out->hasSurface = qfalse;
 		} else {
 			out->hasSurface = qtrue;
@@ -3284,9 +3294,9 @@ void RE_LoadWorldMap( const char *name ) {
 	fileBase = (byte *)header;
 
 	i = LittleLong (header->version);
-	if ( i != BSP_VERSION ) {
-		ri.Error (ERR_DROP, "RE_LoadWorldMap: %s has wrong version number (%i should be %i)", 
-			name, i, BSP_VERSION);
+	if ( i != Q3_BSP_VERSION && i != WOLF_BSP_VERSION ) {
+		ri.Error (ERR_DROP, "RE_LoadWorldMap: %s has wrong version number (%i should be %i or %i)", 
+			name, i, Q3_BSP_VERSION, WOLF_BSP_VERSION);
 	}
 
 	// swap all the lumps

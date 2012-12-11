@@ -653,7 +653,7 @@ static qboolean ParseStage( shaderStage_t *stage, char **text )
 			}
 			else
 			{
-				stage->bundle[0].image[0] = R_FindImageFile( token, !shader.noMipMaps, !shader.noPicMip, GL_REPEAT );
+				stage->bundle[0].image[0] = R_FindImageFile( token, !shader.noMipMaps, !shader.noPicMip, GL_REPEAT, qfalse );
 				if ( !stage->bundle[0].image[0] )
 				{
 					ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
@@ -673,11 +673,50 @@ static qboolean ParseStage( shaderStage_t *stage, char **text )
 				return qfalse;
 			}
 
-			stage->bundle[0].image[0] = R_FindImageFile( token, !shader.noMipMaps, !shader.noPicMip, GL_CLAMP_TO_EDGE );
+			stage->bundle[0].image[0] = R_FindImageFile( token, !shader.noMipMaps, !shader.noPicMip, GL_CLAMP_TO_EDGE, qfalse );
 			if ( !stage->bundle[0].image[0] )
 			{
 				ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
 				return qfalse;
+			}
+		}
+		//
+		// lightmap <name>
+		//
+		else if ( !Q_stricmp( token, "lightmap" ) ) {
+			token = COM_ParseExt( text, qfalse );
+			if ( !token[0] ) {
+				ri.Printf( PRINT_WARNING, "WARNING: missing parameter for 'lightmap' keyword in shader '%s'\n", shader.name );
+				return qfalse;
+			}
+
+//----(SA)	fixes startup error and allows polygon shadows to work again
+			if ( !Q_stricmp( token, "$whiteimage" ) || !Q_stricmp( token, "*white" ) ) {
+//----(SA)	end
+				stage->bundle[0].image[0] = tr.whiteImage;
+				continue;
+			}
+//----(SA) added
+			else if ( !Q_stricmp( token, "$dlight" ) ) {
+				stage->bundle[0].image[0] = tr.dlightImage;
+				continue;
+			}
+//----(SA) end
+			else if ( !Q_stricmp( token, "$lightmap" ) ) {
+				stage->bundle[0].isLightmap = qtrue;
+				if ( shader.lightmapIndex < 0 ) {
+					stage->bundle[0].image[0] = tr.whiteImage;
+				} else {
+					stage->bundle[0].image[0] = tr.lightmaps[shader.lightmapIndex];
+				}
+				continue;
+			} else {
+				stage->bundle[0].image[0] = R_FindImageFile( token, qfalse, qfalse, GL_CLAMP_TO_EDGE, qtrue );
+				if ( !stage->bundle[0].image[0] ) {
+					ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
+					return qfalse;
+				}
+				stage->bundle[0].isLightmap = qtrue;
 			}
 		}
 		//
@@ -703,7 +742,7 @@ static qboolean ParseStage( shaderStage_t *stage, char **text )
 				}
 				num = stage->bundle[0].numImageAnimations;
 				if ( num < MAX_IMAGE_ANIMATIONS ) {
-					stage->bundle[0].image[num] = R_FindImageFile( token, !shader.noMipMaps, !shader.noPicMip, GL_REPEAT );
+					stage->bundle[0].image[num] = R_FindImageFile( token, !shader.noMipMaps, !shader.noPicMip, GL_REPEAT, qfalse );
 					if ( !stage->bundle[0].image[num] )
 					{
 						ri.Printf( PRINT_WARNING, "WARNING: R_FindImageFile could not find '%s' in shader '%s'\n", token, shader.name );
@@ -1295,7 +1334,7 @@ static void ParseSkyParms( char **text ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga"
 				, token, suf[i] );
-			shader.sky.outerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE );
+			shader.sky.outerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_CLAMP_TO_EDGE, qfalse );
 
 			if ( !shader.sky.outerbox[i] ) {
 				shader.sky.outerbox[i] = tr.defaultImage;
@@ -1326,7 +1365,7 @@ static void ParseSkyParms( char **text ) {
 		for (i=0 ; i<6 ; i++) {
 			Com_sprintf( pathname, sizeof(pathname), "%s_%s.tga"
 				, token, suf[i] );
-			shader.sky.innerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_REPEAT );
+			shader.sky.innerbox[i] = R_FindImageFile( ( char * ) pathname, qtrue, qtrue, GL_REPEAT, qfalse );
 			if ( !shader.sky.innerbox[i] ) {
 				shader.sky.innerbox[i] = tr.defaultImage;
 			}
@@ -2989,7 +3028,7 @@ void R_FindLightmap( int *lightmapIndex ) {
 
 	// attempt to load an external lightmap
 	Com_sprintf( fileName, sizeof (fileName), "%s/" EXTERNAL_LIGHTMAP, tr.worldDir, *lightmapIndex );
-	image = R_FindImageFile( fileName, qfalse, qfalse, GL_CLAMP_TO_EDGE );
+	image = R_FindImageFile( fileName, qfalse, qfalse, GL_CLAMP_TO_EDGE, qtrue );
 	if ( image == NULL ) {
 		*lightmapIndex = LIGHTMAP_BY_VERTEX;
 		return;
@@ -3135,7 +3174,7 @@ shader_t *R_FindShader( const char *name, int lightmapIndex, qboolean mipRawImag
 	// if not defined in the in-memory shader descriptions,
 	// look for a single supported image file
 	//
-	image = R_FindImageFile( fileName, mipRawImage, mipRawImage, mipRawImage ? GL_REPEAT : GL_CLAMP_TO_EDGE );
+	image = R_FindImageFile( fileName, mipRawImage, mipRawImage, mipRawImage ? GL_REPEAT : GL_CLAMP_TO_EDGE, qfalse );
 	if ( !image ) {
 		ri.Printf( PRINT_DEVELOPER, "Couldn't find image file for shader %s\n", name );
 		shader.defaultShader = qtrue;
