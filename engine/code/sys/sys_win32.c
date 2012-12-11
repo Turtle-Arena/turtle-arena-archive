@@ -46,6 +46,8 @@ Suite 120, Rockville, Maryland 20850 USA.
 #include <shlobj.h>
 #include <psapi.h>
 #include <float.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 // Used to determine where to store user-specific files
 static char homePath[ MAX_OSPATH ] = { 0 };

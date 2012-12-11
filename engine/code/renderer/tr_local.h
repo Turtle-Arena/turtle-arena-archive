@@ -567,7 +567,7 @@ typedef struct {
 	int			viewportX, viewportY, viewportWidth, viewportHeight;
 	float		fovX, fovY;
 	float		projectionMatrix[16];
-	cplane_t	frustum[4];
+	cplane_t	frustum[5];			// ydnar: added farplane
 	vec3_t		visBounds[2];
 	float		zFar;
 	stereoFrame_t	stereoFrame;

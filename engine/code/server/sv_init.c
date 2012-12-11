@@ -309,7 +309,7 @@ SV_ChangeMaxClients
 */
 void SV_ChangeMaxClients( void ) {
 	int		oldMaxClients;
-	int		i;
+	int		i, j;
 	client_t	*oldClients;
 	int		count;
 
@@ -340,6 +340,18 @@ void SV_ChangeMaxClients( void ) {
 		else {
 			Com_Memset(&oldClients[i], 0, sizeof(client_t));
 		}
+
+		// save main clientNum
+		if (svs.clients[i].mainClient) {
+			oldClients[i].mainClient = (void*)(svs.clients[i].mainClient - svs.clients + 1);
+		}
+
+		// save splitscreen clientNums
+		for ( j = 0; j < MAX_SPLITVIEW-1; j++) {
+			if (svs.clients[i].localClients[j]) {
+				oldClients[i].localClients[j] = (void*)(svs.clients[i].localClients[j] - svs.clients + 1);
+			}
+		}
 	}
 
 	// free old clients arrays
@@ -353,6 +365,18 @@ void SV_ChangeMaxClients( void ) {
 	for ( i = 0 ; i < count ; i++ ) {
 		if ( oldClients[i].state >= CS_CONNECTED ) {
 			svs.clients[i] = oldClients[i];
+		}
+
+		// restore main client pointer
+		if (oldClients[i].mainClient) {
+			svs.clients[i].mainClient = &svs.clients[(intptr_t)oldClients[i].mainClient - 1];
+		}
+
+		// restore splitscreen pointers
+		for ( j = 0; j < MAX_SPLITVIEW-1; j++) {
+			if (oldClients[i].localClients[j]) {
+				svs.clients[i].localClients[j] = &svs.clients[(intptr_t)oldClients[i].localClients[j] - 1];
+			}
 		}
 	}
 

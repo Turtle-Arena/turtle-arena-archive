@@ -85,7 +85,7 @@ int R_CullLocalBox (vec3_t bounds[2]) {
 
 	// check against frustum planes
 	anyBack = 0;
-	for (i = 0 ; i < 4 ; i++) {
+	for (i = 0 ; i < 5 ; i++) {
 		frust = &tr.viewParms.frustum[i];
 
 		front = back = 0;
@@ -141,7 +141,7 @@ int R_CullPointAndRadius( vec3_t pt, float radius )
 	}
 
 	// check against frustum planes
-	for (i = 0 ; i < 4 ; i++) 
+	for (i = 0 ; i < 5 ; i++) 
 	{
 		frust = &tr.viewParms.frustum[i];
 
@@ -511,6 +511,12 @@ void R_SetupFrustum (viewParms_t *dest, float xmin, float xmax, float ymax, floa
 		dest->frustum[i].dist = DotProduct (ofsorigin, dest->frustum[i].normal);
 		SetPlaneSignbits( &dest->frustum[i] );
 	}
+
+	// farplane
+	VectorScale( dest->or.axis[0], -1, dest->frustum[4].normal );
+	dest->frustum[4].dist = DotProduct( dest->or.origin, dest->frustum[4].normal ) - dest->zFar;
+	dest->frustum[4].type = PLANE_NON_AXIAL;
+	SetPlaneSignbits( &dest->frustum[4] );
 }
 
 /*
@@ -563,8 +569,12 @@ void R_SetupProjection(viewParms_t *dest, float zProj, qboolean computeFrustum)
 	dest->projectionMatrix[15] = 0;
 	
 	// Now that we have all the data for the projection matrix we can also setup the view frustum.
-	if(computeFrustum)
+	if(computeFrustum) {
+		// dynamically compute far clip plane distance
+		R_SetFarClip();
+
 		R_SetupFrustum(dest, xmin, xmax, ymax, zProj, stereoSep);
+	}
 }
 
 /*
@@ -1380,6 +1390,20 @@ R_GenerateDrawSurfs
 ====================
 */
 void R_GenerateDrawSurfs( void ) {
+
+	// set the projection matrix (and view frustum) here
+	// first with max or fog distance so we can have proper
+	// arbitrary frustum farplane culling optimization
+	if ( tr.refdef.rdflags & RDF_NOWORLDMODEL || tr.world == NULL ) {
+		VectorSet( tr.viewParms.visBounds[ 0 ], MIN_WORLD_COORD, MIN_WORLD_COORD, MIN_WORLD_COORD );
+		VectorSet( tr.viewParms.visBounds[ 1 ], MAX_WORLD_COORD, MAX_WORLD_COORD, MAX_WORLD_COORD );
+	} else {
+		VectorCopy( tr.world->nodes->mins, tr.viewParms.visBounds[ 0 ] );
+		VectorCopy( tr.world->nodes->maxs, tr.viewParms.visBounds[ 1 ] );
+	}
+
+	R_SetupProjection(&tr.viewParms, r_zproj->value, qtrue);
+
 	R_AddWorldSurfaces ();
 
 	R_AddPolygonSurfaces();
@@ -1391,9 +1415,7 @@ void R_GenerateDrawSurfs( void ) {
 	// this needs to be done before entities are
 	// added, because they use the projection
 	// matrix for lod calculation
-
-	// dynamically compute far clip plane distance
-	R_SetFarClip();
+	R_SetupProjection(&tr.viewParms, r_zproj->value, qtrue);
 
 	// we know the size of the clipping volume. Now set the rest of the projection matrix.
 	R_SetupProjectionZ (&tr.viewParms);
@@ -1480,8 +1502,6 @@ void R_RenderView (viewParms_t *parms) {
 
 	// set viewParms.world
 	R_RotateForViewer ();
-
-	R_SetupProjection(&tr.viewParms, r_zproj->value, qtrue);
 
 	R_GenerateDrawSurfs();
 
