@@ -197,6 +197,14 @@ void trap_R_AddPolyToScene( qhandle_t hShader , int numVerts, const polyVert_t *
 	syscall( UI_R_ADDPOLYTOSCENE, hShader, numVerts, verts );
 }
 
+void trap_R_AddPolysToScene( qhandle_t hShader , int numVerts, const polyVert_t *verts, int num ) {
+	syscall( UI_R_ADDPOLYSTOSCENE, hShader, numVerts, verts, num );
+}
+
+void trap_R_AddPolyBufferToScene( polyBuffer_t* pPolyBuffer ) {
+	syscall( UI_R_ADDPOLYBUFFERTOSCENE, pPolyBuffer );
+}
+
 void trap_R_AddLightToScene( const vec3_t org, float intensity, float r, float g, float b ) {
 	syscall( UI_R_ADDLIGHTTOSCENE, org, PASSFLOAT(intensity), PASSFLOAT(r), PASSFLOAT(g), PASSFLOAT(b) );
 }
@@ -215,6 +223,19 @@ void  trap_R_SetClipRegion( const float *region ) {
 
 void trap_R_DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader ) {
 	syscall( UI_R_DRAWSTRETCHPIC, PASSFLOAT(x), PASSFLOAT(y), PASSFLOAT(w), PASSFLOAT(h), PASSFLOAT(s1), PASSFLOAT(t1), PASSFLOAT(s2), PASSFLOAT(t2), hShader );
+}
+
+void trap_R_DrawRotatedPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader, float angle ) {
+	syscall( UI_R_DRAWROTATEDPIC, PASSFLOAT( x ), PASSFLOAT( y ), PASSFLOAT( w ), PASSFLOAT( h ), PASSFLOAT( s1 ), PASSFLOAT( t1 ), PASSFLOAT( s2 ), PASSFLOAT( t2 ), hShader, PASSFLOAT( angle ) );
+}
+
+void trap_R_DrawStretchPicGradient(  float x, float y, float w, float h, float s1, float t1, float s2, float t2, qhandle_t hShader,
+										const float *gradientColor, int gradientType ) {
+	syscall( UI_R_DRAWSTRETCHPIC_GRADIENT, PASSFLOAT( x ), PASSFLOAT( y ), PASSFLOAT( w ), PASSFLOAT( h ), PASSFLOAT( s1 ), PASSFLOAT( t1 ), PASSFLOAT( s2 ), PASSFLOAT( t2 ), hShader, gradientColor, gradientType  );
+}
+
+void trap_R_Add2dPolys( polyVert_t *verts, int numverts, qhandle_t hShader ) {
+	syscall( UI_R_DRAW2DPOLYS, verts, numverts, hShader );
 }
 
 void	trap_R_ModelBounds( clipHandle_t model, vec3_t mins, vec3_t maxs ) {
