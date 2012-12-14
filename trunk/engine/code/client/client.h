@@ -278,6 +278,8 @@ typedef struct {
 	int voipIncomingSequence[MAX_CLIENTS];
 	float voipGain[MAX_CLIENTS];
 	qboolean voipIgnore[MAX_CLIENTS];
+	int voipLastPacketTime[MAX_CLIENTS];
+	float voipPower[MAX_CLIENTS];
 	qboolean voipMuteAll;
 
 	// outgoing data...
@@ -293,7 +295,6 @@ typedef struct {
 	int voipOutgoingSequence;
 	byte voipOutgoingGeneration;
 	byte voipOutgoingData[1024];
-	float voipPower;
 #endif
 
 #ifdef LEGACY_PROTOCOL
@@ -489,7 +490,6 @@ extern	cvar_t	*cl_voipSend;
 extern	cvar_t	*cl_voipSendTarget;
 extern	cvar_t	*cl_voipGainDuringCapture;
 extern	cvar_t	*cl_voipCaptureMult;
-extern	cvar_t	*cl_voipShowMeter;
 extern	cvar_t	*cl_voip;
 #endif
 
@@ -561,6 +561,11 @@ extern int cl_connectedToCheatServer;
 
 #ifdef USE_VOIP
 void CL_Voip_f( void );
+int CL_GetVoipTime( int clientNum );
+float CL_GetVoipPower( int clientNum );
+float CL_GetVoipGain( int clientNum );
+qboolean CL_GetVoipMuteClient( int clientNum );
+qboolean CL_GetVoipMuteAll( void );
 #endif
 
 void CL_SystemInfoChanged( void );

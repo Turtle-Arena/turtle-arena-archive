@@ -314,6 +314,30 @@ void trap_GetGlconfig( glconfig_t *glconfig ) {
 	syscall( UI_GETGLCONFIG, glconfig );
 }
 
+int trap_GetVoipTime( int clientNum ) {
+	return syscall( UI_GET_VOIP_TIME, clientNum );
+}
+
+float trap_GetVoipPower( int clientNum ) {
+	floatint_t fi;
+	fi.i = syscall( UI_GET_VOIP_POWER, clientNum );
+	return fi.f;
+}
+
+float trap_GetVoipGain( int clientNum ) {
+	floatint_t fi;
+	fi.i = syscall( UI_GET_VOIP_GAIN, clientNum );
+	return fi.f;
+}
+
+qboolean trap_GetVoipMute( int clientNum ) {
+	return syscall( UI_GET_VOIP_MUTE_CLIENT, clientNum );
+}
+
+qboolean trap_GetVoipMuteAll( void ) {
+	return syscall(	UI_GET_VOIP_MUTE_ALL );
+}
+
 void trap_GetClientState( uiClientState_t *state ) {
 	syscall( UI_GETCLIENTSTATE, state );
 }

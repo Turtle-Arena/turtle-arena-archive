@@ -791,7 +791,8 @@ void CL_ParseVoip ( msg_t *msg ) {
 	char encoded[1024];
 	int seqdiff = sequence - clc.voipIncomingSequence[sender];
 	int written = 0;
-	int i;
+	float voipPower = 0.0f;
+	int i, j;
 
 	Com_DPrintf("VoIP: %d-byte packet from client %d\n", packetsize, sender);
 
@@ -846,7 +847,7 @@ void CL_ParseVoip ( msg_t *msg ) {
 		// reset the bits just in case.
 		speex_bits_reset(&clc.speexDecoderBits[sender]);
 		seqdiff = 0;
-	} else if (seqdiff > 100) { // more than 2 seconds of audio dropped?
+	} else if (seqdiff * clc.speexFrameSize * 2 >= sizeof (decoded)) { // dropped more than we can handle?
 		// just start over.
 		Com_DPrintf("VoIP: Dropped way too many (%d) frames from client #%d\n",
 		            seqdiff, sender);
@@ -896,6 +897,15 @@ void CL_ParseVoip ( msg_t *msg ) {
 		if (decio != NULL) { fwrite(decoded+written, clc.speexFrameSize*2, 1, decio); fflush(decio); }
 		#endif
 
+		const int16_t *sampptr = (const int16_t *)decoded + written;
+
+		// calculate the "power" of this packet...
+		for (j = 0; j < clc.speexFrameSize; j++) {
+			const float flsamp = (float) sampptr[j];
+			const float s = fabs(flsamp);
+			voipPower += s * s;
+		}
+
 		written += clc.speexFrameSize;
 	}
 
@@ -905,7 +915,12 @@ void CL_ParseVoip ( msg_t *msg ) {
 	if(written > 0)
 		CL_PlayVoip(sender, written, (const byte *) decoded, flags);
 
+	clc.voipPower[sender] = (voipPower / (32768.0f * 32768.0f *
+			                 ((float) (clc.speexFrameSize * i)))) *
+			                 100.0f;
+
 	clc.voipIncomingSequence[sender] = sequence + frames;
+	clc.voipLastPacketTime[sender] = cl.serverTime;
 }
 #endif
 
