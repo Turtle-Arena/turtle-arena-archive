@@ -2722,7 +2722,7 @@ void CG_DrawVoipMeter( void ) {
 	buffer[i] = '\0';
 
 	Com_sprintf( string, sizeof ( string ), "VoIP: [%s]", buffer );
-	CG_DrawStringExt( 320 - strlen( string ) * TINYCHAR_WIDTH / 2, 10, string, colorWhite, qfalse, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
+	CG_DrawStringExt( CENTER_X, 10, string, colorWhite, qfalse, qtrue, TINYCHAR_WIDTH, TINYCHAR_HEIGHT, 0 );
 }
 
 
