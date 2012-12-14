@@ -560,6 +560,11 @@ Sounds that use to be played in CG_CheckLocalSounds, but with splitscreen we onl
 void CG_CheckGameSounds( void ) {
 	int		highScore;
 
+	// if we are going into the intermission, don't start any voices
+	if ( cg.intermissionStarted ) {
+		return;
+	}
+
 	// lead changes
 	switch ( cg.bestLeadChange ) {
 		case LEAD_TAKEN:

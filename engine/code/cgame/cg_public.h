@@ -134,6 +134,11 @@ typedef enum {
 	CG_GETGLCONFIG,
 	CG_MEMORY_REMAINING,
 	CG_UPDATESCREEN,
+	CG_GET_VOIP_TIME,
+	CG_GET_VOIP_POWER,
+	CG_GET_VOIP_GAIN,
+	CG_GET_VOIP_MUTE_CLIENT,
+	CG_GET_VOIP_MUTE_ALL,
 
 	// these are not available in ui
 	CG_GETGAMESTATE = 150,
@@ -298,6 +303,10 @@ typedef enum {
 
 	CG_WANTSBINDKEYS,
 //	qboolean CG_WantsBindKeys( void );
+
+	CG_VOIP_STRING
+//  char *(*CG_VoIPString)( void );
+//  returns a string of comma-delimited clientnums based on args
 } cgameExport_t;
 
 //----------------------------------------------

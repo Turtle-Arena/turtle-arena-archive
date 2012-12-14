@@ -1753,6 +1753,8 @@ extern	vmCvar_t		cg_oldPlasma;
 extern	vmCvar_t		cg_trueLightning;
 extern	vmCvar_t		cg_atmosphericEffects;
 extern	vmCvar_t		cg_teamDmLeadAnnouncements;
+extern	vmCvar_t		cg_voipShowMeter;
+extern	vmCvar_t		cg_voipShowCrosshairMeter;
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
@@ -2370,6 +2372,11 @@ void		trap_GetGlconfig( glconfig_t *glconfig );
 // force a screen update, only used during gamestate load
 void		trap_UpdateScreen( void );
 int			trap_MemoryRemaining( void );
+int			trap_GetVoipTime( int clientNum );
+float		trap_GetVoipPower( int clientNum );
+float		trap_GetVoipGain( int clientNum );
+qboolean	trap_GetVoipMute( int clientNum );
+qboolean	trap_GetVoipMuteAll( void );
 
 
 // The glconfig_t will not change during the life of a cgame.

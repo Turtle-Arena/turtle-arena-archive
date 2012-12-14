@@ -47,6 +47,7 @@ int blueTeamNameModificationCount = -1;
 
 void CG_Init( int serverMessageNum, int serverCommandSequence, int maxSplitView, int clientNum0, int clientNum1, int clientNum2, int clientNum3 );
 void CG_Shutdown( void );
+static char *CG_VoIPString( int localClientNum );
 
 
 /*
@@ -77,6 +78,8 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		return CG_CrosshairPlayer(arg0);
 	case CG_LAST_ATTACKER:
 		return CG_LastAttacker(arg0);
+    case CG_VOIP_STRING:
+      return (intptr_t)CG_VoIPString(arg0);
 	case CG_KEY_EVENT:
 		CG_KeyEvent(arg0, arg1);
 		return 0;
@@ -235,6 +238,8 @@ vmCvar_t	cg_oldPlasma;
 vmCvar_t	cg_trueLightning;
 vmCvar_t	cg_atmosphericEffects;
 vmCvar_t	cg_teamDmLeadAnnouncements;
+vmCvar_t	cg_voipShowMeter;
+vmCvar_t	cg_voipShowCrosshairMeter;
 
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 vmCvar_t 	cg_redTeamName;
@@ -496,21 +501,23 @@ static cvarTable_t cvarTable[] = {
 #endif
 	{ &cg_trueLightning, "cg_trueLightning", "0.0", CVAR_ARCHIVE},
 	{ &cg_atmosphericEffects, "cg_atmosphericEffects", "1", CVAR_ARCHIVE },
-	{ &cg_teamDmLeadAnnouncements, "cg_teamDmLeadAnnouncements", "1", CVAR_ARCHIVE }
-//	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
+	{ &cg_teamDmLeadAnnouncements, "cg_teamDmLeadAnnouncements", "1", CVAR_ARCHIVE },
+	{ &cg_voipShowMeter, "cg_voipShowMeter", "1", CVAR_ARCHIVE },
+	{ &cg_voipShowCrosshairMeter, "cg_voipShowCrosshairMeter", "1", CVAR_ARCHIVE },
 #ifdef TA_WEAPSYS // MELEE_TRAIL
-	,{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE}
+	{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE},
 #endif
 #ifdef TA_MISC // MATERIALS 
-	,{ &cg_impactDebris, "cg_impactDebris", "1", CVAR_ARCHIVE}
+	{ &cg_impactDebris, "cg_impactDebris", "1", CVAR_ARCHIVE},
 #endif
 #ifdef IOQ3ZTM // LASERTAG
-	,{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO }
+	{ &cg_laserTag, "g_laserTag", "0", CVAR_SERVERINFO },
 #endif
 #ifdef TA_PATHSYS // 2DMODE
-	,{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO}
-	,{ &cg_2dmodeOverride, "cg_2dmodeOverride", "0", 0}
+	{ &cg_2dmode, "g_2dmode", "0", CVAR_SERVERINFO},
+	{ &cg_2dmodeOverride, "cg_2dmodeOverride", "0", 0},
 #endif
+//	{ &cg_pmove_fixed, "cg_pmove_fixed", "0", CVAR_USERINFO | CVAR_ARCHIVE }
 };
 
 static int  cvarTableSize = ARRAY_LEN( cvarTable );
@@ -2721,3 +2728,55 @@ void CG_MouseEvent(int localClientNum, int x, int y) {
 }
 #endif
 
+/*
+================
+CG_VoIPString
+================
+*/
+static char *CG_VoIPString( int localClientNum ) {
+	// a generous overestimate of the space needed for 0,1,2...61,62,63
+	static char voipString[ MAX_CLIENTS * 4 ];
+	char voipSendTarget[ MAX_CVAR_VALUE_STRING ];
+
+	if ( localClientNum < 0 || localClientNum > CG_MaxSplitView() || cg.localClients[localClientNum].clientNum == -1 ) {
+		return NULL;
+	}
+
+	trap_Argv( 0, voipSendTarget, sizeof( voipSendTarget ) );
+
+	if( Q_stricmpn( voipSendTarget, "team", 4 ) == 0 )
+	{
+		int i, slen, nlen;
+		for( slen = i = 0; i < cgs.maxclients; i++ )
+		{
+			if( !cgs.clientinfo[ i ].infoValid || i == cg.localClients[ localClientNum ].clientNum )
+				continue;
+			if( cgs.clientinfo[ i ].team != cgs.clientinfo[ cg.localClients[ localClientNum ].clientNum ].team )
+				continue;
+
+			nlen = Com_sprintf( &voipString[ slen ], sizeof( voipString ) - slen,
+					"%s%d", ( slen > 0 ) ? "," : "", i );
+			if( slen + nlen + 1 >= sizeof( voipString ) )
+			{
+				CG_Printf( S_COLOR_YELLOW "WARNING: voipString overflowed\n" );
+				break;
+			}
+
+			slen += nlen;
+		}
+
+		// Notice that if the Com_sprintf was truncated, slen was not updated
+		// so this will remove any trailing commas or partially-completed numbers
+		voipString[ slen ] = '\0';
+	}
+	else if( Q_stricmpn( voipSendTarget, "crosshair", 9 ) == 0 )
+		Com_sprintf( voipString, sizeof( voipString ), "%d",
+				CG_CrosshairPlayer( localClientNum ) );
+	else if( Q_stricmpn( voipSendTarget, "attacker", 8 ) == 0 )
+		Com_sprintf( voipString, sizeof( voipString ), "%d",
+				CG_LastAttacker( localClientNum ) );
+	else
+		return NULL;
+
+	return voipString;
+}
