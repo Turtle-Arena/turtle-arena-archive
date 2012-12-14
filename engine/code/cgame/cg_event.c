@@ -1604,20 +1604,24 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 	case EV_GLOBAL_TEAM_SOUND:	// play from the player's head so it never diminishes
 		DEBUGNAME("EV_GLOBAL_TEAM_SOUND");
 		{
+#ifndef TA_DATA
 			qboolean blueTeam			= qfalse;
 			qboolean redTeam			= qfalse;
+#endif
 			qboolean localHasBlue		= qfalse;
 			qboolean localHasRed		= qfalse;
 			qboolean localHasNeutral	= qfalse;
 
 			// Check if any local client is on blue/red team or has flags.
 			for (i = 0; i < cg.snap->numPSs; i++) {
+#ifndef TA_DATA
 				if (cg.snap->pss[i].persistant[PERS_TEAM] == TEAM_BLUE) {
 					blueTeam = qtrue;
 				}
 				if (cg.snap->pss[i].persistant[PERS_TEAM] == TEAM_RED) {
 					redTeam = qtrue;
 				}
+#endif
 
 				if (cg.snap->pss[i].powerups[PW_BLUEFLAG]) {
 					localHasBlue = qtrue;
@@ -1630,40 +1634,96 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 				}
 			}
 
+#ifndef TA_DATA
 			// ZTM: NOTE: Some of these sounds don't really work with local clients on different teams.
 			//     New games might want to replace you/enemy sounds with red/blue.
 			//     See http://code.google.com/p/ioq3ztm/wiki/NewSounds
+#endif
 
 			switch( es->eventParm ) {
 				case GTS_RED_CAPTURE: // CTF: red team captured the blue flag, 1FCTF: red team captured the neutral flag
+#ifdef TA_DATA
+					CG_AddBufferedSound( cgs.media.captureFlagSound );
+#else
 					if ( redTeam )
 						CG_AddBufferedSound( cgs.media.captureYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.captureOpponentSound );
+#endif
 					break;
 				case GTS_BLUE_CAPTURE: // CTF: blue team captured the red flag, 1FCTF: blue team captured the neutral flag
+#ifdef TA_DATA
+					CG_AddBufferedSound( cgs.media.captureFlagSound );
+#else
 					if ( blueTeam )
 						CG_AddBufferedSound( cgs.media.captureYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.captureOpponentSound );
+#endif
 					break;
 				case GTS_RED_RETURN: // CTF: blue flag returned, 1FCTF: never used
+#ifdef TA_DATA
+					CG_AddBufferedSound( cgs.media.returnFlagSound );
+#else
 					if ( redTeam )
 						CG_AddBufferedSound( cgs.media.returnYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.returnOpponentSound );
+#endif
 					//
 					CG_AddBufferedSound( cgs.media.blueFlagReturnedSound );
 					break;
 				case GTS_BLUE_RETURN: // CTF red flag returned, 1FCTF: neutral flag returned
+#ifdef TA_DATA
+					CG_AddBufferedSound( cgs.media.returnFlagSound );
+#ifdef MISSIONPACK
+					//
+					if (cgs.gametype == GT_1FCTF) {
+						CG_AddBufferedSound( cgs.media.neutralFlagReturnedSound );
+						break;
+					}
+#endif
+#else
 					if ( blueTeam )
 						CG_AddBufferedSound( cgs.media.returnYourTeamSound );
 					else
 						CG_AddBufferedSound( cgs.media.returnOpponentSound );
+#endif
 					//
 					CG_AddBufferedSound( cgs.media.redFlagReturnedSound );
 					break;
-
+#ifdef TA_DATA
+				case GTS_RED_TAKEN: // CTF: red team took blue flag, 1FCTF: blue team took the neutral flag
+					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
+					if (localHasBlue || localHasNeutral) {
+#ifdef MISSIONPACK
+					} else if (cgs.gametype == GT_1FCTF) {
+						CG_AddBufferedSound( cgs.media.redTeamTookTheFlagSound );
+#endif
+					} else {
+						CG_AddBufferedSound( cgs.media.redTeamTookBlueFlagSound );
+					}
+					break;
+				case GTS_BLUE_TAKEN: // CTF: blue team took the red flag, 1FCTF red team took the neutral flag
+					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
+					if (localHasRed || localHasNeutral) {
+#ifdef MISSIONPACK
+					} else if (cgs.gametype == GT_1FCTF) {
+						CG_AddBufferedSound( cgs.media.blueTeamTookTheFlagSound );
+#endif
+					} else {
+						CG_AddBufferedSound( cgs.media.blueTeamTookRedFlagSound );
+					}
+					break;
+#ifdef MISSIONPACK
+				case GTS_REDOBELISK_ATTACKED: // Overload: red obelisk is being attacked
+					CG_AddBufferedSound( cgs.media.redBaseIsUnderAttackSound );
+					break;
+				case GTS_BLUEOBELISK_ATTACKED: // Overload: blue obelisk is being attacked
+					CG_AddBufferedSound( cgs.media.blueBaseIsUnderAttackSound );
+					break;
+#endif
+#else
 				case GTS_RED_TAKEN: // CTF: red team took blue flag, 1FCTF: blue team took the neutral flag
 					// if this player picked up the flag then a sound is played in CG_CheckLocalSounds
 					if (localHasBlue || localHasNeutral) {
@@ -1726,6 +1786,7 @@ void CG_EntityEvent( centity_t *cent, vec3_t position ) {
 						CG_AddBufferedSound( cgs.media.yourBaseIsUnderAttackSound );
 					}
 					break;
+#endif
 #endif
 
 				case GTS_REDTEAM_SCORED:

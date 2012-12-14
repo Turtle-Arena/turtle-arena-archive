@@ -1436,18 +1436,35 @@ typedef struct {
 	sfxHandle_t blueLeadsSound;
 	sfxHandle_t teamsTiedSound;
 
+#ifdef TA_DATA
+	sfxHandle_t	captureFlagSound;
+	sfxHandle_t	returnFlagSound;
+#else
 	sfxHandle_t	captureYourTeamSound;
 	sfxHandle_t	captureOpponentSound;
 	sfxHandle_t	returnYourTeamSound;
 	sfxHandle_t	returnOpponentSound;
 	sfxHandle_t	takenYourTeamSound;
 	sfxHandle_t	takenOpponentSound;
+#endif
 
 	sfxHandle_t redFlagReturnedSound;
 	sfxHandle_t blueFlagReturnedSound;
 #ifdef MISSIONPACK
 	sfxHandle_t neutralFlagReturnedSound;
 #endif
+#ifdef TA_DATA
+	sfxHandle_t redTeamTookBlueFlagSound;
+	sfxHandle_t blueTeamTookRedFlagSound;
+	sfxHandle_t	youHaveFlagSound;
+	sfxHandle_t	playerHasFlagSound[MAX_SPLITVIEW];
+#ifdef MISSIONPACK
+	sfxHandle_t	redTeamTookTheFlagSound;
+	sfxHandle_t	blueTeamTookTheFlagSound;
+	sfxHandle_t redBaseIsUnderAttackSound;
+	sfxHandle_t blueBaseIsUnderAttackSound;
+#endif
+#else
 	sfxHandle_t	enemyTookYourFlagSound;
 	sfxHandle_t yourTeamTookEnemyFlagSound;
 	sfxHandle_t	youHaveFlagSound;
@@ -1455,6 +1472,7 @@ typedef struct {
 	sfxHandle_t	enemyTookTheFlagSound;
 	sfxHandle_t yourTeamTookTheFlagSound;
 	sfxHandle_t yourBaseIsUnderAttackSound;
+#endif
 #endif
 #ifndef NOTRATEDM // Disable strong lang.
 	sfxHandle_t holyShitSound;
