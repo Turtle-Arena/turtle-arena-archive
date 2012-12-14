@@ -248,13 +248,8 @@ static void UI_NetworkOptionsMenu_Init( void ) {
 #ifdef IOQ3ZTM // VOIP
 	y += BIGCHAR_HEIGHT+2;
 	networkOptionsInfo.voip.generic.type		= MTYPE_RADIOBUTTON;
-#if 0 // ZTM: TODO: Allow changing cl_voip anytime.
 	networkOptionsInfo.voip.generic.name		= "Voice chat (VoIP):";
 	networkOptionsInfo.voip.generic.x			= 400;
-#else
-	networkOptionsInfo.voip.generic.name		= "Voice chat (requires restart):";
-	networkOptionsInfo.voip.generic.x			= 500;
-#endif
 	networkOptionsInfo.voip.generic.flags		= QMF_PULSEIFFOCUS|QMF_SMALLFONT;
 	networkOptionsInfo.voip.generic.callback	= UI_NetworkOptionsMenu_Event;
 	networkOptionsInfo.voip.generic.id			= ID_VOIP;
