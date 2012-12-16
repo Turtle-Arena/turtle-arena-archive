@@ -1918,6 +1918,8 @@ void SV_UserVoip(client_t *cl, msg_t *msg)
 			continue;  // not in the game yet, don't send to this guy.
 		else if (i == sender)
 			continue;  // don't send voice packet back to original author.
+		else if (client->mainClient != NULL)
+			continue;  // don't send voice packet to splitscreen clients
 		else if (!client->hasVoip)
 			continue;  // no VoIP support, or unsupported protocol
 		else if (client->muteAllVoip)
