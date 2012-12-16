@@ -296,8 +296,11 @@ New cvars
                                       distances, requires cheats to be enabled
 
 
-  cg_teamDmLeadAnnouncements        - set to 0 to disable the team lead change
-                                      announcements in Team Deathmatch.
+  cg_atmosphericEffects             - 0.0 to 1.0 scales the amount of rain and
+                                      snow. set to 0 to disable rain/snow.
+  cg_teamDmLeadAnnouncements        - Set to 0 to disable the team lead change
+                                      announcements in Team Deathmatch (quake3
+                                      1.32 had no lead announcements in TDM).
 
 
 New commands
@@ -614,7 +617,7 @@ Building with MinGW for pre Windows XP
 ------------------------------------------------------------- Contributing -----
 
 Please submit all patches to the issue tracker (http://ioq3ztm.googlecode.com),
-or join the mailing list (edit: Spearmint doesn't have a mailing list yet) and 
+or join the mailing list (http://groups.google.com/group/spearmint-engine) and 
 submit your patch there.  The best case scenario is that you submit your patch 
 to the issue tracker, and then post the URL to the mailing list.
 
