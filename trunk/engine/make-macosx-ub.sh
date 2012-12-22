@@ -9,12 +9,12 @@ DESTDIR=build/release-darwin-ub
 BASEDIR=base
 
 BIN_OBJ="
-	build/release-darwin-x86_64/spearmint.x86_64
-	build/release-darwin-i386/spearmint.i386
+	build/release-darwin-x86_64/turtlearena.x86_64
+	build/release-darwin-i386/turtlearena.i386
 "
 BIN_DEDOBJ="
-	build/release-darwin-x86_64/spearmint-server.x86_64
-	build/release-darwin-i386/spearmint-server.i386
+	build/release-darwin-x86_64/turtlearena-server.x86_64
+	build/release-darwin-i386/turtlearena-server.i386
 "
 BASE_OBJ="
 	build/release-darwin-x86_64/$BASEDIR/cgamex86_64.dylib
