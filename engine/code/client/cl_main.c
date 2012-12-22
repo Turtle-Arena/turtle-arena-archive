@@ -146,7 +146,7 @@ clientConnection_t	clc;
 clientStatic_t		cls;
 vm_t				*cgvm;
 
-char				cl_reconnectServername[MAX_OSPATH];
+char				cl_reconnectArgs[MAX_OSPATH];
 char				cl_oldGame[MAX_QPATH];
 qboolean			cl_oldGameSet;
 
@@ -1783,18 +1783,14 @@ CL_Reconnect_f
 ================
 */
 void CL_Reconnect_f( void ) {
-	if ( !strlen( cl_reconnectServername ) )
+	if ( !strlen( cl_reconnectArgs ) )
 		return;
-	if ( !strcmp( cl_reconnectServername, "localhost" ) ) {
-		Com_Printf( "Can't reconnect to localhost.\n" );
-		return;
-	}
 	Cvar_Set("ui_singlePlayerActive", "0");
 #ifdef TA_SP
 	Cvar_Set("savegame_loading", "0");
 	Cvar_Set("savegame_filename", "");
 #endif
-	Cbuf_AddText( va("connect %s\n", cl_reconnectServername ) );
+	Cbuf_AddText( va("connect %s\n", cl_reconnectArgs ) );
 }
 
 /*
@@ -1828,6 +1824,9 @@ void CL_Connect_f( void ) {
 		server = Cmd_Argv(2);
 	}
 
+	// save arguments for reconnect
+	Q_strncpyz( cl_reconnectArgs, Cmd_Args(), sizeof( cl_reconnectArgs ) );
+
 	Cvar_Set("ui_singlePlayerActive", "0");
 #ifdef TA_SP
 	Cvar_Set("savegame_loading", "0");
@@ -1854,7 +1853,6 @@ void CL_Connect_f( void ) {
 	Con_Close();
 
 	Q_strncpyz( clc.servername, server, sizeof(clc.servername) );
-	Q_strncpyz( cl_reconnectServername, server, sizeof( cl_reconnectServername ) );
 
 	if (!NET_StringToAdr(clc.servername, &clc.serverAddress, family) ) {
 		Com_Printf ("Bad server address\n");
