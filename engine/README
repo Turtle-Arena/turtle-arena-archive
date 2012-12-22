@@ -303,6 +303,9 @@ New cvars
                                       1.32 had no lead announcements in TDM).
 
 
+  cg_consoleLatency                 - controls how long messages stay in cgame
+                                      notify area in miliseconds (default 3000)
+
 New commands
   video [filename]        - start video capture (use with demo command)
   stopvideo               - stop video capture

@@ -41,9 +41,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 // client only
 #define	CS_MESSAGE				3		// from the map worldspawn's message field
 
-#define PM_INTERMISSION 5 // bg_misc.h enum pmtype_t
-#define PM_SPINTERMISSION 6 // bg_misc.h enum pmtype_t
-
 // botlib only
 //NOTE: enum entityType_t in bg_misc.h
 //FIXME: these might change

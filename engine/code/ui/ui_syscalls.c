@@ -129,6 +129,10 @@ void trap_Args( char *buffer, int bufferLength ) {
 	syscall( UI_ARGS, buffer, bufferLength );
 }
 
+void trap_LiteralArgs( char *buffer, int bufferLength ) {
+	syscall( UI_LITERAL_ARGS, buffer, bufferLength );
+}
+
 void trap_Cmd_ExecuteText( int exec_when, const char *text ) {
 	syscall( UI_CMD_EXECUTETEXT, exec_when, text );
 }

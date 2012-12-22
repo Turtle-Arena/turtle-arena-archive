@@ -215,6 +215,7 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 	va_list		argptr;
 	byte		message[MAX_MSGLEN];
 	client_t	*client;
+	qboolean	globalPrint;
 	int			j;
 	
 	va_start (argptr,fmt);
@@ -234,15 +235,23 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 		return;
 	}
 
+	// hack so client knows message is for all local clients.
+	globalPrint = !strncmp( (char *)message, "print", 5 );
+
+	if ( globalPrint ) {
+		memmove( &message[1], &message[0], (size_t)( strlen( (const char *)message ) ) );
+		message[0] = 'g'; // "gprint"
+	}
+
 	// hack to echo broadcast prints to console
-	if ( com_dedicated->integer && !strncmp( (char *)message, "print", 5) ) {
+	if ( com_dedicated->integer && globalPrint ) {
 		Com_Printf ("broadcast: %s\n", SV_ExpandNewlines((char *)message) );
 	}
 
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
 		// Don't sent print for extra local clients
-		if (client->mainClient && !strncmp( (char *)message, "print", 5)) {
+		if ( client->mainClient && globalPrint ) {
 			continue;
 		}
 

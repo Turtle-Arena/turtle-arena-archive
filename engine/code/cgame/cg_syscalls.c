@@ -118,6 +118,10 @@ void	trap_Args( char *buffer, int bufferLength ) {
 	syscall( CG_ARGS, buffer, bufferLength );
 }
 
+void	trap_LiteralArgs( char *buffer, int bufferLength ) {
+	syscall( CG_LITERAL_ARGS, buffer, bufferLength );
+}
+
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode ) {
 	return syscall( CG_FS_FOPENFILE, qpath, f, mode );
 }

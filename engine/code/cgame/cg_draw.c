@@ -3756,6 +3756,47 @@ static void CG_DrawWarmup( void ) {
 #endif
 }
 
+
+/*
+=====================
+CG_DrawSmallWrappedText
+
+Draw multiline text
+=====================
+*/
+void CG_DrawSmallWrappedText(int x, int y, const char *textPtr) {
+	const char *p, *start;
+	char buff[1024];
+
+	if (!textPtr || *textPtr == '\0') {
+		return;
+	}
+
+	start = textPtr;
+	p = strchr(textPtr, '\n');
+	while (p && *p) {
+		strncpy(buff, start, p-start+1);
+		buff[p-start] = '\0';
+		CG_DrawSmallString(x, y, buff, 1.0f );
+		y += SMALLCHAR_HEIGHT + 3;
+		start += p - start + 1;
+		p = strchr(p+1, '\n');
+	}
+	CG_DrawSmallString(x, y, start, 1.0f );
+}
+
+/*
+=====================
+CG_DrawNotify
+
+Draw console notify area.
+=====================
+*/
+void CG_DrawNotify( void ) {
+	CG_SetScreenPlacement(PLACE_LEFT, PLACE_TOP);
+	CG_DrawSmallWrappedText(0, 0, cg.cur_lc->consoleText);
+}
+
 //==================================================================================
 #ifdef MISSIONPACK_HUD
 /* 
@@ -3962,6 +4003,8 @@ static void CG_Draw2D(stereoFrame_t stereoFrame)
 #endif
 		CG_DrawCenterString();
 	}
+
+	CG_DrawNotify();
 }
 
 
