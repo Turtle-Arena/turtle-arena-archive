@@ -1496,11 +1496,7 @@ typedef enum {
 typedef struct {
   int height;       // number of scan lines
   int top;          // top of glyph in buffer
-#ifdef IOQ3ZTM // FONT_REWRITE
   int left;         // left of glyph in buffer
-#else
-  int bottom;       // bottom of glyph in buffer
-#endif
   int pitch;        // width for copying
   int xSkip;        // x adjustment
   int imageWidth;   // width of actual image

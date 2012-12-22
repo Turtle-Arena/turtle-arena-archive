@@ -1454,17 +1454,17 @@ float Com_FontScale( const font_t *font, float scale )
 {
 	float glyphScale;
 
-	if (scale <= 0) {
-		// Use native point scale
-		return 1.0f;
-	}
-
 	if (font && font->fontInfo.name[0]) {
     	glyphScale = font->fontInfo.glyphScale;
 	} else if (font) {
 		glyphScale = (48.0f / font->pointSize);
     } else {
     	glyphScale = 1.0f;
+	}
+
+	if (scale <= 0) {
+		// Use native point scale
+		return (font->pointSize / 48.0f) * glyphScale;
 	}
 
 	return scale * glyphScale;
