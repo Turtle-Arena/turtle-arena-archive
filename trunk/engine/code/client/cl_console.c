@@ -34,6 +34,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 
 int g_console_field_width = 78;
 
+
 #define		CON_TEXTSIZE	32768
 typedef struct {
 	qboolean	initialized;
