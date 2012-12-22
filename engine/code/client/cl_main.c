@@ -3250,14 +3250,12 @@ void CL_DrawCenteredPic(qhandle_t hShader)
 
 /*
 ============
-CL_DrawLoadingScreen
+CL_DrawLoadingScreenFrame
 ============
 */
-void CL_DrawLoadingScreen(void)
+void CL_DrawLoadingScreenFrame( stereoFrame_t stereoFrame, qhandle_t hShader )
 {
-	qhandle_t hShader;
-
-	re.BeginFrame( STEREO_CENTER );
+	re.BeginFrame( stereoFrame );
 
 	// Need to draw extra stuff or screen is completely white for some shaders.
 	re.SetColor( g_color_table[0] );
@@ -3265,9 +3263,23 @@ void CL_DrawLoadingScreen(void)
 	re.SetColor( NULL );
 
 #ifdef TA_DATA
+	CL_DrawPicFullScreen( hShader );
+#else
+	CL_DrawCenteredPic( hShader );
+#endif
+}
+
+/*
+============
+CL_DrawLoadingScreen
+============
+*/
+void CL_DrawLoadingScreen( void ) {
+	qhandle_t hShader;
+
+#ifdef TA_DATA
 	// get loading shader
 	hShader = re.RegisterShaderNoMip("clientLoading");
-	CL_DrawPicFullScreen(hShader);
 #else
 	// Q3A menu background logo
 	if (cls.glconfig.hardwareType == GLHW_RAGEPRO ) {
@@ -3276,9 +3288,17 @@ void CL_DrawLoadingScreen(void)
 	} else {
 		hShader = re.RegisterShaderNoMip("menuback");
 	}
-
-	CL_DrawCenteredPic(hShader);
 #endif
+
+	// XXX
+	int in_anaglyphMode = Cvar_VariableIntegerValue("r_anaglyphMode");
+	// if running in stereo, we need to draw the frame twice
+	if ( cls.glconfig.stereoEnabled || in_anaglyphMode) {
+		CL_DrawLoadingScreenFrame( STEREO_LEFT, hShader );
+		CL_DrawLoadingScreenFrame( STEREO_RIGHT, hShader );
+	} else {
+		CL_DrawLoadingScreenFrame( STEREO_CENTER, hShader );
+	}
 
 	if ( com_speeds->integer ) {
 		re.EndFrame( &time_frontend, &time_backend );
