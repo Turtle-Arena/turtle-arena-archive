@@ -150,11 +150,7 @@ void CL_ParsePacketEntities( msg_t *msg, clSnapshot_t *oldframe, clSnapshot_t *n
 		}
 
 		if ( msg->readcount > msg->cursize ) {
-#ifdef IOQ3ZTM
-			Com_Error (ERR_DROP,"CL_ParsePacketEntities: end of message (newnum=%d, oldindex=%d | read=%d, size=%d)", newnum, oldindex, msg->readcount, msg->cursize);
-#else
 			Com_Error (ERR_DROP,"CL_ParsePacketEntities: end of message");
-#endif
 		}
 
 		while ( oldnum < newnum ) {

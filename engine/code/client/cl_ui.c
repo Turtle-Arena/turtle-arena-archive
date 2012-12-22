@@ -49,7 +49,7 @@ static void GetClientState( uiClientState_t *state ) {
 	Q_strncpyz( state->servername, clc.servername, sizeof( state->servername ) );
 	Q_strncpyz( state->updateInfoString, cls.updateInfoString, sizeof( state->updateInfoString ) );
 	Q_strncpyz( state->messageString, clc.serverMessage, sizeof( state->messageString ) );
- 
+
 	for (i = 0; i < MAX_SPLITVIEW; i++) {
 		state->clientNums[i] = clc.clientNums[i];
 
