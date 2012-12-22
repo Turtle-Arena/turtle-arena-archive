@@ -454,11 +454,12 @@ void Text_Paint(float x, float y, float scale, vec4_t color, const char *text, f
 				continue;
 			} else {
 				float yadj = useScale * glyph->top;
+				float xadj = useScale * glyph->left;
 				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
 					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
 					trap_R_SetColor( colorBlack );
-					Text_PaintChar(x + ofs, y - yadj + ofs, 
+					Text_PaintChar(x + xadj + ofs, y - yadj + ofs, 
 														glyph->imageWidth,
 														glyph->imageHeight,
 														useScale, 
@@ -470,7 +471,7 @@ void Text_Paint(float x, float y, float scale, vec4_t color, const char *text, f
 					trap_R_SetColor( newColor );
 					colorBlack[3] = 1.0;
 				}
-				Text_PaintChar(x, y - yadj, 
+				Text_PaintChar(x + xadj, y - yadj, 
 													glyph->imageWidth,
 													glyph->imageHeight,
 													useScale, 
@@ -493,7 +494,7 @@ void Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const cha
   int len, count;
 	vec4_t newColor;
 	glyphInfo_t *glyph, *glyph2;
-	float yadj;
+	float yadj, xadj;
 	float useScale;
 	fontInfo_t *font = &uiInfo.uiDC.Assets.textFont;
 	if (scale <= ui_smallFont.value) {
@@ -524,11 +525,12 @@ void Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const cha
 				continue;
 			} else {
 				yadj = useScale * glyph->top;
+				xadj = useScale * glyph->left;
 				if (style == ITEM_TEXTSTYLE_SHADOWED || style == ITEM_TEXTSTYLE_SHADOWEDMORE) {
 					int ofs = style == ITEM_TEXTSTYLE_SHADOWED ? 1 : 2;
 					colorBlack[3] = newColor[3];
 					trap_R_SetColor( colorBlack );
-					Text_PaintChar(x + ofs, y - yadj + ofs, 
+					Text_PaintChar(x + xadj + ofs, y - yadj + ofs, 
 														glyph->imageWidth,
 														glyph->imageHeight,
 														useScale, 
@@ -540,7 +542,7 @@ void Text_PaintWithCursor(float x, float y, float scale, vec4_t color, const cha
 					colorBlack[3] = 1.0;
 					trap_R_SetColor( newColor );
 				}
-				Text_PaintChar(x, y - yadj, 
+				Text_PaintChar(x + xadj, y - yadj, 
 													glyph->imageWidth,
 													glyph->imageHeight,
 													useScale, 
@@ -620,11 +622,12 @@ static void Text_Paint_Limit(float *maxX, float x, float y, float scale, vec4_t 
 				continue;
 			} else {
 	      float yadj = useScale * glyph->top;
+	      float xadj = useScale * glyph->left;
 				if (Text_Width(s, useScale, 1) + x > max) {
 					*maxX = 0;
 					break;
 				}
-		    Text_PaintChar(x, y - yadj, 
+		    Text_PaintChar(x + xadj, y - yadj, 
 			                 glyph->imageWidth,
 				               glyph->imageHeight,
 				               useScale, 

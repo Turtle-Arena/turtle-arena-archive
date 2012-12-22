@@ -1317,8 +1317,8 @@ long FS_FOpenFileReadDir(const char *filename, searchpath_t *search, fileHandle_
 			   !FS_IsExt(filename, ".menu", len) &&		// menu files
 			   !FS_IsExt(filename, ".game", len) &&		// menu files
 			   !FS_IsExt(filename, ".dat", len) &&		// for journal files
-#ifdef IOQ3ZTM // Allow custom fonts and music on pure servers
 			   !strstr(filename, "fonts") &&
+#ifdef IOQ3ZTM // Allow custom music on pure servers
 			   !strstr(filename, "music") &&
 #endif
 			   !FS_IsDemoExt(filename, len))			// demos
