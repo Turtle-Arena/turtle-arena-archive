@@ -1109,6 +1109,8 @@ G_Say
 */
 
 static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
+	const char *cmd;
+
 	if (!other) {
 		return;
 	}
@@ -1131,9 +1133,26 @@ static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, cons
 		return;
 	}
 
+	switch ( mode ) {
+		case SAY_ALL:
+		default:
+			// don't send global chats to splitscreen clients
+			if ( other->r.mainClientNum != -1 ) {
+				return;
+			}
+
+			cmd = "chat";
+			break;
+		case SAY_TELL:
+			cmd = "tell";
+			break;
+		case SAY_TEAM:
+			cmd = "tchat";
+			break;
+	}
+
 	trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"", 
-		mode == SAY_TEAM ? "tchat" : "chat",
-		name, Q_COLOR_ESCAPE, color, message));
+		cmd, name, Q_COLOR_ESCAPE, color, message));
 }
 
 #define EC		"\x19"
@@ -1194,11 +1213,6 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 	// send it to all the apropriate clients
 	for (j = 0; j < level.maxclients; j++) {
 		other = &g_entities[j];
-
-		// Don't send to extra local clients, would be printed multiple times.
-		if (other->r.mainClientNum != -1) {
-			continue;
-		}
 
 		G_SayTo( ent, other, mode, color, name, text );
 	}

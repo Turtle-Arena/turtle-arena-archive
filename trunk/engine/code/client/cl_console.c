@@ -34,12 +34,6 @@ Suite 120, Rockville, Maryland 20850 USA.
 
 int g_console_field_width = 78;
 
-#ifdef IOQ3ZTM // ZTM: More chat lines
-#define	NUM_CON_TIMES 6
-#else
-#define	NUM_CON_TIMES 4
-#endif
-
 #define		CON_TEXTSIZE	32768
 typedef struct {
 	qboolean	initialized;
@@ -59,8 +53,6 @@ typedef struct {
 
 	int		vislines;		// in scanlines
 
-	int		times[NUM_CON_TIMES];	// cls.realtime time the line was generated
-								// for transparent notify lines
 	vec4_t	color;
 } console_t;
 
@@ -69,7 +61,6 @@ extern	console_t	con;
 console_t	con;
 
 cvar_t		*con_conspeed;
-cvar_t		*con_notifytime;
 
 #define	DEFAULT_CONSOLE_WIDTH	78
 
@@ -88,7 +79,6 @@ void Con_ToggleConsole_f (void) {
 	Field_Clear( &g_consoleField );
 	g_consoleField.widthInChars = g_console_field_width;
 
-	Con_ClearNotify ();
 	Key_SetCatcher( Key_GetCatcher( ) ^ KEYCATCH_CONSOLE );
 }
 
@@ -237,11 +227,8 @@ Con_ClearNotify
 ================
 */
 void Con_ClearNotify( void ) {
-	int		i;
-	
-	for ( i = 0 ; i < NUM_CON_TIMES ; i++ ) {
-		con.times[i] = 0;
-	}
+	Cmd_TokenizeString( NULL );
+	CL_GameConsoleText( );
 }
 
 						
@@ -310,8 +297,6 @@ void Con_CheckResize (void)
 							  oldtotallines) * oldwidth + j];
 			}
 		}
-
-		Con_ClearNotify ();
 	}
 
 	con.current = con.totallines - 1;
@@ -338,7 +323,6 @@ Con_Init
 void Con_Init (void) {
 	int		i;
 
-	con_notifytime = Cvar_Get ("con_notifytime", "3", 0);
 	con_conspeed = Cvar_Get ("scr_conspeed", "3", 0);
 
 	Field_Clear( &g_consoleField );
@@ -380,18 +364,9 @@ void Con_Shutdown(void)
 Con_Linefeed
 ===============
 */
-void Con_Linefeed (qboolean skipnotify)
+void Con_Linefeed (void)
 {
 	int		i;
-
-	// mark time for transparent overlay
-	if (con.current >= 0)
-	{
-    if (skipnotify)
-		  con.times[con.current % NUM_CON_TIMES] = 0;
-    else
-		  con.times[con.current % NUM_CON_TIMES] = cls.realtime;
-	}
 
 	con.x = 0;
 	if (con.display == con.current)
@@ -415,7 +390,6 @@ void CL_ConsolePrint( char *txt ) {
 	unsigned char	c;
 	unsigned short	color;
 	qboolean skipnotify = qfalse;		// NERVE - SMF
-	int prev;							// NERVE - SMF
 #ifdef IOQ3ZTM // FONT_REWRITE
 	float	lineWidth;
 	float	wordWidth;
@@ -442,6 +416,16 @@ void CL_ConsolePrint( char *txt ) {
 		con.linewidth = -1;
 		Con_CheckResize ();
 		con.initialized = qtrue;
+	}
+
+	if( !skipnotify && !( Key_GetCatcher( ) & KEYCATCH_CONSOLE ) ) {
+		Cmd_SaveCmdContext( );
+
+		// feed the text to cgame
+		Cmd_TokenizeString( txt );
+		CL_GameConsoleText( );
+
+		Cmd_RestoreCmdContext( );
 	}
 
 	color = ColorIndex(COLOR_WHITE);
@@ -477,15 +461,15 @@ void CL_ConsolePrint( char *txt ) {
 			wordWidth = Com_FontStringWidthExt( &cls.fontSmall, txt, 0, l+1, qtrue );
 
 			if (l != con.linewidth && (con.x + l >= con.linewidth)) {
-				Con_Linefeed(skipnotify);
+				Con_Linefeed();
 			} else if (lineWidth + wordWidth >= screenWidth) {
-				Con_Linefeed(skipnotify);
+				Con_Linefeed();
 			}
 		}
 		else
 #endif
 		if (l != con.linewidth && (con.x + l >= con.linewidth) ) {
-			Con_Linefeed(skipnotify);
+			Con_Linefeed();
 
 		}
 
@@ -494,7 +478,7 @@ void CL_ConsolePrint( char *txt ) {
 		switch (c)
 		{
 		case '\n':
-			Con_Linefeed (skipnotify);
+			Con_Linefeed ();
 			break;
 		case '\r':
 			con.x = 0;
@@ -504,24 +488,9 @@ void CL_ConsolePrint( char *txt ) {
 			con.text[y*con.linewidth+con.x] = (color << 8) | c;
 			con.x++;
 			if(con.x >= con.linewidth)
-				Con_Linefeed(skipnotify);
+				Con_Linefeed();
 			break;
 		}
-	}
-
-
-	// mark time for transparent overlay
-	if (con.current >= 0) {
-		// NERVE - SMF
-		if ( skipnotify ) {
-			prev = con.current % NUM_CON_TIMES - 1;
-			if ( prev < 0 )
-				prev = NUM_CON_TIMES - 1;
-			con.times[prev] = 0;
-		}
-		else
-		// -NERVE - SMF
-			con.times[con.current % NUM_CON_TIMES] = cls.realtime;
 	}
 }
 
@@ -571,166 +540,6 @@ void Con_DrawInput (void) {
 	Field_Draw( &g_consoleField, x, y,
 		SCREEN_WIDTH - x - SMALLCHAR_WIDTH, qtrue, qtrue );
 #endif
-}
-
-
-/*
-================
-Con_DrawNotify
-
-Draws the last few lines of output transparently over the game top
-================
-*/
-void Con_DrawNotify (void)
-{
-	int		x, v;
-	short	*text;
-	int		i;
-	int		time;
-	int		skip;
-	int		currentColor;
-
-	v = 0;
-
-#ifdef TA_MISC // Place the chat input above notify lines.
-	if (!(Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) )) {
-		// draw the chat line
-		if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE )
-		{
-			x = cl_conXOffset->integer;
-
-			if (chat_team)
-			{
-				SCR_DrawBigString (x, v, "say_team:", 1.0f, qfalse );
-#ifdef IOQ3ZTM // FONT_REWRITE
-				skip = x+Com_FontStringWidth(&cls.fontBig, "say_team: ", 0);
-#else
-				skip = 10;
-#endif
-			}
-			else
-			{
-				SCR_DrawBigString (x, v, "say:", 1.0f, qfalse );
-#ifdef IOQ3ZTM // FONT_REWRITE
-				skip = x+Com_FontStringWidth(&cls.fontBig, "say: ", 0);
-#else
-				skip = 5;
-#endif
-			}
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-			Field_BigDraw( &chatField, skip, v,
-				SCREEN_WIDTH - skip, qtrue, qtrue );
-#else
-			Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
-				SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
-#endif
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-			v += Com_FontCharHeight(&cls.fontBig, 0);
-#else
-			v += BIGCHAR_HEIGHT;
-#endif
-		}
-	}
-#endif
-
-	currentColor = 7;
-	re.SetColor( g_color_table[currentColor] );
-
-	for (i= con.current-NUM_CON_TIMES+1 ; i<=con.current ; i++)
-	{
-		if (i < 0)
-			continue;
-		time = con.times[i % NUM_CON_TIMES];
-		if (time == 0)
-			continue;
-		time = cls.realtime - time;
-		if (time > con_notifytime->value*1000)
-			continue;
-		text = con.text + (i % con.totallines)*con.linewidth;
-
-		if (cl.snap.pss[0].pm_type != PM_INTERMISSION
-#ifdef TA_SP
-		&& cl.snap.pss[0].pm_type != PM_SPINTERMISSION
-#endif
-		&& Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
-			continue;
-		}
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-		float currentWidthLocation = cl_conXOffset->integer;
-#endif
-		for (x = 0 ; x < con.linewidth ; x++) {
-#ifndef IOQ3ZTM // FONT_REWRITE
-			if ( ( text[x] & 0xff ) == ' ' ) {
-				continue;
-			}
-#endif
-			if ( ( (text[x]>>8)&7 ) != currentColor ) {
-				currentColor = (text[x]>>8)&7;
-				re.SetColor( g_color_table[currentColor] );
-			}
-#ifdef IOQ3ZTM // FONT_REWRITE
-			SCR_DrawFontChar(&cls.fontSmall, con.xadjust + currentWidthLocation, v, text[x] & 0xff, qfalse);
-			currentWidthLocation += Com_FontCharWidth( &cls.fontSmall, text[x], 0 );
-#else
-			SCR_DrawSmallChar( cl_conXOffset->integer + con.xadjust + (x+1)*SMALLCHAR_WIDTH, v, text[x] & 0xff );
-#endif
-		}
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-		v += Com_FontCharHeight(&cls.fontSmall, 0);
-#else
-		v += SMALLCHAR_HEIGHT;
-#endif
-	}
-
-	re.SetColor( NULL );
-
-#ifndef TA_MISC
-	if (Key_GetCatcher( ) & (KEYCATCH_UI | KEYCATCH_CGAME) ) {
-		return;
-	}
-
-	// draw the chat line
-	if ( Key_GetCatcher( ) & KEYCATCH_MESSAGE )
-	{
-		if (chat_team)
-		{
-			SCR_DrawBigString (8, v, "say_team:", 1.0f, qfalse );
-#ifdef IOQ3ZTM // FONT_REWRITE
-			skip = 8+Com_FontStringWidth(&cls.fontBig, "say_team: ", 0);
-#else
-			skip = 10;
-#endif
-		}
-		else
-		{
-			SCR_DrawBigString (8, v, "say:", 1.0f, qfalse );
-#ifdef IOQ3ZTM // FONT_REWRITE
-			skip = 8+Com_FontStringWidth(&cls.fontBig, "say: ", 0);
-#else
-			skip = 5;
-#endif
-		}
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-		Field_BigDraw( &chatField, skip, v,
-			SCREEN_WIDTH - skip, qtrue, qtrue );
-#else
-		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, v,
-			SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qtrue );
-#endif
-
-#ifdef IOQ3ZTM // FONT_REWRITE
-		v += Com_FontCharHeight(&cls.fontBig, 0);
-#else
-		v += BIGCHAR_HEIGHT;
-#endif
-	}
-#endif
-
 }
 
 #ifdef IOQ3ZTM
@@ -942,11 +751,27 @@ void Con_DrawConsole( void ) {
 
 	if ( con.displayFrac ) {
 		Con_DrawSolidConsole( con.displayFrac );
-	} else {
-		// draw notify lines
-		if ( clc.state == CA_ACTIVE ) {
-			Con_DrawNotify ();
+	}
+
+	if( Key_GetCatcher( ) & ( KEYCATCH_UI | KEYCATCH_CGAME ) )
+		return;
+
+	// draw the chat line
+	// ZTM: FIXME: Move to cgame or ui
+	if( Key_GetCatcher( ) & KEYCATCH_MESSAGE )
+	{
+		int skip;
+
+		if( chat_team ) {
+			SCR_DrawBigString( 8, 232, "Team Say:", 1.0f, qfalse );
+			skip = 11;
+		} else {
+			SCR_DrawBigString( 8, 232, "Say:", 1.0f, qfalse );
+			skip = 5;
 		}
+
+		Field_BigDraw( &chatField, skip * BIGCHAR_WIDTH, 232,
+				SCREEN_WIDTH - ( skip + 1 ) * BIGCHAR_WIDTH, qtrue, qfalse );
 	}
 }
 
@@ -1015,7 +840,6 @@ void Con_Close( void ) {
 		return;
 	}
 	Field_Clear( &g_consoleField );
-	Con_ClearNotify ();
 	Key_SetCatcher( Key_GetCatcher( ) & ~KEYCATCH_CONSOLE );
 	con.finalFrac = 0;				// none visible
 	con.displayFrac = 0;

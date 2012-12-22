@@ -1848,6 +1848,11 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 #endif
 		}
 #endif
+
+		// Remove expired console lines
+		if( cg.cur_lc->consoleLines[ 0 ].time + cg_consoleLatency.integer < cg.time && cg_consoleLatency.integer > 0 ) {
+			CG_RemoveNotifyLine( cg.cur_lc );
+		}
 	}
 
 	// If all local clients dropped out from playing still draw main local client.

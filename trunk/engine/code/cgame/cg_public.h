@@ -95,6 +95,7 @@ typedef enum {
 	CG_ARGC,
 	CG_ARGV,
 	CG_ARGS,
+	CG_LITERAL_ARGS,
 
 	CG_ADDCOMMAND,
 	CG_REMOVECOMMAND,
@@ -292,6 +293,10 @@ typedef enum {
 	CG_LAST_ATTACKER,
 //	int (*CG_LastAttacker)( int localClientNum );
 
+	CG_VOIP_STRING,
+//  char *(*CG_VoIPString)( void );
+//  returns a string of comma-delimited clientnums based on args
+
 	CG_KEY_EVENT, 
 //	void	(*CG_KeyEvent)( int key, qboolean down );
 
@@ -301,12 +306,14 @@ typedef enum {
 	CG_EVENT_HANDLING,
 //	void (*CG_EventHandling)(int type);
 
-	CG_WANTSBINDKEYS,
+	CG_CONSOLE_TEXT,
+//	void (*CG_ConsoleText)( void );
+//	pass text that has been printed to the console to cgame
+//	use Cmd_Argc() / Cmd_Argv() to read it
+
+	CG_WANTSBINDKEYS
 //	qboolean CG_WantsBindKeys( void );
 
-	CG_VOIP_STRING
-//  char *(*CG_VoIPString)( void );
-//  returns a string of comma-delimited clientnums based on args
 } cgameExport_t;
 
 //----------------------------------------------

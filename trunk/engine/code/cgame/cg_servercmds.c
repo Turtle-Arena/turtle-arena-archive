@@ -1191,7 +1191,8 @@ static void CG_ServerCommand( void ) {
 		return;
 	}
 
-	if ( !strcmp( cmd, "print" ) ) {
+	// global print to all clients
+	if ( !strcmp( cmd, "gprint" ) ) {
 #ifdef MISSIONPACK
 		cmd = CG_Argv(start+1);			// yes, this is obviously a hack, but so is the way we hear about
 									// votes passing or failing
@@ -1212,41 +1213,47 @@ static void CG_ServerCommand( void ) {
 		}
 #endif
 
-		if (lc != 0) {
-			// Show which client this is for.
-			CG_Printf("(For Local Client %d): ", lc+1);
-		}
-		CG_Printf( "%s", CG_Argv(start+1) );
+		CG_Printf("%s", CG_Argv( start+1 ) );
+		return;
+	}
+
+	if ( !strcmp( cmd, "print" ) ) {
+		CG_NotifyPrintf( lc, "%s", CG_Argv( start+1 ) );
 		return;
 	}
 
 	if ( !strcmp( cmd, "chat" ) ) {
 		if ( !cg_teamChatsOnly.integer ) {
 			trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-			if (lc != 0) {
-				// Show which client this is for.
-				Com_sprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
-			} else {
-				Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
-			}
+
+			Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+
 			CG_RemoveChatEscapeChar( text );
 			CG_Printf( "%s\n", text );
 		}
 		return;
 	}
 
+	if ( !strcmp( cmd, "tell" ) ) {
+		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
+
+		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+
+		CG_RemoveChatEscapeChar( text );
+		CG_NotifyPrintf( lc, "%s\n", text );
+		return;
+	}
+
+	// ZTM: FIXME: only send each tchat message once for each team (if a local client is on the team).
 	if ( !strcmp( cmd, "tchat" ) ) {
 		trap_S_StartLocalSound( cgs.media.talkSound, CHAN_LOCAL_SOUND );
-		if (lc != 0) {
-			// Show which client this is for.
-			Com_sprintf(text, MAX_SAY_TEXT, "(For Local Client %d): %s", lc+1, CG_Argv(start+1));
-		} else {
-			Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
-		}
+
+		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
+
 		CG_RemoveChatEscapeChar( text );
 		CG_AddToTeamChat( text );
 #ifndef IOQ3ZTM // TEAM_CHAT_CON
-		CG_Printf( "%s\n", text );
+		CG_NotifyPrintf( lc, "%s\n", text );
 #endif
 		return;
 	}

@@ -407,6 +407,9 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case G_ARGS:
 		Cmd_ArgsBuffer( VMA(1), args[2] );
 		return 0;
+	case G_LITERAL_ARGS:
+		Cmd_LiteralArgsBuffer( VMA(1), args[2] );
+		return 0;
 
 	case G_FS_FOPEN_FILE:
 		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );

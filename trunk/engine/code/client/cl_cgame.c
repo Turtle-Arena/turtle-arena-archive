@@ -542,6 +542,9 @@ intptr_t CL_CgameSystemCalls( intptr_t *args ) {
 	case CG_ARGS:
 		Cmd_ArgsBuffer( VMA(1), args[2] );
 		return 0;
+	case CG_LITERAL_ARGS:
+		Cmd_LiteralArgsBuffer( VMA(1), args[2] );
+		return 0;
 	case CG_FS_FOPENFILE:
 		return FS_FOpenFileByMode( VMA(1), VMA(2), args[3] );
 	case CG_FS_READ:
@@ -999,6 +1002,18 @@ qboolean CL_GameCommand( void ) {
 	return VM_Call( cgvm, CG_CONSOLE_COMMAND );
 }
 
+/*
+====================
+CL_GameConsoleText
+====================
+*/
+void CL_GameConsoleText( void ) {
+	if ( !cgvm ) {
+		return;
+	}
+
+	VM_Call( cgvm, CG_CONSOLE_TEXT );
+}
 
 
 /*

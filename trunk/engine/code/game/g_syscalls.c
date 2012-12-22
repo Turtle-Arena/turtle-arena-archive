@@ -75,6 +75,10 @@ void	trap_Args( char *buffer, int bufferLength ) {
 	syscall( G_ARGS, buffer, bufferLength );
 }
 
+void	trap_LiteralArgs( char *buffer, int bufferLength ) {
+	syscall( G_LITERAL_ARGS, buffer, bufferLength );
+}
+
 int		trap_FS_FOpenFile( const char *qpath, fileHandle_t *f, fsMode_t mode ) {
 	return syscall( G_FS_FOPEN_FILE, qpath, f, mode );
 }

@@ -131,6 +131,7 @@ typedef enum {
 	G_ARGC,			// ( void );
 	G_ARGV,			// ( int n, char *buffer, int bufferLength );
 	G_ARGS,			// ( char *buffer, int bufferLength );
+	G_LITERAL_ARGS,	// ( char *buffer, int bufferLength );
 
 	G_ADDCOMMAND,	// ( const char *cmdName );
 	G_REMOVECOMMAND,// ( const char *cmdName );

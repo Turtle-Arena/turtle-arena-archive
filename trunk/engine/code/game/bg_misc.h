@@ -1637,10 +1637,6 @@ typedef enum {
 	PM_SPECTATOR,	// still run into walls
 	PM_DEAD,		// no acceleration or turning, but free falling
 	PM_FREEZE,		// stuck in place with no control
-	/* bg_public.h
-		ZTM: NOTE: Client (not cgame) expects PM_INTERMISSION as 5 and
-			PM_SPINTERMISSION as 6.
-	*/
 	PM_INTERMISSION,	// no movement or status bar
 	PM_SPINTERMISSION	// no movement or status bar
 } pmtype_t;
@@ -2077,6 +2073,7 @@ void	trap_SnapVector( float *v );
 int		trap_Argc( void );
 void	trap_Argv( int n, char *buffer, int bufferLength );
 void	trap_Args( char *buffer, int bufferLength );
+void	trap_LiteralArgs( char *buffer, int bufferLength );
 
 // register a command name so the console can perform command completion.
 void	trap_AddCommand( const char *cmdName );

@@ -735,6 +735,15 @@ typedef enum {
 
 //======================================================================
 
+typedef struct
+{
+  int time;
+  int length;
+} consoleLine_t;
+
+#define MAX_CONSOLE_LINES 4
+#define MAX_CONSOLE_TEXT  ( 256 * MAX_CONSOLE_LINES )
+
 // all cg.stepTime, cg.duckTime, cg.landTime, etc are set to cg.time when the action
 // occurs, and they will have visible effects for #define STEP_TIME or whatever msec after
 
@@ -897,6 +906,11 @@ typedef struct {
 	int			airBarFadeTime; // Air bar start fade time
 	qboolean	airBarDrawn; // Drew air bar last frame
 #endif
+
+	// console
+	char			consoleText[ MAX_CONSOLE_TEXT ];
+	consoleLine_t	consoleLines[ MAX_CONSOLE_LINES ];
+	int				numConsoleLines;
 
 } cglc_t;
  
@@ -1773,6 +1787,7 @@ extern	vmCvar_t		cg_atmosphericEffects;
 extern	vmCvar_t		cg_teamDmLeadAnnouncements;
 extern	vmCvar_t		cg_voipShowMeter;
 extern	vmCvar_t		cg_voipShowCrosshairMeter;
+extern	vmCvar_t		cg_consoleLatency;
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 extern	vmCvar_t		cg_redTeamName;
 extern	vmCvar_t		cg_blueTeamName;
@@ -1818,6 +1833,8 @@ void QDECL CG_DPrintf( const char *msg, ... ) __attribute__ ((format (printf, 1,
 void QDECL CG_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 2)));
 void QDECL CG_Error( const char *msg, ... ) __attribute__ ((noreturn, format (printf, 1, 2)));
 
+void QDECL CG_NotifyPrintf( int localClientNum, const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
+
 void CG_LocalClientAdded(int localClientNum, int clientNum);
 void CG_LocalClientRemoved(int localClientNum);
 
@@ -1835,6 +1852,9 @@ void CG_RankRunFrame( void );
 void CG_SetScoreSelection(void *menu);
 score_t *CG_GetSelectedScore( void );
 void CG_BuildSpectatorString( void );
+
+void CG_RemoveNotifyLine( cglc_t *localClient );
+void CG_AddNotifyText( void );
 
 
 //

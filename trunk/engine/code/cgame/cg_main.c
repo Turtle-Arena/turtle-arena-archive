@@ -89,6 +89,9 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 	case CG_EVENT_HANDLING:
 		CG_EventHandling(arg0);
 		return 0;
+    case CG_CONSOLE_TEXT:
+		CG_AddNotifyText();
+		return 0;
 	case CG_WANTSBINDKEYS:
 #ifdef MISSIONPACK_HUD
 		return Display_WantsBindKeys();
@@ -240,6 +243,7 @@ vmCvar_t	cg_atmosphericEffects;
 vmCvar_t	cg_teamDmLeadAnnouncements;
 vmCvar_t	cg_voipShowMeter;
 vmCvar_t	cg_voipShowCrosshairMeter;
+vmCvar_t	cg_consoleLatency;
 
 #if !defined MISSIONPACK && defined IOQ3ZTM // Support MissionPack players.
 vmCvar_t 	cg_redTeamName;
@@ -504,6 +508,7 @@ static cvarTable_t cvarTable[] = {
 	{ &cg_teamDmLeadAnnouncements, "cg_teamDmLeadAnnouncements", "1", CVAR_ARCHIVE },
 	{ &cg_voipShowMeter, "cg_voipShowMeter", "1", CVAR_ARCHIVE },
 	{ &cg_voipShowCrosshairMeter, "cg_voipShowCrosshairMeter", "1", CVAR_ARCHIVE },
+	{ &cg_consoleLatency, "cg_consoleLatency", "3000", CVAR_ARCHIVE },
 #ifdef TA_WEAPSYS // MELEE_TRAIL
 	{ &cg_drawMeleeWeaponTrails, "cg_drawMeleeWeaponTrails", "1", CVAR_ARCHIVE},
 #endif
@@ -659,6 +664,107 @@ int CG_LastAttacker( int localClientNum ) {
 	}
 
 	return cg.snap->pss[cg.snap->lcIndex[localClientNum]].persistant[PERS_ATTACKER];
+}
+
+/*
+=================
+CG_RemoveNotifyLine
+=================
+*/
+void CG_RemoveNotifyLine( cglc_t *localClient )
+{
+  int i, offset, totalLength;
+
+  if( !localClient || localClient->numConsoleLines == 0 )
+    return;
+
+  offset = localClient->consoleLines[ 0 ].length;
+  totalLength = strlen( localClient->consoleText ) - offset;
+
+  //slide up consoleText
+  for( i = 0; i <= totalLength; i++ )
+    localClient->consoleText[ i ] = localClient->consoleText[ i + offset ];
+
+  //pop up the first consoleLine
+  for( i = 0; i < localClient->numConsoleLines; i++ )
+    localClient->consoleLines[ i ] = localClient->consoleLines[ i + 1 ];
+
+  localClient->numConsoleLines--;
+}
+
+/*
+=================
+CG_AddNotifyText
+=================
+*/
+void CG_AddNotifyText( void ) {
+	char text[ BIG_INFO_STRING ];
+	char *buffer;
+	int bufferLen;
+	int lc;
+	cglc_t *localClient;
+	int localClientBits;
+
+	trap_LiteralArgs( text, sizeof ( text ) );
+
+	if( !text[ 0 ] ) {
+		for ( lc = 0; lc < CG_MaxSplitView(); lc++ ) {
+			cg.localClients[lc].consoleText[ 0 ] = '\0';
+			cg.localClients[lc].numConsoleLines = 0;
+		}
+		return;
+	}
+
+	buffer = text;
+	bufferLen = strlen( buffer );
+
+	// [player #] perfix for text that only shows up in notify area for one local client
+	if ( bufferLen > 4 && !Q_strncmp( buffer, "[player ", 8 ) && isdigit(buffer[8]) && buffer[9] == ']' ) {
+		localClientBits = 1 << ( atoi( &buffer[8] ) - 1 );
+
+		buffer += 10;
+		bufferLen = strlen( buffer );
+	} else {
+		localClientBits = ~0;
+	}
+
+	for ( lc = 0; lc < CG_MaxSplitView(); lc++ ) {
+		if ( !( localClientBits & ( 1 << lc ) ) ) {
+			continue;
+		}
+
+		localClient = &cg.localClients[lc];
+
+		if( localClient->numConsoleLines == MAX_CONSOLE_LINES )
+			CG_RemoveNotifyLine( localClient );
+
+		Q_strcat( localClient->consoleText, MAX_CONSOLE_TEXT, buffer );
+		localClient->consoleLines[ localClient->numConsoleLines ].time = cg.time;
+		localClient->consoleLines[ localClient->numConsoleLines ].length = bufferLen;
+		localClient->numConsoleLines++;
+	}
+}
+
+/*
+=================
+CG_NotifyPrintf
+
+Only printed in notify area for localClientNum (and client console)
+=================
+*/
+void QDECL CG_NotifyPrintf( int localClientNum, const char *msg, ... ) {
+	va_list		argptr;
+	char		text[1024];
+	int			prefixLen;
+
+	Com_sprintf( text, sizeof(text), "[player %d]", localClientNum + 1 );
+	prefixLen = strlen(text);
+
+	va_start (argptr, msg);
+	Q_vsnprintf (text+prefixLen, sizeof(text)-prefixLen, msg, argptr);
+	va_end (argptr);
+
+	trap_Print( text );
 }
 
 void QDECL CG_DPrintf( const char *msg, ... ) {

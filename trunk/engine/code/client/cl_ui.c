@@ -761,6 +761,10 @@ intptr_t CL_UISystemCalls( intptr_t *args ) {
 		Cmd_ArgsBuffer( VMA(1), args[2] );
 		return 0;
 
+	case UI_LITERAL_ARGS:
+		Cmd_LiteralArgsBuffer( VMA(1), args[2] );
+		return 0;
+
 	case UI_ADDCOMMAND:
 		CL_AddUICommand( VMA(1) );
 		return 0;
