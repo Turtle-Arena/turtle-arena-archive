@@ -453,7 +453,12 @@ CG_AddToTeamChat
 
 =======================
 */
-static void CG_AddToTeamChat( const char *str ) {
+#ifdef IOQ3ZTM // TEAM_CHAT_CON
+static void CG_AddToTeamChat( int lc, const char *str )
+#else
+static void CG_AddToTeamChat( const char *str )
+#endif
+{
 	int len;
 	char *p, *ls;
 	int lastcolor;
@@ -469,7 +474,7 @@ static void CG_AddToTeamChat( const char *str ) {
 		// team chat disabled, dump into normal chat
 		cgs.teamChatPos = cgs.teamLastChatPos = 0;
 #ifdef IOQ3ZTM // TEAM_CHAT_CON
-		CG_Printf( "%s\n", str );
+		CG_NotifyPrintf( lc, "%s\n", str );
 #endif
 		return;
 	}
@@ -998,8 +1003,10 @@ void CG_PlayVoiceChat( bufferedVoiceChat_t *vchat ) {
 		}
 	}
 	if (!vchat->voiceOnly && !cg_noVoiceText.integer) {
+#ifdef IOQ3ZTM // TEAM_CHAT_CON
+		CG_AddToTeamChat( 0, vchat->message );
+#else
 		CG_AddToTeamChat( vchat->message );
-#ifndef IOQ3ZTM // TEAM_CHAT_CON
 		CG_Printf( "%s\n", vchat->message );
 #endif
 	}
@@ -1251,8 +1258,10 @@ static void CG_ServerCommand( void ) {
 		Q_strncpyz( text, CG_Argv(start+1), MAX_SAY_TEXT );
 
 		CG_RemoveChatEscapeChar( text );
+#ifdef IOQ3ZTM // TEAM_CHAT_CON
+		CG_AddToTeamChat( lc, text );
+#else
 		CG_AddToTeamChat( text );
-#ifndef IOQ3ZTM // TEAM_CHAT_CON
 		CG_NotifyPrintf( lc, "%s\n", text );
 #endif
 		return;
