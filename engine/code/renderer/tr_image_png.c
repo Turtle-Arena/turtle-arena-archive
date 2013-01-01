@@ -2,7 +2,7 @@
 ===========================================================================
 ioquake3 png decoder and encoder
 Copyright (C) 2007,2008 Joerg Dietrich
-Copyright (C) 2011 Zack "ZTurtleMan" Middleton
+Copyright (C) 2011 Zack Middleton
 
 This file is part of Spearmint Source Code.
 
