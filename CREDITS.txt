@@ -9,20 +9,20 @@ Turtle Arena credits.
 * Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
 * Chris "Lakitu7" Schwarz (Fixed up freetype code and use TTF in console)
 * ZEQ2-lite				(For cel shading tcGen code)
-* M+ Outline Fonts		(For M+ 1c, M+ 1mn, and M+ 2p fonts)
+* M+ Outline Fonts		(For fonts)
 * zero-project			(For music)
 * Neil Crowe			(For music)
-* Zack "ZTurtleMan" Middleton
+* Zack Middleton
 
 
 == License ==
 Most of the Turtle Arena source code is licensed under the GNU General Public
-	License version 2 or later. See GPL-2 file for license text.
+	License version 3 or later, with some additional terms.
+	See CODE_LICENSE file for license text.
 
-Most of the Turtle Arena data is licensed under the GNU GPLv2 or later and/or
-	licensed under the Creative Commons Attribution-ShareAlike 3.0, see
-	COPYRIGHTS file for details. See GPL-2 and CC-BY-SA-3.0 files for license
-	text.
+Most of the Turtle Arena data is licensed under the the Creative Commons
+	Attribution-ShareAlike 3.0, see	COPYRIGHTS file for details.
+	See CC-BY-SA-3.0 files for license text.
 
 
 == Data ==
@@ -39,11 +39,11 @@ ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
 
 === GPLv2 or later ===
 * ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
-** (IOSTVEF_NOISE) Adds support for "noise" and "random" waveform keywords
-** RF_FORCE_ENT_ALPHA, it will be used so items/weapons fad out when dispearing.
+** Support for "noise" and "random" waveform keywords
+** RF_FORCE_ENT_ALPHA, allows items/weapons to fad out when dispearing.
 
 * OpenArena (OPENARENA): http://openarena.ws
-** (OA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
+** (TA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
 
 * Xreal (XREAL): http://www.xreal-project.net/
 ** Homing rockets (Xreal svn r2785)

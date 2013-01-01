@@ -5,14 +5,14 @@ If you have any questions or comments, feel free to join the forums or the IRC c
 	IRC: #turtlearena on irc.freenode.net
 
 == License ==
-The Turtle Arena source code is licensed under the GNU General Public License version 2 or later.
-	(See GPL-2.txt for full license)
+The Turtle Arena source code is licensed under the GNU General Public License version 3 or later, there are additional terms appended to the end of the license.
+	(See CODE_LICENSE.txt for full license)
 
-The Turtle Arena data is a mix of GPL2+ and CC-BY-SA-3.0.
+The Turtle Arena data files are mostly licensed as CC-BY-SA-3.0. There are a few GNU General Public License version 2 or later files.
 	(See COPYRIGHTS.txt for data copyrights and licenses.)
 
 == Credits ==
-Turtle Arena uses code written by id software, ioquake3 developers, OpenArena developers, Robert "Tr3B" Beckebans, Smokin' Guns developers, Chris "Lakitu7" Schwarz, ZEQ2-lite developers, and Zack "ZTurtleMan" Middleton
+Turtle Arena uses code written by id software, ioquake3 developers, OpenArena developers, Robert "Tr3B" Beckebans, Smokin' Guns developers, Chris "Lakitu7" Schwarz, ZEQ2-lite developers, and Zack Middleton
 
 See CREDITS.txt for details.
 

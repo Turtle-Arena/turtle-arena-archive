@@ -1,8 +1,8 @@
 Turtle Arena source directories setup
 
 base (or base/assets*.pk3) - Game data used to run the engine
-base-src - Source files for the game data that are not used by the engine
-engine - Modified version of ioquake3
+base-src - Source files for the game data
+engine - Modified version of Spearmint (based on ioquake3)
 extras/radiant-config - GtkRadiant 1.5.0 / NetRadiant config
 extras/wminput - Config for using wiimote with Turtle Arena (Linux only)
 

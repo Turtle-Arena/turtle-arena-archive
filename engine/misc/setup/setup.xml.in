@@ -76,7 +76,8 @@ ifelse(HAVE_PPC64,yes,dnl
 	base/assets0.pk3
 	base/assets1-qvms.pk3
 	turtlearena.png
-	COPYING
+	CODE_LICENSE
+	CC-BY-SA-3.0
 	COPYRIGHTS
 	CREDITS
       </files>
