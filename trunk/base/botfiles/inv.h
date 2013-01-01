@@ -1,7 +1,7 @@
 /*
 ===========================================================================
 Copyright (C) 1999-2005 Id Software, Inc.
-Copyright (C) 2009-2012 Zack "ZTurtleMan" Middleton
+Copyright (C) 2009-2012 Zack Middleton
 
 This file is part of Turtle Arena.
 
