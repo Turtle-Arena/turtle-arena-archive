@@ -67,7 +67,7 @@ turtlearena.$(ARCH).nsi: turtlearena.nsi.in
 	sed 's|XXXFILENAMEXXX|$(NSISFILENAME)|;s|XXXVERSIONXXX|$(VERSION)|;s|XXXRELEASEXXX|$(RELEASE)|;s|x86|$(ARCH)|g;s|XXXASSETPATHXXX|$(ASSETPATH)|;s|SDL.dll|$(SDLDLL)|' < $< > $@
 
 $(NSISFILENAME): turtlearena.$(ARCH).nsi
-	cp "../../../GPL-2.txt" .
+	cp "../../../CODE_LICENSE.txt" .
 	cp "../../../CC-BY-SA-3.0.txt" .
 	cp "../../../COPYRIGHTS.txt" .
 	cp "../../../CREDITS.txt" .
@@ -82,7 +82,7 @@ endif
 	makensis $(DEFINES) turtlearena.$(ARCH).nsi
 
 clean:
-	rm -rf *.exe turtlearena.$(ARCH).nsi GPL-2.txt CC-BY-SA-3.0.txt COPYRIGHTS.txt CREDITS.txt README.txt
+	rm -rf *.exe turtlearena.$(ARCH).nsi CODE_LICENSE.txt CC-BY-SA-3.0.txt COPYRIGHTS.txt CREDITS.txt README.txt
 
 install:
 	mkdir -p $(INSTALLDIR)

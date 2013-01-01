@@ -87,7 +87,7 @@ install -m 644 turtlearena.desktop image/turtlearena.desktop.in
 
 ### README, COPYING and EULA
 install -m 644 ../$topdir/INSTALLER_README.txt image/README
-install -m 644 ../$topdir/GPL-2.txt image/GPL-2
+install -m 644 ../$topdir/CODE_LICENSE.txt image/CODE_LICENSE
 install -m 644 ../$topdir/CC-BY-SA-3.0.txt image/CC-BY-SA-3.0
 install -m 644 ../$topdir/COPYRIGHTS.txt image/COPYRIGHTS
 install -m 644 ../$topdir/CREDITS.txt image/CREDITS

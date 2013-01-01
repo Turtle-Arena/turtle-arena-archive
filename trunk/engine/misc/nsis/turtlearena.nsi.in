@@ -106,7 +106,7 @@ Section "${GAMENAME} ${VERSION}-${RELEASE} (required)"
   File "../../build/release-mingw32-x86/renderer_rend2_x86.dll"
 !endif
 
-  File "GPL-2.txt"
+  File "CODE_LICENSE.txt"
   File "CC-BY-SA-3.0.txt"
   File "COPYRIGHTS.txt"
   File "CREDITS.txt"
@@ -207,7 +207,7 @@ Section "Uninstall"
   Delete $INSTDIR\renderer_rend2_x86.dll
 !endif
 
-  Delete $INSTDIR\GPL-2.txt
+  Delete $INSTDIR\CODE_LICENSE.txt
   Delete $INSTDIR\CC-BY-SA-3.0.txt
   Delete $INSTDIR\COPYRIGHTS.txt
   Delete $INSTDIR\CREDITS.txt

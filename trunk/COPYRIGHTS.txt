@@ -1,8 +1,7 @@
 Turtle Arena data copyrights for base and base-src directories ("the data files"), excludes any files compiled from the engine source code (including but not limited to QVM, DLL, SO, and DYLIB files).
 
 == ZTM ==
-All of the data files, unless otherwise noted, are copyright (c) 2009-2012 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version and licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported.
-	You may use the data as GPLv2+ and/or CC-BY-SA-3.0.
+All of the data files, unless otherwise noted, are copyright (c) 2009-2013 Zack Middleton and are licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported (CC-BY-SA-3.0).
 
 The data files in the base directory that have source files are included in the base-src directory.
 
@@ -104,7 +103,7 @@ music/NeilCrowe_-_EVENT.ogg
 Some of the shaders in the base/scripts/*.shader files are from OpenArena.
 base/scripts/male1.voice is based on file from OpenArena.
 
-The following are based on files from OpenArena and are copyright (c) 2006 Dmn_clown and 2009-2012 Zack "ZTurtleMan" Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
+The following are based on files from OpenArena and are copyright (c) 2006 Bob Isaac and 2009-2013 Zack Middleton and are licensed under the GNU General Public License; either version 2 of the License, or (at your option) any later version.
 
 base/botfiles/bots/default_c.c
 base/botfiles/bots/default_t.c
@@ -118,42 +117,12 @@ base/botfiles/syn.c
 base/botfiles/teamplay.h
 
 == M+ Outline Fonts ==
-The following files are Copyright (C) 2002-2011 M+ FONTS PROJECT and licensed as follows:
+The following files are Copyright (C) 2002-2012 M+ FONTS PROJECT and licensed as follows:
 	"These fonts are free softwares. Unlimited permission is granted to use, copy, and distribute it, with or without modification, either commercially and noncommercially. THESE FONTS ARE PROVIDED "AS IS" WITHOUT WARRANTY."
 
-TrueType Fonts from M+ Outline Fonts (v044)
+TrueType Fonts from M+ Outline Fonts (v053)
 base/fonts/mplus-1c-regular.ttf
 base/fonts/mplus-1c-bold.ttf
 base/fonts/mplus-1mn-regular.ttf
 base/fonts/mplus-2p-black.ttf
-
-The dat and png files listed below were created by the engine, using freetype2.
-
-Files created from base/fonts/mplus-1c-regular.ttf:
-base/fonts/mplus-1c-regular_0_8.png
-base/fonts/mplus-1c-regular_0_12.png
-base/fonts/mplus-1c-regular_0_16.png
-base/fonts/mplus-1c-regular_0_20.png
-base/fonts/mplus-1c-regular_0_48.png
-base/fonts/mplus-1c-regular_1_48.png
-base/fonts/mplus-1c-regular_8.dat
-base/fonts/mplus-1c-regular_12.dat
-base/fonts/mplus-1c-regular_16.dat
-base/fonts/mplus-1c-regular_20.dat
-base/fonts/mplus-1c-regular_48.dat
-
-Files created from base/fonts/mplus-1c-bold.ttf:
-base/fonts/mplus-1c-bold_0_20.png
-base/fonts/mplus-1c-bold_0_27.png
-base/fonts/mplus-1c-bold_1_27.png
-base/fonts/mplus-1c-bold_20.dat
-base/fonts/mplus-1c-bold_27.dat
-
-Files created from base/fonts/mplus-1mn-regular.ttf:
-base/fonts/mplus-1mn-regular_0_16.png
-base/fonts/mplus-1mn-regular_16.dat
-
-Files created from base/fonts/mplus-1mn-regular.ttf:
-base/fonts/mplus-1mn-regular_0_16.png
-base/fonts/mplus-1mn-regular_16.dat
 
