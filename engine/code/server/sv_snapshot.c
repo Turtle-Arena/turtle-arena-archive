@@ -149,7 +149,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 	} else if ( client->netchan.outgoingSequence - client->deltaMessage 
 		>= (PACKET_BACKUP - 3) ) {
 		// client hasn't gotten a good message through in a long time
-		Com_DPrintf ("%s: Delta request from out of date packet.\n", client->name);
+		Com_DPrintf ("%s: Delta request from out of date packet.\n", SV_ClientName( client ));
 		oldframe = NULL;
 		lastframe = 0;
 	} else {
@@ -159,7 +159,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 
 		// the snapshot's entities may still have rolled off the buffer, though
 		if ( oldframe->first_entity <= svs.nextSnapshotEntities - svs.numSnapshotEntities ) {
-			Com_DPrintf ("%s: Delta request from out of date entities.\n", client->name);
+			Com_DPrintf ("%s: Delta request from out of date entities.\n", SV_ClientName( client ));
 			oldframe = NULL;
 			lastframe = 0;
 		}
@@ -211,7 +211,7 @@ static void SV_WriteSnapshotToClient( client_t *client, msg_t *msg ) {
 		frame->numPSs = MAX_SPLITVIEW;
 	}
 
-	// send number of playerstates and local client indexes if needed
+	// send number of playerstates and local player indexes if needed
 	if (snapFlags & SNAPFLAG_MULTIPLE_PSS) {
 		MSG_WriteByte (msg, frame->numPSs);
 		for (i = 0; i < MAX_SPLITVIEW; i++) {
@@ -503,8 +503,6 @@ copies off the playerstate and areabits.
 
 This properly handles multiple recursive portals, but the render
 currently doesn't.
-
-For viewing through other player's eyes, clent can be something other than client->gentity
 =============
 */
 static void SV_BuildClientSnapshot( client_t *client ) {
@@ -515,7 +513,6 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 	sharedEntity_t				*ent;
 	entityState_t				*state;
 	svEntity_t					*svEnt;
-	sharedEntity_t				*clent;
 	int							clientNum;
 	playerState_t				*ps;
 
@@ -532,27 +529,24 @@ static void SV_BuildClientSnapshot( client_t *client ) {
   // https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=62
 	frame->num_entities = 0;
 	
-	clent = client->gentity;
-	if ( !clent || client->state == CS_ZOMBIE ) {
+	if ( client->state == CS_ZOMBIE ) {
 		return;
 	}
 
-	// grab the current playerState_t
-	ps = SV_GameClientNum( client - svs.clients );
-	frame->pss[0] = *ps;
-	frame->numPSs = 1;
-	frame->lcIndex[0] = 0;
-
-	// Add splitscreen clients
-	for (i = 1; i < MAX_SPLITVIEW; i++) {
-		if (!client->localClients[i-1]) {
+	// grab the current player states
+	for (i = 0, frame->numPSs = 0; i < MAX_SPLITVIEW; i++) {
+		if ( !client->localPlayers[i] || !client->localPlayers[i]->gentity ) {
 			frame->lcIndex[i] = -1;
 			continue;
 		}
-		ps = SV_GameClientNum( client->localClients[i-1] - svs.clients );
+		ps = SV_GameClientNum( client->localPlayers[i] - svs.players );
 		frame->pss[frame->numPSs] = *ps;
 		frame->lcIndex[i] = frame->numPSs;
 		frame->numPSs++;
+	}
+
+	if ( !frame->numPSs ) {
+		return;
 	}
 
 	// never send client's own entity, because it can
@@ -567,7 +561,7 @@ static void SV_BuildClientSnapshot( client_t *client ) {
 		svEnt->snapshotCounter = sv.snapshotCounter;
 	}
 
-	// Now that local clients have been marked as no send, add visible entities.
+	// Now that local players have been marked as no send, add visible entities.
 	for (i = 0; i < frame->numPSs; i++) {
 		// find the client's viewpoint
 		VectorCopy( frame->pss[i].origin, org );
@@ -685,17 +679,12 @@ void SV_SendClientSnapshot( client_t *client ) {
 	byte		msg_buf[MAX_MSGLEN];
 	msg_t		msg;
 
-	// Splitscreen clients are sent with main client.
-	if (client->mainClient) {
-		return;
-	}
-
 	// build the snapshot
 	SV_BuildClientSnapshot( client );
 
 	// bots need to have their snapshots build, but
 	// the query them directly without needing to be sent
-	if ( client->gentity && client->gentity->r.svFlags & SVF_BOT ) {
+	if ( client->netchan.remoteAddress.type == NA_BOT ) {
 		return;
 	}
 
@@ -719,7 +708,7 @@ void SV_SendClientSnapshot( client_t *client ) {
 
 	// check for overflow
 	if ( msg.overflowed ) {
-		Com_Printf ("WARNING: msg overflowed for %s\n", client->name);
+		Com_Printf ("WARNING: msg overflowed for %s\n", SV_ClientName( client ));
 		MSG_Clear (&msg);
 	}
 

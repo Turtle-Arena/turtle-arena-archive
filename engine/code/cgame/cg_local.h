@@ -1834,6 +1834,7 @@ void QDECL CG_Printf( const char *msg, ... ) __attribute__ ((format (printf, 1, 
 void QDECL CG_Error( const char *msg, ... ) __attribute__ ((noreturn, format (printf, 1, 2)));
 
 void QDECL CG_NotifyPrintf( int localClientNum, const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
+void QDECL CG_NotifyBitsPrintf( int localClientNum, const char *msg, ... ) __attribute__ ((format (printf, 2, 3)));
 
 void CG_LocalClientAdded(int localClientNum, int clientNum);
 void CG_LocalClientRemoved(int localClientNum);

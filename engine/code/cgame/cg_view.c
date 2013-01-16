@@ -1803,7 +1803,7 @@ void CG_DrawActiveFrame( int serverTime, stereoFrame_t stereoView, qboolean demo
 		cg.cur_ps = &cg.snap->pss[cg.snap->lcIndex[i]];
 
 		// Check if viewport should be drawn.
-		if ((cg.singleCamera && cg.numViewports >= 1) || (cg.cur_ps->persistant[PERS_TEAM] == TEAM_SPECTATOR && (cg.cur_ps->pm_flags & PMF_LOCAL_HIDE))) {
+		if ( cg.singleCamera && cg.numViewports >= 1 ) {
 			renderClientViewport[i] = qfalse;
 		} else {
 			cg.numViewports++;

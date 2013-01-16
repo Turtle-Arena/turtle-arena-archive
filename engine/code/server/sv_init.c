@@ -69,7 +69,7 @@ static void SV_SendConfigstring(client_t *client, int index)
 			Q_strncpyz( buf, &sv.configstrings[index][sent],
 				maxChunkSize );
 
-			SV_SendServerCommand( client, "%s %i \"%s\"\n", cmd,
+			SV_SendServerCommand( client, -1, "%s %i \"%s\"\n", cmd,
 				index, buf );
 
 			sent += (maxChunkSize - 1);
@@ -77,7 +77,7 @@ static void SV_SendConfigstring(client_t *client, int index)
 		}
 	} else {
 		// standard cs, just send it
-		SV_SendServerCommand( client, "cs %i \"%s\"\n", index,
+		SV_SendServerCommand( client, -1, "cs %i \"%s\"\n", index,
 			sv.configstrings[index] );
 	}
 }
@@ -99,11 +99,6 @@ void SV_UpdateConfigstrings(client_t *client)
 		if(!client->csUpdated[index])
 			continue;
 
-		// do not always send server info to all clients
-		if ( index == CS_SERVERINFO && client->gentity &&
-			(client->gentity->r.svFlags & SVF_NOSERVERINFO) ) {
-			continue;
-		}
 		SV_SendConfigstring(client, index);
 		client->csUpdated[index] = qfalse;
 	}
@@ -147,11 +142,7 @@ void SV_SetConfigstring (int index, const char *val) {
 					client->csUpdated[ index ] = qtrue;
 				continue;
 			}
-			// do not always send server info to all clients
-			if ( index == CS_SERVERINFO && client->gentity && (client->gentity->r.svFlags & SVF_NOSERVERINFO) ) {
-				continue;
-			}
-		
+
 			SV_SendConfigstring(client, index);
 		}
 	}
@@ -194,8 +185,8 @@ void SV_SetUserinfo( int index, const char *val ) {
 		val = "";
 	}
 
-	Q_strncpyz( svs.clients[index].userinfo, val, sizeof( svs.clients[ index ].userinfo ) );
-	Q_strncpyz( svs.clients[index].name, Info_ValueForKey( val, "name" ), sizeof(svs.clients[index].name) );
+	Q_strncpyz( svs.players[index].userinfo, val, sizeof( svs.players[ index ].userinfo ) );
+	Q_strncpyz( svs.players[index].name, Info_ValueForKey( val, "name" ), sizeof(svs.players[index].name) );
 }
 
 
@@ -213,7 +204,7 @@ void SV_GetUserinfo( int index, char *buffer, int bufferSize ) {
 	if ( index < 0 || index >= sv_maxclients->integer ) {
 		Com_Error (ERR_DROP, "SV_GetUserinfo: bad index %i", index);
 	}
-	Q_strncpyz( buffer, svs.clients[ index ].userinfo, bufferSize );
+	Q_strncpyz( buffer, svs.players[ index ].userinfo, bufferSize );
 }
 
 
@@ -282,6 +273,7 @@ static void SV_Startup( void ) {
 	SV_BoundMaxClients( 1 );
 
 	svs.clients = Z_Malloc (sizeof(client_t) * sv_maxclients->integer );
+	svs.players = Z_Malloc (sizeof(player_t) * sv_maxclients->integer );
 	if ( com_dedicated->integer ) {
 		svs.numSnapshotEntities = sv_maxclients->integer * PACKET_BACKUP * 64;
 	} else {
@@ -311,12 +303,13 @@ void SV_ChangeMaxClients( void ) {
 	int		oldMaxClients;
 	int		i, j;
 	client_t	*oldClients;
+	player_t	*oldPlayers;
 	int		count;
 
-	// get the highest client number in use
+	// get the highest client or player number in use
 	count = 0;
 	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
-		if ( svs.clients[i].state >= CS_CONNECTED ) {
+		if ( svs.clients[i].state >= CS_CONNECTED || svs.players[i].inUse ) {
 			if (i > count)
 				count = i;
 		}
@@ -332,55 +325,64 @@ void SV_ChangeMaxClients( void ) {
 	}
 
 	oldClients = Hunk_AllocateTempMemory( count * sizeof(client_t) );
-	// copy the clients to hunk memory
+	oldPlayers = Hunk_AllocateTempMemory( count * sizeof(player_t) );
+	// copy the clients and players to hunk memory
 	for ( i = 0 ; i < count ; i++ ) {
+		if ( svs.players[i].inUse && oldPlayers[i].client->state >= CS_CONNECTED ) {
+			oldPlayers[i] = svs.players[i];
+			oldPlayers[i].client = NULL; // client pointer gets restored using localPlayers pointers.
+		}
+		else {
+			Com_Memset(&oldPlayers[i], 0, sizeof(player_t));
+		}
+
 		if ( svs.clients[i].state >= CS_CONNECTED ) {
 			oldClients[i] = svs.clients[i];
+
+			// save player indexes
+			for ( j = 0; j < MAX_SPLITVIEW; j++ ) {
+				if (svs.clients[i].localPlayers[j]) {
+					oldClients[i].localPlayers[j] = (void*)((svs.clients[i].localPlayers[j] - svs.players) + 1);
+				}
+			}
 		}
 		else {
 			Com_Memset(&oldClients[i], 0, sizeof(client_t));
 		}
-
-		// save main clientNum
-		if (svs.clients[i].mainClient) {
-			oldClients[i].mainClient = (void*)(svs.clients[i].mainClient - svs.clients + 1);
-		}
-
-		// save splitscreen clientNums
-		for ( j = 0; j < MAX_SPLITVIEW-1; j++) {
-			if (svs.clients[i].localClients[j]) {
-				oldClients[i].localClients[j] = (void*)(svs.clients[i].localClients[j] - svs.clients + 1);
-			}
-		}
 	}
 
-	// free old clients arrays
+	// free old clients and players arrays
 	Z_Free( svs.clients );
+	Z_Free( svs.players );
 
-	// allocate new clients
+	// allocate new clients and players
 	svs.clients = Z_Malloc ( sv_maxclients->integer * sizeof(client_t) );
 	Com_Memset( svs.clients, 0, sv_maxclients->integer * sizeof(client_t) );
 
-	// copy the clients over
+	svs.players = Z_Malloc ( sv_maxclients->integer * sizeof(player_t) );
+	Com_Memset( svs.players, 0, sv_maxclients->integer * sizeof(player_t) );
+
+	// copy the clients and players over
 	for ( i = 0 ; i < count ; i++ ) {
+		if ( oldPlayers[i].inUse ) {
+			svs.players[i] = oldPlayers[i];
+		}
+
 		if ( oldClients[i].state >= CS_CONNECTED ) {
 			svs.clients[i] = oldClients[i];
-		}
 
-		// restore main client pointer
-		if (oldClients[i].mainClient) {
-			svs.clients[i].mainClient = &svs.clients[(intptr_t)oldClients[i].mainClient - 1];
-		}
-
-		// restore splitscreen pointers
-		for ( j = 0; j < MAX_SPLITVIEW-1; j++) {
-			if (oldClients[i].localClients[j]) {
-				svs.clients[i].localClients[j] = &svs.clients[(intptr_t)oldClients[i].localClients[j] - 1];
+			// restore pointers
+			for ( j = 0; j < MAX_SPLITVIEW; j++ ) {
+				if (oldClients[i].localPlayers[j]) {
+					svs.clients[i].localPlayers[j] = &svs.players[ (intptr_t)oldClients[i].localPlayers[j] - 1 ];
+					svs.clients[i].localPlayers[j]->client = &svs.clients[i];
+				}
 			}
 		}
 	}
 
-	// free the old clients on the hunk
+	// free the old playes and clients on the hunk
+	Hunk_FreeTempMemory( oldPlayers );
 	Hunk_FreeTempMemory( oldClients );
 	
 	// allocate new snapshot entities
@@ -563,6 +565,8 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 		// send the new gamestate to all connected clients
 		if (svs.clients[i].state >= CS_CONNECTED) {
 			char	*denied;
+			player_t *player;
+			int j;
 
 			if ( svs.clients[i].netchan.remoteAddress.type == NA_BOT ) {
 				if ( killBots ) {
@@ -575,32 +579,43 @@ void SV_SpawnServer( char *server, qboolean killBots ) {
 				isBot = qfalse;
 			}
 
-			// setup entity before connecting
-			SV_SetupClientEntity(&svs.clients[i]);
+			for ( j = 0; j < MAX_SPLITVIEW; j++ ) {
+				player = svs.clients[i].localPlayers[j];
 
-			// connect the client again
-			denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );	// firstTime = qfalse
-			if ( denied ) {
-				// this generally shouldn't happen, because the client
-				// was connected before the level change
-				SV_DropClient( &svs.clients[i], denied );
+				if ( !player )
+					continue;
+
+				// setup entity before connecting
+				SV_SetupPlayerEntity( player );
+
+				// connect the client again
+				denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, player - svs.players, qfalse, isBot, i, j ) );	// firstTime = qfalse
+				if ( denied ) {
+					// this generally shouldn't happen, because the client
+					// was connected before the level change
+					SV_DropPlayer( player, denied );
+				}
+			}
+
+			// check if client was dropped
+			if ( svs.clients[i].state < CS_CONNECTED ) {
+				continue;
+			}
+
+			if( !isBot ) {
+				// when we get the next packet from a connected client,
+				// the new gamestate will be sent
+				svs.clients[i].state = CS_CONNECTED;
 			} else {
-				if( !isBot ) {
-					// when we get the next packet from a connected client,
-					// the new gamestate will be sent
-					svs.clients[i].state = CS_CONNECTED;
-				}
-				else {
-					client_t		*client;
+				client_t		*client;
 
-					client = &svs.clients[i];
-					client->state = CS_ACTIVE;
+				client = &svs.clients[i];
+				client->state = CS_ACTIVE;
 
-					client->deltaMessage = -1;
-					client->lastSnapshotTime = 0;	// generate a snapshot immediately
+				client->deltaMessage = -1;
+				client->lastSnapshotTime = 0;	// generate a snapshot immediately
 
-					VM_Call( gvm, GAME_CLIENT_BEGIN, i );
-				}
+				VM_Call( gvm, GAME_CLIENT_BEGIN, i );
 			}
 		}
 	}	
@@ -779,8 +794,8 @@ void SV_FinalMessage( char *message ) {
 			if (cl->state >= CS_CONNECTED) {
 				// don't send a disconnect to a local client
 				if ( cl->netchan.remoteAddress.type != NA_LOOPBACK ) {
-					SV_SendServerCommand( cl, "print \"%s\n\"\n", message );
-					SV_SendServerCommand( cl, "disconnect \"%s\"", message );
+					SV_SendServerCommand( cl, -1, "print \"%s\n\"\n", message );
+					SV_SendServerCommand( cl, -1, "disconnect \"%s\"", message );
 				}
 				// force a snapshot to be sent
 				cl->lastSnapshotTime = 0;
@@ -820,6 +835,15 @@ void SV_Shutdown( char *finalmsg ) {
 	SV_ClearServer();
 
 	// free server static data
+	if(svs.players)
+	{
+		int index;
+		
+		for(index = 0; index < sv_maxclients->integer; index++)
+			SV_FreePlayer(&svs.players[index]);
+		
+		Z_Free(svs.players);
+	}
 	if(svs.clients)
 	{
 		int index;

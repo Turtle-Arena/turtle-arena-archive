@@ -1032,7 +1032,7 @@ int BotAI(int client, float thinktime) {
 			{ /*CenterPrintf*/ }
 		else if (!Q_stricmp(buf, "cs"))
 			{ /*ConfigStringModified*/ }
-		else if (!Q_stricmp(buf, "gprint") || !Q_stricmp(buf, "print")) {
+		else if (!Q_stricmp(buf, "print")) {
 			//remove first and last quote from the chat message
 			memmove(args, args+1, strlen(args));
 			args[strlen(args)-1] = '\0';

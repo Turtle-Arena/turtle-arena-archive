@@ -138,22 +138,10 @@ UI_TogglePlayerIngame
 void UI_TogglePlayerIngame(int localClientNum)
 {
 	uiClientState_t	cs;
-	char	info[MAX_INFO_STRING];
-	int		team;
 
 	trap_GetClientState( &cs );
 
-	if (localClientNum == 0) {
-		trap_GetConfigString( CS_PLAYERS + cs.clientNums[localClientNum], info, MAX_INFO_STRING );
-
-		team = atoi( Info_ValueForKey( info, "t" ) );
-		if( team == TEAM_SPECTATOR ) {
-			// ZTM: FIXME: There is no way to know if client is hiding or just spectating.
-			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team auto\n" );
-		} else {
-			trap_Cmd_ExecuteText( EXEC_APPEND, "cmd team hide\n" );
-		}
-	} else if (cs.clientNums[localClientNum] == -1) {
+	if (cs.clientNums[localClientNum] == -1) {
 		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropin")) );
 	} else {
 		trap_Cmd_ExecuteText( EXEC_APPEND, va("%s\n", Com_LocalClientCvarName(localClientNum, "dropout")) );

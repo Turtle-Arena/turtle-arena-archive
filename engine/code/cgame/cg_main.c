@@ -767,6 +767,29 @@ void QDECL CG_NotifyPrintf( int localClientNum, const char *msg, ... ) {
 	trap_Print( text );
 }
 
+/*
+=================
+CG_NotifyBitsPrintf
+
+Only printed in notify area for players specified in localClientBits (and client console)
+=================
+*/
+void QDECL CG_NotifyBitsPrintf( int localClientBits, const char *msg, ... ) {
+	va_list		argptr;
+	char		text[1024];
+	int i;
+
+	va_start (argptr, msg);
+	Q_vsnprintf (text, sizeof(text), msg, argptr);
+	va_end (argptr);
+
+	for ( i = 0; i < CG_MaxSplitView(); i++ ) {
+		if ( localClientBits & ( 1 << i ) ) {
+			CG_NotifyPrintf( i, "%s", text );
+		}
+	}
+}
+
 void QDECL CG_DPrintf( const char *msg, ... ) {
 	va_list		argptr;
 	char		text[1024];

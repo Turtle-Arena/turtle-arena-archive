@@ -163,8 +163,8 @@ void trap_DropClient( int clientNum, const char *reason ) {
 	syscall( G_DROP_CLIENT, clientNum, reason );
 }
 
-void trap_SendServerCommand( int clientNum, const char *text ) {
-	syscall( G_SEND_SERVER_COMMAND, clientNum, text );
+void trap_SendServerCommandEx( int connectionNum, int localPlayerNum, const char *text ) {
+	syscall( G_SEND_SERVER_COMMAND, connectionNum, localPlayerNum, text );
 }
 
 void trap_SetConfigstring( int num, const char *string ) {

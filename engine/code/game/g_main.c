@@ -45,6 +45,7 @@ typedef struct {
 
 gentity_t		g_entities[MAX_GENTITIES];
 gclient_t		g_clients[MAX_CLIENTS];
+gconnection_t	g_connections[MAX_CLIENTS];
 
 vmCvar_t	g_gametype;
 vmCvar_t	g_dmflags;
@@ -286,7 +287,7 @@ Q_EXPORT intptr_t vmMain( int command, int arg0, int arg1, int arg2, int arg3, i
 		G_ShutdownGame( arg0 );
 		return 0;
 	case GAME_CLIENT_CONNECT:
-		return (intptr_t)ClientConnect( arg0, arg1, arg2 );
+		return (intptr_t)ClientConnect( arg0, arg1, arg2, arg3, arg4 );
 	case GAME_CLIENT_THINK:
 		ClientThink( arg0 );
 		return 0;
@@ -555,7 +556,7 @@ G_InitGame
 ============
 */
 void G_InitGame( int levelTime, int randomSeed, int restart ) {
-	int					i;
+	int					i, j;
 
 	G_DPrintf ("------- Game Initialization -------\n");
 	G_DPrintf ("gamename: %s\n", GAMEVERSION);
@@ -607,6 +608,18 @@ void G_InitGame( int levelTime, int randomSeed, int restart ) {
 	// initialize all entities for this game
 	memset( g_entities, 0, MAX_GENTITIES * sizeof(g_entities[0]) );
 	level.gentities = g_entities;
+
+	// initialize all client connections for this game
+	level.maxconnections = g_maxclients.integer;
+	memset( g_connections, 0, MAX_CLIENTS * sizeof(g_connections[0]) );
+	level.connections = g_connections;
+
+	// clear local player nums
+	for ( i=0 ; i<level.maxconnections ; i++ ) {
+		for ( j=0; j<MAX_SPLITVIEW ; j++ ) {
+			level.connections[i].localPlayerNums[j] = -1;
+		}
+	}
 
 	// initialize all clients for this game
 	level.maxclients = g_maxclients.integer;
@@ -813,7 +826,6 @@ void AddTournamentPlayer( void ) {
 		}
 		// never select the dedicated follow or scoreboard clients
 		if ( client->sess.spectatorState == SPECTATOR_SCOREBOARD || 
-			client->sess.spectatorState == SPECTATOR_LOCAL_HIDE || 
 			client->sess.spectatorClient < 0  ) {
 			continue;
 		}
@@ -1986,13 +1998,7 @@ PrintTeam
 ==================
 */
 void PrintTeam(int team, char *message) {
-	int i;
-
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if (level.clients[i].sess.sessionTeam != team)
-			continue;
-		trap_SendServerCommand( i, message );
-	}
+	G_TeamCommand( team, message );
 }
 
 /*

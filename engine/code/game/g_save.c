@@ -65,33 +65,6 @@ extern vmCvar_t g_spSkill;
 
 /*
 ============
-G_LocalClientNumForGentitiyNum
-============
-*/
-int G_LocalClientNumForGentitiyNum(int gentityNum) {
-	int i;
-	int mainClient;
-	
-	mainClient = g_entities[gentityNum].r.mainClientNum;
-
-	// Check if main client.
-	if (mainClient < 0 || mainClient >= level.maxclients)
-		return 0;
-	else
-	{
-		// Find the extra local client number.
-		for (i = 1; i < MAX_SPLITVIEW; i++) {
-			if (g_entities[mainClient].r.localClientNums[i-1] == gentityNum) {
-				return i;
-			}
-		}
-	}
-
-	return -1;
-}
-
-/*
-============
 G_SaveGame
 ============
 */
@@ -151,7 +124,7 @@ qboolean G_SaveGame(const char *savegame)
 		if (level.clients[i].ps.persistant[PERS_LIVES] < 1 && level.clients[i].ps.persistant[PERS_CONTINUES] < 1)
 			continue;
 
-		saveData.clients[client].localClientNum = G_LocalClientNumForGentitiyNum(i);
+		saveData.clients[client].localClientNum = level.clients[i].pers.localPlayerNum;
 		saveData.localClients |= (1<<saveData.clients[client].localClientNum);
 
 		// model/skin
@@ -276,7 +249,7 @@ void G_LoadGameClient(int gameClient)
 		return;
 	}
 
-	localClientNum = G_LocalClientNumForGentitiyNum(gameClient);
+	localClientNum = level.clients[gameClient].pers.localPlayerNum;
 
 	// Not a valid local client.
 	if (localClientNum < 0) {

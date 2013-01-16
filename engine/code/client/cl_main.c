@@ -1729,6 +1729,14 @@ void CL_DropOut( int localClientNum ) {
 	CL_AddReliableCommand(va("dropout%d", localClientNum+1), qfalse);
 }
 
+void CL_DropIn_f( void ) {
+	CL_DropIn(0);
+}
+
+void CL_DropOut_f( void ) {
+	CL_DropOut(0);
+}
+
 void CL_2DropIn_f( void ) {
 	CL_DropIn(1);
 }
@@ -2445,7 +2453,6 @@ void CL_CheckForResend( void ) {
 
 			Q_strncpyz( info, Cvar_InfoString( cl_userinfoFlags[i] ), sizeof( info ) );
 
-			// ZTM: FIXME: Do we need to set these for more than the first client?
 			Info_SetValueForKey( info, "protocol", va("%i", protocol ) );
 			Info_SetValueForKey( info, "qport", va("%i", port ) );
 			Info_SetValueForKey( info, "challenge", va("%i", clc.challenge ) );
@@ -2972,9 +2979,7 @@ CL_CheckUserinfo
 ==================
 */
 void CL_CheckUserinfo( void ) {
-#if CL_MAX_SPLITVIEW > 1
 	int i;
-#endif
 
 	// don't add reliable commands when not yet connected
 	if(clc.state < CA_CONNECTED)
@@ -2985,21 +2990,12 @@ void CL_CheckUserinfo( void ) {
 		return;
 
 	// send a reliable userinfo update if needed
-	if(cvar_modifiedFlags & CVAR_USERINFO)
-	{
-		cvar_modifiedFlags &= ~CVAR_USERINFO;
-		CL_AddReliableCommand(va("userinfo \"%s\"", Cvar_InfoString( CVAR_USERINFO ) ), qfalse);
-	}
-#if CL_MAX_SPLITVIEW > 1
-	for (i = 1; i < CL_MAX_SPLITVIEW; i++)
-	{
-		if(cvar_modifiedFlags & cl_userinfoFlags[i])
-		{
+	for(i = 0; i < CL_MAX_SPLITVIEW; i++) {
+		if(cvar_modifiedFlags & cl_userinfoFlags[i]) {
 			cvar_modifiedFlags &= ~cl_userinfoFlags[i];
 			CL_AddReliableCommand(va("userinfo%d \"%s\"", i+1, Cvar_InfoString( cl_userinfoFlags[i] ) ), qfalse);
 		}
 	}
-#endif
 }
 
 /*
@@ -3855,9 +3851,9 @@ void CL_Init( void ) {
 
 	// This is a protocol version number.
 #ifdef IOQ3ZTM // Default voip to off in client
-	cl_voip = Cvar_Get ("cl_voip", "0", CVAR_USERINFO | CVAR_ARCHIVE);
+	cl_voip = Cvar_Get ("cl_voip", "0", CVAR_USERINFO_ALL | CVAR_ARCHIVE);
 #else
-	cl_voip = Cvar_Get ("cl_voip", "1", CVAR_USERINFO | CVAR_ARCHIVE);
+	cl_voip = Cvar_Get ("cl_voip", "1", CVAR_USERINFO_ALL | CVAR_ARCHIVE);
 #endif
 	Cvar_CheckRange( cl_voip, 0, 1, qtrue );
 #endif
@@ -3867,6 +3863,8 @@ void CL_Init( void ) {
 	//
 	Cmd_AddCommand ("cmd", CL_ForwardToServer_f);
 #if CL_MAX_SPLITVIEW > 1
+	Cmd_AddCommand ("dropin", CL_DropIn_f);
+	Cmd_AddCommand ("dropout", CL_DropOut_f);
 	Cmd_AddCommand ("2dropin", CL_2DropIn_f);
 	Cmd_AddCommand ("2dropout", CL_2DropOut_f);
 #endif
@@ -3954,10 +3952,12 @@ void CL_Shutdown(char *finalmsg, qboolean disconnect, qboolean quit)
 	CL_Snd_Shutdown();
 
 	Cmd_RemoveCommand ("cmd");
-	for (i = 1; i < CL_MAX_SPLITVIEW; i++) {
+#if CL_MAX_SPLITVIEW > 1
+	for (i = 0; i < CL_MAX_SPLITVIEW; i++) {
 		Cmd_RemoveCommand (Com_LocalClientCvarName(i, "dropout"));
 		Cmd_RemoveCommand (Com_LocalClientCvarName(i, "dropin"));
 	}
+#endif
 	Cmd_RemoveCommand ("configstrings");
 	Cmd_RemoveCommand ("clientinfo");
 	Cmd_RemoveCommand ("snd_restart");

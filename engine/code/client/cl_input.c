@@ -1079,8 +1079,9 @@ During normal gameplay, a client packet will contain something like:
 4	clc.serverCommandSequence
 <optional reliable commands>
 1	clc_move or clc_moveNoDelta
+1	local client bits
 1	command count
-<count * usercmds>
+<local clients * count * usercmds>
 
 ===================
 */
@@ -1093,6 +1094,7 @@ void CL_WritePacket( void ) {
 	int			packetNum;
 	int			oldPacketNum;
 	int			count, key;
+	int			lc, localClientBits;
 
 	// don't send anything if playing back a demo
 	if ( clc.demoplaying || clc.state == CA_CINEMATIC ) {
@@ -1142,9 +1144,13 @@ void CL_WritePacket( void ) {
 #ifdef USE_VOIP
 	if (clc.voipOutgoingDataSize > 0)
 	{
-		if((clc.voipFlags & VOIP_SPATIAL) || Com_IsVoipTarget(clc.voipTargets, sizeof(clc.voipTargets), -1))
+		// ZTM: TODO: Allow each local player to use voip, or at least allow using voip when player 1 isn't present.
+		const int voipLocalClientNum = 0;
+
+		if(clc.clientNums[voipLocalClientNum] != -1 && ((clc.voipFlags & VOIP_SPATIAL) || Com_IsVoipTarget(clc.voipTargets, sizeof(clc.voipTargets), -1)))
 		{
 			MSG_WriteByte (&buf, clc_voip);
+			MSG_WriteByte (&buf, voipLocalClientNum);
 			MSG_WriteByte (&buf, clc.voipOutgoingGeneration);
 			MSG_WriteLong (&buf, clc.voipOutgoingSequence);
 			MSG_WriteByte (&buf, clc.voipOutgoingDataFrames);
@@ -1166,7 +1172,7 @@ void CL_WritePacket( void ) {
 				MSG_Bitstream (&fakemsg);
 				MSG_WriteLong (&fakemsg, clc.reliableAcknowledge);
 				MSG_WriteByte (&fakemsg, svc_voip);
-				MSG_WriteShort (&fakemsg, clc.clientNums[0]);
+				MSG_WriteShort (&fakemsg, clc.clientNums[voipLocalClientNum]);
 				MSG_WriteByte (&fakemsg, clc.voipOutgoingGeneration);
 				MSG_WriteLong (&fakemsg, clc.voipOutgoingSequence);
 				MSG_WriteByte (&fakemsg, clc.voipOutgoingDataFrames);
@@ -1203,6 +1209,18 @@ void CL_WritePacket( void ) {
 			MSG_WriteByte (&buf, clc_move);
 		}
 
+		// set bits
+		localClientBits = 0;
+		for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+			if ( cl.snap.valid && cl.snap.lcIndex[lc] == -1 ) {
+				continue;
+			}
+			localClientBits |= (1<<lc);
+		}
+
+		// write the local client bits
+		MSG_WriteByte( &buf, localClientBits );
+
 		// write the command count
 		MSG_WriteByte( &buf, count );
 
@@ -1211,48 +1229,20 @@ void CL_WritePacket( void ) {
 		// also use the last acknowledged server command in the key
 		key ^= MSG_HashKey(clc.serverCommands[ clc.serverCommandSequence & (MAX_RELIABLE_COMMANDS-1) ], 32);
 
-		// write all the commands, including the predicted command
-		for ( i = 0 ; i < count ; i++ ) {
-			j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
-			cmd = &cl.cmdss[0][j];
-			MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
-			oldcmd = cmd;
-		}
+		for (lc = 0; lc < MAX_SPLITVIEW; lc++) {
+			if (!(localClientBits & (1<<lc))) {
+				continue;
+			}
 
-#ifdef LEGACY_PROTOCOL
-		if (!clc.compat)
-#endif
-		{
-			int lc;
+			Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
+			oldcmd = &nullcmd;
 
-			for (lc = 1; lc < CL_MAX_SPLITVIEW; lc++) {
-				if (cl.snap.valid && cl.snap.lcIndex[lc] == -1) {
-					continue;
-				}
-
-				// begin a client move command
-				if ( cl_nodelta->integer || !cl.snap.valid || clc.demowaiting
-					|| clc.serverMessageSequence != cl.snap.messageNum ) {
-					MSG_WriteByte (&buf, clc_moveLocalNoDelta);
-				} else {
-					MSG_WriteByte (&buf, clc_moveLocal);
-				}
-
-				MSG_WriteByte (&buf, lc-1); // localClient-1
-
-				// write the command count
-				MSG_WriteByte( &buf, count );
-
-				Com_Memset( &nullcmd, 0, sizeof(nullcmd) );
-				oldcmd = &nullcmd;
-
-				// write all the commands, including the predicted command
-				for ( i = 0 ; i < count ; i++ ) {
-					j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
-					cmd = &cl.cmdss[lc][j];
-					MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
-					oldcmd = cmd;
-				}
+			// write all the commands, including the predicted command
+			for ( i = 0 ; i < count ; i++ ) {
+				j = (cl.cmdNumber - count + i + 1) & CMD_MASK;
+				cmd = &cl.cmdss[lc][j];
+				MSG_WriteDeltaUsercmdKey (&buf, key, oldcmd, cmd);
+				oldcmd = cmd;
 			}
 		}
 	}
