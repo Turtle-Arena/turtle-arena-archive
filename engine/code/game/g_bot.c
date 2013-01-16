@@ -333,7 +333,7 @@ int G_SelectRandomBotForAdd( int team ) {
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
 			}
-			if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
+			if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
 				continue;
 			}
 			if ( team >= 0 && cl->sess.sessionTeam != team ) {
@@ -356,7 +356,7 @@ int G_SelectRandomBotForAdd( int team ) {
 			if ( cl->pers.connected != CON_CONNECTED ) {
 				continue;
 			}
-			if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
+			if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
 				continue;
 			}
 			if ( team >= 0 && cl->sess.sessionTeam != team ) {
@@ -417,13 +417,13 @@ int G_RemoveRandomBot( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
+		if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
 			continue;
 		}
 		if ( team >= 0 && cl->sess.sessionTeam != team ) {
 			continue;
 		}
-		trap_Cmd_ExecuteText( EXEC_INSERT, va("kicknum %d\n", cl->ps.clientNum) );
+		trap_Cmd_ExecuteText( EXEC_INSERT, va("kicknum %d\n", i) );
 		return qtrue;
 	}
 	return qfalse;
@@ -444,7 +444,7 @@ int G_CountHumanPlayers( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		if ( g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT ) {
+		if ( g_entities[i].r.svFlags & SVF_BOT ) {
 			continue;
 		}
 		if ( team >= 0 && cl->sess.sessionTeam != team ) {
@@ -470,7 +470,7 @@ int G_CountBotPlayers( int team ) {
 		if ( cl->pers.connected != CON_CONNECTED ) {
 			continue;
 		}
-		if ( !(g_entities[cl->ps.clientNum].r.svFlags & SVF_BOT) ) {
+		if ( !(g_entities[i].r.svFlags & SVF_BOT) ) {
 			continue;
 		}
 		if ( team >= 0 && cl->sess.sessionTeam != team ) {
@@ -674,7 +674,6 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	int				clientNum;
 	int				t;
 	char			*botinfo;
-	gentity_t		*bot;
 	char			*key;
 	char			*s;
 	char			*botname;
@@ -747,7 +746,8 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	Info_SetValueForKey( userinfo, "name", botname );
 	Info_SetValueForKey( userinfo, "rate", "25000" );
 	Info_SetValueForKey( userinfo, "snaps", "20" );
-	Info_SetValueForKey( userinfo, "skill", va("%1.2f", skill) );
+	Info_SetValueForKey( userinfo, "skill", va("%.2f", skill) );
+	Info_SetValueForKey( userinfo, "team", team );
 
 	if ( skill >= 1 && skill < 2 ) {
 		Info_SetValueForKey( userinfo, "handicap", "50" );
@@ -814,15 +814,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 		trap_BotFreeClient(clientNum);
 		return;
 	}
-
-	// initialize the bot settings
-	Info_SetValueForKey( userinfo, "characterfile", Info_ValueForKey( botinfo, "aifile" ) );
-	Info_SetValueForKey( userinfo, "skill", va( "%4.2f", skill ) );
-	Info_SetValueForKey( userinfo, "team", team );
-
-	bot = &g_entities[ clientNum ];
-	bot->r.svFlags |= SVF_BOT;
-	bot->inuse = qtrue;
+	Info_SetValueForKey( userinfo, "characterfile", s );
 
 	// register the userinfo
 	trap_SetUserinfo( clientNum, userinfo );
