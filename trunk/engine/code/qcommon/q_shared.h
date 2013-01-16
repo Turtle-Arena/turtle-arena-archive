@@ -951,9 +951,9 @@ default values.
 #define CVAR_SERVER_CREATED	0x0800	// cvar was created by a server the client connected to.
 #define CVAR_VM_CREATED		0x1000	// cvar was created exclusively in one of the VMs.
 #define CVAR_PROTECTED		0x2000	// prevent modifying this var from VMs or the server
-#define CVAR_USERINFO2		0x4000 // userinfo for second local client
-#define CVAR_USERINFO3		0x8000 // userinfo for third local client
-#define CVAR_USERINFO4		0x10000 // userinfo for fourth local client
+#define CVAR_USERINFO2		0x4000 // userinfo for second local player
+#define CVAR_USERINFO3		0x8000 // userinfo for third local player
+#define CVAR_USERINFO4		0x10000 // userinfo for fourth local player
 // These flags are only returned by the Cvar_Flags() function
 #define CVAR_MODIFIED		0x40000000	// Cvar was modified
 #define CVAR_NONEXISTENT	0x80000000	// Cvar doesn't exist.
@@ -1334,7 +1334,7 @@ typedef struct playerState_s {
 #define PATHMODE_BACK 3
 #endif
 
-// Max local clients for splitscreen
+// Max players for splitscreen
 // Also see CL_MAX_SPLITVIEW in client.h for lowering max supported splitview
 // clients in client/renderer, while still keep network and mod compatibility.
 #define MAX_SPLITVIEW 4

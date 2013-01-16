@@ -153,18 +153,49 @@ int G_StringIndex( char *name ) {
 
 /*
 ================
+trap_SendServerCommand
+
+Broadcasts a command to only a specific client.
+
+ZTM: NOTE: Function name kept to reduce source code changes.
+================
+*/
+void trap_SendServerCommand( int clientNum, char *cmd ) {
+	if ( clientNum == -1 ) {
+		trap_SendServerCommandEx( -1, -1, cmd );
+	} else {
+		trap_SendServerCommandEx( level.clients[clientNum].pers.connectionNum, level.clients[clientNum].pers.localPlayerNum, cmd );
+	}
+}
+
+
+/*
+================
 G_TeamCommand
 
 Broadcasts a command to only a specific team
 ================
 */
 void G_TeamCommand( team_t team, char *cmd ) {
-	int		i;
+	gconnection_t	*connection;
+	int				i, j, clientNum;
 
-	for ( i = 0 ; i < level.maxclients ; i++ ) {
-		if ( level.clients[i].pers.connected == CON_CONNECTED ) {
-			if ( level.clients[i].sess.sessionTeam == team ) {
-				trap_SendServerCommand( i, va("%s", cmd ));
+	for ( i = 0 ; i < level.maxconnections ; i++ ) {
+		connection = &level.connections[i];
+
+		for ( j = 0; j < MAX_SPLITVIEW; j++ ) {
+			clientNum = connection->localPlayerNums[j];
+
+			if ( level.clients[clientNum].sess.sessionTeam == team )
+				break;			
+		}
+
+		if ( j < MAX_SPLITVIEW ) {
+			// Include team when there are multiple local players
+			if ( connection->numLocalPlayers > 1 ) {
+				trap_SendServerCommandEx( i, -1, va( "[%s] %s", TeamName( team ), cmd ) );
+			} else {
+				trap_SendServerCommand( i, cmd );
 			}
 		}
 	}

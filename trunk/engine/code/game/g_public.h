@@ -50,10 +50,7 @@ Suite 120, Rockville, Maryland 20850 USA.
 #define	SVF_USE_CURRENT_ORIGIN	0x00000080	// entity->r.currentOrigin instead of entity->s.origin
 											// for link position (missiles and movers)
 #define SVF_SINGLECLIENT		0x00000100	// only send to a single client (entityShared_t->singleClient)
-#define SVF_NOSERVERINFO		0x00000200	// don't send CS_SERVERINFO updates to this client
-											// so that it can be updated for ping tools without
-											// lagging clients
-#define SVF_NOTSINGLECLIENT		0x00000800	// send entity to everyone but one client
+#define SVF_NOTSINGLECLIENT		0x00000200	// send entity to everyone but one client
 											// (entityShared_t->singleClient)
 
 
@@ -86,10 +83,6 @@ typedef struct {
 	// ent->r.ownerNum == passEntityNum	(don't interact with your own missiles)
 	// entity[ent->r.ownerNum].r.ownerNum == passEntityNum	(don't interact with other missiles from owner)
 	int			ownerNum;
-
-	// Variables for game read access.
-	int			mainClientNum; // If not -1 this client is splitscreen with mainClientNum
-	int			localClientNums[MAX_SPLITVIEW-1]; // Extra local clients for splitscreen.
 } entityShared_t;
 
 
@@ -179,7 +172,7 @@ typedef enum {
 	G_DROP_CLIENT,		// ( int clientNum, const char *reason );
 	// kick a client off the server with a message
 
-	G_SEND_SERVER_COMMAND,	// ( int clientNum, const char *fmt, ... );
+	G_SEND_SERVER_COMMAND,	// ( int connectionNum, int localPlayerNum, const char *text );
 	// reliably sends a command string to be interpreted by the given
 	// client.  If clientNum is -1, it will be sent to all clients
 
@@ -444,7 +437,7 @@ typedef enum {
 
 	GAME_SHUTDOWN,	// (void);
 
-	GAME_CLIENT_CONNECT,	// ( int clientNum, qboolean firstTime, qboolean isBot );
+	GAME_CLIENT_CONNECT,	// ( int clientNum, qboolean firstTime, qboolean isBot, int connectionNum, int localPlayerNum );
 	// return NULL if the client is allowed to connect, otherwise return
 	// a text string with the reason for denial
 
@@ -454,7 +447,7 @@ typedef enum {
 
 	GAME_CLIENT_DISCONNECT,			// ( int clientNum );
 
-	GAME_CLIENT_COMMAND,			// ( int clientNum );
+	GAME_CLIENT_COMMAND,			// ( int connectionNum );
 
 	GAME_CLIENT_THINK,				// ( int clientNum );
 

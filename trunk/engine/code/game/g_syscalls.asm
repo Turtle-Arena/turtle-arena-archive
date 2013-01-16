@@ -58,7 +58,7 @@ equ trap_PC_SourceFileAndLine			-57
 
 equ	trap_LocateGameData					-101
 equ	trap_DropClient						-102
-equ	trap_SendServerCommand				-103
+equ	trap_SendServerCommandEx			-103
 equ	trap_SetConfigstring				-104
 equ	trap_GetConfigstring				-105
 equ	trap_GetUserinfo					-106

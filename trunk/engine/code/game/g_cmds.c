@@ -625,7 +625,6 @@ void SetTeam( gentity_t *ent, char *s ) {
 	spectatorState_t	specState;
 	int					specClient;
 	int					teamLeader;
-	int					i;
 
 	//
 	// see what change is requested
@@ -656,21 +655,6 @@ void SetTeam( gentity_t *ent, char *s ) {
 	{
 		team = TEAM_SPECTATOR;
 		specState = SPECTATOR_FREE;
-	} else if ( !Q_stricmp( s, "hide" ) || !Q_stricmp( s, "h" ) ) {
-		team = TEAM_SPECTATOR;
-		specState = SPECTATOR_LOCAL_HIDE;
-
-		// check if client has any splitscreen clients.
-		for ( i = 0; i < MAX_SPLITVIEW-1; i++ ) {
-			if ( ent->r.localClientNums[i] != -1 ) {
-				break;
-			}
-		}
-
-		// Don't allow hiding viewport / fake disconnect if there are no splitscreen players.
-		if ( i == MAX_SPLITVIEW-1 ) {
-			return;
-		}
 	} else if ( g_gametype.integer >= GT_TEAM
 #ifdef TA_SP // SP_BOSS
 			|| (g_gametype.integer == GT_SINGLE_PLAYER && (ent->r.svFlags & SVF_BOT))
@@ -735,12 +719,6 @@ void SetTeam( gentity_t *ent, char *s ) {
 	// execute the team change
 	//
 
-	// main client in splitscreen allow to fake drop out, as it currently not possible to drop main and keep splitscreen players
-	if ( ent->client->pers.connected == CON_CONNECTED && specState == SPECTATOR_LOCAL_HIDE ) {
-		ClientDisconnect( clientNum );
-		ent->client->pers.connected = CON_CONNECTED;
-	}
-
 	// if the player was dead leave the body
 	if ( client->ps.stats[STAT_HEALTH] <= 0 ) {
 		CopyToBodyQue(ent);
@@ -748,7 +726,7 @@ void SetTeam( gentity_t *ent, char *s ) {
 
 	// he starts at 'base'
 	client->pers.teamState.state = TEAM_BEGIN;
-	if ( oldTeam != TEAM_SPECTATOR && specState != SPECTATOR_LOCAL_HIDE ) {
+	if ( oldTeam != TEAM_SPECTATOR ) {
 		// Kill him (makes sure he loses flags, etc)
 		ent->flags &= ~FL_GODMODE;
 		ent->client->ps.stats[STAT_HEALTH] = ent->health = 0;
@@ -902,7 +880,6 @@ Cmd_Follow_f
 void Cmd_Follow_f( gentity_t *ent ) {
 	int		i;
 	char	arg[MAX_TOKEN_CHARS];
-	int		lc;
 
 	if ( trap_Argc() != 2 ) {
 		if ( ent->client->sess.spectatorState == SPECTATOR_FOLLOW ) {
@@ -936,22 +913,9 @@ void Cmd_Follow_f( gentity_t *ent ) {
 	}
 #endif
 
-	// don't follow one of their local client
-	if (ent->r.mainClientNum == -1) {
-		for (lc = 0; lc < MAX_SPLITVIEW-1; ++lc) {
-			if (i == ent->r.localClientNums[lc]) {
-				return;
-			}
-		}
-	} else {
-		if (i == ent->r.mainClientNum) {
-			return;
-		}
-		for (lc = 0; lc < MAX_SPLITVIEW-1; ++lc) {
-			if (i == level.gentities[ent->r.mainClientNum].r.localClientNums[lc]) {
-				return;
-			}
-		}
+	// don't follow one of their local players
+	if ( level.clients[ i ].pers.connectionNum == ent->client->pers.connectionNum ) {
+		return;
 	}
 
 	// if they are playing a tournement game, count as a loss
@@ -987,7 +951,6 @@ Cmd_FollowCycle_f
 void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 	int		clientnum;
 	int		original;
-	int		lc;
 
 	// if they are playing a tournement game, count as a loss
 	if ( (g_gametype.integer == GT_TOURNAMENT )
@@ -1068,28 +1031,9 @@ void Cmd_FollowCycle_f( gentity_t *ent, int dir ) {
 		}
 #endif
 
-		// don't follow one of their local client
-		if (ent->r.mainClientNum == -1) {
-			for (lc = 0; lc < MAX_SPLITVIEW-1; ++lc) {
-				if (clientnum == ent->r.localClientNums[lc]) {
-					break;
-				}
-			}
-			if (lc != MAX_SPLITVIEW-1) {
-				continue;
-			}
-		} else {
-			if (clientnum == ent->r.mainClientNum) {
-				continue;
-			}
-			for (lc = 0; lc < MAX_SPLITVIEW-1; ++lc) {
-				if (clientnum == level.gentities[ent->r.mainClientNum].r.localClientNums[lc]) {
-					break;
-				}
-			}
-			if (lc != MAX_SPLITVIEW-1) {
-				continue;
-			}
+		// don't follow one of their local players
+		if ( level.clients[ clientnum ].pers.connectionNum == ent->client->pers.connectionNum ) {
+			continue;
 		}
 
 		// this is good, we can use it
@@ -1108,63 +1052,43 @@ G_Say
 ==================
 */
 
-static void G_SayTo( gentity_t *ent, gentity_t *other, int mode, int color, const char *name, const char *message ) {
-	const char *cmd;
-
+static qboolean G_SayTo( gentity_t *ent, gentity_t *other, int mode ) {
 	if (!other) {
-		return;
+		return qfalse;
 	}
 	if (!other->inuse) {
-		return;
+		return qfalse;
 	}
 	if (!other->client) {
-		return;
+		return qfalse;
 	}
 	if ( other->client->pers.connected != CON_CONNECTED ) {
-		return;
+		return qfalse;
 	}
 	if ( mode == SAY_TEAM  && !OnSameTeam(ent, other) ) {
-		return;
+		return qfalse;
 	}
 	// no chatting to players in tournements
 	if ( (g_gametype.integer == GT_TOURNAMENT )
 		&& other->client->sess.sessionTeam == TEAM_FREE
 		&& ent->client->sess.sessionTeam != TEAM_FREE ) {
-		return;
+		return qfalse;
 	}
 
-	switch ( mode ) {
-		case SAY_ALL:
-		default:
-			// don't send global chats to splitscreen clients
-			if ( other->r.mainClientNum != -1 ) {
-				return;
-			}
-
-			cmd = "chat";
-			break;
-		case SAY_TELL:
-			cmd = "tell";
-			break;
-		case SAY_TEAM:
-			cmd = "tchat";
-			break;
-	}
-
-	trap_SendServerCommand( other-g_entities, va("%s \"%s%c%c%s\"", 
-		cmd, name, Q_COLOR_ESCAPE, color, message));
+	return qtrue;
 }
 
 #define EC		"\x19"
 
 void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) {
-	int			j;
+	int			i, j;
 	gentity_t	*other;
 	int			color;
 	char		name[64];
 	// don't let text be too long for malicious reasons
 	char		text[MAX_SAY_TEXT];
 	char		location[64];
+	char		*cmd, *str;
 
 	if ( g_gametype.integer < GT_TEAM && mode == SAY_TEAM ) {
 		mode = SAY_ALL;
@@ -1176,6 +1100,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		G_LogPrintf( "say: %s: %s\n", ent->client->pers.netname, chatText );
 		Com_sprintf (name, sizeof(name), "%s%c%c"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_GREEN;
+		cmd = "chat";
 		break;
 	case SAY_TEAM:
 		G_LogPrintf( "sayteam: %s: %s\n", ent->client->pers.netname, chatText );
@@ -1186,6 +1111,7 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 			Com_sprintf (name, sizeof(name), EC"(%s%c%c"EC")"EC": ", 
 				ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_CYAN;
+		cmd = "tchat";
 		break;
 	case SAY_TELL:
 		if (target && target->inuse && target->client && g_gametype.integer >= GT_TEAM &&
@@ -1195,13 +1121,20 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		else
 			Com_sprintf (name, sizeof(name), EC"[%s%c%c"EC"]"EC": ", ent->client->pers.netname, Q_COLOR_ESCAPE, COLOR_WHITE );
 		color = COLOR_MAGENTA;
+		cmd = "tell";
 		break;
 	}
 
 	Q_strncpyz( text, chatText, sizeof(text) );
 
+	str = va( "%s \"%s%c%c%s\"", cmd, name, Q_COLOR_ESCAPE, color, text );
+
 	if ( target ) {
-		G_SayTo( ent, target, mode, color, name, text );
+		if ( !G_SayTo( ent, target, mode ) ) {
+			return;
+		}
+
+		trap_SendServerCommand( target-g_entities, str );
 		return;
 	}
 
@@ -1210,11 +1143,28 @@ void G_Say( gentity_t *ent, gentity_t *target, int mode, const char *chatText ) 
 		G_Printf( "%s%s\n", name, text);
 	}
 
-	// send it to all the apropriate clients
-	for (j = 0; j < level.maxclients; j++) {
-		other = &g_entities[j];
+	// send to everyone on team
+	if ( mode == SAY_TEAM ) {
+		G_TeamCommand( ent->client->sess.sessionTeam, str );
+		return;
+	}
 
-		G_SayTo( ent, other, mode, color, name, text );
+	// send it to all the apropriate clients
+	for (i = 0; i < level.maxconnections; i++) {
+		for (  j = 0; j < MAX_SPLITVIEW; j++ ) {
+			if ( level.connections[i].localPlayerNums[j] == -1 )
+				continue;
+
+			other = &g_entities[level.connections[i].localPlayerNums[j]];
+
+			if ( !G_SayTo( ent, other, mode ) ) {
+				break;
+			}
+		}
+
+		if ( j == MAX_SPLITVIEW ) {
+			trap_SendServerCommandEx( i, -1, str );
+		}
 	}
 }
 
@@ -2039,38 +1989,52 @@ void Cmd_DropFlag_f( gentity_t *ent ) {
 ClientCommand
 =================
 */
-void ClientCommand( int clientNum ) {
+void ClientCommand( int connectionNum ) {
 	gentity_t *ent;
+	gconnection_t *connection;
+	int		clientNum;
 	char	*cmd;
 	char	buf[MAX_TOKEN_CHARS];
 
-	ent = g_entities + clientNum;
-	if ( !ent->client ) {
-		return;		// not fully in game yet
-	}
+	connection = &level.connections[connectionNum];
 
 	trap_Argv( 0, buf, sizeof( buf ) );
 
 	cmd = &buf[0];
 
-	// Commands for extra local clients.
+	// Commands for extra local players.
 	// 2team, 2give, 2teamtask, ...
 	if (cmd[0] >= '2' && cmd[0] <= '0'+MAX_SPLITVIEW) {
-		int lc;
+		int num;
 
-		lc = cmd[0]-'2';
+		num = cmd[0]-'1';
 
 		cmd++;
 
-		if (ent->r.localClientNums[lc] == -1) {
-			//G_Printf("Local client %d not connected.\n", lc+1);
+		if ( connection->localPlayerNums[num] == -1 ) {
+			//G_Printf("Client %d's local player %d not connected.\n", connectionNum, lc+1);
 			return;
 		}
 
-		ent = g_entities + ent->r.localClientNums[lc];
-		if ( !ent->client ) {
-			return;		// not fully in game yet
+		clientNum = connection->localPlayerNums[num];
+	} else {
+		int i;
+
+		for ( i = 0; i < MAX_SPLITVIEW; i++ ) {
+			if ( connection->localPlayerNums[i] != -1 ) {
+				clientNum = connection->localPlayerNums[i];
+				break;
+			}
 		}
+		if ( i == MAX_SPLITVIEW ) {
+			//G_Printf("No Local player connected from connection %d!\n", connectionNum);
+			return;
+		}
+	}
+
+	ent = g_entities + clientNum;
+	if ( !ent->client ) {
+		return;		// not fully in game yet
 	}
 
 	if ( ent->client->pers.connected != CON_CONNECTED ) {

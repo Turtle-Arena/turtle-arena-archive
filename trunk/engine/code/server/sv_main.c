@@ -146,21 +146,8 @@ The given command will be transmitted to the client, and is guaranteed to
 not have future snapshot_t executed before it is executed
 ======================
 */
-void SV_AddServerCommand( client_t *client, const char *cmd ) {
+void SV_AddServerCommand( client_t *client, int localPlayerNum, const char *cmd ) {
 	int		index, i;
-	int 	lc = 0;
-
-	// Send command to main client, but prepend it with "lc# "
-	if (client->mainClient) {
-		for (i = 0; i < MAX_SPLITVIEW-1; i++) {
-			if (client->mainClient->localClients[i] == client) {
-				lc = i+1;
-				break;
-			}
-		}
-
-		client = client->mainClient;
-	}
 
 	// this is very ugly but it's also a waste to for instance send multiple config string updates
 	// for the same config string index in one snapshot
@@ -183,8 +170,8 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 			Com_Printf( "cmd %5d: %s\n", i, client->reliableCommands[ i & (MAX_RELIABLE_COMMANDS-1) ] );
 		}
 
-		if (lc != 0) {
-			Com_Printf( "cmd %5d: lc%d %s\n", i, lc, cmd );
+		if ( client->netchan.remoteAddress.type != NA_BOT && localPlayerNum >= 0 && localPlayerNum < MAX_SPLITVIEW ) {
+			Com_Printf( "cmd %5d: lc%d %s\n", i, localPlayerNum, cmd );
 		} else {
 			Com_Printf( "cmd %5d: %s\n", i, cmd );
 		}
@@ -194,8 +181,8 @@ void SV_AddServerCommand( client_t *client, const char *cmd ) {
 	}
 	index = client->reliableSequence & ( MAX_RELIABLE_COMMANDS - 1 );
 
-	if (lc != 0) {
-		Com_sprintf(client->reliableCommands[ index ], sizeof( client->reliableCommands[ index ] ), "lc%d %s", lc, cmd);
+	if ( client->netchan.remoteAddress.type != NA_BOT && localPlayerNum >= 0 && localPlayerNum < MAX_SPLITVIEW ) {
+		Com_sprintf( client->reliableCommands[ index ], sizeof( client->reliableCommands[ index ] ), "lc%d %s", localPlayerNum, cmd );
 	} else {
 		Q_strncpyz( client->reliableCommands[ index ], cmd, sizeof( client->reliableCommands[ index ] ) );
 	}
@@ -211,11 +198,10 @@ the client game module: "cp", "print", "chat", etc
 A NULL client will broadcast to all clients
 =================
 */
-void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
+void QDECL SV_SendServerCommand(client_t *cl, int localPlayerNum, const char *fmt, ...) {
 	va_list		argptr;
 	byte		message[MAX_MSGLEN];
 	client_t	*client;
-	qboolean	globalPrint;
 	int			j;
 	
 	va_start (argptr,fmt);
@@ -231,34 +217,18 @@ void QDECL SV_SendServerCommand(client_t *cl, const char *fmt, ...) {
 	}
 
 	if ( cl != NULL ) {
-		SV_AddServerCommand( cl, (char *)message );
+		SV_AddServerCommand( cl, localPlayerNum, (char *)message );
 		return;
 	}
 
-	// hack so client knows message is for all local clients.
-	globalPrint = !strncmp( (char *)message, "print", 5 );
-
-	if ( globalPrint ) {
-		int len = strlen( (const char *)message );
-
-		memmove( &message[1], &message[0], (size_t)( len - 1 ) );
-		message[0] = 'g'; // "gprint"
-		message[len+1] = 0;
-	}
-
 	// hack to echo broadcast prints to console
-	if ( com_dedicated->integer && globalPrint ) {
+	if ( com_dedicated->integer && !strncmp( (char *)message, "print", 5 ) ) {
 		Com_Printf ("broadcast: %s\n", SV_ExpandNewlines((char *)message) );
 	}
 
 	// send the data to all relevent clients
 	for (j = 0, client = svs.clients; j < sv_maxclients->integer ; j++, client++) {
-		// Don't sent print for extra local clients
-		if ( client->mainClient && globalPrint ) {
-			continue;
-		}
-
-		SV_AddServerCommand( client, (char *)message );
+		SV_AddServerCommand( client, -1, (char *)message );
 	}
 }
 
@@ -656,6 +626,7 @@ static void SVC_Status( netadr_t from ) {
 	char	status[MAX_MSGLEN];
 	int		i;
 	client_t	*cl;
+	player_t	*pl;
 	playerState_t	*ps;
 	int		statusLength;
 	int		playerLength;
@@ -699,15 +670,18 @@ static void SVC_Status( netadr_t from ) {
 	statusLength = 0;
 
 	for (i=0 ; i < sv_maxclients->integer ; i++) {
-		cl = &svs.clients[i];
+		pl = &svs.players[i];
+		if (!pl->inUse)
+			continue;
+		cl = pl->client;
 		if ( cl->state >= CS_CONNECTED ) {
 			ps = SV_GameClientNum( i );
 #ifdef IOQ3ZTM // Addon for G_HUMANPLAYERS // Tell which players are bots (hopefully, without breaking compatiblity... tested/working in Q3:Team Arena)
 			Com_sprintf (player, sizeof(player), "%i %i \"%s\"%s\n", 
-				ps->persistant[PERS_SCORE], cl->ping, cl->name, (cl->netchan.remoteAddress.type == NA_BOT) ? " [bot]" : "");
+				ps->persistant[PERS_SCORE], cl->ping, pl->name, (cl->netchan.remoteAddress.type == NA_BOT) ? " [bot]" : "");
 #else
 			Com_sprintf (player, sizeof(player), "%i %i \"%s\"\n", 
-				ps->persistant[PERS_SCORE], cl->ping, cl->name);
+				ps->persistant[PERS_SCORE], cl->ping, pl->name);
 #endif
 			playerLength = strlen(player);
 			if (statusLength + playerLength >= sizeof(status) ) {
@@ -789,9 +763,9 @@ void SVC_Info( netadr_t from ) {
 	count = humans = 0;
 	for ( i = sv_privateClients->integer ; i < sv_maxclients->integer ; i++ ) {
 		if ( svs.clients[i].state >= CS_CONNECTED ) {
-			count++;
+			count += SV_ClientNumLocalPlayers( &svs.clients[i] );
 			if (svs.clients[i].netchan.remoteAddress.type != NA_BOT) {
-				humans++;
+				humans += SV_ClientNumLocalPlayers( &svs.clients[i] );
 			}
 		}
 	}
@@ -982,7 +956,6 @@ SV_PacketEvent
 */
 void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 	int			i;
-	int			j;
 	client_t	*cl;
 	int			qport;
 
@@ -1011,10 +984,6 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 		if (cl->netchan.qport != qport) {
 			continue;
 		}
-		// ignore splitscreen players, they have the same qport as their main client and never send any packets.
-		if (cl->mainClient) {
-			continue;
-		}
 
 		// the IP port can't be used to differentiate them, because
 		// some address translating routers periodically change UDP
@@ -1031,13 +1000,6 @@ void SV_PacketEvent( netadr_t from, msg_t *msg ) {
 			// reliable message, but they don't do any other processing
 			if (cl->state != CS_ZOMBIE) {
 				cl->lastPacketTime = svs.time;	// don't timeout
-
-				for (j = 0; j < MAX_SPLITVIEW-1; j++) {
-					if (cl->localClients[j]) {
-						cl->localClients[j]->lastPacketTime = svs.time;	// don't timeout
-					}
-				}
-
 				SV_ExecuteClientMessage( cl, msg );
 			}
 		}
@@ -1063,19 +1025,11 @@ static void SV_CalcPings( void ) {
 	for (i=0 ; i < sv_maxclients->integer ; i++) {
 		cl = &svs.clients[i];
 
-		// Splitscreen client's ping is set by main client.
-		if (cl->mainClient) {
-			continue;
-		}
 		if ( cl->state != CS_ACTIVE ) {
 			cl->ping = 999;
 			continue;
 		}
-		if ( !cl->gentity ) {
-			cl->ping = 999;
-			continue;
-		}
-		if ( cl->gentity->r.svFlags & SVF_BOT ) {
+		if ( cl->netchan.remoteAddress.type == NA_BOT ) {
 			cl->ping = 0;
 			continue;
 		}
@@ -1100,16 +1054,12 @@ static void SV_CalcPings( void ) {
 		}
 
 		// let the game dll know about the ping
-		ps = SV_GameClientNum( i );
-		ps->ping = cl->ping;
-
-		// Splitscreen clients' ping is set by main client.
-		for ( j = 0 ; j < MAX_SPLITVIEW-1 ; j++ ) {
-			if (!cl->localClients[j]) {
+		for ( j = 0 ; j < MAX_SPLITVIEW ; j++ ) {
+			if ( !cl->localPlayers[j] ) {
 				continue;
 			}
 
-			ps = SV_GameClientNum( cl->localClients[j] - svs.clients );
+			ps = SV_GameClientNum( cl->localPlayers[j] - svs.players );
 			ps->ping = cl->ping;
 		}
 	}
@@ -1181,10 +1131,6 @@ static qboolean SV_CheckPaused( void ) {
 	// only pause if there is just a single client connected
 	count = 0;
 	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++) {
-		if (cl->mainClient) {
-			// Don't count extra local clients (allows pausing in splitscreen).
-			continue;
-		}
 		if ( cl->state >= CS_CONNECTED && cl->netchan.remoteAddress.type != NA_BOT ) {
 			count++;
 		}

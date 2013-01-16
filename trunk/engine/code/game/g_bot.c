@@ -669,6 +669,8 @@ G_AddBot
 ===============
 */
 static void G_AddBot( const char *name, float skill, const char *team, int delay, char *altname) {
+	int				value;
+	int				connectionNum;
 	int				clientNum;
 	int				t;
 	char			*botinfo;
@@ -682,12 +684,16 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	qboolean		modelSet;
 
 	// have the server allocate a client slot
-	clientNum = trap_BotAllocateClient();
-	if ( clientNum == -1 ) {
+	value = trap_BotAllocateClient();
+	if ( value == -1 ) {
 		G_Printf( S_COLOR_RED "Unable to add bot. All player slots are in use.\n" );
 		G_Printf( S_COLOR_RED "Start server with more 'open' slots (or check setting of sv_maxclients cvar).\n" );
 		return;
 	}
+
+	// get connection and client numbers
+	connectionNum = value & 0xFFFF;
+	clientNum = value >> 16;
 
 	// set default team
 	if( !team || !*team ) {
@@ -822,7 +828,7 @@ static void G_AddBot( const char *name, float skill, const char *team, int delay
 	trap_SetUserinfo( clientNum, userinfo );
 
 	// have it connect to the game as a normal client
-	if ( ClientConnect( clientNum, qtrue, qtrue ) ) {
+	if ( ClientConnect( clientNum, qtrue, qtrue, connectionNum, 0 ) ) {
 		return;
 	}
 

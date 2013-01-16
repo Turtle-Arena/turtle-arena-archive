@@ -134,9 +134,22 @@ typedef struct netchan_buffer_s {
 	struct netchan_buffer_s *next;
 } netchan_buffer_t;
 
+typedef struct player_s {
+	qboolean		inUse;
+	qboolean		inWorld;
+
+	char			userinfo[MAX_INFO_STRING];		// name, etc
+
+	usercmd_t		lastUsercmd;
+	sharedEntity_t	*gentity;			// SV_GentityNum(playerNum)
+	char			name[MAX_NAME_LENGTH];			// extracted from userinfo, high bits masked
+
+	struct client_s	*client;
+} player_t;
+
 typedef struct client_s {
 	clientState_t	state;
-	char			userinfo[MAX_INFO_STRING];		// name, etc
+	player_t		*localPlayers[MAX_SPLITVIEW];
 
 	char			reliableCommands[MAX_RELIABLE_COMMANDS][MAX_STRING_CHARS];
 	int				reliableSequence;		// last added reliable message, not necesarily sent or acknowledged yet
@@ -147,12 +160,9 @@ typedef struct client_s {
 	int				gamestateMessageNum;	// netchan->outgoingSequence of gamestate
 	int				challenge;
 
-	usercmd_t		lastUsercmd;
 	int				lastMessageNum;		// for delta compression
 	int				lastClientCommand;	// reliable client message sequence
 	char			lastClientCommandString[MAX_STRING_CHARS];
-	sharedEntity_t	*gentity;			// SV_GentityNum(clientnum)
-	char			name[MAX_NAME_LENGTH];			// extracted from userinfo, high bits masked
 
 	// downloading
 	char			downloadName[MAX_QPATH]; // if not empty string, we are downloading
@@ -202,9 +212,6 @@ typedef struct client_s {
 	qboolean		compat;
 #endif
 
-	struct client_s *mainClient;
-	struct client_s *localClients[MAX_SPLITVIEW-1]; // If any are not NULL this client is splitscreen main client,
-										// localClients are their splitscreen players.
 } client_t;
 
 //=============================================================================
@@ -238,6 +245,7 @@ typedef struct {
 	int			snapFlagServerBit;			// ^= SNAPFLAG_SERVERCOUNT every SV_SpawnServer()
 
 	client_t	*clients;					// [sv_maxclients->integer];
+	player_t	*players;					// [sv_maxclients->integer]; // a single client can have multiple players
 	int			numSnapshotEntities;		// sv_maxclients->integer*PACKET_BACKUP*MAX_PACKET_ENTITIES
 	int			nextSnapshotEntities;		// next snapshotEntities to use
 	entityState_t	*snapshotEntities;		// [numSnapshotEntities]
@@ -308,7 +316,7 @@ extern	cvar_t	*sv_voip;
 // sv_main.c
 //
 void SV_FinalMessage (char *message);
-void QDECL SV_SendServerCommand( client_t *cl, const char *fmt, ...) __attribute__ ((format (printf, 2, 3)));
+void QDECL SV_SendServerCommand( client_t *cl, int localPlayerNum, const char *fmt, ...) __attribute__ ((format (printf, 3, 4)));
 
 
 void SV_AddOperatorCommands (void);
@@ -343,18 +351,25 @@ void SV_GetChallenge(netadr_t from);
 void SV_DirectConnect( netadr_t from );
 
 void SV_ExecuteClientMessage( client_t *cl, msg_t *msg );
-void SV_UserinfoChanged( client_t *cl );
+void SV_UserinfoChanged( player_t *cl );
 #ifdef TA_GAME_MODELS
 void SV_UpdateUserinfos(void);
 #endif
 
-void SV_SetupClientEntity( client_t *client );
-void SV_ClientEnterWorld( client_t *client, usercmd_t *cmd );
-void SV_FreeClient(client_t *client);
+void SV_SetupPlayerEntity( player_t *player );
+void SV_PlayerEnterWorld( player_t *player, usercmd_t *cmd );
+void SV_FreePlayer( player_t *player );
+void SV_DropPlayer( player_t *drop, const char *reason );
+void SV_FreeClient( client_t *client );
 void SV_DropClient( client_t *drop, const char *reason );
 
+const char *SV_ClientName( client_t *client );
+int SV_ClientNumLocalPlayers( client_t *client );
+int SV_ClientNumLocalPlayersInWorld( client_t *client );
+int	SV_LocalPlayerNum( player_t *player );
+
 void SV_ExecuteClientCommand( client_t *cl, const char *s, qboolean clientOK );
-void SV_ClientThink (client_t *cl, usercmd_t *cmd);
+void SV_PlayerThink( player_t *player, usercmd_t *cmd );
 
 int SV_WriteDownloadToClient(client_t *cl , msg_t *msg);
 int SV_SendDownloadMessages(void);
@@ -369,7 +384,7 @@ void SV_Heartbeat_f( void );
 //
 // sv_snapshot.c
 //
-void SV_AddServerCommand( client_t *client, const char *cmd );
+void SV_AddServerCommand( client_t *client, int localPlayerNum, const char *cmd );
 void SV_UpdateServerCommandsToClient( client_t *client, msg_t *msg );
 void SV_WriteFrameToClient (client_t *client, msg_t *msg);
 void SV_SendMessageToClient( msg_t *msg, client_t *client );

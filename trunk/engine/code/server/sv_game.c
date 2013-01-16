@@ -88,30 +88,30 @@ SV_GameSendServerCommand
 Sends a command string to a client
 ===============
 */
-void SV_GameSendServerCommand( int clientNum, const char *text ) {
+void SV_GameSendServerCommand( int clientNum, int localPlayerNum, const char *text ) {
 	if ( clientNum == -1 ) {
-		SV_SendServerCommand( NULL, "%s", text );
+		SV_SendServerCommand( NULL, -1, "%s", text );
 	} else {
 		if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
 			return;
 		}
-		SV_SendServerCommand( svs.clients + clientNum, "%s", text );	
+		SV_SendServerCommand( svs.clients + clientNum, localPlayerNum, "%s", text );	
 	}
 }
 
 
 /*
 ===============
-SV_GameDropClient
+SV_GameDropPlayer
 
-Disconnects the client with a message
+Disconnects the player with a message
 ===============
 */
-void SV_GameDropClient( int clientNum, const char *reason ) {
-	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
+void SV_GameDropPlayer( int playerNum, const char *reason ) {
+	if ( playerNum < 0 || playerNum >= sv_maxclients->integer ) {
 		return;
 	}
-	SV_DropClient( svs.clients + clientNum, reason );	
+	SV_DropPlayer( svs.players + playerNum, reason );	
 }
 
 
@@ -281,11 +281,11 @@ SV_GetUsercmd
 
 ===============
 */
-void SV_GetUsercmd( int clientNum, usercmd_t *cmd ) {
-	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
-		Com_Error( ERR_DROP, "SV_GetUsercmd: bad clientNum:%i", clientNum );
+void SV_GetUsercmd( int playerNum, usercmd_t *cmd ) {
+	if ( playerNum < 0 || playerNum >= sv_maxclients->integer ) {
+		Com_Error( ERR_DROP, "SV_GetUsercmd: bad playerNum:%i", playerNum );
 	}
-	*cmd = svs.clients[clientNum].lastUsercmd;
+	*cmd = svs.players[playerNum].lastUsercmd;
 }
 
 //==============================================
@@ -454,10 +454,10 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 		SV_LocateGameData( VMA(1), args[2], args[3], VMA(4), args[5] );
 		return 0;
 	case G_DROP_CLIENT:
-		SV_GameDropClient( args[1], VMA(2) );
+		SV_GameDropPlayer( args[1], VMA(2) );
 		return 0;
 	case G_SEND_SERVER_COMMAND:
-		SV_GameSendServerCommand( args[1], VMA(2) );
+		SV_GameSendServerCommand( args[1], args[2], VMA(3) );
 		return 0;
 	case G_LINKENTITY:
 		SV_LinkEntity( VMA(1) );
@@ -586,7 +586,7 @@ intptr_t SV_GameSystemCalls( intptr_t *args ) {
 	case BOTLIB_GET_CONSOLE_MESSAGE:
 		return SV_BotGetConsoleMessage( args[1], VMA(2), args[3] );
 	case BOTLIB_USER_COMMAND:
-		SV_ClientThink( &svs.clients[args[1]], VMA(2) );
+		SV_PlayerThink( &svs.players[args[1]], VMA(2) );
 		return 0;
 
 	case BOTLIB_AAS_BBOX_AREAS:
@@ -988,7 +988,7 @@ static void SV_InitGameVM( qboolean restart ) {
 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=522
 	//   now done before GAME_INIT call
 	for ( i = 0 ; i < sv_maxclients->integer ; i++ ) {
-		svs.clients[i].gentity = NULL;
+		svs.players[i].gentity = NULL;
 	}
 	
 	// use the current msec count for a random seed

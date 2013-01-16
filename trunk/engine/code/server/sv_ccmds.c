@@ -47,8 +47,8 @@ SV_GetPlayerByHandle
 Returns the player with player id or name from Cmd_Argv(1)
 ==================
 */
-static client_t *SV_GetPlayerByHandle( void ) {
-	client_t	*cl;
+static player_t *SV_GetPlayerByHandle( void ) {
+	player_t	*player;
 	int			i;
 	char		*s;
 	char		cleanName[64];
@@ -75,26 +75,26 @@ static client_t *SV_GetPlayerByHandle( void ) {
 		// Check for numeric playerid match
 		if(plid >= 0 && plid < sv_maxclients->integer)
 		{
-			cl = &svs.clients[plid];
+			player = &svs.players[plid];
 			
-			if(cl->state)
-				return cl;
+			if(player->inUse)
+				return player;
 		}
 	}
 
 	// check for a name match
-	for ( i=0, cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++ ) {
-		if ( !cl->state ) {
+	for ( i=0, player=svs.players ; i < sv_maxclients->integer ; i++,player++ ) {
+		if ( !player->inUse ) {
 			continue;
 		}
-		if ( !Q_stricmp( cl->name, s ) ) {
-			return cl;
+		if ( !Q_stricmp( player->name, s ) ) {
+			return player;
 		}
 
-		Q_strncpyz( cleanName, cl->name, sizeof(cleanName) );
+		Q_strncpyz( cleanName, player->name, sizeof(cleanName) );
 		Q_CleanStr( cleanName );
 		if ( !Q_stricmp( cleanName, s ) ) {
-			return cl;
+			return player;
 		}
 	}
 
@@ -110,8 +110,8 @@ SV_GetPlayerByNum
 Returns the player with idnum from Cmd_Argv(1)
 ==================
 */
-static client_t *SV_GetPlayerByNum( void ) {
-	client_t	*cl;
+static player_t *SV_GetPlayerByNum( void ) {
+	player_t	*player;
 	int			i;
 	int			idnum;
 	char		*s;
@@ -140,12 +140,12 @@ static client_t *SV_GetPlayerByNum( void ) {
 		return NULL;
 	}
 
-	cl = &svs.clients[idnum];
-	if ( !cl->state ) {
+	player = &svs.players[idnum];
+	if ( !player->inUse ) {
 		Com_Printf( "Client %i is not active\n", idnum );
 		return NULL;
 	}
-	return cl;
+	return player;
 }
 
 //=========================================================
@@ -222,8 +222,9 @@ This allows fair starts with variable load times.
 ================
 */
 static void SV_MapRestart_f( void ) {
-	int			i;
+	int			i, j;
 	client_t	*client;
+	player_t	*player;
 	char		*denied;
 	qboolean	isBot;
 	int			delay;
@@ -321,31 +322,38 @@ static void SV_MapRestart_f( void ) {
 		}
 
 		// add the map_restart command
-		SV_AddServerCommand( client, "map_restart\n" );
+		SV_AddServerCommand( client, -1, "map_restart\n" );
 
-		// setup entity before connecting
-		SV_SetupClientEntity(&svs.clients[i]);
+		for ( j = 0; j < MAX_SPLITVIEW; j++ ) {
+			player = client->localPlayers[j];
 
-		// connect the client again, without the firstTime flag
-		denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, i, qfalse, isBot ) );
-		if ( denied ) {
-			// this generally shouldn't happen, because the client
-			// was connected before the level change
-			SV_DropClient( client, denied );
-			Com_Printf( "SV_MapRestart_f(%d): dropped client %i - denied!\n", delay, i );
-			continue;
+			if ( !player )
+				continue;
+
+			// setup entity before connecting
+			SV_SetupPlayerEntity( player );
+
+			// connect the client again, without the firstTime flag
+			denied = VM_ExplicitArgPtr( gvm, VM_Call( gvm, GAME_CLIENT_CONNECT, player - svs.players, qfalse, isBot, client - svs.clients, j ) );
+			if ( denied ) {
+				// this generally shouldn't happen, because the player
+				// was connected before the level change
+				SV_DropPlayer( player, denied );
+				Com_Printf( "SV_MapRestart_f(%d): dropped client %i - denied!\n", delay, i );
+				continue;
+			}
+
+			if(client->state == CS_ACTIVE)
+				SV_PlayerEnterWorld( player, &player->lastUsercmd );
+			else
+			{
+				// If we don't reset player->lastUsercmd and are restarting during map load,
+				// the client will hang because we'll use the last Usercmd from the previous map,
+				// which is wrong obviously.
+				SV_PlayerEnterWorld( player, NULL );
+			}
 		}
-
-		if(client->state == CS_ACTIVE)
-			SV_ClientEnterWorld(client, &client->lastUsercmd);
-		else
-		{
-			// If we don't reset client->lastUsercmd and are restarting during map load,
-			// the client will hang because we'll use the last Usercmd from the previous map,
-			// which is wrong obviously.
-			SV_ClientEnterWorld(client, NULL);
-		}
-	}	
+	}
 
 	// run another frame to allow things to look at all the players
 	VM_Call (gvm, GAME_RUN_FRAME, sv.time);
@@ -363,7 +371,7 @@ Kick a user off of the server
 ==================
 */
 static void SV_Kick_f( void ) {
-	client_t	*cl;
+	player_t	*player;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -376,17 +384,17 @@ static void SV_Kick_f( void ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByHandle();
-	if ( !cl ) {
+	player = SV_GetPlayerByHandle();
+	if ( !player ) {
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if( player->client->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		Com_Printf("Cannot kick host player\n");
 		return;
 	}
 
-	SV_DropClient( cl, "was kicked" );
-	cl->lastPacketTime = svs.time;	// in case there is a funny zombie
+	SV_DropPlayer( player, "was kicked" );
+	player->client->lastPacketTime = svs.time;	// in case there is a funny zombie
 }
 
 /*
@@ -458,7 +466,7 @@ Kick a user off of the server
 ==================
 */
 static void SV_KickNum_f( void ) {
-	client_t	*cl;
+	player_t	*player;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -471,17 +479,17 @@ static void SV_KickNum_f( void ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByNum();
-	if ( !cl ) {
+	player = SV_GetPlayerByNum();
+	if ( !player ) {
 		return;
 	}
-	if( cl->netchan.remoteAddress.type == NA_LOOPBACK ) {
+	if( player->client->netchan.remoteAddress.type == NA_LOOPBACK ) {
 		Com_Printf("Cannot kick host player\n");
 		return;
 	}
 
-	SV_DropClient( cl, "was kicked" );
-	cl->lastPacketTime = svs.time;	// in case there is a funny zombie
+	SV_DropPlayer( player, "was kicked" );
+	player->client->lastPacketTime = svs.time;	// in case there is a funny zombie
 }
 
 /*
@@ -725,19 +733,19 @@ static void SV_AddBanToList(qboolean isexception)
 	}
 	else
 	{
-		client_t *cl;
+		player_t *player;
 		
 		// client num.
 		
-		cl = SV_GetPlayerByNum();
+		player = SV_GetPlayerByNum();
 
-		if(!cl)
+		if(!player)
 		{
 			Com_Printf("Error: Playernum %s does not exist.\n", Cmd_Argv(1));
 			return;
 		}
 		
-		ip = cl->netchan.remoteAddress;
+		ip = player->client->netchan.remoteAddress;
 		
 		if(argc == 3)
 		{
@@ -1007,6 +1015,7 @@ SV_Status_f
 */
 static void SV_Status_f( void ) {
 	int			i, j, l;
+	player_t	*player;
 	client_t	*cl;
 	playerState_t	*ps;
 	const char		*s;
@@ -1022,8 +1031,11 @@ static void SV_Status_f( void ) {
 
 	Com_Printf ("num score ping name            lastmsg address               qport rate\n");
 	Com_Printf ("--- ----- ---- --------------- ------- --------------------- ----- -----\n");
-	for (i=0,cl=svs.clients ; i < sv_maxclients->integer ; i++,cl++)
+	for (i=0,player=svs.players ; i < sv_maxclients->integer ; i++,player++)
 	{
+		if (!player->inUse)
+			continue;
+		cl = player->client;
 		if (!cl->state)
 			continue;
 		Com_Printf ("%3i ", i);
@@ -1040,12 +1052,12 @@ static void SV_Status_f( void ) {
 			Com_Printf ("%4i ", ping);
 		}
 
-		Com_Printf ("%s", cl->name);
+		Com_Printf ("%s", player->name);
 		
 		// TTimo adding a ^7 to reset the color
 		// NOTE: colored names in status breaks the padding (WONTFIX)
 		Com_Printf ("^7");
-		l = 14 - strlen(cl->name);
+		l = 14 - strlen(player->name);
 		j = 0;
 		
 		do
@@ -1105,7 +1117,7 @@ static void SV_ConSay_f(void) {
 
 	strcat(text, p);
 
-	SV_SendServerCommand(NULL, "chat \"%s\"", text);
+	SV_SendServerCommand(NULL, -1, "chat \"%s\"", text);
 }
 
 /*
@@ -1116,7 +1128,7 @@ SV_ConTell_f
 static void SV_ConTell_f(void) {
 	char	*p;
 	char	text[1024];
-	client_t	*cl;
+	player_t	*player;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1129,8 +1141,8 @@ static void SV_ConTell_f(void) {
 		return;
 	}
 
-	cl = SV_GetPlayerByNum();
-	if ( !cl ) {
+	player = SV_GetPlayerByNum();
+	if ( !player ) {
 		return;
 	}
 
@@ -1144,7 +1156,7 @@ static void SV_ConTell_f(void) {
 
 	strcat(text, p);
 
-	SV_SendServerCommand(cl, "chat \"%s\"", text);
+	SV_SendServerCommand( player->client, SV_LocalPlayerNum( player ), "chat \"%s\"", text );
 }
 
 
@@ -1206,7 +1218,7 @@ Examine all a users info strings
 ===========
 */
 static void SV_DumpUser_f( void ) {
-	client_t	*cl;
+	player_t	*player;
 
 	// make sure server is running
 	if ( !com_sv_running->integer ) {
@@ -1219,14 +1231,14 @@ static void SV_DumpUser_f( void ) {
 		return;
 	}
 
-	cl = SV_GetPlayerByHandle();
-	if ( !cl ) {
+	player = SV_GetPlayerByHandle();
+	if ( !player ) {
 		return;
 	}
 
 	Com_Printf( "userinfo\n" );
 	Com_Printf( "--------\n" );
-	Info_Print( cl->userinfo );
+	Info_Print( player->userinfo );
 }
 
 

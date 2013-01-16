@@ -55,8 +55,9 @@ SV_BotAllocateClient
 ==================
 */
 int SV_BotAllocateClient(void) {
-	int			i, j;
+	int			i;
 	client_t	*cl;
+	player_t	*player;
 
 	// find a client slot
 	for ( i = 0, cl = svs.clients; i < sv_maxclients->integer; i++, cl++ ) {
@@ -69,22 +70,29 @@ int SV_BotAllocateClient(void) {
 		return -1;
 	}
 
+	// find a player slot
+	for ( i = 0, player = svs.players; i < sv_maxclients->integer; i++, player++ ) {
+		if ( !player->inUse ) {
+			break;
+		}
+	}
+
+	if ( i == sv_maxclients->integer ) {
+		return -1;
+	}
+
+	player->inUse = qtrue;
+	player->client = cl;
+
 	cl->state = CS_ACTIVE;
+	cl->localPlayers[0] = player;
 	cl->lastPacketTime = svs.time;
 	cl->netchan.remoteAddress.type = NA_BOT;
 	cl->rate = 16384;
 
-	// Not an extra splitscreen client.
-	cl->mainClient = NULL;
+	SV_SetupPlayerEntity( player );
 
-	// No extra splitscreen clients.
-	for (j = 0; j < MAX_SPLITVIEW-1; j++) {
-		cl->localClients[j] = NULL;
-	}
-
-	SV_SetupClientEntity(cl);
-
-	return i;
+	return ( (int)( cl - svs.clients ) & 0xFFFF ) | ( (int)( player - svs.players ) << 16 );
 }
 
 /*
@@ -92,17 +100,24 @@ int SV_BotAllocateClient(void) {
 SV_BotFreeClient
 ==================
 */
-void SV_BotFreeClient( int clientNum ) {
-	client_t	*cl;
+void SV_BotFreeClient( int playerNum ) {
+	client_t	*client;
+	player_t	*player;
 
-	if ( clientNum < 0 || clientNum >= sv_maxclients->integer ) {
-		Com_Error( ERR_DROP, "SV_BotFreeClient: bad clientNum: %i", clientNum );
+	if ( playerNum < 0 || playerNum >= sv_maxclients->integer ) {
+		Com_Error( ERR_DROP, "SV_BotFreeClient: bad playerNum: %i", playerNum );
 	}
-	cl = &svs.clients[clientNum];
-	cl->state = CS_FREE;
-	cl->name[0] = 0;
-	if ( cl->gentity ) {
-		cl->gentity->r.svFlags &= ~SVF_BOT;
+
+	player = &svs.players[playerNum];
+
+	client = player->client;
+	client->state = CS_FREE;
+	client->localPlayers[0] = NULL;
+
+	player->client = NULL;
+	player->name[0] = 0;
+	if ( player->gentity ) {
+		player->gentity->r.svFlags &= ~SVF_BOT;
 	}
 }
 
@@ -130,12 +145,12 @@ void BotDrawDebugPolygons(void (*drawPoly)(int color, int numPoints, float *poin
 		if (!bot_highlightarea) bot_highlightarea = Cvar_Get("bot_highlightarea", "0", 0);
 		//
 		parm0 = 0;
-		if (svs.clients[0].lastUsercmd.buttons & BUTTON_ATTACK) parm0 |= 1;
+		if (svs.players[0].lastUsercmd.buttons & BUTTON_ATTACK) parm0 |= 1;
 		if (bot_reachability->integer) parm0 |= 2;
 		if (bot_groundonly->integer) parm0 |= 4;
 		botlib_export->BotLibVarSet("bot_highlightarea", bot_highlightarea->string);
-		botlib_export->Test(parm0, NULL, svs.clients[0].gentity->r.currentOrigin, 
-			svs.clients[0].gentity->r.currentAngles);
+		botlib_export->Test(parm0, NULL, svs.players[0].gentity->r.currentOrigin, 
+			svs.players[0].gentity->r.currentAngles);
 	} //end if
 	//draw all debug polys
 	for (i = 0; i < bot_maxdebugpolys; i++) {
@@ -441,11 +456,30 @@ static void BotImport_DebugLineShow(int line, vec3_t start, vec3_t end, int colo
 
 /*
 ==================
+SV_ClientForPlayerNum
+
+ClientNum is for players array and we want client_t
+==================
+*/
+client_t *SV_ClientForPlayerNum( int playerNum ) {
+	if ( playerNum < 0 || playerNum >= sv_maxclients->integer )
+		return NULL;
+
+	return svs.players[playerNum].client;
+}
+
+/*
+==================
 SV_BotClientCommand
 ==================
 */
-static void BotClientCommand( int client, char *command ) {
-	SV_ExecuteClientCommand( &svs.clients[client], command, qtrue );
+static void BotClientCommand( int playerNum, char *command ) {
+	client_t *client = SV_ClientForPlayerNum( playerNum );
+
+	if ( !client )
+		return;
+
+	SV_ExecuteClientCommand( client, command, qtrue );
 }
 
 /*
@@ -602,7 +636,11 @@ int SV_BotGetConsoleMessage( int client, char *buf, int size )
 	client_t	*cl;
 	int			index;
 
-	cl = &svs.clients[client];
+	cl = SV_ClientForPlayerNum( client );
+
+	if ( !cl )
+		return qfalse;
+
 	cl->lastPacketTime = svs.time;
 
 	if ( cl->reliableAcknowledge == cl->reliableSequence ) {
@@ -626,12 +664,16 @@ int SV_BotGetConsoleMessage( int client, char *buf, int size )
 EntityInPVS
 ==================
 */
-int EntityInPVS( int client, int entityNum ) {
+int EntityInPVS( int playerNum, int entityNum ) {
 	client_t			*cl;
 	clientSnapshot_t	*frame;
 	int					i;
 
-	cl = &svs.clients[client];
+	cl = SV_ClientForPlayerNum( playerNum );
+
+	if ( !cl )
+		return qfalse;
+
 	frame = &cl->frames[cl->netchan.outgoingSequence & PACKET_MASK];
 	for ( i = 0; i < frame->num_entities; i++ )	{
 		if ( svs.snapshotEntities[(frame->first_entity + i) % svs.numSnapshotEntities].number == entityNum ) {
@@ -647,11 +689,15 @@ int EntityInPVS( int client, int entityNum ) {
 SV_BotGetSnapshotEntity
 ==================
 */
-int SV_BotGetSnapshotEntity( int client, int sequence ) {
-	client_t			*cl;
+int SV_BotGetSnapshotEntity( int playerNum, int sequence ) {
+	client_t *cl;
 	clientSnapshot_t	*frame;
 
-	cl = &svs.clients[client];
+	cl = SV_ClientForPlayerNum( playerNum );
+
+	if ( !cl )
+		return -1;
+
 	frame = &cl->frames[cl->netchan.outgoingSequence & PACKET_MASK];
 	if (sequence < 0 || sequence >= frame->num_entities) {
 		return -1;

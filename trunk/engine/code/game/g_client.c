@@ -1098,7 +1098,7 @@ void ClientUserinfoChanged( int clientNum ) {
 #ifdef TA_SP
 	// Override names in main game and arcade mode.
 	if (g_singlePlayer.integer && !(ent->r.svFlags & SVF_BOT)) {
-		Info_SetValueForKey(userinfo, "name", va("Player %d", G_LocalClientNumForGentitiyNum(clientNum)+1));
+		Info_SetValueForKey( userinfo, "name", va( "Player %d", client->pers.localPlayerNum + 1 ) );
 	}
 #endif
 
@@ -1332,49 +1332,55 @@ to the server machine, but qfalse on map changes and tournement
 restarts.
 ============
 */
-char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
+char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot, int connectionNum, int localPlayerNum ) {
 	char		*value;
 //	char		*areabits;
 	gclient_t	*client;
 	char		userinfo[MAX_INFO_STRING];
 	gentity_t	*ent;
+	qboolean	firstConnectionPlayer;
 
 	ent = &g_entities[ clientNum ];
 
 	trap_GetUserinfo( clientNum, userinfo, sizeof( userinfo ) );
 
- 	// IP filtering
- 	// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
- 	// recommanding PB based IP / GUID banning, the builtin system is pretty limited
- 	// check to see if they are on the banned IP list
-	value = Info_ValueForKey (userinfo, "ip");
-	if ( G_FilterPacket( value ) ) {
-		return "You are banned from this server.";
-	}
+	// Check if it's the first player on the client (i.e. not a splitscreen player)
+	firstConnectionPlayer = ( level.connections[connectionNum].numLocalPlayers == 0 );
 
-  // we don't check password for bots and local client
-  // NOTE: local client <-> "ip" "localhost"
-  //   this means this client is not running in our current process
-	if ( !isBot && (strcmp(value, "localhost") != 0)) {
-		// check for a password
-		value = Info_ValueForKey (userinfo, "password");
-		if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
-			strcmp( g_password.string, value) != 0) {
-			return "Invalid password";
+	if ( firstConnectionPlayer ) {
+		// IP filtering
+		// https://zerowing.idsoftware.com/bugzilla/show_bug.cgi?id=500
+		// recommanding PB based IP / GUID banning, the builtin system is pretty limited
+		// check to see if they are on the banned IP list
+		value = Info_ValueForKey (userinfo, "ip");
+		if ( G_FilterPacket( value ) ) {
+			return "You are banned from this server.";
 		}
-	}
-
+ 
+		// we don't check password for bots and local client
+		// NOTE: local client <-> "ip" "localhost"
+		//   this means this client is not running in our current process
+		if ( !isBot && (strcmp(value, "localhost") != 0) ) {
+			// check for a password
+			value = Info_ValueForKey (userinfo, "password");
+			if ( g_password.string[0] && Q_stricmp( g_password.string, "none" ) &&
+				strcmp( g_password.string, value) != 0) {
+				return "Invalid password";
+			}
+		}
+	} else {
 #ifdef TA_SP
-	// Don't allow extra splitscreen clients in arcade mode.
-	if (g_singlePlayer.integer && g_gametype.integer != GT_SINGLE_PLAYER && ent->r.mainClientNum != -1) {
-		return "Splitscreen not allowed in arcade mode.";
-	}
+		// Don't allow extra splitscreen players in arcade mode.
+		if ( g_singlePlayer.integer && g_gametype.integer != GT_SINGLE_PLAYER ) {
+			return "Splitscreen not allowed in arcade mode.";
+		}
 #else
-	// Don't allow extra splitscreen clients in single player.
-	if (g_singlePlayer.integer && ent->r.mainClientNum != -1) {
-		return "Splitscreen not allowed in single player.";
-	}
+		// Don't allow splitscreen players in single player.
+		if ( g_singlePlayer.integer ) {
+			return "Splitscreen not allowed in single player.";
+		}
 #endif
+ 	}
 
 	// if a player reconnects quickly after a disconnect, the client disconnect may never be called, thus flag can get lost in the ether
 	if (ent->inuse) {
@@ -1391,6 +1397,12 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	memset( client, 0, sizeof(*client) );
 
 	client->pers.connected = CON_CONNECTING;
+
+	// update client connection info
+	level.connections[connectionNum].numLocalPlayers++;
+	level.connections[connectionNum].localPlayerNums[localPlayerNum] = clientNum;
+	client->pers.connectionNum = connectionNum;
+	client->pers.localPlayerNum = localPlayerNum;
 
 	// read or initialize the session data
 	if ( firstTime || level.newSession ) {
@@ -1414,15 +1426,13 @@ char *ClientConnect( int clientNum, qboolean firstTime, qboolean isBot ) {
 	ClientUserinfoChanged( clientNum );
 
 	// don't do the "xxx connected" messages if they were caried over from previous level
-	if ( firstTime ) {
+	// or if they're an extra local player
+	if ( firstTime && firstConnectionPlayer ) {
 #ifdef TA_SP
     	// If it's single player don't add message.
 		if (!g_singlePlayer.integer)
 #endif
-		// Only show for main client.
-		if (ent->r.mainClientNum == -1) {
-			trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
-		}
+		trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " connected\n\"", client->pers.netname) );
 
 #ifdef IOQ3ZTM
 		// show entered the game message
@@ -1539,8 +1549,7 @@ void ClientBegin( int clientNum ) {
 		if ( g_gametype.integer != GT_TOURNAMENT  )
 #endif
 		{
-			if (ent->r.mainClientNum != -1) {
-				// Extra local clients show a different message.
+			if ( level.connections[client->pers.connectionNum].numLocalPlayers > 1 ) {
 				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " dropped in\n\"", client->pers.netname) );
 			} else {
 				trap_SendServerCommand( -1, va("print \"%s" S_COLOR_WHITE " entered the game\n\"", client->pers.netname) );
@@ -2050,6 +2059,11 @@ void ClientDisconnect( int clientNum ) {
 	if ( ent->r.svFlags & SVF_BOT ) {
 		BotAIShutdownClient( clientNum, qfalse );
 	}
+
+	// clear player connection info
+	level.connections[ent->client->pers.connectionNum].numLocalPlayers--;
+	level.connections[ent->client->pers.connectionNum].localPlayerNums[ent->client->pers.localPlayerNum] = -1;
+	ent->client->pers.localPlayerNum = ent->client->pers.connectionNum = -1;
 }
 
 #ifdef TA_SP
