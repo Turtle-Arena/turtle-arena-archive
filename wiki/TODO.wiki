@@ -4,8 +4,6 @@
 
 = engine =
 == Weapons (and attacking) ==
-  * TODO: Add a option to weapon group info to hold a weapon upside-down? (affect rendering and damaging)
-
   * TODO: Add attack movement flags? Stop, cut speed in half, double speed, turn right?, etc.
 
   * TODO: Remove code for tag_hand_primary/secondary and just use tag_weapon/flag ?
@@ -27,8 +25,6 @@
     * sp_complete and sp_gameover
 
 == UI ==
-  * TODO: Remake UI/HUD using Quake III: Team Arena menu scripting?
-
   * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
 
 == Teamplay ==
@@ -103,11 +99,9 @@
     * Special icon on HUD?
     * Automaticly name splitscreen players (mainClientName[spilt#]) and don't allow custom names?
 
-  * TODO: Remove say, say_team, and tell for splitscreen clients?
-
   * Splitview mode for viewing multiple players online
     * Need someway to tell server which clients we want in splitview.
-      * Probably a use a command, list clientNums, client names, or teams. (Like "splitview 1 john blue" for three splitview clients)
+      * Probably use a command, list clientNums, client names, or teams. (Like "splitview 1 john blue" for three splitview clients)
         * If teams are supported add a command for changing to next team member? Or automaticly cycle through team members?
 
 == Objects ==
