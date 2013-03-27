@@ -25,7 +25,7 @@
     * sp_complete and sp_gameover
 
 == UI ==
-  * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161
+  * TODO: Update MISSIONPACK ui? http://svn.icculus.org/quake3/trunk/code/q3_ui/ui_video.c?r1=390&r2=1161&pathrev=2398
 
 == Teamplay ==
   * TODO: Per-team flag skins? (Team icon is on flag skin)
