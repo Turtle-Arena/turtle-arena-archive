@@ -1,2 +1,0 @@
-#!/bin/sh
-wminput -d -c turtlearena &\turtlearena && killall wminput

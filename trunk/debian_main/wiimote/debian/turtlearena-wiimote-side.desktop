@@ -1,9 +1,0 @@
-
-[Desktop Entry]
-Name=Turtle Arena (Wiimote Sideways)
-Comment=3D Third-Person Arena Combat Game
-Exec=turtlearena-wiimote-side
-Terminal=false
-Icon=turtlearena128
-Type=Application
-Categories=Game;ArcadeGame;

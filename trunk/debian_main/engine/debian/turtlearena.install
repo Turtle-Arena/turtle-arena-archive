@@ -1,4 +1,0 @@
-debian/tmp/turtlearena usr/games
-debian/turtlearena.desktop usr/share/applications
-debian/turtlearena128.png usr/share/icons/hicolor/128x128/apps
-debian/turtlearena32.xpm usr/share/pixmaps
