@@ -1,0 +1,91 @@
+Turtle Arena credits.
+
+== Credits ==
+* id software			(For making and releasing Quake III Arena's source code)
+* ioquake3 devoplers	(For improving, fixing, and cleaning up Quake 3's source code)
+* ioSTVEF				(For "noise" and "random" waveform keywords, and RF_FORCE_ENT_ALPHA render flag)
+* OpenArena				(For botfiles and shaders)
+* Xreal project			(For homing rockets and shootable rockets)
+* Smokin' Guns			(For some breakable respawn code and a minor animation time fix)
+* Chris "Lakitu7" Schwarz (Fixed up freetype code and use TTF in console)
+* ZEQ2-lite				(For cel shading tcGen code)
+* M+ Outline Fonts		(For fonts)
+* zero-project			(For music)
+* Neil Crowe			(For music)
+* Zack Middleton
+
+
+== License ==
+Most of the Turtle Arena source code is licensed under the GNU General Public
+	License version 3 or later, with some additional terms.
+	See CODE_LICENSE file for license text.
+
+Most of the Turtle Arena data is licensed under the the Creative Commons
+	Attribution-ShareAlike 3.0, see	COPYRIGHTS file for details.
+	See CC-BY-SA-3.0 files for license text.
+
+
+== Data ==
+See COPYRIGHTS file for data per-file copyrights.
+
+
+== Code ==
+Turtle Arena uses code directly or based on the following.
+
+=== Mixed ===
+ioq3 is mostly GPLv2 or later, but also includes code under other licenses.
+
+* ioquake3: http://ioquake3.org/
+
+=== GPLv2 or later ===
+* ioSTVEF (IOSTVEF): http://thilo.kickchat.com/efport-progress/
+** Support for "noise" and "random" waveform keywords
+** RF_FORCE_ENT_ALPHA, allows items/weapons to fad out when dispearing.
+
+* OpenArena (OPENARENA): http://openarena.ws
+** (TA_BLOOM) OpenArena's bloom effect, disabled by default. (r_bloom 1 to enable)
+
+* Xreal (XREAL): http://www.xreal-project.net/
+** Homing rockets (Xreal svn r2785)
+** Fired rockets and homing-rockets can be destroyed (Xreal svn r > 2785)
+
+* Smokin' Guns (SMOKIN_GUNS): http://www.smokin-guns.net/
+** Fixed animation timing based on PM_AnimLength from Smokin' Guns' bg_pmove.c
+** Used some of Smokin' Guns' breakable respawn code
+
+* Chris "Lakitu7" Schwarz: http://projects.mercenariesguild.net/projects/mgclient
+** (USE_FREETYPE) Lakitu7-freetype+consolecustomize.patch  (Not all of the patch was used, modified some parts, ...)
+
+* ZEQ2-lite (ZEQ2_CEL): http://zeq2.com/lite/
+** Cel shading texture coord generation code, "tcGen cel".
+
+=== Other ===
+Code based on guides, etc.
+
+* The Reaction Factory: http://www.rfactory.org/
+** The Dark Conjunction (via rfactory): http://tdc.planetquake.gamespy.com/news.htm
+
+* "inolan.com", basic breakable brush code: http://www.quake3hut.co.uk/q3coding/Breakable%20Glass.htm
+
+
+== Software used ==
+Software used to create the Turtle Arena data files.
+
+=== Text ===
+* Code::Blocks
+* gedit (GNOME Text Editor)
+* Microsoft Windows Notepad and Wordpad
+
+=== 3D Models ===
+* Wings3D
+* Misfit Model 3D
+
+=== 2D Graphics ===
+* GIMP
+* Inkscape
+
+== Maps ==
+* GtkRadiant
+* NetRadiant
+* GenSurf
+

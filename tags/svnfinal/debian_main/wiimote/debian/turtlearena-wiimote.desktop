@@ -1,0 +1,9 @@
+
+[Desktop Entry]
+Name=Turtle Arena (Wiimote)
+Comment=3D Third-Person Arena Combat Game
+Exec=turtlearena-wiimote
+Terminal=false
+Icon=turtlearena128
+Type=Application
+Categories=Game;ArcadeGame;
