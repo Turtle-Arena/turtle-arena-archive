@@ -10,8 +10,19 @@ This is the main page for how to compile and run Turtle Arena. It may seem a lit
 For all platforms the first step is to get the source code.
 
 == Get the Source ==
-=== Archive ===
-There are  source tarballs on the download page for Turtle Arena 0.4 (and later) released versions. Earlier versions included a zip of the source in main download.
+=== Latest Development ==
+You will need a git client, such as [https://code.google.com/p/tortoisegit/ TortoiseGit] (Windows), [http://www.rabbitvcs.org RabbitVCS] (Linux), or the command line program "git"
+
+Next you will need to do a source checkout, this varies by program.
+
+Code and data are split up, you're recommended to name code repo "engine" and data repo "baseturtle".
+
+  * https://github.com/Turtle-Arena/turtle-arena-code.git
+  * https://github.com/Turtle-Arena/turtle-arena-data.git
+
+=== Released Versions ===
+==== Archives =====
+There are source tarballs on the download page for Turtle Arena 0.4.x, 0.5.x, and 0.6.x versions. Earlier versions included a zip of the source in main download.
 
 Notes;
   * 0.4.x does not include data files or data source files in the tarball, they are in subversion.
@@ -24,11 +35,8 @@ You will need a subversion client, such as [http://tortoisesvn.tigris.org/ Torto
 
 Next you will need to do a source checkout, this varies by program.
 
-Latest development code is located at
-  * http://turtlearena.googlecode.com/svn/trunk/
-
-You can also get the source for released versions
-  * http://turtlearena.googlecode.com/svn/tags/0.6/
+Tags for latest stable release versions
+  * http://turtlearena.googlecode.com/svn/tags/0.6.1/
   * http://turtlearena.googlecode.com/svn/tags/0.4.3/
   * http://turtlearena.googlecode.com/svn/tags/0.2/
 
